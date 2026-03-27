@@ -1,4 +1,4 @@
-# Grupp 8 
+# Grupp GR8
 ---
 ### Sebastian, Elina, Daniel, Jonna, Jennifer, Reza, victoria, Chipego & Anton 
 

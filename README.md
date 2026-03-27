@@ -1,9 +1,6 @@
 # Grupp 8 
 ---
-<<<<<<< Updated upstream
 ### Sebastian, Elina, Daniel, Jonna, Jennifer, Reza, victoria, Chipego & Anton 
-=======
-### Sebastian, Elina, Daniel, Jonna, Jennifer, Reza, victoria, Chipego & Anton
 
 ## Getting Started
 
@@ -22,4 +19,3 @@ The following services will be available:
 - **Frontend**: http://localhost:3000
 - **API**: http://localhost:8080
 - **SQL Server**: localhost:1433
->>>>>>> Stashed changes

@@ -1,7 +1,25 @@
 stages:
   - test
 
+check-merge-source:
+  stage: test
+  script:
+    - |
+      if [ "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" == "main" ] && [ "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" != "staging" ]; then
+        echo "ERROR: Only staging can merge into main"
+        exit 1
+      fi
+      if [ "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" == "staging" ] && [ "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" != "develop" ]; then
+        echo "ERROR: Only develop can merge into staging"
+        exit 1
+      fi
+      echo "Merge source check passed"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
 placeholder:
   stage: test
   script:
     - echo "Pipeline OK"
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event"

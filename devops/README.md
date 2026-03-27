@@ -17,15 +17,15 @@ project/
 ## Branch Strategy
 
 ```
-feature/* → development → stage → main
+feature/* → develop → staging → main
 ```
 
 | Branch      | Purpose                          | Protected | Hosted            |
 |-------------|----------------------------------|-----------|-------------------|
 | main        | Production, deployed to live site | Yes       | Production URL    |
-| stage       | Pre-production testing           | Yes       | Staging URL       |
-| development | Integration branch               | Yes       | —                 |
-| feature/*   | Individual features, branched off development | No | —            |
+| staging     | Pre-production testing           | Yes       | Staging URL       |
+| develop     | Integration branch               | Yes       | —                 |
+| feature/*   | Individual features, branched off develop | No   | —                 |
 | devops      | CI/CD and infrastructure work    | No        | —                 |
 
 ## CI/CD Pipeline

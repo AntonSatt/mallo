@@ -1,13 +1,14 @@
-# Grupp 8 
+# Grupp GR8
 ---
-### Sebastian, Elina, Daniel, Jonna, Jennifer, Reza, victoria, Chipego & Anton
+### Sebastian, Elina, Daniel, Jonna, Jennifer, Reza, victoria, Chipego & Anton 
 
 ## Getting Started
 
-1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+1. Install [Docker](https://docs.docker.com/get-started/get-docker/)
 2. Copy the example environment file and set a password:
    ```
-   cp .env.example .env
+   cp .env.example .env          # Linux/Mac
+   copy .env.example .env        # Windows
    ```
 3. Start all services:
    ```

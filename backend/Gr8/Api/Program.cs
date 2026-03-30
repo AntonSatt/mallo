@@ -13,6 +13,8 @@ namespace Gr8
             // Add services to the container.
             builder.Services.AddAuthorization();
 
+            builder.Services.AddOpenApi();
+
             builder.Services.AddInfrastructure(builder.Configuration);
 
             var app = builder.Build();
@@ -20,6 +22,7 @@ namespace Gr8
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
+                app.MapOpenApi();
                 app.MapScalarApiReference();
             }
 
@@ -28,7 +31,7 @@ namespace Gr8
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.MapCommunityEndpoints();
+            app.MapEndpoints();
 
             app.Run();
         }

@@ -1,4 +1,5 @@
 ﻿using Gr8.Infrastructure.Identity;
+using Gr8.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +14,9 @@ namespace Gr8.Infrastructure
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-            //TODO: Add other infrastructure services here, such as AppDbContext, repositories, etc.
+            // Configure Entity Framework Core to use SQL Server for the CommunityDbContext
+            services.AddDbContext<CommunityDbContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             // Configure ASP.NET Core Identity to use the ApplicationUser and ApplicationRole classes, and to use Entity Framework Core for storage
             services.AddIdentity<ApplicationUser, ApplicationRole>()

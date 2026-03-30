@@ -7,6 +7,9 @@ namespace Gr8.Infrastructure.Persistence
 {
     public class CommunityDbContext : DbContext
     {
-
+        public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
+        {
+            
+        }
     }
 }

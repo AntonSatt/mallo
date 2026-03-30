@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Gr8.Infrastructure.Persistence
 {
-    internal class CommunityDbContext : DbContext
+    public class CommunityDbContext : DbContext
     {
 
     }

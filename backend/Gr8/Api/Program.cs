@@ -1,4 +1,6 @@
+using Gr8.Api.Endpoints;
 using Gr8.Infrastructure;
+using Scalar.AspNetCore;
 
 namespace Gr8
 {
@@ -18,7 +20,7 @@ namespace Gr8
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                //app.MapScalarApiReference();
+                app.MapScalarApiReference();
             }
 
             app.UseHttpsRedirection();
@@ -26,7 +28,7 @@ namespace Gr8
             app.UseAuthentication();
             app.UseAuthorization();
 
-            //TODO: app.MapEndpoints();
+            app.MapCommunityEndpoints();
 
             app.Run();
         }

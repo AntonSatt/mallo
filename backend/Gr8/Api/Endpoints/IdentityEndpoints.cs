@@ -36,9 +36,9 @@ namespace Gr8.Api.Endpoints
                     }
                 });
 
-            app.MapPost("/login", async (SignInManager<ApplicationUser> signInManager, string userName, string password) =>
+            app.MapPost("/login", async (SignInManager<ApplicationUser> signInManager, [FromBody] LoginDto loginDto) =>
                 {
-                    var result = await signInManager.PasswordSignInAsync(userName, password, false, false);
+                    var result = await signInManager.PasswordSignInAsync(loginDto.UserName, loginDto.Password, false, false);
 
                     //TODO: Implement token generation logic after successful login.
                     if (result.Succeeded)

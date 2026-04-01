@@ -57,6 +57,21 @@ namespace Gr8.Api.Endpoints
                     await signInManager.SignOutAsync();
                     return Results.Ok("User logged out successfully.");
                 });
+
+            app.MapDelete("/delete", async (UserManager<ApplicationUser> userManager, string userName) =>
+                {
+                    var appUser = await userManager.FindByNameAsync(userName);
+                    if (appUser == null)
+                    {
+                        return Results.NotFound("User not found.");
+                    }
+                    var result = await userManager.DeleteAsync(appUser);
+
+                    return result.Succeeded
+                        ? Results.Ok("User deleted successfully.")
+                        : Results.BadRequest(result.Errors);
+                })
+                .RequireAuthorization();
         }
     }
 }

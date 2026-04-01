@@ -4,7 +4,8 @@ import Navbar from './components/layout/Navbar'
 import HomePage from './pages/home/HomePage'
 import LoginPage from './pages/login/LoginPage'
 import RegisterPage from './pages/register/RegisterPage'
-  
+import Settings from './pages/Settings'
+
 function App() {
  
 
@@ -16,6 +17,7 @@ function App() {
         <Route path='/' element={<HomePage />} />
         <Route path='/login' element={<LoginPage />} />
         <Route path='/register' element={<RegisterPage />} />
+        <Route path='/settings' element={<Settings />} />
       </Routes>
     </Router>
      

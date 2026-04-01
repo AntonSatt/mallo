@@ -1,6 +1,9 @@
 using Gr8.Api.Endpoints;
 using Gr8.Infrastructure;
 using Scalar.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Gr8
 {
@@ -10,7 +13,25 @@ namespace Gr8
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            var jwtSettings = builder.Configuration.GetSection("Jwt");
+
             // Add services to the container.
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings["Jwt:Issuer"],
+                        ValidAudience = jwtSettings["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(jwtSettings["Jwt:Key"]))
+                    };
+                });
+
             builder.Services.AddAuthorization();
 
             builder.Services.AddCors(options =>

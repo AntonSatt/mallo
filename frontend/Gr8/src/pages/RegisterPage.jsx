@@ -1,9 +1,11 @@
+import React from 'react'
+import RegisterForm from '../components/registerForm/RegisterForm'
+
 const RegisterPage = () => {
     return (
-        <div>
-            <h1>Registrera dig</h1>
-            <p>Här kommer registrerings formuläret ligga.</p>
-        </div>
+        <main>
+            <RegisterForm />
+        </main>
     )
 }
 

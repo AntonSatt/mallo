@@ -1,9 +1,10 @@
 import React from "react";
+import UserServices from "../../services/UserServices";
 
 const LoginForm = () => {
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => { //TODO: Change to useeffect?
     event.preventDefault();
-    console.log("Inloggning lyckades!");
+    UserServices.login(event.target.userName.value, event.target.password.value);
   };
 
   return (

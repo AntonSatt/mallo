@@ -13,6 +13,16 @@ namespace Gr8
             // Add services to the container.
             builder.Services.AddAuthorization();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("ReactApplication", policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
+
             builder.Services.AddOpenApi();
 
             builder.Services.AddInfrastructure(builder.Configuration);
@@ -25,6 +35,8 @@ namespace Gr8
                 app.MapOpenApi();
                 app.MapScalarApiReference();
             }
+
+            app.UseCors("ReactApplication");
 
             app.UseHttpsRedirection();
 

@@ -1,3 +1,7 @@
+using Gr8.Api.Endpoints;
+using Gr8.Infrastructure;
+using Scalar.AspNetCore;
+
 namespace Gr8
 {
     public class Program
@@ -9,14 +13,25 @@ namespace Gr8
             // Add services to the container.
             builder.Services.AddAuthorization();
 
+            builder.Services.AddOpenApi();
+
+            builder.Services.AddInfrastructure(builder.Configuration);
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.MapOpenApi();
+                app.MapScalarApiReference();
+            }
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
+
+            app.MapEndpoints();
 
             app.Run();
         }

@@ -1,3 +1,6 @@
 <Solution>
-  <Project Path="Gr8/Gr8.csproj" />
+  <Project Path="Application/Gr8.Application.csproj" Id="ec911350-d24b-4a8e-a48b-561e52edb97c" />
+  <Project Path="Domain/Gr8.Domain.csproj" Id="30064be6-ee09-45df-9444-8c4f884861af" />
+  <Project Path="Api/Gr8.Api.csproj" />
+  <Project Path="Infrastructure/Gr8.Infrastructure.csproj" Id="1fa947b3-9cba-4f40-85eb-c0c246aee8bf" />
 </Solution>

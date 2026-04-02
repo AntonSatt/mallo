@@ -29,13 +29,13 @@ const UserSettings = () => {
                     Användarnamn:
                     <input type="text" id="userName" name="userName" />
                 </label>
-                <label htmlFor="firstname">
+                <label htmlFor="firstName">
                     Förnamn:
-                    <input type="text" id="firstname" name="firstname" />
+                    <input type="text" id="firstName" name="firstName" />
                 </label>
-                <label htmlFor="lastname">
+                <label htmlFor="lastName">
                     Efternamn:
-                    <input type="text" id="lastname" name="lastname" />
+                    <input type="text" id="lastName" name="lastName" />
                 </label>
                 <label htmlFor="email">
                     Email:

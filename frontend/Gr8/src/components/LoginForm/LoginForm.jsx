@@ -1,10 +1,18 @@
-import React from "react";
+import { useState } from "react";
 import UserServices from "../../services/UserServices";
 
 const LoginForm = () => {
-  const handleSubmit = async (event) => { //TODO: Change to useeffect?
+
+  const [userName, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (event) => { //TODO: Change to useeffect? Usestate?
     event.preventDefault();
-    UserServices.login(event.target.userName.value, event.target.password.value);
+    UserServices.login(userName, password);
+  };
+
+  const handleForgotPassword = () => {
+    // Handle forgot password logic
   };
 
   return (
@@ -14,20 +22,20 @@ const LoginForm = () => {
         <fieldset>
           <p>
             <label htmlFor="userName">Användarnamn </label>
-            <input type="text" id="userName" />
+            <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} placeholder="Användarnamn" />
           </p>
 
           <p>
             <label htmlFor="password">Lösenord </label>
-            <input type="text" id="password" />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Lösenord" />
           </p>
 
           <button type="submit">Logga in</button>
         </fieldset>
-
-        <h3>Glömt ditt lösenord?</h3>
-        <button type="submit">Klicka här</button>
       </form>
+
+      <h3>Glömt ditt lösenord?</h3>
+      <button onClick={handleForgotPassword}>Klicka här</button>
     </section>
   );
 };

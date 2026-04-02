@@ -1,9 +1,12 @@
-﻿using Gr8.Application.DTOs;
+﻿using Gr8.Application.Common.Constants;
+using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Infrastructure.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Gr8.Api.Endpoints
 {
@@ -66,9 +69,9 @@ namespace Gr8.Api.Endpoints
                     return Results.Ok("User logged out successfully.");
                 });
 
-            app.MapDelete("/delete", [Authorize] async (UserManager<ApplicationUser> userManager, string userName) =>
+            app.MapDelete("/delete", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, string userName) =>
                 {
-                    var appUser = await userManager.FindByNameAsync(userName);
+                    var appUser = await userManager.GetUserAsync(user);
                     if (appUser == null)
                     {
                         return Results.NotFound("User not found.");
@@ -79,7 +82,7 @@ namespace Gr8.Api.Endpoints
                         ? Results.Ok("User deleted successfully.")
                         : Results.BadRequest(result.Errors);
                 })
-                .RequireAuthorization();
+                .RequireAuthorization(AuthorizationConstants.JwtOnly);
         }
     }
 }

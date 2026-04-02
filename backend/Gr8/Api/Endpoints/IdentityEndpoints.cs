@@ -74,7 +74,7 @@ namespace Gr8.Api.Endpoints
                 })
                 .RequireAuthorization();
 
-            app.MapPut("/profile-update", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) => 
+            app.MapPut("/user", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) => 
             {
                 var appUser = await userManger.GetUserAsync(user);
 
@@ -96,7 +96,7 @@ namespace Gr8.Api.Endpoints
             })
             .RequireAuthorization();
 
-            app.MapPost("/password-update", async (UserManager<ApplicationUser>  userManger, ClaimsPrincipal user, [FromBody] UpdatePasswordDto updatePasswordDto) => 
+            app.MapPatch("/password", async (UserManager<ApplicationUser>  userManger, ClaimsPrincipal user, [FromBody] UpdatePasswordDto updatePasswordDto) => 
             {
                 var appUser = await userManger.GetUserAsync(user);
 

@@ -2,8 +2,6 @@
 using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Infrastructure.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

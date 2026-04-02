@@ -1,5 +1,7 @@
 ﻿using Gr8.Application.DTOs;
+using Gr8.Application.Interfaces;
 using Gr8.Infrastructure.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +14,7 @@ namespace Gr8.Api.Endpoints
         /// </summary>
         public static void MapIdentityEndpoints(WebApplication app)
         {
-            app.MapPost("/register", async (UserManager<ApplicationUser> userManager, [FromBody] RegisterDto userDto) =>
+            app.MapPost("/register", async (UserManager<ApplicationUser> userManager, IJwtTokenGenerator jwtGenerator, [FromBody] RegisterDto userDto) =>
                 {
                     var user = new ApplicationUser
                     {
@@ -25,30 +27,36 @@ namespace Gr8.Api.Endpoints
 
                     var result = await userManager.CreateAsync(user, userDto.Password);
 
-                    //TODO: Implement token generation logic after successful registration.
-                    if (result.Succeeded)
-                    {
-                        return Results.Ok("User registered successfully.");
-                    }
-                    else
+                    if (!result.Succeeded)
                     {
                         return Results.BadRequest(result.Errors);
                     }
+
+                    var token = jwtGenerator.GenerateToken(user.Id, user.Email);
+
+                    return Results.Ok(new { Token = token, Message = "User registered successfully." });
                 });
 
-            app.MapPost("/login", async (SignInManager<ApplicationUser> signInManager, [FromBody] LoginDto loginDto) =>
+            app.MapPost("/login", async (UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtTokenGenerator jwtGenerator, [FromBody] LoginDto loginDto) =>
                 {
+                    // TODO: Check login agaisnt email, currently only username is supported.
                     var result = await signInManager.PasswordSignInAsync(loginDto.UserName, loginDto.Password, false, false);
 
-                    //TODO: Implement token generation logic after successful login.
-                    if (result.Succeeded)
+                    if (!result.Succeeded)
                     {
-                        return Results.Ok("User logged in successfully.");
+                        return Results.Unauthorized();
                     }
-                    else
+
+                    var user = await userManager.FindByNameAsync(loginDto.UserName);
+
+                    if (user == null)
                     {
-                        return Results.BadRequest("Invalid login attempt.");
+                        return Results.Unauthorized();
                     }
+
+                    var token = jwtGenerator.GenerateToken(user.Id, user.Email!);
+
+                    return Results.Ok(new { Token = token, Message = "User logged in successfully." });
                 });
 
             app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager) =>
@@ -58,7 +66,7 @@ namespace Gr8.Api.Endpoints
                     return Results.Ok("User logged out successfully.");
                 });
 
-            app.MapDelete("/delete", async (UserManager<ApplicationUser> userManager, string userName) =>
+            app.MapDelete("/delete", [Authorize] async (UserManager<ApplicationUser> userManager, string userName) =>
                 {
                     var appUser = await userManager.FindByNameAsync(userName);
                     if (appUser == null)

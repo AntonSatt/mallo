@@ -29,9 +29,13 @@ const UserSettings = () => {
                     Användarnamn:
                     <input type="text" id="userName" name="userName" />
                 </label>
-                <label htmlFor="name">
-                    Namn:
-                    <input type="text" id="name" name="name" />
+                <label htmlFor="firstname">
+                    Förnamn:
+                    <input type="text" id="firstname" name="firstname" />
+                </label>
+                <label htmlFor="lastname">
+                    Efternamn:
+                    <input type="text" id="lastname" name="lastname" />
                 </label>
                 <label htmlFor="email">
                     Email:

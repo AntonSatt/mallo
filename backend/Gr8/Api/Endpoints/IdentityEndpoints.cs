@@ -81,6 +81,45 @@ namespace Gr8.Api.Endpoints
                         : Results.BadRequest(result.Errors);
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPut("/user", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) =>
+                {
+                    var appUser = await userManger.GetUserAsync(user);
+
+                    if (appUser == null)
+                    {
+                        return Results.NotFound("User not found.");
+                    }
+
+                    appUser.UserName = updateProfileDto.Username;
+                    appUser.FirstName = updateProfileDto.FirstName;
+                    appUser.LastName = updateProfileDto.LastName;
+                    appUser.Email = updateProfileDto.Email;
+
+                    var changedProfil = await userManger.UpdateAsync(appUser);
+
+                    return changedProfil.Succeeded
+                    ? Results.Ok("User updated successfully")
+                    : Results.BadRequest(changedProfil.Errors);
+                })
+                .RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPatch("/password", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user, [FromBody] UpdatePasswordDto updatePasswordDto) =>
+                {
+                    var appUser = await userManger.GetUserAsync(user);
+
+                    if (appUser == null)
+                    {
+                        return Results.NotFound("User not found.");
+                    }
+
+                    var changedPassword = await userManger.ChangePasswordAsync(appUser, updatePasswordDto.CurrentPassword, updatePasswordDto.NewPassword);
+
+                    return changedPassword.Succeeded
+                    ? Results.Ok("Password updated successfully")
+                    : Results.BadRequest(changedPassword.Errors);
+                })
+                .RequireAuthorization(AuthorizationConstants.JwtOnly);
         }
     }
 }

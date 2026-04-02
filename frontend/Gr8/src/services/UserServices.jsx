@@ -13,9 +13,11 @@ const UserServices = {
     register: async (userData) => {
         const response = await ApiClient.post("/register", {
             userName: userData.userName,
-            name: userData.name,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
             email: userData.email,
-            password: userData.password
+            password: userData.password,
+            socialNumber: userData.ssn
         });
         const token = response.data.token;
         localStorage.setItem("token", token);

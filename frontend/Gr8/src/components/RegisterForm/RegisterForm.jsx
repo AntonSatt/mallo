@@ -7,7 +7,7 @@ const RegisterForm = () => {
     firstName: "",
     lastName: "",
     ssn: "",
-    username: "",
+    userName: "",
     password: "",
     email: ""
   });
@@ -53,8 +53,8 @@ const RegisterForm = () => {
         </fieldset>
 
         <p>
-          <label htmlFor="username">Användarnamn </label>
-          <input type="text" id="username" value={formData.username} onChange={handleChange} placeholder="Välj ett namn" />
+          <label htmlFor="userName">Användarnamn </label>
+          <input type="text" id="userName" value={formData.userName} onChange={handleChange} placeholder="Välj ett namn" />
         </p>
         <p>
           <label htmlFor="password">Lösenord </label>

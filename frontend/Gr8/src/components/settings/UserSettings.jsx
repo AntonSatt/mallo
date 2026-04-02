@@ -25,9 +25,9 @@ const UserSettings = () => {
         <>
             <form onSubmit={handleSubmit}>
                 <h2>Användarinställningar</h2>
-                <label htmlFor="username">
+                <label htmlFor="userName">
                     Användarnamn:
-                    <input type="text" id="username" name="username" />
+                    <input type="text" id="userName" name="userName" />
                 </label>
                 <label htmlFor="name">
                     Namn:

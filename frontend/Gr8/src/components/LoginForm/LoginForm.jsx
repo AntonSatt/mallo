@@ -1,14 +1,24 @@
 import { useState } from "react";
-import UserServices from "../../services/UserServices";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 const LoginForm = () => {
-
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (event) => { //TODO: Change to useeffect? Usestate?
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    UserServices.login(userName, password);
+    setError("");
+    try {
+      await login({ userName, password });
+      navigate('/');
+    } catch (err) {
+      setError(err.message || 'Login failed');
+    }
   };
 
   const handleForgotPassword = () => {
@@ -18,6 +28,7 @@ const LoginForm = () => {
   return (
     <section>
       <h2>Logga in</h2>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <fieldset>
           <p>

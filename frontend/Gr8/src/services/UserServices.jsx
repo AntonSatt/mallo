@@ -1,21 +1,21 @@
 import ApiClient from "../api/ApiClient";
 
 const UserServices = {
-    login: async (userName, password) => {
+    login: async (credentials) => {
         const response = await ApiClient.post("/login", {
-            userName: userName,
-            password: password
+            userName: credentials.userName,
+            password: credentials.password
         });
         const token = response.data.token;
         localStorage.setItem("token", token);
         return response.data;
     },
-    register: async (userName, name, email, password) => {
+    register: async (userData) => {
         const response = await ApiClient.post("/register", {
-            userName: userName,
-            name: name,
-            email: email,
-            password: password
+            userName: userData.userName,
+            name: userData.name,
+            email: userData.email,
+            password: userData.password
         });
         const token = response.data.token;
         localStorage.setItem("token", token);
@@ -24,8 +24,8 @@ const UserServices = {
     logout: () => {
         localStorage.removeItem("token");
     },
-    delete: async (userName) => {
-        const response = await ApiClient.delete("/delete", userName);
+    delete: async (userData) => {
+        const response = await ApiClient.delete("/delete", userData);
         this.logout();
         return response.data;
     }

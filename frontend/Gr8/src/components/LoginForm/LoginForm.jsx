@@ -1,5 +1,6 @@
 import React from "react";
 import UserServices from "../../services/UserServices";
+import {Button} from "@mui/material"
 
 const LoginForm = () => {
   const handleSubmit = async (event) => { //TODO: Change to useeffect?
@@ -14,19 +15,21 @@ const LoginForm = () => {
         <fieldset>
           <p>
             <label htmlFor="userName">Användarnamn </label>
-            <input type="text" id="userName" />
+            <input type="text" id="userName" name="userName"/>
           </p>
 
           <p>
             <label htmlFor="password">Lösenord </label>
-            <input type="text" id="password" />
+            <input type="password" id="password" name="password"/>
           </p>
 
-          <button type="submit">Logga in</button>
+          <Button type="submit" variant="contained" color="primary">
+            Logga in
+          </Button>
         </fieldset>
 
         <h3>Glömt ditt lösenord?</h3>
-        <button type="submit">Klicka här</button>
+        <Button type="button" variant="outlined" color="secondary">Klicka här</Button>
       </form>
     </section>
   );

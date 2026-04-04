@@ -1,4 +1,5 @@
 import React from "react";
+import Button from "@mui/material/Button";
 
 const RegisterForm = () => {
   const handleSubmit = (event) => {
@@ -14,32 +15,32 @@ const RegisterForm = () => {
           <legend>Personuppgifter</legend>
           <p>
             <label htmlFor="firstName">Förnamn </label>
-            <input type="text" id="firstName" />
+            <input type="text" id="firstName" name="firstName" />
           </p>
           <p>
             <label htmlFor="lastName">Efternamn </label>
-            <input type="text" id="lastName" />
+            <input type="text" id="lastName" name="lastName" />
           </p>
           <p>
             <label htmlFor="ssn">Personnummer </label>
-            <input type="text" id="ssn" placeholder="ÅÅMMDD" />
+            <input type="text" id="ssn" name="ssn" placeholder="ÅÅMMDD" />
           </p>
         </fieldset>
 
         <p>
           <label htmlFor="username">Användarnamn </label>
-          <input type="text" id="username" placeholder="Välj ett namn" />
+          <input type="text" id="username" name="username" placeholder="Välj ett namn" />
         </p>
         <p>
           <label htmlFor="password">Lösenord </label>
-          <input type="text" id="password" placeholder="Välj ett lösenord" />
+          <input type="text" id="password" name="password" placeholder="Välj ett lösenord" />
         </p>
         <p>
           <label htmlFor="email">Email </label>
-          <input type="text" id="email" placeholder="exempel@exempel.com" />
+          <input type="text" id="email" name="email" placeholder="exempel@exempel.com" />
         </p>
 
-        <button type="submit">Registrera dig</button>
+        <Button type="submit" variant="contained" color="primary">Registrera dig</Button>
       </form>
     </section>
   );

@@ -43,3 +43,17 @@ placeholder:
 ```
 
 This is a temporary pipeline to satisfy GitLab's "Pipeline must succeed" merge check. It will be replaced with real jobs (linting, testing, building, deploying) as the project progresses.
+
+## Jira Integration
+
+New feature! We now have Jira integrated into our project! 
+
+Using it:
+
+From this point, just include the Jira issue key in your work:
+
+- Branch name example: `feature/UT8-42-add-login`
+- Commit message: `UT8-42 implement auth endpoint`
+- MR title: `UT8-42: Add user authentication`
+
+

@@ -56,4 +56,4 @@ From this point, just include the Jira issue key in your work:
 - Commit message: `UT8-42 implement auth endpoint`
 - MR title: `UT8-42: Add user authentication`
 
-
+Testing

@@ -2,6 +2,7 @@
 using Gr8.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Gr8.Api.Endpoints
 {
@@ -38,6 +39,17 @@ namespace Gr8.Api.Endpoints
 
             app.MapPost("/login", async (SignInManager<ApplicationUser> signInManager, [FromBody] LoginDto loginDto) =>
                 {
+
+                    var context = new ValidationContext(loginDto);
+                    var results = new List<ValidationResult>();
+
+                    bool isValid = Validator.TryValidateObject(loginDto, context, results, true);
+
+                    if (!isValid)
+                    {
+                        return Results.BadRequest(results);
+                    }
+
                     var result = await signInManager.PasswordSignInAsync(loginDto.UserName, loginDto.Password, false, false);
 
                     //TODO: Implement token generation logic after successful login.

@@ -1,8 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { Dialog } from "@mui/material";
-import { DialogTitle } from "@mui/material";
-import { DialogActions } from "@mui/material";
+import { Dialog, DialogTitle, DialogActions, Button} from "@mui/material";
 
 const UserSettings = () => {
     const [open, setOpen] = useState(false);
@@ -45,18 +43,20 @@ const UserSettings = () => {
                     Lösenord:
                     <input type="password" id="password" name="password" />
                 </label>
-                <button type="submit">Spara inställningar</button>
+                <Button type="submit" variant="contained" color="primary">
+                    Spara inställningar
+                </Button>
 
-                <button type="delete" onClick={handleClickOpen}>
+                <Button variant="outlined" color="error" onClick={handleClickOpen}>
                     Ta bort konto
-                </button>
+                </Button>
             </form>
             
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Är du säker på att du vill ta bort ditt konto?</DialogTitle>
                 <DialogActions>
-                    <button onClick={handleClose}>Avbryt</button>
-                    <button onClick={handleClose} id="deleteUser">Ja, ta bort konto</button>
+                    <Button variant="text " color="inherit" onClick={handleClose}>Avbryt</Button>
+                    <Button variant="contained" color="error"  onClick={handleClose} id="deleteUser">Ja, ta bort konto</Button>
                 </DialogActions>
             </Dialog>
         </>

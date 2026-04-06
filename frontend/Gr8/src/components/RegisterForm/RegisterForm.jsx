@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import { Button } from "@mui/material"
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -40,32 +41,32 @@ const RegisterForm = () => {
           <legend>Personuppgifter</legend>
           <p>
             <label htmlFor="firstName">Förnamn </label>
-            <input type="text" id="firstName" value={formData.firstName} onChange={handleChange} />
+            <input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} />
           </p>
           <p>
             <label htmlFor="lastName">Efternamn </label>
-            <input type="text" id="lastName" value={formData.lastName} onChange={handleChange} />
+            <input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} />
           </p>
           <p>
             <label htmlFor="ssn">Personnummer </label>
-            <input type="text" id="ssn" value={formData.ssn} onChange={handleChange} placeholder="ÅÅMMDD" />
+            <input type="text" id="ssn" name="ssn" value={formData.ssn} onChange={handleChange} placeholder="ÅÅMMDD" />
           </p>
         </fieldset>
 
         <p>
           <label htmlFor="userName">Användarnamn </label>
-          <input type="text" id="userName" value={formData.userName} onChange={handleChange} placeholder="Välj ett namn" />
+          <input type="text" id="userName" name="userName" value={formData.userName} onChange={handleChange} placeholder="Välj ett namn" />
         </p>
         <p>
           <label htmlFor="password">Lösenord </label>
-          <input type="password" id="password" value={formData.password} onChange={handleChange} placeholder="Välj ett lösenord" />
+          <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} placeholder="Välj ett lösenord" />
         </p>
         <p>
           <label htmlFor="email">Email </label>
-          <input type="email" id="email" value={formData.email} onChange={handleChange} placeholder="exempel@exempel.com" />
+          <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} placeholder="exempel@exempel.com" />
         </p>
 
-        <button type="submit">Registrera dig</button>
+        <Button type="submit" variant="contained" color="primary">Registrera dig</Button>
       </form>
     </section>
   );

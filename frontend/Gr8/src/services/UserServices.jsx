@@ -9,6 +9,8 @@ const UserServices = {
             console.log(response);
         });
     }
+
+    //TODO: add registerData. use async/await?
 };
 
 export default UserServices

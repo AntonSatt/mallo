@@ -9,15 +9,21 @@ const LoginForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    
+    setError("");
 
-    if (!userName || !password) 
+    if (!userName.trim() || !password) 
     {
-      setError("Username and password are required")
+      setError("Användarnamn och lösenord måste vara ifyllda.")
       return;
     }
 
-    setError("");
-    await UserServices.login(userName, password);
+    try {
+      await UserServices.login(userName, password);
+    } catch(err){
+      console.error(err)
+      setError("Fel användarnamn eller lösenord.");
+    }
   };
 
   return (

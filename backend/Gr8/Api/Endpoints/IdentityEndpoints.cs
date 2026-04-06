@@ -15,6 +15,16 @@ namespace Gr8.Api.Endpoints
         {
             app.MapPost("/register", async (UserManager<ApplicationUser> userManager, [FromBody] RegisterDto userDto) =>
                 {
+                    var context = new ValidationContext(userDto);
+                    var results = new List<ValidationResult>();
+
+                    bool isValid = Validator.TryValidateObject(userDto, context, results, true);
+
+                    if (!isValid)
+                    {
+                        return Results.BadRequest(results);
+                    }
+
                     var user = new ApplicationUser
                     {
                         UserName = userDto.UserName,
@@ -39,7 +49,6 @@ namespace Gr8.Api.Endpoints
 
             app.MapPost("/login", async (SignInManager<ApplicationUser> signInManager, [FromBody] LoginDto loginDto) =>
                 {
-
                     var context = new ValidationContext(loginDto);
                     var results = new List<ValidationResult>();
 

@@ -1,15 +1,19 @@
 import React, {useState} from "react";
-import UserServices from "../../services/UserServices";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { Button } from "@mui/material"
+
 
 const LoginForm = () => {
-
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
     setError("");
 
     if (!userName.trim() || !password) 
@@ -19,11 +23,15 @@ const LoginForm = () => {
     }
 
     try {
-      await UserServices.login(userName, password);
-    } catch(err){
-      console.error(err)
-      setError("Fel användarnamn eller lösenord.");
+      await login({ userName, password });
+      navigate('/');
+    } catch (err) {
+      setError(err.message || 'Fel användarnamn eller lösenord.');
     }
+  };
+
+  const handleForgotPassword = () => {
+    // Handle forgot password logic
   };
 
   return (
@@ -34,22 +42,25 @@ const LoginForm = () => {
           <p>
             <label htmlFor="userName">Användarnamn </label>
             <input type="text" id="userName" name="userName"
-            value={userName} onChange={(event) => setUserName(event.target.value)} /> {/* controlled inputs*/}
+            value={userName} onChange={(event) => setUserName(event.target.value)} placeholder="Användarnamn" />
           </p>
 
           <p>
             <label htmlFor="password">Lösenord </label>
             <input type="password" id="password" name="password" 
-            value={password} onChange={(event) => setPassword(event.target.value)}/>
+            value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Lösenord" />
           </p>
 
           {error && <p>{error}</p>} 
-
-          <button type="submit">Logga in</button>
+          <Button type="submit" variant="contained" color="primary">
+            Logga in
+          </Button>
         </fieldset>
 
         <h3>Glömt ditt lösenord?</h3>
-        <button type="button">Klicka här</button>
+        <Button type="button" variant="outlined" color="secondary" onClick={handleForgotPassword}>
+          Klicka här
+        </Button>
       </form>
     </section>
   );

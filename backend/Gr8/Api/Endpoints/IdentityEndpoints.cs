@@ -62,7 +62,6 @@ namespace Gr8.Api.Endpoints
 
             app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager) =>
                 {
-                    //TODO: Implement token revocation logic in frontend.
                     await signInManager.SignOutAsync();
                     return Results.Ok("User logged out successfully.");
                 });

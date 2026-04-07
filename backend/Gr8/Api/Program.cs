@@ -1,6 +1,8 @@
 using Gr8.Api.Endpoints;
+using Gr8.Application.Common.Constants;
 using Gr8.Infrastructure;
 using Scalar.AspNetCore;
+using Gr8.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -13,10 +15,14 @@ namespace Gr8
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            var jwtSettings = builder.Configuration.GetSection("Jwt");
+            var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 
             // Add services to the container.
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -25,14 +31,28 @@ namespace Gr8
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = jwtSettings["Jwt:Issuer"],
-                        ValidAudience = jwtSettings["Jwt:Audience"],
+                        ValidIssuer = jwtSettings.Issuer,
+                        ValidAudience = jwtSettings.Audience,
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(jwtSettings["Jwt:Key"]))
+                            Encoding.UTF8.GetBytes(jwtSettings.Key))
                     };
                 });
 
-            builder.Services.AddAuthorization();
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy(AuthorizationConstants.JwtOnly, policy =>
+                {
+                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+                    policy.RequireAuthenticatedUser();
+                });
+
+                //TODO: Add Admin role
+                //options.AddPolicy(AuthorizationConstants.AdminOnly, policy =>
+                //{
+                //    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+                //    policy.RequireRole("Admin");
+                //});
+            });
 
             builder.Services.AddCors(options =>
             {

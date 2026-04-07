@@ -1,4 +1,5 @@
-﻿using Gr8.Infrastructure.Identity;
+﻿using Gr8.Application.Interfaces;
+using Gr8.Infrastructure.Identity;
 using Gr8.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,12 @@ namespace Gr8.Infrastructure
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            // Configure JWT settings and register the JWT token generator service
+            var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>();
+
+            services.AddSingleton<JwtSettings>(jwtSettings);
+            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
             return services;
         }

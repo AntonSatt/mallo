@@ -48,11 +48,10 @@ const LoginForm = () => {
         </fieldset>
 
         <h3>Glömt ditt lösenord?</h3>
-        <Button type="button" variant="outlined" color="secondary">Klicka här</Button>
+        <Button type="button" variant="outlined" color="secondary" onClick={handleForgotPassword}>
+          Klicka här
+        </Button>
       </form>
-
-      <h3>Glömt ditt lösenord?</h3>
-      <button onClick={handleForgotPassword}>Klicka här</button>
     </section>
   );
 };

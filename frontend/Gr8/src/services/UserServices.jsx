@@ -31,6 +31,8 @@ const UserServices = {
         this.logout();
         return response.data;
     }
+
+    //TODO: add registerData. use async/await?
 };
 
 export default UserServices

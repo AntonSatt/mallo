@@ -5,6 +5,7 @@ using Gr8.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.ComponentModel.DataAnnotations;
 
 namespace Gr8.Api.Endpoints
 {
@@ -17,6 +18,16 @@ namespace Gr8.Api.Endpoints
         {
             app.MapPost("/register", async (UserManager<ApplicationUser> userManager, IJwtTokenGenerator jwtGenerator, [FromBody] RegisterDto userDto) =>
                 {
+                    var context = new ValidationContext(userDto);
+                    var results = new List<ValidationResult>();
+
+                    bool isValid = Validator.TryValidateObject(userDto, context, results, true);
+
+                    if (!isValid)
+                    {
+                        return Results.BadRequest(results);
+                    }
+
                     var user = new ApplicationUser
                     {
                         UserName = userDto.UserName,
@@ -40,7 +51,18 @@ namespace Gr8.Api.Endpoints
 
             app.MapPost("/login", async (UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtTokenGenerator jwtGenerator, [FromBody] LoginDto loginDto) =>
                 {
-                    // TODO: Check login agaisnt email, currently only username is supported.
+                    var context = new ValidationContext(loginDto);
+                    var results = new List<ValidationResult>();
+
+                    bool isValid = Validator.TryValidateObject(loginDto, context, results, true);
+
+                    if (!isValid)
+                    {
+                        return Results.BadRequest(results);
+                    }
+
+            app.MapPost("/login", async (UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtTokenGenerator jwtGenerator, [FromBody] LoginDto loginDto) =>
+                {
                     var result = await signInManager.PasswordSignInAsync(loginDto.UserName, loginDto.Password, false, false);
 
                     if (!result.Succeeded)

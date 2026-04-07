@@ -1,7 +1,8 @@
-import { useState } from "react";
+import React, {useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { Button } from "@mui/material"
+
 
 const LoginForm = () => {
   const [userName, setUserName] = useState("");
@@ -14,11 +15,18 @@ const LoginForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
+
+    if (!userName.trim() || !password) 
+    {
+      setError("Användarnamn och lösenord måste vara ifyllda.")
+      return;
+    }
+
     try {
       await login({ userName, password });
       navigate('/');
     } catch (err) {
-      setError(err.message || 'Login failed');
+      setError(err.message || 'Fel användarnamn eller lösenord.');
     }
   };
 
@@ -29,19 +37,21 @@ const LoginForm = () => {
   return (
     <section>
       <h2>Logga in</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <fieldset>
           <p>
             <label htmlFor="userName">Användarnamn </label>
-            <input type="text" id="userName" name="userName" value={userName} onChange={(e) => setUserName(e.target.value)} placeholder="Användarnamn" />
+            <input type="text" id="userName" name="userName"
+            value={userName} onChange={(event) => setUserName(event.target.value)} placeholder="Användarnamn" />
           </p>
 
           <p>
             <label htmlFor="password">Lösenord </label>
-            <input type="password" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Lösenord" />
+            <input type="password" id="password" name="password" 
+            value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Lösenord" />
           </p>
 
+          {error && <p>{error}</p>} 
           <Button type="submit" variant="contained" color="primary">
             Logga in
           </Button>

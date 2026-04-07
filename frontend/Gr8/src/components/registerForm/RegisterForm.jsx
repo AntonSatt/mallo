@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { Button } from "@mui/material"
 
+
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -12,6 +13,7 @@ const RegisterForm = () => {
     password: "",
     email: ""
   });
+
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
@@ -24,47 +26,85 @@ const RegisterForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
+
+    if (
+      !formData.userName.trim() ||
+      !formData.firstName.trim() ||
+      !formData.lastName.trim() ||
+      !formData.ssn.trim() ||
+      !formData.email.trim() ||
+      !formData.password
+    ) {
+      setError("Alla fält måste vara ifyllda.");
+      return;
+    }
+
+    if (formData.ssn.length !==8 || !(/^\d+$/.test(formData.ssn)))
+      {
+        setError("Personnummer måste ha 8 siffror.");
+        return;
+      }
+
+    if (formData.password.length < 8) //TODO: add more password requirements
+    {
+      setError("Lösenord måste ha minst 8 tecken.");
+      return;
+    }
+
+    if (!formData.email.includes("@"))
+    {
+      setError("Ogiltig e-post.");
+      return;
+    }
+
     try {
       await register(formData);
       navigate('/');
     } catch (err) {
-      setError(err.message || 'Registration failed');
+      setError(err.message || 'Registrering misslyckades. Försök igen.');
     }
   };
-
+    
   return (
     <section>
       <h2>Skapa konto</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <fieldset>
           <legend>Personuppgifter</legend>
           <p>
             <label htmlFor="firstName">Förnamn </label>
-            <input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} />
+            <input type="text" id="firstName" name="firstName" 
+            value={formData.firstName} onChange={handleChange}/>
           </p>
           <p>
             <label htmlFor="lastName">Efternamn </label>
-            <input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} />
+            <input type="text" id="lastName" name="lastName" 
+            value={formData.lastName} onChange={handleChange}/>
           </p>
           <p>
             <label htmlFor="ssn">Personnummer </label>
-            <input type="text" id="ssn" name="ssn" value={formData.ssn} onChange={handleChange} placeholder="ÅÅMMDD" />
+            <input type="text" id="ssn" name="ssn" placeholder="ÅÅÅÅMMDD"  
+            value={formData.ssn} onChange={handleChange}/>
           </p>
         </fieldset>
 
         <p>
           <label htmlFor="userName">Användarnamn </label>
-          <input type="text" id="userName" name="userName" value={formData.userName} onChange={handleChange} placeholder="Välj ett namn" />
+          <input type="text" id="userName" name="userName" placeholder="Välj ett namn" 
+          value={formData.userName} onChange={handleChange}/>
         </p>
         <p>
           <label htmlFor="password">Lösenord </label>
-          <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} placeholder="Välj ett lösenord" />
+          <input type="password" id="password" name="password" placeholder="Välj ett lösenord" 
+          value={formData.password} onChange={handleChange}/>
         </p>
         <p>
           <label htmlFor="email">Email </label>
-          <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} placeholder="exempel@exempel.com" />
+          <input type="email" id="email" name="email" placeholder="exempel@exempel.com"  
+          value={formData.email} onChange={handleChange}/>
         </p>
+
+        {error && <p>{error}</p>}
 
         <Button type="submit" variant="contained" color="primary">Registrera dig</Button>
       </form>

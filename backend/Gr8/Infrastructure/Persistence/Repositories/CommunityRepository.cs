@@ -15,10 +15,14 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             _communityDbContext = communityDbContext;
         }
 
-        public async Task<int> AddAsync(Post post)
+        public async Task AddAsync(Post post)
         {
-           _communityDbContext.Posts.Add(post);
-           return await _communityDbContext.SaveChangesAsync();
+            _communityDbContext.Posts.Add(post);
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _communityDbContext.SaveChangesAsync();
         }
     }
 }

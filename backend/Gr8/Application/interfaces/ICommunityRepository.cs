@@ -7,6 +7,7 @@ namespace Gr8.Application.Interfaces
 {
     public interface ICommunityRepository
     {
-        Task<int> AddAsync(Post post);
+        Task AddAsync(Post post);
+        Task<int> SaveChangesAsync();
     }
 }

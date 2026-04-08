@@ -61,8 +61,6 @@ namespace Gr8.Api.Endpoints
                         return Results.BadRequest(results);
                     }
 
-            app.MapPost("/login", async (UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtTokenGenerator jwtGenerator, [FromBody] LoginDto loginDto) =>
-                {
                     var result = await signInManager.PasswordSignInAsync(loginDto.UserName, loginDto.Password, false, false);
 
                     if (!result.Succeeded)

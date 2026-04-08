@@ -26,9 +26,18 @@ const UserServices = {
     logout: () => {
         localStorage.removeItem("token");
     },
-    delete: async (userData) => {
-        const response = await ApiClient.delete("/delete", userData);
-        this.logout();
+    delete: async () => {
+        const response = await ApiClient.delete("/delete");
+        UserServices.logout();
+        return response.data;
+    },
+    update: async (userData) => {
+        const response = await ApiClient.put("/update", {
+            userName: userData.userName,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            email: userData.email,
+        });
         return response.data;
     }
 

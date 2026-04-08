@@ -88,7 +88,7 @@ namespace Gr8.Api.Endpoints
                     return Results.Ok("User logged out successfully.");
                 });
 
-            app.MapDelete("/delete", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, string userName) =>
+            app.MapDelete("/delete", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user) =>
                 {
                     var appUser = await userManager.GetUserAsync(user);
                     if (appUser == null)

@@ -22,8 +22,13 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
+  const deleteAccount = async () => {
+    await UserServices.delete();
+    setIsAuthenticated(false);
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, register, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, register, logout, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );

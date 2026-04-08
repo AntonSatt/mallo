@@ -61,7 +61,6 @@ const PostForm = () => {
 
   return (
     <>
-      {/* <dialog>   */}
       <form>
         <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
           <AccountCircle sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
@@ -107,7 +106,6 @@ const PostForm = () => {
           Posta ditt inlägg
         </Button>
       </form>
-      {/* </dialog> */}
     </>
   );
 };

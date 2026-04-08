@@ -6,7 +6,7 @@ import Navbar from './components/layout/Navbar'
 import HomePage from './pages/home/HomePage'
 import LoginPage from './pages/login/LoginPage'
 import RegisterPage from './pages/register/RegisterPage'
-import Settings from './pages/Settings'
+import Settings from './pages/settings/SettingsPage'
 import ForumPage from './pages/forum/ForumPage'
 
 function App() {

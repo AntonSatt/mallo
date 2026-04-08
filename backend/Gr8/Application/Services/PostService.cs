@@ -1,5 +1,5 @@
 ﻿using Gr8.Application.DTOs;
-using Gr8.Application.interfaces;
+using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
 using System;
 using System.Collections.Generic;

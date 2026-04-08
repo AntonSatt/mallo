@@ -1,5 +1,4 @@
-﻿using Gr8.Application.interfaces;
-using Gr8.Application.Interfaces;
+﻿using Gr8.Application.Interfaces;
 using Gr8.Application.Services;
 using Gr8.Infrastructure.Identity;
 using Gr8.Infrastructure.Persistence;

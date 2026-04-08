@@ -20,6 +20,8 @@ namespace Gr8.Infrastructure.Persistence
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<ApplicationUser>().ToTable("AspNetUsers");
+
             modelBuilder.Entity<Post>()
                 .HasOne<ApplicationUser>()
                 .WithMany()

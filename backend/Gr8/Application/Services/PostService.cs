@@ -16,20 +16,22 @@ namespace Gr8.Application.Services
             _communityRepository = communityRepository;
         }
 
-        public async Task<PostDto> CreateAsync(PostDto postDto, string userId)
+        public async Task<PostDto?> CreateAsync(PostDto postDto, string userId)
         {
             var post = new Post(userId)
             {
                 Content = postDto.Content
             };
 
-            var result = await _communityRepository.AddAsync(post);
+            await _communityRepository.AddAsync(post);
+            var result = await _communityRepository.SaveChangesAsync();
 
             if (result > 0)
             {
                 return postDto;
             }
-            return null; // Error handling?
+
+            return null;
         }
     }
 }

@@ -23,13 +23,10 @@ import PostServices from "../../services/PostServices";
 const ForumPage = () => {
     const [expanded, setExpanded] = useState(false);
     const [open, setOpen] = useState(false);
-
-    const [posts, setPosts] = useState([
-        
-    ]);
+    const [posts, setPosts] = useState([]);
 
     const ExpandMore = styled((props) => {
-        const { expand, ...other } = props;
+        const { ...other } = props;
         return <IconButton {...other} />;
     })(({ theme, expand }) => ({
         marginLeft: "auto",
@@ -55,7 +52,7 @@ const ForumPage = () => {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const data = await PostServices.getAll();               
+                const data = await PostServices.getAll();
 
                 const allPosts = data.map((post) => ({
                     id: post.id,
@@ -67,12 +64,12 @@ const ForumPage = () => {
             } catch (error) {
                 console.error("Error fetching posts:", error);
             } finally {
-                setLoading(false);
+                // setLoading(false);
             }
         };
 
         fetchPosts();
-    }, []);
+    }, [posts]);
 
     return (
         <>

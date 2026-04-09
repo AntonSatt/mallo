@@ -1,22 +1,23 @@
 import React, { useState } from "react";
+import PostServices from "../../services/PostServices";
 // Page is not implemeted to backend yet, so this is just a mockup of the form.
 
 //import { useNavigate } from "react-router-dom";
 //import { Button, Dialog, DialogTitle, DialogAction, Box } from "@mui/material"
-import { 
-    Input,
-    InputLabel,
-    InputAdornment,
-    TextField,
-    Box,
-    OutlinedInput,
-    MenuItem,
-    ListItemText,
-    Select,
-    FormControl,
-    Button
+import {
+  Input,
+  InputLabel,
+  InputAdornment,
+  TextField,
+  Box,
+  OutlinedInput,
+  MenuItem,
+  ListItemText,
+  Select,
+  FormControl,
+  Button
 } from "@mui/material"
-import { AccountCircle} from "@mui/icons-material"
+import { AccountCircle } from "@mui/icons-material"
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 
@@ -32,22 +33,46 @@ const MenuProps = {
     },
   },
 };
+const tagOptions = ["Fråga", "Svar", "Diskussion", "Nyheter", "Tips"];
+const postForm = () => {
+  const [postData, setPostData] = useState({
+    postTitle: "",
+    postContent: "",
+    postTag: ""
+  });
 
-const tagOptions = [
-    "Självskada",
-    "Ångest",
-    "Depression",
-    "Våld",
-    "Sexuella övergrepp",
-    "Missbruk",
-    "Trauma",
-    "Misshandel",
-    "Psykisk ohälsa"
-];
-
-
-const PostForm = () => {
   const [selectedTags, setSelectedTags] = useState([]);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
+
+    if (
+      !postData.postTitle.trim() ||
+      !postData.postContent.trim() ||
+      !postData.postTag.trim()
+    ) {
+      setError("Alla fält måste vara ifyllda.");
+      return;
+    }
+
+    if (postData.postContent.length < 1) {
+      setError("Posten måste innehålla minst 1 tecken.");
+      return;
+    }
+
+    if (postData.postTag.length < 1) {
+      setError("Inlägget måste innehålla minst 1 tagg.");
+      return;
+    }
+
+    try {
+      await register(postData);
+      navigate('/');
+    } catch (err) {
+      setError(err.message || 'Registrering misslyckades. Försök igen.');
+    }
+  };
 
   const handleChange = (event) => {
     const {
@@ -64,13 +89,19 @@ const PostForm = () => {
       <form>
         <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
           <AccountCircle sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
-          <TextField 
+          <TextField
             fullWidth
-            id="outlined-multiline-flexible"
+            value={postForm.postTitle}
+            onChange={(e) => setPostData({ ...postData, postTitle: e.target.value })}
+          />
+          <TextField
+            fullWidth
+            value={postForm.postContent}
+            onChange={(e) => setPostData({ ...postData, postContent: e.target.value })}
             label="Skriv ditt inlägg här..."
             multiline
             maxRows={6}
-          /> 
+          />
         </Box>
         <div>
           <FormControl sx={{ m: 3, width: 300 }}>
@@ -102,9 +133,7 @@ const PostForm = () => {
             </Select>
           </FormControl>
         </div>
-        <Button variant="contained" color="primary">
-          Posta ditt inlägg
-        </Button>
+        <Button variant="contained" onClick={handleSubmit} id="submitPost">Lägg upp inlägg</Button>
       </form>
     </>
   );

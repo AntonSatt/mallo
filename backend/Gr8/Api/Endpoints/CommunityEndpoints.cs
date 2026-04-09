@@ -14,43 +14,71 @@ namespace Gr8.Api.Endpoints
     {
         public static void MapCommunityEndpoints(WebApplication app)
         {
-            app.MapGet("/forum/posts/{PostId}/comments/", async (int postId, ICommentService commentService) => 
+            app.MapPost("/forum/post", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, IPostService postService, PostDto postDto) =>
                 {
-                    var comments = await commentService.GetCommentsByPostAsync(postId);
-
-                    if (comments.Count == 0)
+                    var appUser = await userManager.GetUserAsync(user);
+                    if (appUser == null)
                     {
-                        return Results.NoContent();
+                        return Results.NotFound("User not found.");
                     }
 
-                    return Results.Ok(comments);
-                })
-                .RequireAuthorization(AuthorizationConstants.JwtOnly);
-
-            app.MapPost("/forum/posts/{PostId}/comments", async (int postId, ICommentService commentService, UserManager<ApplicationUser> userManager, CommentDto commentDto, ClaimsPrincipal user) => 
-                {
-                    var context = new ValidationContext(commentDto);
+                    var context = new ValidationContext(postDto);
                     var results = new List<ValidationResult>();
 
-                    bool isValid = Validator.TryValidateObject(commentDto, context, results, true);
+                    bool isValid = Validator.TryValidateObject(postDto, context, results, true);
 
                     if (!isValid)
                     {
                         return Results.BadRequest(results);
                     }
 
-                    var appUser = await userManager.GetUserAsync(user);
-
-                    if (appUser == null)
+                    var result = await postService.CreateAsync(postDto, appUser.Id);
+                    if (result != null)
                     {
-                        return Results.Unauthorized();
+                        return Results.Ok(result);
                     }
 
-                    var comment = await commentService.CreateAsync(commentDto, postId, appUser.Id);
+                    return Results.BadRequest("Failed to create post.");
+                })
+                .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-                    return Results.Ok(comment); 
+            app.MapGet("/forum/posts/{PostId}/comments/", async (int postId, ICommentService commentService) =>
+            {
+                var comments = await commentService.GetCommentsByPostAsync(postId);
 
-                }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+                if (comments.Count == 0)
+                {
+                    return Results.NoContent();
+                }
+
+                return Results.Ok(comments);
+            })
+              .RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPost("/forum/posts/{PostId}/comments", async (int postId, ICommentService commentService, UserManager<ApplicationUser> userManager, CommentDto commentDto, ClaimsPrincipal user) =>
+            {
+                var context = new ValidationContext(commentDto);
+                var results = new List<ValidationResult>();
+
+                bool isValid = Validator.TryValidateObject(commentDto, context, results, true);
+
+                if (!isValid)
+                {
+                    return Results.BadRequest(results);
+                }
+
+                var appUser = await userManager.GetUserAsync(user);
+
+                if (appUser == null)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var comment = await commentService.CreateAsync(commentDto, postId, appUser.Id);
+
+                return Results.Ok(comment);
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
         }
     }
 }

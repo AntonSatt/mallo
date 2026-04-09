@@ -16,7 +16,7 @@ namespace Gr8.Application.Services
             _communityRepository = communityRepository;
         }
 
-        public async Task<PostDto> CreateAsync(PostDto postDto, string userId)
+        public async Task<PostDto?> CreateAsync(PostDto postDto, string userId)
         {
             var post = new Post(userId)
             {
@@ -30,7 +30,8 @@ namespace Gr8.Application.Services
             {
                 return postDto;
             }
-            return null; // Error handling?
+
+            return null;
         }
     }
 }

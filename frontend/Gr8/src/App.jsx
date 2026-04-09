@@ -6,7 +6,8 @@ import Navbar from './components/layout/Navbar'
 import HomePage from './pages/home/HomePage'
 import LoginPage from './pages/login/LoginPage'
 import RegisterPage from './pages/register/RegisterPage'
-import Settings from './pages/Settings'
+import Settings from './pages/settings/SettingsPage'
+import ForumPage from './pages/forum/ForumPage'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path='/login' element={<LoginPage />} />
           <Route path='/register' element={<RegisterPage />} />
           <Route path='/settings' element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path='/forum' element={<ProtectedRoute><ForumPage /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

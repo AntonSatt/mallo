@@ -17,6 +17,7 @@ const Navbar = () => {
                 {isAuthenticated ? (
                     <>
                         <li><NavLink to="/settings">Inställningar</NavLink></li>
+                        <li><NavLink to="/forum">Forum</NavLink></li>
                         <li><button onClick={logout}>Logga ut</button></li>
                     </>
                 ) : (

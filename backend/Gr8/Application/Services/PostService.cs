@@ -23,7 +23,8 @@ namespace Gr8.Application.Services
                 Content = postDto.Content
             };
 
-            var result = await _communityRepository.AddAsync(post);
+            await _communityRepository.AddPostAsync(post);
+            var result = await _communityRepository.SaveChangesAsync();
 
             if (result > 0)
             {

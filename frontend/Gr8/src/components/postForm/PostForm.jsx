@@ -34,12 +34,13 @@ const MenuProps = {
   },
 };
 const tagOptions = ["Fråga", "Svar", "Diskussion", "Nyheter", "Tips"];
-const postForm = () => {
+const PostForm = () => {
   const [postData, setPostData] = useState({
     postTitle: "",
     postContent: "",
     postTag: ""
   });
+  const [error, setError] = useState("");
 
   const [selectedTags, setSelectedTags] = useState([]);
 
@@ -67,8 +68,7 @@ const postForm = () => {
     }
 
     try {
-      await register(postData);
-      navigate('/');
+      // await register(postData);
     } catch (err) {
       setError(err.message || 'Registrering misslyckades. Försök igen.');
     }
@@ -86,17 +86,18 @@ const postForm = () => {
 
   return (
     <>
+      {error && <p>{error}</p>}
       <form>
         <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
           <AccountCircle sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
           <TextField
             fullWidth
-            value={postForm.postTitle}
+            value={postData.postTitle}
             onChange={(e) => setPostData({ ...postData, postTitle: e.target.value })}
           />
           <TextField
             fullWidth
-            value={postForm.postContent}
+            value={postData.postContent}
             onChange={(e) => setPostData({ ...postData, postContent: e.target.value })}
             label="Skriv ditt inlägg här..."
             multiline
@@ -140,5 +141,3 @@ const postForm = () => {
 };
 
 export default PostForm;
-
-

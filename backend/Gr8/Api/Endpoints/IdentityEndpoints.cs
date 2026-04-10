@@ -101,9 +101,9 @@ namespace Gr8.Api.Endpoints
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPut("/user", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) =>
+            app.MapPut("/user", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) =>
                 {
-                    var appUser = await userManger.GetUserAsync(user);
+                    var appUser = await userManager.GetUserAsync(user);
 
                     if (appUser == null)
                     {
@@ -115,7 +115,7 @@ namespace Gr8.Api.Endpoints
                     appUser.LastName = updateProfileDto.LastName;
                     appUser.Email = updateProfileDto.Email;
 
-                    var changedProfil = await userManger.UpdateAsync(appUser);
+                    var changedProfil = await userManager.UpdateAsync(appUser);
 
                     return changedProfil.Succeeded
                     ? Results.Ok("User updated successfully")
@@ -123,16 +123,16 @@ namespace Gr8.Api.Endpoints
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPatch("/password", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user, [FromBody] UpdatePasswordDto updatePasswordDto) =>
+            app.MapPatch("/password", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdatePasswordDto updatePasswordDto) =>
                 {
-                    var appUser = await userManger.GetUserAsync(user);
+                    var appUser = await userManager.GetUserAsync(user);
 
                     if (appUser == null)
                     {
                         return Results.NotFound("User not found.");
                     }
 
-                    var changedPassword = await userManger.ChangePasswordAsync(appUser, updatePasswordDto.CurrentPassword, updatePasswordDto.NewPassword);
+                    var changedPassword = await userManager.ChangePasswordAsync(appUser, updatePasswordDto.CurrentPassword, updatePasswordDto.NewPassword);
 
                     return changedPassword.Succeeded
                     ? Results.Ok("Password updated successfully")

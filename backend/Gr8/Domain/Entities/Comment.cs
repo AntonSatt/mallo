@@ -8,8 +8,10 @@ namespace Gr8.Domain.Entities
     {
         public int Id { get; set; }
         public string Content { get; set; } = null!;
-        public bool isEdited { get; set; }
-        public bool isDeleted { get; set; }
+        public bool IsEdited { get; set; } = false;
+        public bool IsDeleted { get; set; } = false;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt {  get; set; }
 
         public int PostId { get; set; }
         public Post Post { get; set; } = null!;

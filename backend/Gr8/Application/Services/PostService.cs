@@ -33,5 +33,21 @@ namespace Gr8.Application.Services
 
             return null;
         }
+
+        public async Task<List<PostDto>> GetAllPostsAsync()
+        {
+            var posts = await _communityRepository.GetAllPostsAsync();
+
+            return posts.Select(p => new PostDto 
+            {
+                Title = p.Title,
+                Content = p.Content,
+                CreatedAt = p.CreatedAt,
+                UpdatedAt = p.UpdatedAt,
+                IsDeleted = p.IsDeleted,
+                IsEdited = p.IsEdited
+            })
+            .ToList();
+        }
     }
 }

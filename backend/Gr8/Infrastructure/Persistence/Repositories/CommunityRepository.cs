@@ -16,6 +16,11 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             _communityDbContext = communityDbContext;
         }
 
+        public async Task<List<Post>> GetAllPostsAsync() 
+        {
+            return await _communityDbContext.Posts.ToListAsync();
+        }
+        
         public async Task AddPostAsync(Post post)
         {
             await _communityDbContext.Posts.AddAsync(post);

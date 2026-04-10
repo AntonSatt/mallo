@@ -12,5 +12,6 @@ namespace Gr8.Application.Interfaces
         Task<int> SaveChangesAsync();
         Task<List<Comment>> GetCommentsByPostAsync(int postId);
         Task AddCommentAsync(Comment comment);
+        Task <List<Post>> GetAllPostsAsync();
     }
 }

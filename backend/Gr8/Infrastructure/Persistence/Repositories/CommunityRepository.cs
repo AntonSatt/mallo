@@ -40,5 +40,15 @@ namespace Gr8.Infrastructure.Persistence.Repositories
         {
             await _communityDbContext.Comments.AddAsync(comment);
         }
+
+        public async Task<List<Category>> GetAllCategoriesAsync()
+        {
+            return await _communityDbContext.Categories.ToListAsync();
+        }
+
+        public async Task<List<Tag>> GetAllTagsAsync()
+        {
+            return await _communityDbContext.Tags.ToListAsync();
+        }
     }
 }

@@ -49,27 +49,27 @@ const ForumPage = () => {
         setExpanded(!expanded);
     };
 
-    useEffect(() => {
-        const fetchPosts = async () => {
-            try {
-                const data = await PostServices.getAll();
+    // useEffect(() => {
+    //     const fetchPosts = async () => {
+    //         try {
+    //             const data = await PostServices.getAll();
 
-                const allPosts = data.map((post) => ({
-                    id: post.id,
-                    title: post.title,
-                    content: posts.length > 0 ? posts[0].content : "Innehåll saknas",
-                }));
+    //             const allPosts = data.map((post) => ({
+    //                 id: post.id,
+    //                 title: post.title,
+    //                 content: posts.length > 0 ? posts[0].content : "Innehåll saknas",
+    //             }));
 
-                setPosts([...allPosts, ...posts]);
-            } catch (error) {
-                console.error("Error fetching posts:", error);
-            } finally {
-                // setLoading(false);
-            }
-        };
+    //             setPosts([...allPosts, ...posts]);
+    //         } catch (error) {
+    //             console.error("Error fetching posts:", error);
+    //         } finally {
+    //             // setLoading(false);
+    //         }
+    //     };
 
-        fetchPosts();
-    }, [posts]);
+    //     fetchPosts();
+    // }, [posts]);
 
     return (
         <>

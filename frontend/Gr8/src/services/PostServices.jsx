@@ -17,6 +17,14 @@ const PostServices = {
     getAll: async () => {
         const response = await ApiClient.get("/forum/posts");
         return response.data;
+    },
+    getTags: async () => {
+        const response = await ApiClient.get("/forum/tags");
+        return response.data;
+    },
+    getCategories: async () => {
+        const response = await ApiClient.get("/forum/categories");
+        return response.data;
     }
 };
 

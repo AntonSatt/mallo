@@ -16,9 +16,9 @@ namespace Gr8.Application.Services
             _communityRepository = communityRepository;
         }
 
-        public async Task<PostDto?> CreateAsync(PostDto postDto, string userId)
+        public async Task<PostDto?> CreateAsync(PostDto postDto, string userId) //Add categoryId and tags
         {
-            var post = new Post(userId)
+            var post = new Post(userId, 0, new List<Tag>())
             {
                 Content = postDto.Content
             };

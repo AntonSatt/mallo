@@ -4,6 +4,7 @@ using Gr8.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gr8.Infrastructure.Migrations.CommunityDb
 {
     [DbContext(typeof(CommunityDbContext))]
-    partial class CommunityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260410100859_AddTagAndCategoriesToPost")]
+    partial class AddTagAndCategoriesToPost
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,7 +39,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
 
                     b.HasData(
                         new
@@ -98,7 +101,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Post", b =>
@@ -142,7 +145,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Posts", (string)null);
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Tag", b =>
@@ -159,7 +162,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags", (string)null);
+                    b.ToTable("Tags");
 
                     b.HasData(
                         new

@@ -12,6 +12,7 @@ namespace Gr8.Infrastructure.Persistence
         public DbSet<Post> Posts => Set<Post>();
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<Comment> Comments => Set<Comment>();
+        public DbSet<Category> Categories => Set<Category>();
 
         public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
         {
@@ -21,38 +22,54 @@ namespace Gr8.Infrastructure.Persistence
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Tag>().HasData(
-                new Tag { Name = "Självskada" },
-                new Tag { Name = "Ångest" },
-                new Tag { Name = "Depression" },
-                new Tag { Name = "Våld" },
-                new Tag { Name = "Sexuella övergrepp" },
-                new Tag { Name = "Missbruk" },
-                new Tag { Name = "Trauma" },
-                new Tag { Name = "Misshandel" },
-                new Tag { Name = "Psykisk ohälsa" },
-                new Tag { Name = "Mobbning" },
-                new Tag { Name = "Abort" },
-                new Tag { Name = "Graviditet" },
-                new Tag { Name = "Barnlöshet" },
-                new Tag { Name = "Missfall" },
-                new Tag { Name = "IVF" },
-                new Tag { Name = "Förlust" },
-                new Tag { Name = "PSOS" },
-                new Tag { Name = "Ätstörning" },
-                new Tag { Name = "Suicidtankar" },
-                new Tag { Name = "Relation" }
+                new Tag { Name = "Självskada", Id = 1 },
+                new Tag { Name = "Ångest", Id = 2 },
+                new Tag { Name = "Depression", Id = 3 },
+                new Tag { Name = "Våld", Id = 4 },
+                new Tag { Name = "Sexuella övergrepp", Id = 5 },
+                new Tag { Name = "Missbruk", Id = 6 },
+                new Tag { Name = "Trauma", Id = 7 },
+                new Tag { Name = "Misshandel", Id = 8 },
+                new Tag { Name = "Psykisk ohälsa", Id = 9 },
+                new Tag { Name = "Mobbning", Id = 10 },
+                new Tag { Name = "Abort", Id = 11 },
+                new Tag { Name = "Graviditet", Id = 12 },
+                new Tag { Name = "Barnlöshet", Id = 13 },
+                new Tag { Name = "Missfall", Id = 14 },
+                new Tag { Name = "IVF", Id = 15 },
+                new Tag { Name = "Förlust", Id = 16 },
+                new Tag { Name = "PCOS", Id = 17 },
+                new Tag { Name = "Ätstörning", Id = 18 },
+                new Tag { Name = "Suicidtankar", Id = 19 },
+                new Tag { Name = "Relation", Id = 20 }
                 );
 
             modelBuilder.Entity<Category>().HasData(
-                new Category { Name = "Djur"},
-                new Category { Name = "Generell" },
-                new Category { Name = "Relation" }
+                new Category { Name = "Djur", Id = 1 },
+                new Category { Name = "Generell", Id = 2 },
+                new Category { Name = "Relation", Id = 3 }
                 );
 
             base.OnModelCreating(modelBuilder);
 
+            // Map ApplicationUser to AspNetUsers table
             modelBuilder.Entity<ApplicationUser>().ToTable("AspNetUsers");
 
+            // Configure many-to-many relationship between Post and Tag
+            modelBuilder.Entity<Post>()
+                .HasMany(p => p.Tags)
+                .WithMany(t => t.Posts)
+                .UsingEntity(j => j.ToTable("PostTags"));
+
+            // Configure one-to-many relationship between Category and Post
+            modelBuilder.Entity<Post>()
+                .HasOne(p => p.Category)
+                .WithMany(c => c.Posts)
+                .HasForeignKey(p => p.CategoryId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure one-to-many relationship between ApplicationUser and Post
             modelBuilder.Entity<Post>()
                 .HasOne<ApplicationUser>()
                 .WithMany()

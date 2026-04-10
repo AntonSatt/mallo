@@ -34,6 +34,8 @@ const MenuProps = {
   },
 };
 const tagOptions = ["Fråga", "Svar", "Diskussion", "Nyheter", "Tips"];
+const categoryOptions = ["Allmänt", "Teknik", "Hälsa", "Resor", "Mat"];
+
 const PostForm = () => {
   const [postData, setPostData] = useState({
     postTitle: "",
@@ -43,32 +45,44 @@ const PostForm = () => {
   const [error, setError] = useState("");
 
   const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState([]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
 
-    if (
-      !postData.postTitle.trim() ||
-      !postData.postContent.trim() ||
-      !postData.postTag.trim()
-    ) {
-      setError("Alla fält måste vara ifyllda.");
-      return;
-    }
+    // if (
+    //   !postData.postTitle.trim() ||
+    //   !postData.postContent.trim() ||
+    //   !postData.postTag.trim()
+    // ) {
+    //   setError("Alla fält måste vara ifyllda.");
+    //   return;
+    // }
 
-    if (postData.postContent.length < 1) {
-      setError("Posten måste innehålla minst 1 tecken.");
-      return;
-    }
+    // if (postData.postTitle.length < 1 || postData.postTitle.length > 50) {
+    //   setError("Titeln måste innehålla minst 1 och max 50 tecken.");
+    //   return;
+    // }
 
-    if (postData.postTag.length < 1) {
-      setError("Inlägget måste innehålla minst 1 tagg.");
-      return;
-    }
+    // if (postData.postContent.length < 1) {
+    //   setError("Posten måste innehålla minst 1 tecken.");
+    //   return;
+    // }
+
+    // if (postData.postTag.length < 1) {
+    //   setError("Inlägget måste innehålla minst 1 tagg.");
+    //   return;
+    // }
+
+    // if (selectedCategory.length < 1) {
+    //   setError("Inlägget måste innehålla minst 1 kategori.");
+    //   return;
+    // }
 
     try {
-      // await register(postData);
+      const result = await PostServices.create(postData);
+      console.log("Post created successfully:", result);
     } catch (err) {
       setError(err.message || 'Registrering misslyckades. Försök igen.');
     }
@@ -84,17 +98,30 @@ const PostForm = () => {
     );
   };
 
+  const handleChangeCategory = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedCategory(
+      // On autofill we get a stringified value.
+      typeof value === 'string' ? value.split(',') : value,
+    );
+  };
+
   return (
     <>
       {error && <p>{error}</p>}
       <form>
-        <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
-          <AccountCircle sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
-          <TextField
-            fullWidth
-            value={postData.postTitle}
-            onChange={(e) => setPostData({ ...postData, postTitle: e.target.value })}
-          />
+        <div>
+          <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
+            <TextField
+              fullWidth
+              value={postData.postTitle}
+              onChange={(e) => setPostData({ ...postData, postTitle: e.target.value })}
+              label="Titel"
+            /></Box>
+        </div>
+        <div>
           <TextField
             fullWidth
             value={postData.postContent}
@@ -103,7 +130,37 @@ const PostForm = () => {
             multiline
             maxRows={6}
           />
-        </Box>
+        </div>
+        <div>
+          <FormControl sx={{ m: 3, width: 300 }}>
+            <InputLabel id="demo-multiple-checkbox-label">Kategorier</InputLabel>
+            <Select
+              labelId="demo-multiple-checkbox-label"
+              id="demo-multiple-checkbox"
+              multiple
+              value={selectedCategory}
+              onChange={handleChangeCategory}
+              input={<OutlinedInput label="Category" />}
+              renderValue={(selected) => selected.join(', ')}
+              MenuProps={MenuProps}
+            >
+              {categoryOptions.map((category) => {
+                const selected = selectedCategory.includes(category);
+                const SelectionIcon = selected ? CheckBoxIcon : CheckBoxOutlineBlankIcon;
+
+                return (
+                  <MenuItem key={category} value={category}>
+                    <SelectionIcon
+                      fontSize="small"
+                      style={{ marginRight: 8, padding: 9, boxSizing: 'content-box' }}
+                    />
+                    <ListItemText primary={category} />
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+        </div>
         <div>
           <FormControl sx={{ m: 3, width: 300 }}>
             <InputLabel id="demo-multiple-checkbox-label">Taggar</InputLabel>
@@ -113,7 +170,7 @@ const PostForm = () => {
               multiple
               value={selectedTags}
               onChange={handleChange}
-              input={<OutlinedInput label="Tag" />}
+              input={<OutlinedInput label="Taggar" />}
               renderValue={(selected) => selected.join(', ')}
               MenuProps={MenuProps}
             >
@@ -134,8 +191,12 @@ const PostForm = () => {
             </Select>
           </FormControl>
         </div>
-        <Button variant="contained" onClick={handleSubmit} id="submitPost">Lägg upp inlägg</Button>
-      </form>
+        <Button variant="contained"
+          onClick={handleSubmit}
+          id="submitPost"
+          style={{ marginRight: 8 }}>
+          Lägg upp inlägg</Button>
+      </form >
     </>
   );
 };

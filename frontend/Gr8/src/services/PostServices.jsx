@@ -5,8 +5,8 @@ const PostServices = {
         const response = await ApiClient.post("/forum/posts", {
             title: postData.postTitle,
             content: postData.postContent,
-            tag: postData.selectedTags,
-            category: postData.selectedCategory
+            categoryId: postData.categoryId,
+            tagIds: postData.tagsIds
         });
         return response.data;
     },

@@ -7,7 +7,6 @@ namespace Gr8.Domain.Entities
     public class Report
     {
         public int Id { get; set; }
-
         public string ReportedByUserId { get; private set; } = null!;
 
         public int? PostId { get; set; }

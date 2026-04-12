@@ -13,6 +13,7 @@ namespace Gr8.Infrastructure.Persistence
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<Comment> Comments => Set<Comment>();
         public DbSet<Category> Categories => Set<Category>();
+        public DbSet<Report> Reports => Set<Report>();
 
         public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
         {
@@ -95,6 +96,40 @@ namespace Gr8.Infrastructure.Persistence
                        .HasForeignKey(c => c.ParentCommentId)
                        .OnDelete(DeleteBehavior.NoAction);
                });
+
+            modelBuilder.Entity<Report>(entity =>
+                {
+                    entity.Property(r => r.Reason)
+                    .IsRequired();
+
+                    entity.Property(r => r.Status)
+                    .IsRequired();
+
+                    entity.Property(r => r.CreatedAt)
+                    .IsRequired();
+
+                    entity.HasOne<ApplicationUser>()
+                    .WithMany()
+                    .HasForeignKey(r => r.ReportedByUserId)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                    entity.HasOne(r => r.Post)
+                    .WithMany()
+                    .HasForeignKey(r => r.PostId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                    entity.HasOne(r => r.Comment)
+                    .WithMany()
+                    .HasForeignKey(r => r.CommentId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+
+
+
+
+
+                });
         }
     }
 }

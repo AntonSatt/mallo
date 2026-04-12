@@ -124,11 +124,10 @@ namespace Gr8.Infrastructure.Persistence
                     .HasForeignKey(r => r.CommentId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-
-
-
-
-
+                    entity.HasOne<ApplicationUser>()
+                    .WithMany()
+                    .HasForeignKey(r => r.ReviewedByAdminId)
+                    .OnDelete(DeleteBehavior.Restrict);
                 });
         }
     }

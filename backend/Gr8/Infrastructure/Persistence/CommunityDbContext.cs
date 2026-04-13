@@ -22,6 +22,8 @@ namespace Gr8.Infrastructure.Persistence
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Tag>().HasData(
                 new Tag { Name = "Självskada", Id = 1 },
                 new Tag { Name = "Ångest", Id = 2 },
@@ -50,8 +52,6 @@ namespace Gr8.Infrastructure.Persistence
                 new Category { Name = "Generell", Id = 2 },
                 new Category { Name = "Relation", Id = 3 }
                 );
-
-            base.OnModelCreating(modelBuilder);
 
             // Map ApplicationUser to AspNetUsers table
             modelBuilder.Entity<ApplicationUser>().ToTable("AspNetUsers");

@@ -95,14 +95,14 @@ namespace Gr8.Api.Endpoints
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPost("/forum/report", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IReportService reportService, [FromBody] ReportDto reportDto, int postId) => 
+            app.MapPost("/forum/report", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IReportService reportService, [FromBody] ReportDto reportDto) => 
             {
                 var context = new ValidationContext(reportDto);
                 var results = new List<ValidationResult>();
 
                 bool isValid = Validator.TryValidateObject(reportDto, context, results, true);
 
-                if (!isValid)
+                if (!isValid || (reportDto.PostId == null && reportDto.CommentId == null))
                 {
                     return Results.BadRequest(results);
                 }

@@ -8,6 +8,6 @@ namespace Gr8.Application.Interfaces
     public interface IReportService
     {
         Task<ReportDto> CreateAsync(ReportDto reportDto, string userId);
-        Task<List<ReportDto>> GetReportByAsync(string userId);
+        //Task<List<ReportDto>> GetReportByUserIdAsync(string userId);
     }
 }

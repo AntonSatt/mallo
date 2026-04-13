@@ -117,12 +117,12 @@ namespace Gr8.Infrastructure.Persistence
                     entity.HasOne(r => r.Post)
                     .WithMany()
                     .HasForeignKey(r => r.PostId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.NoAction);
 
                     entity.HasOne(r => r.Comment)
                     .WithMany()
                     .HasForeignKey(r => r.CommentId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.NoAction);
 
                     entity.HasOne<ApplicationUser>()
                     .WithMany()

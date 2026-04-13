@@ -33,3 +33,11 @@ frontend-lint:
     - npm run lint
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+backend-lint:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:10.0
+  script:
+    - dotnet format backend/Gr8/Gr8.slnx --verify-no-changes
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"

@@ -19,7 +19,7 @@ namespace Gr8.Domain.Entities
 
         public string? Description { get; set; }
 
-        public string Status { get; set; } = null!;
+        public string Status { get; set; } = null!; //add enums for pending, reviews etc.
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 

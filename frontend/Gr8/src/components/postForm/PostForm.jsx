@@ -32,13 +32,12 @@ const MenuProps = {
 
 const PostForm = () => {
   const [postData, setPostData] = useState({
-    postTitle: "",
-    postContent: ""
+    title: "",
+    content: "",
+    tags: [],
+    categoryId: ""
   });
   const [error, setError] = useState("");
-
-  const [tagIds, setTagIds] = useState([]);
-  const [categoryId, setCategoryId] = useState("");
 
   const [tags, setTags] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -47,41 +46,25 @@ const PostForm = () => {
     event.preventDefault();
     setError("");
 
-    if (!postData.postTitle.trim() ||
-      !postData.postContent.trim() ||
-      tagIds.length < 1 ||
-      !categoryId) {
+    if (!postData.title.trim() ||
+      !postData.content.trim() ||
+      postData.tags.length < 1 ||
+      !postData.categoryId) {
       setError("Alla fält måste vara ifyllda.");
       return;
     }
 
-    if (postData.postTitle.length < 1 || postData.postTitle.length > 50) {
+    if (postData.title.length < 1 || postData.title.length > 50) {
       setError("Titeln måste innehålla minst 1 och max 50 tecken.");
       return;
     }
 
-    const payload = {
-      postTitle: postData.postTitle,
-      postContent: postData.postContent,
-      tagsIds: tagIds,
-      categoryId: categoryId
-    };
     try {
-      const result = await PostServices.create(payload);
+      const result = await PostServices.create(postData);
       console.log("Post created successfully:", result);
     } catch (err) {
       setError(err.message || 'Inlägg skapades inte. Försök igen.');
     }
-  };
-
-  const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setTagIds(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
-    );
   };
 
   useEffect(() => {
@@ -113,21 +96,21 @@ const PostForm = () => {
   return (
     <>
       {error && <p>{error}</p>}
-      <form onClick={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <div>
           <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
             <TextField
               fullWidth
-              value={postData.postTitle}
-              onChange={(e) => setPostData({ ...postData, postTitle: e.target.value })}
+              value={postData.title}
+              onChange={(e) => setPostData({ ...postData, title: e.target.value })}
               label="Titel"
             /></Box>
         </div>
         <div>
           <TextField
             fullWidth
-            value={postData.postContent}
-            onChange={(e) => setPostData({ ...postData, postContent: e.target.value })}
+            value={postData.content}
+            onChange={(e) => setPostData({ ...postData, content: e.target.value })}
             label="Skriv ditt inlägg här..."
             multiline
             maxRows={6}
@@ -137,8 +120,8 @@ const PostForm = () => {
           <FormControl sx={{ m: 3, width: 300 }}>
             <InputLabel id="demo-multiple-checkbox-label">Kategorier</InputLabel>
             <Select
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
+              value={postData.categoryId}
+              onChange={(e) => setPostData({ ...postData, categoryId: e.target.value })}
               label="Kategori"
             >
               {categories.map(category => (
@@ -151,11 +134,11 @@ const PostForm = () => {
         </div>
         <div>
           <FormControl sx={{ m: 3, width: 300 }}>
-            <InputLabel id="demo-multiple-checkbox-label">Taggar</InputLabel>
+            <InputLabel id="demo-multiple-checkbox-label">Trigger</InputLabel>
             <Select
               multiple
-              value={tagIds}
-              onChange={handleChange}
+              value={postData.tags}
+              onChange={(e) => setPostData({ ...postData, tags: e.target.value })}
               input={<OutlinedInput label="Taggar" />}
               renderValue={(selected) =>
                 selected
@@ -164,7 +147,7 @@ const PostForm = () => {
               }
             >
               {tags.map(tag => {
-                const selected = tagIds.includes(tag.id);
+                const selected = postData.tags.includes(tag.id);
                 const Icon = selected ? CheckBoxIcon : CheckBoxOutlineBlankIcon;
 
                 return (

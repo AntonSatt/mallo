@@ -5,8 +5,6 @@ stages:
 include:
   - template: Security/Secret-Detection.gitlab-ci.yml
 
-# [SV] Här har vi tagit bort reglerna för 'staging' och ersatt dem med en regel som säger att endast 'develop' får mergeas till 'main'. Allt annat stoppas.
-# [EN] Ensure that only the develop branch can be merged into main.
 check-merge-source:
   stage: test
   script:
@@ -25,3 +23,13 @@ placeholder:
     - echo "Pipeline OK"
   rules:
     - if: $CI_PIPELINE_SOURCE != "merge_request_event"
+
+frontend-lint:
+  stage: test
+  image: node:22-alpine
+  script:
+    - cd frontend/Gr8
+    - npm install
+    - npm run lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"

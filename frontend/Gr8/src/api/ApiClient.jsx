@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { notifyAuthExpired } from '../services/AuthServices';
 
 const ApiClient = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -25,6 +26,7 @@ ApiClient.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             localStorage.removeItem("token"); // remove invalid token
+            notifyAuthExpired();
         }
         return Promise.reject(error);
     }

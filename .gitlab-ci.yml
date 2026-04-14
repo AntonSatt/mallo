@@ -1,12 +1,14 @@
 stages:
   - test
   - secret-detection
+  - build
+  - deploy
+  - cleanup
 
 include:
   - template: Security/Secret-Detection.gitlab-ci.yml
 
-# [SV] Här har vi tagit bort reglerna för 'staging' och ersatt dem med en regel som säger att endast 'develop' får mergeas till 'main'. Allt annat stoppas.
-# [EN] Ensure that only the develop branch can be merged into main.
+# Only develop can be merged into main
 check-merge-source:
   stage: test
   script:
@@ -19,9 +21,109 @@ check-merge-source:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
-placeholder:
-  stage: test
-  script:
-    - echo "Pipeline OK"
+# ---------------------------------------------------------------------------
+# Build stage: build images, push to GitLab Container Registry with buildx cache
+# ---------------------------------------------------------------------------
+
+.build-image: &build-image
+  stage: build
+  image: docker:29
+  services:
+    - docker:29-dind
+  before_script:
+    - docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
+    - docker buildx create --use --name builder --driver docker-container || true
   rules:
-    - if: $CI_PIPELINE_SOURCE != "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+build frontend:
+  <<: *build-image
+  script:
+    - |
+      if [ "$CI_COMMIT_REF_NAME" = "$CI_DEFAULT_BRANCH" ]; then TAG=latest; else TAG=$CI_COMMIT_REF_SLUG; fi
+      docker buildx build \
+        -f frontend/Gr8/Dockerfile \
+        -t "$CI_REGISTRY_IMAGE/frontend:$TAG" \
+        --cache-from=type=registry,ref="$CI_REGISTRY_IMAGE/frontend:cache-$TAG" \
+        --cache-from=type=registry,ref="$CI_REGISTRY_IMAGE/frontend:cache-latest" \
+        --cache-to=type=registry,ref="$CI_REGISTRY_IMAGE/frontend:cache-$TAG",mode=max \
+        --provenance=false --push frontend/Gr8
+
+build backend:
+  <<: *build-image
+  script:
+    - |
+      if [ "$CI_COMMIT_REF_NAME" = "$CI_DEFAULT_BRANCH" ]; then TAG=latest; else TAG=$CI_COMMIT_REF_SLUG; fi
+      docker buildx build \
+        -f backend/Gr8/Dockerfile \
+        -t "$CI_REGISTRY_IMAGE/backend:$TAG" \
+        --cache-from=type=registry,ref="$CI_REGISTRY_IMAGE/backend:cache-$TAG" \
+        --cache-from=type=registry,ref="$CI_REGISTRY_IMAGE/backend:cache-latest" \
+        --cache-to=type=registry,ref="$CI_REGISTRY_IMAGE/backend:cache-$TAG",mode=max \
+        --provenance=false --push backend/Gr8
+
+build python-utils:
+  <<: *build-image
+  script:
+    - docker buildx build -t "$CI_REGISTRY_IMAGE/python-utils:latest" --push devops/scripts
+  rules:
+    - if: $CI_COMMIT_BRANCH
+
+# ---------------------------------------------------------------------------
+# Deploy stage
+# ---------------------------------------------------------------------------
+
+# Review deploy: develop + every feature branch. NOT main.
+deploy review:
+  stage: deploy
+  image: $CI_REGISTRY_IMAGE/python-utils:latest
+  needs:
+    - job: build frontend
+    - job: build backend
+    - job: build python-utils
+      optional: true
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
+    on_stop: stop_review
+  script:
+    - cd devops/scripts
+    - python deploy.py
+  rules:
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+
+# Production deploy: only on main, manual approval gate
+deploy production:
+  stage: deploy
+  image: $CI_REGISTRY_IMAGE/python-utils:latest
+  needs:
+    - job: build frontend
+    - job: build backend
+    - job: build python-utils
+      optional: true
+  environment:
+    name: production
+    url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-main.doe25.swarm.chas-lab.dev
+  script:
+    - cd devops/scripts
+    - python deploy.py
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
+
+# ---------------------------------------------------------------------------
+# Cleanup: manual stack teardown for review environments
+# ---------------------------------------------------------------------------
+
+stop_review:
+  stage: cleanup
+  image: $CI_REGISTRY_IMAGE/python-utils:latest
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    action: stop
+  script:
+    - cd devops/scripts
+    - python delete-stack.py
+  rules:
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+      when: manual

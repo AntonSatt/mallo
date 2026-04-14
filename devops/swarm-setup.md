@@ -1,122 +1,84 @@
-# Docker Swarm CD Setup
+# Swarm setup
 
-Temporary CD pipeline targeting the school's Portainer + Docker Swarm cluster.
-Will be replaced by Kubernetes manifests (see `devops/k8s/`) in ~2–3 weeks. Once k8s is in place, this file can be deleted.
+Notes on how the current CD pipeline works. We're on the school's Portainer + Docker Swarm for now, moving to Kubernetes later. Delete this file when we do.
 
----
+## How it flows
 
-## Architecture
+Push to any branch → GitLab CI builds the images and pushes them to the GitLab registry → `deploy.py` talks to Portainer and creates (or updates) a Swarm stack for that branch → Traefik picks up the new services and gives them a URL.
 
-```
-git push to any branch
-      ↓
-GitLab CI pipeline runs
-      ↓ build
-images pushed to GitLab Container Registry
-      ↓ deploy
-deploy.py → Portainer API
-      ↓
-Portainer creates/updates a Swarm stack for the branch
-      ↓
-Traefik routes:
-  https://gr8-<branch-slug>.doe25.swarm.chas-lab.dev      → frontend
-  https://api.gr8-<branch-slug>.doe25.swarm.chas-lab.dev  → backend
-```
+Stack name is `gr8-<branch-slug>`. Has to be short because Swarm caps network names at 63 chars and it appends `_internal` to ours.
 
-**Stack name:** `gr8-<CI_COMMIT_REF_SLUG>` (kept short to stay under Swarm's 63-char network name limit).
+Image tag is `latest` on main, otherwise the branch slug.
 
-**Image tag:** `latest` on `main`, otherwise the branch's `CI_COMMIT_REF_SLUG`.
+## Pipeline
 
----
+`.gitlab-ci.yml` has these stages:
 
-## Pipeline stages (`.gitlab-ci.yml`)
+- `test` — the old check that only lets develop merge into main
+- `secret-detection` — GitLab's built-in scan
+- `build` — builds frontend, backend, and the python-utils image. Uses buildx with registry cache so rebuilds are fast.
+- `deploy`
+  - `deploy review` runs automatically on every branch except main
+  - `deploy production` only on main, and it's manual (approval gate)
+- `cleanup`
+  - `stop_review` tears down the stack. Manual in the UI, but GitLab also fires it automatically when the MR closes.
 
-1. **test** — `check-merge-source` (only `develop` → `main` allowed)
-2. **secret-detection** — GitLab template scan
-3. **build** — buildx builds with registry cache:
-   - `build frontend` → `$CI_REGISTRY_IMAGE/frontend:<tag>`
-   - `build backend` → `$CI_REGISTRY_IMAGE/backend:<tag>`
-   - `build python-utils` → `$CI_REGISTRY_IMAGE/python-utils:latest` (runs every push so `deploy` always finds the image)
-4. **deploy**
-   - `deploy review` — all branches except `main`. Environment `review/$CI_COMMIT_REF_SLUG` with `on_stop: stop_review`.
-   - `deploy production` — only on `main`, **manual trigger** (approval gate).
-5. **cleanup**
-   - `stop_review` — manual teardown. Auto-fires when the MR is merged/closed (GitLab environment `on_stop`).
+## Scripts
 
----
+In `devops/scripts/`:
 
-## Deploy scripts (`devops/scripts/`)
+- `deploy.py` — logs into Portainer, looks up the Swarm endpoint, envsubsts the compose file, then either creates the stack or updates it if one with the same name already exists.
+- `delete-stack.py` — finds the stack by name and deletes it. No-op if it's already gone.
+- `Dockerfile` + `requirements.txt` — builds the `python-utils` image. The deploy and stop jobs use this as their runtime image so we don't have to `pip install` on every run.
 
-- **`deploy.py`** — auths to Portainer, finds the Swarm endpoint, envsubsts `docker-compose.yml`, creates stack if missing else updates it.
-- **`delete-stack.py`** — finds the stack by name and deletes it. No-op if already gone.
-- **`Dockerfile`** + **`requirements.txt`** — builds the `python-utils` image used as the deploy/stop job runtime.
+Both scripts read the usual GitLab CI env vars plus the Portainer credentials.
 
-Both scripts read CI env vars (`CI_PROJECT_NAME`, `CI_COMMIT_REF_SLUG`, `CI_DEFAULT_BRANCH`, `CI_REGISTRY_IMAGE`) plus Portainer credentials.
+## docker-compose.yml
 
----
+Three services:
 
-## Docker Compose (`docker-compose.yml`)
+- `frontend` — nginx serving the Vite build. Routed by Traefik to `gr8-<branch>.doe25.swarm.chas-lab.dev`.
+- `api` — the .NET backend. Routed to `api.gr8-<branch>.doe25.swarm.chas-lab.dev`.
+- `db` — MSSQL 2022. Internal only, not exposed. Each stack gets its own fresh empty DB and its own volume.
 
-Three services deployed per stack:
+Networks: `traefik-public` is external and provided by the school swarm. `internal` is just so api can reach db.
 
-| Service  | Image                                                | Exposed how                               |
-|----------|------------------------------------------------------|-------------------------------------------|
-| frontend | `$CI_REGISTRY_IMAGE/frontend:<tag>`                  | Traefik → `<stack>.doe25.swarm.chas-lab.dev`     |
-| api      | `$CI_REGISTRY_IMAGE/backend:<tag>`                   | Traefik → `api.<stack>.doe25.swarm.chas-lab.dev` |
-| db       | `mcr.microsoft.com/mssql/server:2022-latest`         | internal network only, per-stack volume   |
+## Required GitLab variables
 
-- `traefik-public` external network (provided by the school swarm) handles ingress.
-- `internal` network connects api ↔ db.
-- Each stack has its own fresh MSSQL instance (empty DB — the app is responsible for running EF Core migrations on startup).
+In Settings → CI/CD → Variables. Masked, **not** protected (if you mark them protected they only work on protected branches, which breaks feature branch deploys):
 
----
+| Key             | What                                              |
+|-----------------|---------------------------------------------------|
+| `PORTAINER_URL` | `https://portainer.doe25.swarm.chas-lab.dev/api`  |
+| `PORTAINER_USR` | Your Portainer username (from the teacher)        |
+| `PORTAINER_PWD` | Your Portainer password (from the teacher)        |
+| `DB_PASSWORD`   | Some strong MSSQL SA password                     |
 
-## Required GitLab CI/CD variables
+If your username is under 8 chars GitLab won't let you mask it. That's fine, a username isn't really a secret.
 
-Settings → CI/CD → Variables. Masked, **not** protected (protected = only protected branches; would break feature-branch deploys).
+## Deploying
 
-| Key             | Value                                                    |
-|-----------------|----------------------------------------------------------|
-| `PORTAINER_URL` | `https://portainer.doe25.swarm.chas-lab.dev/api`         |
-| `PORTAINER_USR` | personal Portainer account (from teacher)                |
-| `PORTAINER_PWD` | personal Portainer password (from teacher)               |
-| `DB_PASSWORD`   | any strong MSSQL SA password                             |
+Just push. Pipeline runs, and when it's green the site is at `https://gr8-<branch-slug>.doe25.swarm.chas-lab.dev`. You can also open GitLab → Operate → Environments, there's a link icon there.
 
-`PORTAINER_USR` can't be masked if < 8 chars — that's fine, it's not a secret.
+## Tearing down
 
----
+Close or merge the MR and GitLab runs `stop_review` automatically. If you want to nuke a stack manually, GitLab → Deployments → Environments → Stop. Or just delete it in Portainer directly.
 
-## How to deploy a branch
+## Things that will probably go wrong
 
-Just `git push`. The pipeline runs automatically. Once green, visit:
-`https://gr8-<branch-slug>.doe25.swarm.chas-lab.dev`
+- **Pipeline shows "Blocked"** — not actually broken. It's waiting on the manual jobs (production deploy, stop_review). Your review deploy already ran.
+- **Backend keeps restarting (exit 139)** — this is a .NET crash, not a pipeline issue. Check container logs in Portainer. Usually it's the app trying to seed data before the DB exists. Fix is on the .NET side: run EF migrations before `SeedData.EnsureSeedDataAsync` in `Program.cs`.
+- **"network name must be 63 characters or fewer"** — branch name is too long. Rename it or change the `stack_name` format in `deploy.py`.
+- **First build warns `cache-... not found`** — ignore, the cache doesn't exist yet on a brand-new branch.
 
-## How to tear down a stack
+## When we move to k8s
 
-**Automatic:** close or merge the MR — GitLab fires the `stop_review` job, which calls `delete-stack.py`.
-
-**Manual:** GitLab → **Deployments → Environments** → find the review env → click **Stop**.
-
----
-
-## Troubleshooting
-
-- **Pipeline shows "Blocked"** — normal. The `stop_review` / production manual jobs make GitLab mark the pipeline as blocked. Deploy review already ran.
-- **Backend container keeps restarting with exit 139** — app-level crash. Check the container's Logs tab in Portainer. Most common cause: app tries to seed data before running EF migrations to create the DB. Fix in `Api/Program.cs` by calling `db.Database.MigrateAsync()` before `SeedData.EnsureSeedDataAsync(...)`.
-- **"network name must be 63 characters or fewer"** — the stack name plus `_internal` is too long. Shorten the branch name, or edit the `stack_name` format in `deploy.py`.
-- **Build fails: `cache-... not found`** — harmless warning on first build of a branch. The cache is seeded by the first successful build.
-
----
-
-## Migration to Kubernetes (future)
-
-When k8s is ready, replace:
+Stuff to replace:
 
 - `docker-compose.yml` → manifests in `devops/k8s/`
-- `deploy.py` / `delete-stack.py` → `kubectl apply` / `kubectl delete` (or helm)
-- Traefik labels → Ingress resources
-- `python-utils` image → `bitnami/kubectl` or similar
-- Portainer CI variables → kubeconfig secret
+- `deploy.py` / `delete-stack.py` → probably just `kubectl apply` / `kubectl delete`, or helm
+- Traefik labels → Ingress
+- `python-utils` image → something like `bitnami/kubectl`
+- Portainer vars → a kubeconfig secret
 
-Pipeline stage structure (build → deploy → cleanup) stays the same.
-Delete this file when the migration is complete.
+The stage layout (build → deploy → cleanup) should stay the same. Delete this file once the migration is done.

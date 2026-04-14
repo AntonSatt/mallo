@@ -1,49 +1,48 @@
 # DevOps
 
-## Project Structure
+Everything related to CI/CD and hosting lives here.
+
+## Layout
 
 ```
 project/
-├── README.md
 ├── .gitlab-ci.yml
-├── docker-compose.yml          ← current: Swarm deployment compose
-├── .env.example
+├── docker-compose.yml        (Swarm deployment, temporary)
 ├── backend/
 ├── frontend/
 └── devops/
-    ├── README.md               ← this file
-    ├── swarm-setup.md          ← current CD setup (Portainer + Docker Swarm). Temporary.
-    ├── scripts/                ← Python deploy/delete scripts for Portainer
-    └── k8s/                    ← Kubernetes manifests (future replacement for Swarm)
+    ├── README.md             (this)
+    ├── swarm-setup.md        (details for the current Swarm pipeline)
+    ├── scripts/              (Python scripts that deploy to Portainer)
+    └── k8s/                  (future — will replace Swarm)
 ```
 
-## CD Pipeline
+## CD in one paragraph
 
-Continuous Deployment is set up in GitLab CI → Portainer (Docker Swarm) with Traefik routing.
-One deployed stack per branch (main, develop, every feature branch). Production deploys are gated by a manual approval step.
+Push to any branch and GitLab CI builds the images, pushes them to the registry, then deploys a Swarm stack via Portainer. Every branch gets its own stack at `https://gr8-<branch-slug>.doe25.swarm.chas-lab.dev`. Main has a manual approval gate for production. Stacks are cleaned up automatically when the MR closes.
 
-See **[swarm-setup.md](swarm-setup.md)** for full details: architecture, pipeline stages, required CI variables, teardown, troubleshooting.
+Full details: [swarm-setup.md](swarm-setup.md).
 
-> ⚠️ The Swarm setup is temporary. We're migrating to Kubernetes in ~2–3 weeks. When that happens, `swarm-setup.md` and `docker-compose.yml` will be replaced by manifests in `k8s/`.
+> Swarm is a stopgap. We're moving to Kubernetes in a few weeks, at which point `swarm-setup.md` and `docker-compose.yml` go away and everything under `k8s/` takes over.
 
-## Branch Strategy
+## Branches
 
 ```
 feature/* → develop → main
 ```
 
-| Branch      | Purpose                                 | Deployed?               |
-|-------------|-----------------------------------------|-------------------------|
-| main        | Production                              | Yes, manual approval    |
-| develop     | Integration / shared dev environment    | Yes, automatic          |
-| feature/*   | Individual features, branched off develop | Yes, automatic review env |
+| Branch      | Deployed                     |
+|-------------|------------------------------|
+| `main`      | Production (manual approval) |
+| `develop`   | Shared dev environment       |
+| `feature/*` | Ephemeral review env per branch |
 
-Only `develop` can be merged into `main` (enforced by the `check-merge-source` CI job).
+Only `develop` can merge into `main` (enforced by CI).
 
-## Jira Integration
+## Jira
 
-Include the Jira issue key in your work:
+Use the Jira key in your branch names, commits, and MR titles so things link up:
 
 - Branch: `feature/UT8-42-add-login`
 - Commit: `UT8-42 implement auth endpoint`
-- MR title: `UT8-42: Add user authentication`
+- MR: `UT8-42: Add user authentication`

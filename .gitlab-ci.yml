@@ -84,7 +84,7 @@ deploy review:
       optional: true
   environment:
     name: review/$CI_COMMIT_REF_SLUG
-    url: https://$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
+    url: https://gr8-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
     on_stop: stop_review
   script:
     - cd devops/scripts
@@ -103,7 +103,7 @@ deploy production:
       optional: true
   environment:
     name: production
-    url: https://$CI_PROJECT_NAME-main.doe25.swarm.chas-lab.dev
+    url: https://gr8-main.doe25.swarm.chas-lab.dev
   script:
     - cd devops/scripts
     - python deploy.py

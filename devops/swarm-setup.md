@@ -19,11 +19,11 @@ deploy.py → Portainer API
 Portainer creates/updates a Swarm stack for the branch
       ↓
 Traefik routes:
-  https://project-<branch-slug>.doe25.swarm.chas-lab.dev      → frontend
-  https://api.project-<branch-slug>.doe25.swarm.chas-lab.dev  → backend
+  https://gr8-<branch-slug>.doe25.swarm.chas-lab.dev      → frontend
+  https://api.gr8-<branch-slug>.doe25.swarm.chas-lab.dev  → backend
 ```
 
-**Stack name:** `project-<CI_COMMIT_REF_SLUG>` (kept short to stay under Swarm's 63-char network name limit).
+**Stack name:** `gr8-<CI_COMMIT_REF_SLUG>` (kept short to stay under Swarm's 63-char network name limit).
 
 **Image tag:** `latest` on `main`, otherwise the branch's `CI_COMMIT_REF_SLUG`.
 
@@ -89,7 +89,7 @@ Settings → CI/CD → Variables. Masked, **not** protected (protected = only pr
 ## How to deploy a branch
 
 Just `git push`. The pipeline runs automatically. Once green, visit:
-`https://project-<branch-slug>.doe25.swarm.chas-lab.dev`
+`https://gr8-<branch-slug>.doe25.swarm.chas-lab.dev`
 
 ## How to tear down a stack
 

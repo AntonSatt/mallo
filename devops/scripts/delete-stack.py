@@ -9,13 +9,12 @@ from deploy import req_env
 
 
 def main():
-    ci_project_name = req_env("CI_PROJECT_NAME")
     ci_commit_ref_slug = req_env("CI_COMMIT_REF_SLUG")
     usr = req_env("PORTAINER_USR")
     pwd = req_env("PORTAINER_PWD")
     portainer_url = req_env("PORTAINER_URL")
 
-    stack_name = f"{ci_project_name}-{ci_commit_ref_slug}"
+    stack_name = f"gr8-{ci_commit_ref_slug}"
 
     try:
         auth = requests.post(

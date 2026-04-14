@@ -6,54 +6,44 @@
 project/
 ├── README.md
 ├── .gitlab-ci.yml
-├── docker-compose.yml
+├── docker-compose.yml          ← current: Swarm deployment compose
 ├── .env.example
 ├── backend/
 ├── frontend/
 └── devops/
-    └── k8s/                ← Kubernetes manifests (future)
+    ├── README.md               ← this file
+    ├── swarm-setup.md          ← current CD setup (Portainer + Docker Swarm). Temporary.
+    ├── scripts/                ← Python deploy/delete scripts for Portainer
+    └── k8s/                    ← Kubernetes manifests (future replacement for Swarm)
 ```
+
+## CD Pipeline
+
+Continuous Deployment is set up in GitLab CI → Portainer (Docker Swarm) with Traefik routing.
+One deployed stack per branch (main, develop, every feature branch). Production deploys are gated by a manual approval step.
+
+See **[swarm-setup.md](swarm-setup.md)** for full details: architecture, pipeline stages, required CI variables, teardown, troubleshooting.
+
+> ⚠️ The Swarm setup is temporary. We're migrating to Kubernetes in ~2–3 weeks. When that happens, `swarm-setup.md` and `docker-compose.yml` will be replaced by manifests in `k8s/`.
 
 ## Branch Strategy
 
 ```
-feature/* → develop → staging → main
+feature/* → develop → main
 ```
 
-| Branch      | Purpose                          | Protected | Hosted            |
-|-------------|----------------------------------|-----------|-------------------|
-| main        | Production, deployed to live site | Yes       | Production URL    |
-| staging     | Pre-production testing           | Yes       | Staging URL       |
-| develop     | Integration branch               | Yes       | —                 |
-| feature/*   | Individual features, branched off develop | No   | —                 |
-| devops      | CI/CD and infrastructure work    | No        | —                 |
+| Branch      | Purpose                                 | Deployed?               |
+|-------------|-----------------------------------------|-------------------------|
+| main        | Production                              | Yes, manual approval    |
+| develop     | Integration / shared dev environment    | Yes, automatic          |
+| feature/*   | Individual features, branched off develop | Yes, automatic review env |
 
-## CI/CD Pipeline
-
-Current `.gitlab-ci.yml` (placeholder):
-
-```yaml
-stages:
-  - test
-
-placeholder:
-  stage: test
-  script:
-    - echo "Pipeline OK"
-```
-
-This is a temporary pipeline to satisfy GitLab's "Pipeline must succeed" merge check. It will be replaced with real jobs (linting, testing, building, deploying) as the project progresses.
+Only `develop` can be merged into `main` (enforced by the `check-merge-source` CI job).
 
 ## Jira Integration
 
-New feature! We now have Jira integrated into our project! 
+Include the Jira issue key in your work:
 
-Using it:
-
-From this point, just include the Jira issue key in your work:
-
-- Branch name example: `feature/UT8-42-add-login`
-- Commit message: `UT8-42 implement auth endpoint`
+- Branch: `feature/UT8-42-add-login`
+- Commit: `UT8-42 implement auth endpoint`
 - MR title: `UT8-42: Add user authentication`
-
-Testing

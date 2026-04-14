@@ -1,59 +1,48 @@
 # DevOps
 
-## Project Structure
+Everything related to CI/CD and hosting lives here.
+
+## Layout
 
 ```
 project/
-├── README.md
 ├── .gitlab-ci.yml
-├── docker-compose.yml
-├── .env.example
+├── docker-compose.yml        (Swarm deployment, temporary)
 ├── backend/
 ├── frontend/
 └── devops/
-    └── k8s/                ← Kubernetes manifests (future)
+    ├── README.md             (this)
+    ├── swarm-setup.md        (details for the current Swarm pipeline)
+    ├── scripts/              (Python scripts that deploy to Portainer)
+    └── k8s/                  (future — will replace Swarm)
 ```
 
-## Branch Strategy
+## CD in one paragraph
+
+Push to any branch and GitLab CI builds the images, pushes them to the registry, then deploys a Swarm stack via Portainer. Every branch gets its own stack at `https://gr8-<branch-slug>.doe25.swarm.chas-lab.dev`. Main has a manual approval gate for production. Stacks are cleaned up automatically when the MR closes.
+
+Full details: [swarm-setup.md](swarm-setup.md).
+
+> Swarm is a stopgap. We're moving to Kubernetes in a few weeks, at which point `swarm-setup.md` and `docker-compose.yml` go away and everything under `k8s/` takes over.
+
+## Branches
 
 ```
-feature/* → develop → staging → main
+feature/* → develop → main
 ```
 
-| Branch      | Purpose                          | Protected | Hosted            |
-|-------------|----------------------------------|-----------|-------------------|
-| main        | Production, deployed to live site | Yes       | Production URL    |
-| staging     | Pre-production testing           | Yes       | Staging URL       |
-| develop     | Integration branch               | Yes       | —                 |
-| feature/*   | Individual features, branched off develop | No   | —                 |
-| devops      | CI/CD and infrastructure work    | No        | —                 |
+| Branch      | Deployed                     |
+|-------------|------------------------------|
+| `main`      | Production (manual approval) |
+| `develop`   | Shared dev environment       |
+| `feature/*` | Ephemeral review env per branch |
 
-## CI/CD Pipeline
+Only `develop` can merge into `main` (enforced by CI).
 
-Current `.gitlab-ci.yml` (placeholder):
+## Jira
 
-```yaml
-stages:
-  - test
+Use the Jira key in your branch names, commits, and MR titles so things link up:
 
-placeholder:
-  stage: test
-  script:
-    - echo "Pipeline OK"
-```
-
-This is a temporary pipeline to satisfy GitLab's "Pipeline must succeed" merge check. It will be replaced with real jobs (linting, testing, building, deploying) as the project progresses.
-
-## Jira Integration
-
-New feature! We now have Jira integrated into our project! 
-
-Using it:
-
-From this point, just include the Jira issue key in your work:
-
-- Branch name example: `feature/UT8-42-add-login`
-- Commit message: `UT8-42 implement auth endpoint`
-- MR title: `UT8-42: Add user authentication`
-
-Testing
+- Branch: `feature/UT8-42-add-login`
+- Commit: `UT8-42 implement auth endpoint`
+- MR: `UT8-42: Add user authentication`

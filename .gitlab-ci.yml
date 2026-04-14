@@ -60,7 +60,7 @@ build backend:
         --cache-from=type=registry,ref="$CI_REGISTRY_IMAGE/backend:cache-$TAG" \
         --cache-from=type=registry,ref="$CI_REGISTRY_IMAGE/backend:cache-latest" \
         --cache-to=type=registry,ref="$CI_REGISTRY_IMAGE/backend:cache-$TAG",mode=max \
-        --provenance=false --push backend/Gr8
+        --provenance=false --push backend
 
 build python-utils:
   <<: *build-image

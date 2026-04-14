@@ -73,7 +73,25 @@ build python-utils:
 # Deploy stage
 # ---------------------------------------------------------------------------
 
-# Review deploy: develop + every feature branch. NOT main.
+# Develop deploy: persistent shared dev environment
+deploy develop:
+  stage: deploy
+  image: $CI_REGISTRY_IMAGE/python-utils:latest
+  needs:
+    - job: build frontend
+    - job: build backend
+    - job: build python-utils
+      optional: true
+  environment:
+    name: develop
+    url: https://gr8-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
+  script:
+    - cd devops/scripts
+    - python deploy.py
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+# Review deploy: ephemeral per-branch stacks for feature branches
 deploy review:
   stage: deploy
   image: $CI_REGISTRY_IMAGE/python-utils:latest
@@ -90,7 +108,7 @@ deploy review:
     - cd devops/scripts
     - python deploy.py
   rules:
-    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_COMMIT_BRANCH != "develop"
 
 # Production deploy: only on main, manual approval gate
 deploy production:
@@ -125,5 +143,5 @@ stop_review:
     - cd devops/scripts
     - python delete-stack.py
   rules:
-    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_COMMIT_BRANCH != "develop"
       when: manual

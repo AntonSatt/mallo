@@ -57,10 +57,10 @@ const ForumPage = () => {
                 const allPosts = data.map((post) => ({
                     id: post.id,
                     title: post.title,
-                    content: posts.length > 0 ? posts[0].content : "Innehåll saknas",
+                    content: post.content ? post.content : "Innehåll saknas",        
                 }));
-
-                setPosts([...allPosts, ...posts]);
+               
+                  setPosts([...allPosts, ...posts]);
             } catch (error) {
                 console.error("Error fetching posts:", error);
             } finally {
@@ -69,7 +69,7 @@ const ForumPage = () => {
         };
 
         fetchPosts();
-    }, [posts]);
+    }, []);
 
     return (
         <>

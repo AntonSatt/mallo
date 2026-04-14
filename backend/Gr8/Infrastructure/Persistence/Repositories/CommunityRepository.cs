@@ -40,5 +40,10 @@ namespace Gr8.Infrastructure.Persistence.Repositories
         {
             await _communityDbContext.Comments.AddAsync(comment);
         }
+
+        public async Task AddReportAsync(Report report)
+        {
+            await _communityDbContext.Reports.AddAsync(report);
+        }
     }
 }

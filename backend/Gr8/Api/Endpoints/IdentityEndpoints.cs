@@ -1,7 +1,11 @@
-﻿using Gr8.Application.DTOs;
+﻿using Gr8.Application.Common.Constants;
+using Gr8.Application.DTOs;
+using Gr8.Application.Interfaces;
 using Gr8.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using System.ComponentModel.DataAnnotations;
 
 namespace Gr8.Api.Endpoints
 {
@@ -12,8 +16,18 @@ namespace Gr8.Api.Endpoints
         /// </summary>
         public static void MapIdentityEndpoints(WebApplication app)
         {
-            app.MapPost("/register", async (UserManager<ApplicationUser> userManager, [FromBody] RegisterDto userDto) =>
+            app.MapPost("/register", async (UserManager<ApplicationUser> userManager, IJwtTokenGenerator jwtGenerator, [FromBody] RegisterDto userDto) =>
                 {
+                    var context = new ValidationContext(userDto);
+                    var results = new List<ValidationResult>();
+
+                    bool isValid = Validator.TryValidateObject(userDto, context, results, true);
+
+                    if (!isValid)
+                    {
+                        return Results.BadRequest(results);
+                    }
+
                     var user = new ApplicationUser
                     {
                         UserName = userDto.UserName,
@@ -25,38 +39,106 @@ namespace Gr8.Api.Endpoints
 
                     var result = await userManager.CreateAsync(user, userDto.Password);
 
-                    //TODO: Implement token generation logic after successful registration.
-                    if (result.Succeeded)
-                    {
-                        return Results.Ok("User registered successfully.");
-                    }
-                    else
+                    if (!result.Succeeded)
                     {
                         return Results.BadRequest(result.Errors);
                     }
+
+                    var token = jwtGenerator.GenerateToken(user.Id, user.Email);
+
+                    return Results.Ok(new { Token = token, Message = "User registered successfully." });
                 });
 
-            app.MapPost("/login", async (SignInManager<ApplicationUser> signInManager, string userName, string password) =>
+            app.MapPost("/login", async (UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtTokenGenerator jwtGenerator, [FromBody] LoginDto loginDto) =>
                 {
-                    var result = await signInManager.PasswordSignInAsync(userName, password, false, false);
+                    var context = new ValidationContext(loginDto);
+                    var results = new List<ValidationResult>();
 
-                    //TODO: Implement token generation logic after successful login.
-                    if (result.Succeeded)
+                    bool isValid = Validator.TryValidateObject(loginDto, context, results, true);
+
+                    if (!isValid)
                     {
-                        return Results.Ok("User logged in successfully.");
+                        return Results.BadRequest(results);
                     }
-                    else
+
+                    var result = await signInManager.PasswordSignInAsync(loginDto.UserName, loginDto.Password, false, false);
+
+                    if (!result.Succeeded)
                     {
-                        return Results.BadRequest("Invalid login attempt.");
+                        return Results.Unauthorized();
                     }
+
+                    var user = await userManager.FindByNameAsync(loginDto.UserName);
+
+                    if (user == null)
+                    {
+                        return Results.Unauthorized();
+                    }
+
+                    var token = jwtGenerator.GenerateToken(user.Id, user.Email!);
+
+                    return Results.Ok(new { Token = token, Message = "User logged in successfully." });
                 });
 
             app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager) =>
                 {
-                    //TODO: Implement token revocation logic in frontend.
                     await signInManager.SignOutAsync();
                     return Results.Ok("User logged out successfully.");
                 });
+
+            app.MapDelete("/delete", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user) =>
+                {
+                    var appUser = await userManager.GetUserAsync(user);
+                    if (appUser == null)
+                    {
+                        return Results.NotFound("User not found.");
+                    }
+                    var result = await userManager.DeleteAsync(appUser);
+
+                    return result.Succeeded
+                        ? Results.Ok("User deleted successfully.")
+                        : Results.BadRequest(result.Errors);
+                })
+                .RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPut("/user", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) =>
+                {
+                    var appUser = await userManager.GetUserAsync(user);
+
+                    if (appUser == null)
+                    {
+                        return Results.NotFound("User not found.");
+                    }
+
+                    appUser.UserName = updateProfileDto.Username;
+                    appUser.FirstName = updateProfileDto.FirstName;
+                    appUser.LastName = updateProfileDto.LastName;
+                    appUser.Email = updateProfileDto.Email;
+
+                    var changedProfil = await userManager.UpdateAsync(appUser);
+
+                    return changedProfil.Succeeded
+                    ? Results.Ok("User updated successfully")
+                    : Results.BadRequest(changedProfil.Errors);
+                })
+                .RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPatch("/password", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdatePasswordDto updatePasswordDto) =>
+                {
+                    var appUser = await userManager.GetUserAsync(user);
+
+                    if (appUser == null)
+                    {
+                        return Results.NotFound("User not found.");
+                    }
+
+                    var changedPassword = await userManager.ChangePasswordAsync(appUser, updatePasswordDto.CurrentPassword, updatePasswordDto.NewPassword);
+
+                    return changedPassword.Succeeded
+                    ? Results.Ok("Password updated successfully")
+                    : Results.BadRequest(changedPassword.Errors);
+                })
+                .RequireAuthorization(AuthorizationConstants.JwtOnly);
         }
     }
 }

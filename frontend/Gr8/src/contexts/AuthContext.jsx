@@ -1,5 +1,6 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import UserServices from '../services/UserServices';
+import { registerAuthListener } from '../services/AuthServices';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
@@ -26,6 +27,11 @@ export const AuthProvider = ({ children }) => {
     await UserServices.delete();
     setIsAuthenticated(false);
   };
+
+  useEffect(() => {
+    registerAuthListener(logout);
+    return () => registerAuthListener(null);
+  });
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, register, logout, deleteAccount }}>

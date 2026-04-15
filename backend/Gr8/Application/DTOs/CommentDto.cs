@@ -7,6 +7,7 @@ namespace Gr8.Application.DTOs
 {
     public class CommentDto
     {
+        public int Id { get; set; }
         [Required(ErrorMessage = "Content is required")]
         [MaxLength(500)]
         public string Content { get; set; } 

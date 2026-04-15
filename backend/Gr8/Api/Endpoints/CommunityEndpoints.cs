@@ -28,7 +28,7 @@ namespace Gr8.Api.Endpoints
             })
              .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPost("/forum/posts", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IPostService postService, [FromBody] PostDto postDto) =>
+            app.MapPost("/forum/posts", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IPostService postService, [FromBody] CreatePostDto postDto) =>
                 {
                     var appUser = await userManager.GetUserAsync(user);
                     if (appUser == null)
@@ -56,7 +56,7 @@ namespace Gr8.Api.Endpoints
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapGet("/forum/posts/{PostId}/comments/", async ([FromServices] ICommentService commentService, int postId) =>
+            app.MapGet("/forum/posts/{PostId}/comments", async ([FromServices] ICommentService commentService, int postId) =>
             {
                 var comments = await commentService.GetCommentsByPostAsync(postId);
 
@@ -69,7 +69,7 @@ namespace Gr8.Api.Endpoints
             })
               .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPost("/forum/posts/{PostId}/comments", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices]ICommentService commentService, [FromBody] CommentDto commentDto, int postId) =>
+            app.MapPost("/forum/posts/{PostId}/comments", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] ICommentService commentService, [FromBody] CommentDto commentDto, int postId) =>
             {
                 var context = new ValidationContext(commentDto);
                 var results = new List<ValidationResult>();
@@ -93,6 +93,53 @@ namespace Gr8.Api.Endpoints
                 return Results.Ok(comment);
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapGet("/forum/tags", async ([FromServices] ITagService tagService) =>
+            {
+                var tags = await tagService.GetAllTagsAsync();
+                if (tags.Count == 0)
+                {
+                    return Results.NoContent();
+                }
+                return Results.Ok(tags);
+            })
+             .RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapGet("/forum/categories", async ([FromServices] ICategoryService categoryService) =>
+            {
+                var categories = await categoryService.GetAllCategoriesAsync();
+                if (categories.Count == 0)
+                {
+                    return Results.NoContent();
+                }
+                return Results.Ok(categories);
+             })
+             .RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPost("/forum/report", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IReportService reportService, [FromBody] ReportDto reportDto) => 
+            {
+                var context = new ValidationContext(reportDto);
+                var results = new List<ValidationResult>();
+
+                bool isValid = Validator.TryValidateObject(reportDto, context, results, true);
+
+                if (!isValid || (reportDto.PostId == null && reportDto.CommentId == null))
+                {
+                    return Results.BadRequest(results);
+                }
+
+                var appUser = await userManager.GetUserAsync(user);
+
+                if (appUser == null)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var report = await reportService.CreateAsync(reportDto, appUser.Id);
+
+                return Results.Ok(report);
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly); 
         }
     }
 }

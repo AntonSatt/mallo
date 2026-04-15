@@ -3,10 +3,10 @@ import ApiClient from "../api/ApiClient";
 const PostServices = {
     create: async (postData) => {
         const response = await ApiClient.post("/forum/posts", {
-            title: postData.postTitle,
-            content: postData.postContent,
-            tag: postData.selectedTags,
-            category: postData.selectedCategory
+            title: postData.title,
+            content: postData.content,
+            categoryId: postData.categoryId,
+            tagIds: postData.tags
         });
         return response.data;
     },
@@ -16,6 +16,14 @@ const PostServices = {
     },
     getAll: async () => {
         const response = await ApiClient.get("/forum/posts");
+        return response.data;
+    },
+    getTags: async () => {
+        const response = await ApiClient.get("/forum/tags");
+        return response.data;
+    },
+    getCategories: async () => {
+        const response = await ApiClient.get("/forum/categories");
         return response.data;
     }
 };

@@ -30,7 +30,7 @@ const MenuProps = {
   },
 };
 
-const PostForm = () => {
+const PostForm = ({ onPostCreated, onClose }) => {
   const [postData, setPostData] = useState({
     title: "",
     content: "",
@@ -48,7 +48,6 @@ const PostForm = () => {
 
     if (!postData.title.trim() ||
       !postData.content.trim() ||
-      postData.tags.length < 1 ||
       !postData.categoryId) {
       setError("Alla fält måste vara ifyllda.");
       return;
@@ -61,7 +60,12 @@ const PostForm = () => {
 
     try {
       const result = await PostServices.create(postData);
-      console.log("Post created successfully:", result);
+      const selectedTags = tags.filter(tag =>
+        postData.tags.includes(tag.id)
+      ).map(tag => tag.name);
+
+      onPostCreated({ ...result, tags: selectedTags }); // Call the callback to update the parent component
+      onClose(); // Close the form after successful submission
     } catch (err) {
       setError(err.message || 'Inlägg skapades inte. Försök igen.');
     }

@@ -19,6 +19,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import PostServices from "../../services/PostServices";
+import moment from "moment";
 
 const ForumPage = () => {
     const [expanded, setExpanded] = useState(false);
@@ -40,9 +41,8 @@ const ForumPage = () => {
         setOpen(true);
     };
 
-    const handleClose = async (event) => {
+    const handleClose = async () => {
         setOpen(false);
-        console.log(event.target.id);
     };
 
     const handleExpandClick = () => {
@@ -71,6 +71,20 @@ const ForumPage = () => {
     //     fetchPosts();
     // }, [posts]);
 
+    const handlePostCreated = (newPost) => {
+        console.log("New post created:", newPost);
+        const formattedPost = {
+            id: newPost.id,
+            title: newPost.title,
+            content: newPost.content,
+            userName: newPost.userName,
+            createdAt: newPost.createdAt,
+            category: newPost.category,
+            tags: newPost.tags
+        };
+        setPosts((prevPosts) => [formattedPost, ...prevPosts]);
+    };
+
     return (
         <>
             <Button variant="outlined" color="error" onClick={handleClickOpen}>
@@ -78,7 +92,10 @@ const ForumPage = () => {
             </Button>
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" >
                 <DialogTitle>Skapa nytt inlägg</DialogTitle>
-                <PostForm />
+                <PostForm
+                    onPostCreated={handlePostCreated}
+                    onClose={handleClose}
+                />
                 <DialogActions>
                     <Button variant="text " color="inherit" onClick={handleClose}>Avbryt</Button>
                 </DialogActions>
@@ -87,7 +104,7 @@ const ForumPage = () => {
             {posts.map((post) => (
                 <Card key={post.id} sx={{ maxWidth: 500, marginBottom: 2 }}>
                     <CardHeader title={post.title}
-                        subheader={`${post.userName} • ${post.date}`}
+                        subheader={`${post.userName} • ${moment(post.createdAt).fromNow()}`}
                         action={
                             <IconButton aria-label="settings">
                                 <MoreVertIcon />
@@ -98,6 +115,18 @@ const ForumPage = () => {
                         <Typography variant="body2" color="text.secondary">
                             {post.content}
                         </Typography>
+
+                        {post.category && (
+                            <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>
+                                Kategori: {post.category.name || post.category}
+                            </Typography>
+                        )}
+
+                        {post.tags && post.tags.length > 0 && (
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                                Trigger: {post.tags.map(tag => tag.name || tag).join(", ")}
+                            </Typography>
+                        )}
                     </CardContent>
 
                     <IconButton aria-label="share">

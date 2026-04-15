@@ -3,10 +3,10 @@ import ApiClient from "../api/ApiClient";
 const PostServices = {
     create: async (postData) => {
         const response = await ApiClient.post("/forum/posts", {
-            title: postData.postTitle,
-            content: postData.postContent,
+            title: postData.title,
+            content: postData.content,
             categoryId: postData.categoryId,
-            tagIds: postData.tagsIds
+            tagIds: postData.tags
         });
         return response.data;
     },

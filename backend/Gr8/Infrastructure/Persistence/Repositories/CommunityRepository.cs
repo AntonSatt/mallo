@@ -16,11 +16,15 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             _communityDbContext = communityDbContext;
         }
 
-        public async Task<List<Post>> GetAllPostsAsync() 
+        public async Task<List<Post>> GetAllPostsAsync()
         {
-            return await _communityDbContext.Posts.ToListAsync();
+            return await _communityDbContext.Posts
+                .Include(p => p.Category)
+                .Include(p => p.Tags)
+                .Include(p => p.Comments)
+                .ToListAsync();
         }
-        
+
         public async Task AddPostAsync(Post post)
         {
             await _communityDbContext.Posts.AddAsync(post);
@@ -49,6 +53,18 @@ namespace Gr8.Infrastructure.Persistence.Repositories
         public async Task<List<Tag>> GetAllTagsAsync()
         {
             return await _communityDbContext.Tags.ToListAsync();
+        }
+
+        public async Task<List<Tag>> GetTagsByIdAsync(List<int> tagIds)
+        {
+            return await _communityDbContext.Tags
+                .Where(t => tagIds.Contains(t.Id))
+                .ToListAsync();
+        }
+
+        public async Task<Category?> GetCategoryByIdAsync(int categoryId)
+        {
+            return await _communityDbContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
         }
     }
 }

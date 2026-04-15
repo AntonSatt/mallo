@@ -13,7 +13,8 @@ import {
     DialogTitle,
     DialogActions,
     Menu,
-    MenuItem
+    MenuItem,
+    TextField
 } from "@mui/material";
 
 import ShareIcon from "@mui/icons-material/Share";
@@ -29,6 +30,8 @@ const ForumPage = () => {
     const [expanded, setExpanded] = useState(null);
     const [openPostModal, setPostModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
+    const [openReportModal, setOpenReportModal] = useState(false);
+    const [reportReason, setReportReason] = useState("");
 
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
     const [selectedPostId, setSelectedPostId] = useState(null);
@@ -56,11 +59,6 @@ const ForumPage = () => {
         setExpanded(expanded == postId ? null : postId);
     };
 
-     const handleReport = () => {
-    handleMenuClose();
-    console.log("Report post:", selectedPostId);
-  };
-
 
     const handleMenuOpen = (event, postId) => {
     setMenuAnchorEl(event.currentTarget);
@@ -72,6 +70,31 @@ const ForumPage = () => {
     setSelectedPostId(null);
   }
 
+    const handleReport = () => {
+    setMenuAnchorEl(null);
+    setOpenReportModal(true);
+  };
+
+    const handleReportClose = () => {
+    setOpenReportModal(false);
+    setReportReason("");
+    setSelectedPostId(null);
+  };
+
+  const handleReportSubmit = async () => {
+    try {
+        //TODO: Implement API call to submit the report with selectedPostId and reportReason.
+
+        console.log("Report submitted:", {
+            postId: selectedPostId,
+            reason: reportReason
+        });
+
+        handleReportClose();
+    } catch (error){
+        console.error("Failed to report  post:", error);
+    }
+  };
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -120,6 +143,44 @@ const ForumPage = () => {
                 />
                 <DialogActions>
                     <Button variant="text " color="inherit" onClick={handleClose}>Avbryt</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Our Report-modal starts here */}
+            <Dialog
+                open={openReportModal}
+                onClose={handleReportClose}
+                fullWidth
+                maxWidth="sm"> 
+
+                <DialogTitle>Anmäl inlägg</DialogTitle>
+                <CardContent>
+                    <Typography variant="body2" sx={{ mb: 2 }}>
+                        Beskriv varför du vill anmäla inlägget:
+                    </Typography>
+                    <TextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        label="Anmälan"
+                        placeholder="Ange anmälan..."
+                        value={reportReason}
+                        onChange={(e) => setReportReason(e.target.value)}
+                    />
+                </CardContent>
+
+                <DialogActions>
+                    <Button color="inherit" onClick={handleReportClose}>
+                        Avbryt
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={handleReportSubmit}
+                        disabled={!reportReason.trim()}
+                    >
+                        Skicka anmälan
+                    </Button>
                 </DialogActions>
             </Dialog>
 

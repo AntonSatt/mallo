@@ -4,6 +4,7 @@ namespace Gr8.Application.DTOs
 {
     public class PostDto
     {
+        public int Id { get; set; }
         [Required(ErrorMessage = "Title is required")]
         public string Title { get; set; } = null!;
         [Required(ErrorMessage = "Content is required")]

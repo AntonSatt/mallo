@@ -40,6 +40,7 @@ namespace Gr8.Application.Services
 
             return posts.Select(p => new PostDto 
             {
+                Id = p.Id,
                 Title = p.Title,
                 Content = p.Content,
                 CreatedAt = p.CreatedAt,

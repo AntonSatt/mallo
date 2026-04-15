@@ -1,3 +1,4 @@
+import * as React from "react";
 import PostForm from "../../components/postForm/PostForm";
 import CommentForm from "../../components/commentForm/CommentForm"
 import {
@@ -10,7 +11,9 @@ import {
     Collapse,
     Button,
     DialogTitle,
-    DialogActions
+    DialogActions,
+    Menu,
+    MenuItem
 } from "@mui/material";
 
 import ShareIcon from "@mui/icons-material/Share";
@@ -24,8 +27,11 @@ import moment from "moment";
 
 const ForumPage = () => {
     const [expanded, setExpanded] = useState(null);
-    const [open, setOpen] = useState(false);
+    const [openPostModal, setPostModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
+
+    const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+    const [selectedPostId, setSelectedPostId] = useState(null);
 
     const ExpandMore = styled(IconButton, {
         shouldForwardProp: (prop) => prop !== 'expand'
@@ -39,16 +45,33 @@ const ForumPage = () => {
     }));
 
     const handleClickOpen = () => {
-        setOpen(true);
+        setPostModalOpen(true);
     };
 
     const handleClose = async () => {
-        setOpen(false);
+        setPostModalOpen(false);
     };
 
     const handleExpandClick = (postId) => {
         setExpanded(expanded == postId ? null : postId);
     };
+
+     const handleReport = () => {
+    handleMenuClose();
+    console.log("Report post:", selectedPostId);
+  };
+
+
+    const handleMenuOpen = (event, postId) => {
+    setMenuAnchorEl(event.currentTarget);
+    setSelectedPostId(postId);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setSelectedPostId(null);
+  }
+
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -89,7 +112,7 @@ const ForumPage = () => {
             <Button variant="outlined" color="error" onClick={handleClickOpen}>
                 Skapa nytt inlägg...
             </Button>
-            <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" >
+            <Dialog open={openPostModal} onClose={handleClose} fullWidth maxWidth="sm" >
                 <DialogTitle>Skapa nytt inlägg</DialogTitle>
                 <PostForm
                     onPostCreated={handlePostCreated}
@@ -105,9 +128,29 @@ const ForumPage = () => {
                     <CardHeader title={post.title}
                         subheader={`${post.userName} • ${moment(post.createdAt).fromNow()}`}
                         action={
-                            <IconButton aria-label="settings">
-                                <MoreVertIcon />
-                            </IconButton>
+                            <>
+                             <IconButton
+                  aria-label="more"
+                  id={"post-menu-button-" + post.id}
+                  aria-controls={menuAnchorEl ? "post-menu" : undefined}
+                  aria-expanded={menuAnchorEl ? "true" : undefined}
+                  aria-haspopup="true"
+                  onClick={(event) => handleMenuOpen(event, post.id)}
+                >
+                  <MoreVertIcon />
+                </IconButton>
+                <Menu
+                  id="post-menu"
+                  anchorEl={menuAnchorEl}
+                  open={Boolean(menuAnchorEl)}
+                  onClose={handleMenuClose}
+                  anchorOrigin={{vertical: "bottom", horizontal: "right",}}
+                  transformOrigin={{vertical: "top",horizontal: "right",}}
+                >
+                <MenuItem onClick={handleReport}>Anmäl inlägg</MenuItem>
+                </Menu>
+
+                            </>
                         } />
 
                     <CardContent>

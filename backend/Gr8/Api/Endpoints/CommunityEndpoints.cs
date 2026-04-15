@@ -29,7 +29,7 @@ namespace Gr8.Api.Endpoints
             })
              .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPost("/forum/posts", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IPostService postService, [FromBody] PostDto postDto) =>
+            app.MapPost("/forum/posts", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IPostService postService, [FromBody] CreatePostDto postDto) =>
                 {
                     var appUser = await userManager.GetUserAsync(user);
                     if (appUser == null)

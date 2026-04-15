@@ -1,4 +1,5 @@
 import PostForm from "../../components/postForm/PostForm";
+import CommentForm from "../../components/commentForm/CommentForm"
 import {
     Dialog,
     Card,
@@ -22,13 +23,13 @@ import PostServices from "../../services/PostServices";
 import moment from "moment";
 
 const ForumPage = () => {
-    const [expanded, setExpanded] = useState(false);
+    const [expanded, setExpanded] = useState(null);
     const [open, setOpen] = useState(false);
     const [posts, setPosts] = useState([]);
 
-    const ExpandMore = styled((props) => {
-        const { ...other } = props;
-        return <IconButton {...other} />;
+    const ExpandMore = styled(IconButton, {
+        shouldForwardProp: (prop) => prop !== 'expand'
+
     })(({ theme, expand }) => ({
         marginLeft: "auto",
         transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
@@ -45,31 +46,29 @@ const ForumPage = () => {
         setOpen(false);
     };
 
-    const handleExpandClick = () => {
-        setExpanded(!expanded);
+    const handleExpandClick = (postId) => {
+        setExpanded(expanded == postId ? null : postId);
     };
 
-    // useEffect(() => {
-    //     const fetchPosts = async () => {
-    //         try {
-    //             const data = await PostServices.getAll();
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                const data = await PostServices.getAll();
 
-    //             const allPosts = data.map((post) => ({
-    //                 id: post.id,
-    //                 title: post.title,
-    //                 content: posts.length > 0 ? posts[0].content : "Innehåll saknas",
-    //             }));
-
-    //             setPosts([...allPosts, ...posts]);
-    //         } catch (error) {
-    //             console.error("Error fetching posts:", error);
-    //         } finally {
-    //             // setLoading(false);
-    //         }
-    //     };
-
-    //     fetchPosts();
-    // }, [posts]);
+                const allPosts = data.map((post) => ({
+                    id: post.id,
+                    title: post.title,
+                    content: post.content ? post.content : "Innehåll saknas",
+                }));
+                setPosts([...allPosts, ...posts]);
+            } catch (error) {
+                console.error("Error fetching posts:", error);
+            } finally {
+                // setLoading(false);
+            }
+        };
+        fetchPosts();
+    }, []);
 
     const handlePostCreated = (newPost) => {
         console.log("New post created:", newPost);
@@ -134,17 +133,18 @@ const ForumPage = () => {
                     </IconButton>
 
                     <ExpandMore
-                        expand={expanded}
-                        onClick={handleExpandClick}
-                        aria-expanded={expanded}
-                        aria-label="show more"
+                        expand={expanded === post.id}
+                        onClick={() => handleExpandClick(post.id)}
+                        aria-expanded={expanded === post.id}
+                        aria-label="Visa kommentarerna"
                     >
                         <ExpandMoreIcon />
                     </ExpandMore>
 
-                    <Collapse in={expanded} timeout="auto" unmountOnExit>
-                        <CardContent>
-                            <Typography>Extra content här…</Typography>
+                    <Collapse in={expanded === post.id} timeout="auto" unmountOnExit>
+                        <CardContent sx={{ bgcolor: '#f9f9f9', borderTop: '1px solid #eee' }}>
+                            <Typography variant="subtitle2" gutterBottom>Kommentarer</Typography>
+                            <CommentForm postId={post.id} />
                         </CardContent>
                     </Collapse>
                 </Card>

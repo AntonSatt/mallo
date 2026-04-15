@@ -13,5 +13,6 @@ namespace Gr8.Application.Interfaces
         Task<List<Tag>> GetAllTagsAsync();
         Task<List<Tag>> GetTagsByIdAsync(List<int> tagIds);
         Task<Category?> GetCategoryByIdAsync(int categoryId);
+        Task AddReportAsync(Report report);
     }
 }

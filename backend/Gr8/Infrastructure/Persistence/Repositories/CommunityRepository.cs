@@ -66,5 +66,10 @@ namespace Gr8.Infrastructure.Persistence.Repositories
         {
             return await _communityDbContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
         }
+
+        public async Task AddReportAsync(Report report)
+        {
+            await _communityDbContext.Reports.AddAsync(report);
+        }
     }
 }

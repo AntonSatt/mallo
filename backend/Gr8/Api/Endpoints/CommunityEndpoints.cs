@@ -1,7 +1,6 @@
 ﻿using Gr8.Application.Common.Constants;
 using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
-using Gr8.Domain.Entities;
 using Gr8.Infrastructure.Identity;
 using Gr8.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
@@ -57,7 +56,7 @@ namespace Gr8.Api.Endpoints
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapGet("/forum/posts/{PostId}/comments/", async ([FromServices] ICommentService commentService, int postId) =>
+            app.MapGet("/forum/posts/{PostId}/comments", async ([FromServices] ICommentService commentService, int postId) =>
             {
                 var comments = await commentService.GetCommentsByPostAsync(postId);
 
@@ -70,7 +69,7 @@ namespace Gr8.Api.Endpoints
             })
               .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPost("/forum/posts/{PostId}/comments", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices]ICommentService commentService, [FromBody] CommentDto commentDto, int postId) =>
+            app.MapPost("/forum/posts/{PostId}/comments", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] ICommentService commentService, [FromBody] CommentDto commentDto, int postId) =>
             {
                 var context = new ValidationContext(commentDto);
                 var results = new List<ValidationResult>();
@@ -116,6 +115,31 @@ namespace Gr8.Api.Endpoints
                 return Results.Ok(categories);
              })
              .RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPost("/forum/report", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IReportService reportService, [FromBody] ReportDto reportDto) => 
+            {
+                var context = new ValidationContext(reportDto);
+                var results = new List<ValidationResult>();
+
+                bool isValid = Validator.TryValidateObject(reportDto, context, results, true);
+
+                if (!isValid || (reportDto.PostId == null && reportDto.CommentId == null))
+                {
+                    return Results.BadRequest(results);
+                }
+
+                var appUser = await userManager.GetUserAsync(user);
+
+                if (appUser == null)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var report = await reportService.CreateAsync(reportDto, appUser.Id);
+
+                return Results.Ok(report);
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly); 
         }
     }
 }

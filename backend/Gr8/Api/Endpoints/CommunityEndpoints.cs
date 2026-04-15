@@ -28,7 +28,7 @@ namespace Gr8.Api.Endpoints
             })
              .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPost("/forum/posts", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IPostService postService, [FromBody] PostDto postDto) =>
+            app.MapPost("/forum/posts", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IPostService postService, [FromBody] CreatePostDto postDto) =>
                 {
                     var appUser = await userManager.GetUserAsync(user);
                     if (appUser == null)
@@ -93,6 +93,28 @@ namespace Gr8.Api.Endpoints
                 return Results.Ok(comment);
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapGet("/forum/tags", async ([FromServices] ITagService tagService) =>
+            {
+                var tags = await tagService.GetAllTagsAsync();
+                if (tags.Count == 0)
+                {
+                    return Results.NoContent();
+                }
+                return Results.Ok(tags);
+            })
+             .RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapGet("/forum/categories", async ([FromServices] ICategoryService categoryService) =>
+            {
+                var categories = await categoryService.GetAllCategoriesAsync();
+                if (categories.Count == 0)
+                {
+                    return Results.NoContent();
+                }
+                return Results.Ok(categories);
+             })
+             .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
             app.MapPost("/forum/report", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IReportService reportService, [FromBody] ReportDto reportDto) => 
             {

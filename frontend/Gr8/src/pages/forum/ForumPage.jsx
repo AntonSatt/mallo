@@ -20,13 +20,14 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import PostServices from "../../services/PostServices";
+import moment from "moment";
 
 const ForumPage = () => {
     const [expanded, setExpanded] = useState(null);
     const [open, setOpen] = useState(false);
     const [posts, setPosts] = useState([]);
 
-    const ExpandMore = styled(IconButton,{
+    const ExpandMore = styled(IconButton, {
         shouldForwardProp: (prop) => prop !== 'expand'
 
     })(({ theme, expand }) => ({
@@ -57,7 +58,7 @@ const ForumPage = () => {
                 const allPosts = data.map((post) => ({
                     id: post.id,
                     title: post.title,
-                    content: post.content ? post.content : "Innehåll saknas",        
+                    content: post.content ? post.content : "Innehåll saknas",
                 }));
                 setPosts([...allPosts, ...posts]);
             } catch (error) {
@@ -66,9 +67,22 @@ const ForumPage = () => {
                 // setLoading(false);
             }
         };
-
         fetchPosts();
     }, []);
+
+    const handlePostCreated = (newPost) => {
+        console.log("New post created:", newPost);
+        const formattedPost = {
+            id: newPost.id,
+            title: newPost.title,
+            content: newPost.content,
+            userName: newPost.userName,
+            createdAt: newPost.createdAt,
+            category: newPost.category,
+            tags: newPost.tags
+        };
+        setPosts((prevPosts) => [formattedPost, ...prevPosts]);
+    };
 
     return (
         <>
@@ -77,7 +91,10 @@ const ForumPage = () => {
             </Button>
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" >
                 <DialogTitle>Skapa nytt inlägg</DialogTitle>
-                <PostForm />
+                <PostForm
+                    onPostCreated={handlePostCreated}
+                    onClose={handleClose}
+                />
                 <DialogActions>
                     <Button variant="text " color="inherit" onClick={handleClose}>Avbryt</Button>
                 </DialogActions>
@@ -86,7 +103,7 @@ const ForumPage = () => {
             {posts.map((post) => (
                 <Card key={post.id} sx={{ maxWidth: 500, marginBottom: 2 }}>
                     <CardHeader title={post.title}
-                        subheader={`${post.userName} • ${post.date}`}
+                        subheader={`${post.userName} • ${moment(post.createdAt).fromNow()}`}
                         action={
                             <IconButton aria-label="settings">
                                 <MoreVertIcon />
@@ -97,6 +114,18 @@ const ForumPage = () => {
                         <Typography variant="body2" color="text.secondary">
                             {post.content}
                         </Typography>
+
+                        {post.category && (
+                            <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>
+                                Kategori: {post.category.name || post.category}
+                            </Typography>
+                        )}
+
+                        {post.tags && post.tags.length > 0 && (
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                                Trigger: {post.tags.map(tag => tag.name || tag).join(", ")}
+                            </Typography>
+                        )}
                     </CardContent>
 
                     <IconButton aria-label="share">
@@ -106,16 +135,16 @@ const ForumPage = () => {
                     <ExpandMore
                         expand={expanded === post.id}
                         onClick={() => handleExpandClick(post.id)}
-                        aria-expanded={expanded===post.id}
+                        aria-expanded={expanded === post.id}
                         aria-label="Visa kommentarerna"
                     >
                         <ExpandMoreIcon />
                     </ExpandMore>
 
                     <Collapse in={expanded === post.id} timeout="auto" unmountOnExit>
-                        <CardContent sx={{bgcolor: '#f9f9f9', borderTop: '1px solid #eee'}}>
+                        <CardContent sx={{ bgcolor: '#f9f9f9', borderTop: '1px solid #eee' }}>
                             <Typography variant="subtitle2" gutterBottom>Kommentarer</Typography>
-                            <CommentForm postId={post.id}/>
+                            <CommentForm postId={post.id} />
                         </CardContent>
                     </Collapse>
                 </Card>

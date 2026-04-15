@@ -1,13 +1,10 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import PostServices from "../../services/PostServices";
 // Page is not implemeted to backend yet, so this is just a mockup of the form.
 
 //import { useNavigate } from "react-router-dom";
-//import { Button, Dialog, DialogTitle, DialogAction, Box } from "@mui/material"
 import {
-  Input,
   InputLabel,
-  InputAdornment,
   TextField,
   Box,
   OutlinedInput,
@@ -17,7 +14,6 @@ import {
   FormControl,
   Button
 } from "@mui/material"
-import { AccountCircle } from "@mui/icons-material"
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 
@@ -33,99 +29,92 @@ const MenuProps = {
     },
   },
 };
-const tagOptions = ["Fråga", "Svar", "Diskussion", "Nyheter", "Tips"];
-const categoryOptions = ["Allmänt", "Teknik", "Hälsa", "Resor", "Mat"];
 
-const PostForm = () => {
+const PostForm = ({ onPostCreated, onClose }) => {
   const [postData, setPostData] = useState({
-    postTitle: "",
-    postContent: "",
-    postTag: ""
+    title: "",
+    content: "",
+    tags: [],
+    categoryId: ""
   });
   const [error, setError] = useState("");
 
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
 
-    // if (
-    //   !postData.postTitle.trim() ||
-    //   !postData.postContent.trim() ||
-    //   !postData.postTag.trim()
-    // ) {
-    //   setError("Alla fält måste vara ifyllda.");
-    //   return;
-    // }
+    if (!postData.title.trim() ||
+      !postData.content.trim() ||
+      !postData.categoryId) {
+      setError("Alla fält måste vara ifyllda.");
+      return;
+    }
 
-    // if (postData.postTitle.length < 1 || postData.postTitle.length > 50) {
-    //   setError("Titeln måste innehålla minst 1 och max 50 tecken.");
-    //   return;
-    // }
-
-    // if (postData.postContent.length < 1) {
-    //   setError("Posten måste innehålla minst 1 tecken.");
-    //   return;
-    // }
-
-    // if (postData.postTag.length < 1) {
-    //   setError("Inlägget måste innehålla minst 1 tagg.");
-    //   return;
-    // }
-
-    // if (selectedCategory.length < 1) {
-    //   setError("Inlägget måste innehålla minst 1 kategori.");
-    //   return;
-    // }
+    if (postData.title.length < 1 || postData.title.length > 50) {
+      setError("Titeln måste innehålla minst 1 och max 50 tecken.");
+      return;
+    }
 
     try {
       const result = await PostServices.create(postData);
-      console.log("Post created successfully:", result);
+      const selectedTags = tags.filter(tag =>
+        postData.tags.includes(tag.id)
+      ).map(tag => tag.name);
+
+      onPostCreated({ ...result, tags: selectedTags }); // Call the callback to update the parent component
+      onClose(); // Close the form after successful submission
     } catch (err) {
-      setError(err.message || 'Registrering misslyckades. Försök igen.');
+      setError(err.message || 'Inlägg skapades inte. Försök igen.');
     }
   };
 
-  const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedTags(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
-    );
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const tagResult = await PostServices.getTags();
+        const catResult = await PostServices.getCategories();
 
-  const handleChangeCategory = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedCategory(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
-    );
-  };
+        const allTags = tagResult.map((tag) => ({
+          id: tag.id,
+          name: tag.name
+        }));
+
+        const allCategories = catResult.map((category) => ({
+          id: category.id,
+          name: category.name
+        }));
+
+        setTags(allTags);
+        setCategories(allCategories);
+      } catch (error) {
+        console.error("Error fetching tags or categories:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <>
       {error && <p>{error}</p>}
-      <form>
+      <form onSubmit={handleSubmit}>
         <div>
           <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
             <TextField
               fullWidth
-              value={postData.postTitle}
-              onChange={(e) => setPostData({ ...postData, postTitle: e.target.value })}
+              value={postData.title}
+              onChange={(e) => setPostData({ ...postData, title: e.target.value })}
               label="Titel"
             /></Box>
         </div>
         <div>
           <TextField
             fullWidth
-            value={postData.postContent}
-            onChange={(e) => setPostData({ ...postData, postContent: e.target.value })}
+            value={postData.content}
+            onChange={(e) => setPostData({ ...postData, content: e.target.value })}
             label="Skriv ditt inlägg här..."
             multiline
             maxRows={6}
@@ -135,56 +124,40 @@ const PostForm = () => {
           <FormControl sx={{ m: 3, width: 300 }}>
             <InputLabel id="demo-multiple-checkbox-label">Kategorier</InputLabel>
             <Select
-              labelId="demo-multiple-checkbox-label"
-              id="demo-multiple-checkbox"
-              multiple
-              value={selectedCategory}
-              onChange={handleChangeCategory}
-              input={<OutlinedInput label="Category" />}
-              renderValue={(selected) => selected.join(', ')}
-              MenuProps={MenuProps}
+              value={postData.categoryId}
+              onChange={(e) => setPostData({ ...postData, categoryId: e.target.value })}
+              label="Kategori"
             >
-              {categoryOptions.map((category) => {
-                const selected = selectedCategory.includes(category);
-                const SelectionIcon = selected ? CheckBoxIcon : CheckBoxOutlineBlankIcon;
-
-                return (
-                  <MenuItem key={category} value={category}>
-                    <SelectionIcon
-                      fontSize="small"
-                      style={{ marginRight: 8, padding: 9, boxSizing: 'content-box' }}
-                    />
-                    <ListItemText primary={category} />
-                  </MenuItem>
-                );
-              })}
+              {categories.map(category => (
+                <MenuItem key={category.id} value={category.id}>
+                  {category.name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </div>
         <div>
           <FormControl sx={{ m: 3, width: 300 }}>
-            <InputLabel id="demo-multiple-checkbox-label">Taggar</InputLabel>
+            <InputLabel id="demo-multiple-checkbox-label">Trigger</InputLabel>
             <Select
-              labelId="demo-multiple-checkbox-label"
-              id="demo-multiple-checkbox"
               multiple
-              value={selectedTags}
-              onChange={handleChange}
+              value={postData.tags}
+              onChange={(e) => setPostData({ ...postData, tags: e.target.value })}
               input={<OutlinedInput label="Taggar" />}
-              renderValue={(selected) => selected.join(', ')}
-              MenuProps={MenuProps}
+              renderValue={(selected) =>
+                selected
+                  .map(id => tags.find(t => t.id === id)?.name)
+                  .join(", ")
+              }
             >
-              {tagOptions.map((tag) => {
-                const selected = selectedTags.includes(tag);
-                const SelectionIcon = selected ? CheckBoxIcon : CheckBoxOutlineBlankIcon;
+              {tags.map(tag => {
+                const selected = postData.tags.includes(tag.id);
+                const Icon = selected ? CheckBoxIcon : CheckBoxOutlineBlankIcon;
 
                 return (
-                  <MenuItem key={tag} value={tag}>
-                    <SelectionIcon
-                      fontSize="small"
-                      style={{ marginRight: 8, padding: 9, boxSizing: 'content-box' }}
-                    />
-                    <ListItemText primary={tag} />
+                  <MenuItem key={tag.id} value={tag.id}>
+                    <Icon fontSize="small" style={{ marginRight: 8 }} />
+                    <ListItemText primary={tag.name} />
                   </MenuItem>
                 );
               })}
@@ -192,7 +165,7 @@ const PostForm = () => {
           </FormControl>
         </div>
         <Button variant="contained"
-          onClick={handleSubmit}
+          type="submit"
           id="submitPost"
           style={{ marginRight: 8 }}>
           Lägg upp inlägg</Button>

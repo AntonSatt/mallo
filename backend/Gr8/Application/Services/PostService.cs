@@ -1,9 +1,6 @@
 ﻿using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Gr8.Application.Services
 {
@@ -11,44 +8,97 @@ namespace Gr8.Application.Services
     {
         private readonly ICommunityRepository _communityRepository;
 
-        public PostService(ICommunityRepository communityRepository)
+        private readonly IApplicationRepository _applicationRepository; 
+
+        public PostService(ICommunityRepository communityRepository, IApplicationRepository applicationRepository)
         {
             _communityRepository = communityRepository;
+            _applicationRepository = applicationRepository;
         }
 
-        public async Task<PostDto?> CreateAsync(PostDto postDto, string userId) //Add categoryId and tags
+        public async Task<PostDto?> CreateAsync(CreatePostDto createPostDto, string userId) 
         {
-            var post = new Post(userId, 0, new List<Tag>())
+            var tags = await _communityRepository.GetTagsByIdAsync(createPostDto.TagIds);
+
+            var post = new Post(userId, createPostDto.CategoryId, tags)
             {
-                Content = postDto.Content
+                Content = createPostDto.Content,
+                Title = createPostDto.Title,
             };
 
             await _communityRepository.AddPostAsync(post);
             var result = await _communityRepository.SaveChangesAsync();
 
-            if (result > 0)
+            if (result <= 0)
             {
-                return postDto;
+                return null;
             }
 
-            return null;
+            var category = await _communityRepository.GetCategoryByIdAsync(post.CategoryId);
+
+            var postDto = new PostDto
+            {
+                Title = post.Title,
+
+                Content = post.Content,
+                CreatedAt = post.CreatedAt,
+                UpdatedAt = post.UpdatedAt,
+                IsEdited = post.IsEdited,
+                IsDeleted = post.IsDeleted
+            };
+
+            if (category != null)
+            {
+                postDto.Category = new CategoryDto
+                {
+                    Id = category.Id,
+                    Name = category.Name
+                };
+            }
+
+            var username = await _applicationRepository.GetUserNameByIdAsync(post.UserId);
+
+            if (username != null) {
+                postDto.UserName = username;
+            }
+
+            return postDto;
         }
 
         public async Task<List<PostDto>> GetAllPostsAsync()
         {
             var posts = await _communityRepository.GetAllPostsAsync();
+            var postDtoList = new List<PostDto>();
 
-            return posts.Select(p => new PostDto 
+            foreach (var post in posts)
             {
-                Id = p.Id,
-                Title = p.Title,
-                Content = p.Content,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt,
-                IsDeleted = p.IsDeleted,
-                IsEdited = p.IsEdited
-            })
-            .ToList();
+                var postDto = new PostDto
+                {
+                    Id = post.Id,
+                    Title = post.Title,
+                    Content = post.Content,
+                    CreatedAt = post.CreatedAt,
+                    UpdatedAt = post.UpdatedAt,
+                    IsDeleted = post.IsDeleted,
+                    IsEdited = post.IsEdited,
+                    Category = new CategoryDto
+                    {
+                        Name = post.Category.Name,
+                        Id = post.Category.Id
+                    }
+                };
+
+                var username = await _applicationRepository.GetUserNameByIdAsync(post.UserId);
+
+                if (username != null) 
+                {
+                    postDto.UserName = username;
+                }
+
+                postDtoList.Add(postDto);
+            }
+
+            return postDtoList;
         }
     }
 }

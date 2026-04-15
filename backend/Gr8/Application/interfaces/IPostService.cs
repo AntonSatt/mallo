@@ -7,7 +7,7 @@ namespace Gr8.Application.Interfaces
 {
     public interface IPostService
     {
-        Task<PostDto?> CreateAsync(PostDto post, string userId);
+        Task<PostDto?> CreateAsync(CreatePostDto post, string userId);
         Task<List<PostDto>> GetAllPostsAsync();
     }
 }

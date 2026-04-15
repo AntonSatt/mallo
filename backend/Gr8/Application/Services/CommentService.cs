@@ -23,6 +23,7 @@ namespace Gr8.Application.Services
             return comments
                 .Select(c => new CommentDto
                 {
+                    Id = c.Id,
                     Content = c.Content,
                     IsDeleted = c.IsDeleted,
                     IsEdited = c.IsEdited,

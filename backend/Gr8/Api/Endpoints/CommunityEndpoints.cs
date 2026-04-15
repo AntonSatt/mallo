@@ -56,7 +56,7 @@ namespace Gr8.Api.Endpoints
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapGet("/forum/posts/{PostId}/comments/", async ([FromServices] ICommentService commentService, int postId) =>
+            app.MapGet("/forum/posts/{PostId}/comments", async ([FromServices] ICommentService commentService, int postId) =>
             {
                 var comments = await commentService.GetCommentsByPostAsync(postId);
 

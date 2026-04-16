@@ -9,5 +9,6 @@ namespace Gr8.Application.Interfaces
     {
         Task<CommentDto?> CreateAsync(CommentDto comment, int postId, string userId); 
         Task<List<CommentDto>> GetCommentsByPostAsync(int postId);
+        Task<bool> DeleteCommentAsync(int commentId, string userId);
     }
 }

@@ -51,5 +51,25 @@ namespace Gr8.Application.Services
 
             return null;
         }
+
+        public async Task<bool> DeleteCommentAsync(int commentId, string userId)
+        {
+            var comment = _communityRepository.GetCommentByIdAsync(commentId).Result;
+
+            if (comment == null)
+            {
+                return false;
+            }
+
+            if (comment.UserId != userId)
+            {
+                return false;
+            }
+
+            comment.IsDeleted = true;
+
+            var result = await _communityRepository.SaveChangesAsync();
+            return result > 0;
+        }
     }
 }

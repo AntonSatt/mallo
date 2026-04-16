@@ -25,7 +25,7 @@ const UserSettings = () => {
         setOpen(true);
     };
 
-    const handleClose = async (event) => {
+    const handleClose = (event) => {
         setOpen(false);
         console.log(event.target.id);
     };

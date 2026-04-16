@@ -1,20 +1,20 @@
 import * as React from "react";
 import PostForm from "../../components/postForm/PostForm";
-import CommentForm from "../../components/commentForm/CommentForm"
+import CommentForm from "../../components/commentForm/CommentForm";
 import {
-    Dialog,
-    Card,
-    CardHeader,
-    CardContent,
-    IconButton,
-    Typography,
-    Collapse,
-    Button,
-    DialogTitle,
-    DialogActions,
-    Menu,
-    MenuItem,
-    TextField
+  Dialog,
+  Card,
+  CardHeader,
+  CardContent,
+  IconButton,
+  Typography,
+  Collapse,
+  Button,
+  DialogTitle,
+  DialogActions,
+  Menu,
+  MenuItem,
+  TextField,
 } from "@mui/material";
 
 import ShareIcon from "@mui/icons-material/Share";
@@ -27,40 +27,38 @@ import PostServices from "../../services/PostServices";
 import moment from "moment";
 
 const ForumPage = () => {
-    const [expanded, setExpanded] = useState(null);
-    const [openPostModal, setPostModalOpen] = useState(false);
-    const [posts, setPosts] = useState([]);
-    const [openReportModal, setOpenReportModal] = useState(false);
-    const [reportReason, setReportReason] = useState("");
+  const [expanded, setExpanded] = useState(null);
+  const [openPostModal, setPostModalOpen] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [openReportModal, setOpenReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
 
-    const [menuAnchorEl, setMenuAnchorEl] = useState(null);
-    const [selectedPostId, setSelectedPostId] = useState(null);
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const [selectedPostId, setSelectedPostId] = useState(null);
 
-    const ExpandMore = styled(IconButton, {
-        shouldForwardProp: (prop) => prop !== 'expand'
+  const ExpandMore = styled(IconButton, {
+    shouldForwardProp: (prop) => prop !== "expand",
+  })(({ theme, expand }) => ({
+    marginLeft: "auto",
+    transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
+    transition: theme.transitions.create("transform", {
+      duration: theme.transitions.duration.shortest,
+    }),
+  }));
 
-    })(({ theme, expand }) => ({
-        marginLeft: "auto",
-        transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
-        transition: theme.transitions.create("transform", {
-            duration: theme.transitions.duration.shortest,
-        }),
-    }));
+  const handleClickOpen = () => {
+    setPostModalOpen(true);
+  };
 
-    const handleClickOpen = () => {
-        setPostModalOpen(true);
-    };
+  const handleClose = async () => {
+    setPostModalOpen(false);
+  };
 
-    const handleClose = async () => {
-        setPostModalOpen(false);
-    };
+  const handleExpandClick = (postId) => {
+    setExpanded(expanded === postId ? null : postId);
+  };
 
-    const handleExpandClick = (postId) => {
-        setExpanded(expanded == postId ? null : postId);
-    };
-
-
-    const handleMenuOpen = (event, postId) => {
+  const handleMenuOpen = (event, postId) => {
     setMenuAnchorEl(event.currentTarget);
     setSelectedPostId(postId);
   };
@@ -68,14 +66,14 @@ const ForumPage = () => {
   const handleMenuClose = () => {
     setMenuAnchorEl(null);
     setSelectedPostId(null);
-  }
+  };
 
-    const handleReport = () => {
+  const handleReport = () => {
     setMenuAnchorEl(null);
     setOpenReportModal(true);
   };
 
-    const handleReportClose = () => {
+  const handleReportClose = () => {
     setOpenReportModal(false);
     setReportReason("");
     setSelectedPostId(null);
@@ -83,114 +81,136 @@ const ForumPage = () => {
 
   const handleReportSubmit = async () => {
     try {
-        //TODO: Implement API call to submit the report with selectedPostId and reportReason.
+      if (!selectedPostId) {
+        console.error("No post selected for report.");
+        return;
+      }
+      await PostServices.report(selectedPostId, {
+        reason: reportReason.trim(),
+      });
 
-        console.log("Report submitted:", {
-            postId: selectedPostId,
-            reason: reportReason
-        });
-
-        handleReportClose();
-    } catch (error){
-        console.error("Failed to report  post:", error);
+      handleReportClose();
+    } catch (error) {
+      console.error("Failed to report  post:", error);
     }
   };
 
-    useEffect(() => {
-        const fetchPosts = async () => {
-            try {
-                const data = await PostServices.getAll();
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const data = await PostServices.getAll();
 
-                const allPosts = data.map((post) => ({
-                    id: post.id,
-                    title: post.title,
-                    content: post.content ? post.content : "Innehåll saknas",
-                }));
-                setPosts([...allPosts, ...posts]);
-            } catch (error) {
-                console.error("Error fetching posts:", error);
-            } finally {
-                // setLoading(false);
-            }
-        };
-        fetchPosts();
-    }, []);
-
-    const handlePostCreated = (newPost) => {
-        console.log("New post created:", newPost);
-        const formattedPost = {
-            id: newPost.id,
-            title: newPost.title,
-            content: newPost.content,
-            userName: newPost.userName,
-            createdAt: newPost.createdAt,
-            category: newPost.category,
-            tags: newPost.tags
-        };
-        setPosts((prevPosts) => [formattedPost, ...prevPosts]);
+        const allPosts = data.map((post) => ({
+          id: post.id,
+          title: post.title,
+          content: post.content ? post.content : "Innehåll saknas",
+          userName: post.userName,
+          createdAt: post.createdAt,
+          category: post.category,
+          tags: post.tags,
+        }));
+        setPosts(allPosts);
+        //setPosts([...allPosts, ...posts]); comment this out to avoid duplicate
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      } finally {
+        // setLoading(false);
+      }
     };
+    fetchPosts();
+  }, []);
 
-    return (
-        <>
-            <Button variant="outlined" color="error" onClick={handleClickOpen}>
-                Skapa nytt inlägg...
-            </Button>
-            <Dialog open={openPostModal} onClose={handleClose} fullWidth maxWidth="sm" >
-                <DialogTitle>Skapa nytt inlägg</DialogTitle>
-                <PostForm
-                    onPostCreated={handlePostCreated}
-                    onClose={handleClose}
-                />
-                <DialogActions>
-                    <Button variant="text " color="inherit" onClick={handleClose}>Avbryt</Button>
-                </DialogActions>
-            </Dialog>
+  const handlePostCreated = (newPost) => {
+    console.log("New post created:", newPost);
+    const formattedPost = {
+      id: newPost.id,
+      title: newPost.title,
+      content: newPost.content,
+      userName: newPost.userName,
+      createdAt: newPost.createdAt,
+      category: newPost.category,
+      tags: newPost.tags,
+    };
+    setPosts((prevPosts) => [formattedPost, ...prevPosts]);
+  };
 
-            {/* Our Report-modal starts here */}
-            <Dialog
-                open={openReportModal}
-                onClose={handleReportClose}
-                fullWidth
-                maxWidth="sm"> 
+  return (
+    <>
+      <Button variant="outlined" color="error" onClick={handleClickOpen}>
+        Skapa nytt inlägg...
+      </Button>
+      <Dialog
+        open={openPostModal}
+        onClose={handleClose}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Skapa nytt inlägg</DialogTitle>
+        <PostForm onPostCreated={handlePostCreated} onClose={handleClose} />
+        <DialogActions>
+          <Button variant="text " color="inherit" onClick={handleClose}>
+            Avbryt
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-                <DialogTitle>Anmäl inlägg</DialogTitle>
-                <CardContent>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
-                        Beskriv varför du vill anmäla inlägget:
-                    </Typography>
-                    <TextField
-                        fullWidth
-                        multiline
-                        rows={4}
-                        label="Anmälan"
-                        placeholder="Ange anmälan..."
-                        value={reportReason}
-                        onChange={(e) => setReportReason(e.target.value)}
-                    />
-                </CardContent>
+      {/* Our Report-modal starts here */}
+      <Dialog
+        open={openReportModal}
+        onClose={handleReportClose}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Anmäl inlägg</DialogTitle>
+        <CardContent>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Beskriv varför du vill anmäla inlägget:
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            label="Anmälan"
+            placeholder="Ange anmälan..."
+            value={reportReason}
+            onChange={(e) => setReportReason(e.target.value)}
+          />
+        </CardContent>
 
-                <DialogActions>
-                    <Button color="inherit" onClick={handleReportClose}>
-                        Avbryt
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="error"
-                        onClick={handleReportSubmit}
-                        disabled={!reportReason.trim()}
-                    >
-                        Skicka anmälan
-                    </Button>
-                </DialogActions>
-            </Dialog>
+        <DialogActions>
+          <Button color="inherit" onClick={handleReportClose}>
+            Avbryt
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleReportSubmit}
+            disabled={!reportReason.trim()}
+          >
+            Skicka anmälan
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-            {posts.map((post) => (
-                <Card key={post.id} sx={{ maxWidth: 500, marginBottom: 2 }}>
-                    <CardHeader title={post.title}
-                        subheader={`${post.userName} • ${moment(post.createdAt).fromNow()}`}
-                        action={
-                            <>
-                             <IconButton
+      <Menu
+        id="post-menu"
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <MenuItem onClick={handleReport}>Anmäl inlägg</MenuItem>
+      </Menu>
+
+      {posts.map((post) => (
+        <Card key={post.id} sx={{ maxWidth: 500, marginBottom: 2 }}>
+          <CardHeader
+            title={post.title}
+            subheader={`${post.userName} • ${moment(post.createdAt).fromNow()}`}
+            action={
+              <>
+                <IconButton
                   aria-label="more"
                   id={"post-menu-button-" + post.id}
                   aria-controls={menuAnchorEl ? "post-menu" : undefined}
@@ -200,60 +220,62 @@ const ForumPage = () => {
                 >
                   <MoreVertIcon />
                 </IconButton>
-                <Menu
-                  id="post-menu"
-                  anchorEl={menuAnchorEl}
-                  open={Boolean(menuAnchorEl)}
-                  onClose={handleMenuClose}
-                  anchorOrigin={{vertical: "bottom", horizontal: "right",}}
-                  transformOrigin={{vertical: "top",horizontal: "right",}}
-                >
-                <MenuItem onClick={handleReport}>Anmäl inlägg</MenuItem>
-                </Menu>
+              </>
+            }
+          />
 
-                            </>
-                        } />
+          <CardContent>
+            <Typography variant="body2" color="text.secondary">
+              {post.content}
+            </Typography>
 
-                    <CardContent>
-                        <Typography variant="body2" color="text.secondary">
-                            {post.content}
-                        </Typography>
+            {post.category && (
+              <Typography
+                variant="subtitle2"
+                color="text.secondary"
+                sx={{ mt: 1 }}
+              >
+                Kategori: {post.category.name || post.category}
+              </Typography>
+            )}
 
-                        {post.category && (
-                            <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>
-                                Kategori: {post.category.name || post.category}
-                            </Typography>
-                        )}
+            {post.tags && post.tags.length > 0 && (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 1 }}
+              >
+                Trigger: {post.tags.map((tag) => tag.name || tag).join(", ")}
+              </Typography>
+            )}
+          </CardContent>
 
-                        {post.tags && post.tags.length > 0 && (
-                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-                                Trigger: {post.tags.map(tag => tag.name || tag).join(", ")}
-                            </Typography>
-                        )}
-                    </CardContent>
+          <IconButton aria-label="share">
+            <ShareIcon />
+          </IconButton>
 
-                    <IconButton aria-label="share">
-                        <ShareIcon />
-                    </IconButton>
+          <ExpandMore
+            expand={expanded === post.id}
+            onClick={() => handleExpandClick(post.id)}
+            aria-expanded={expanded === post.id}
+            aria-label="Visa kommentarerna"
+          >
+            <ExpandMoreIcon />
+          </ExpandMore>
 
-                    <ExpandMore
-                        expand={expanded === post.id}
-                        onClick={() => handleExpandClick(post.id)}
-                        aria-expanded={expanded === post.id}
-                        aria-label="Visa kommentarerna"
-                    >
-                        <ExpandMoreIcon />
-                    </ExpandMore>
-
-                    <Collapse in={expanded === post.id} timeout="auto" unmountOnExit>
-                        <CardContent sx={{ bgcolor: '#f9f9f9', borderTop: '1px solid #eee' }}>
-                            <Typography variant="subtitle2" gutterBottom>Kommentarer</Typography>
-                            <CommentForm postId={post.id} />
-                        </CardContent>
-                    </Collapse>
-                </Card>
-            ))}
-        </>
-    );
-}
+          <Collapse in={expanded === post.id} timeout="auto" unmountOnExit>
+            <CardContent
+              sx={{ bgcolor: "#f9f9f9", borderTop: "1px solid #eee" }}
+            >
+              <Typography variant="subtitle2" gutterBottom>
+                Kommentarer
+              </Typography>
+              <CommentForm postId={post.id} />
+            </CardContent>
+          </Collapse>
+        </Card>
+      ))}
+    </>
+  );
+};
 export default ForumPage;

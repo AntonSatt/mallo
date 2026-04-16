@@ -67,6 +67,42 @@ Cache impact is minor: `npm ci` layer is unaffected, only `npm run build` re-run
 
 There is **no committed `.env.example`** in `frontend/Gr8/`. Devops can't know which `VITE_*` variables exist without grepping the source. Frontend should add a `.env.example` with every var the app reads, and update it whenever they introduce a new one. That's the contract that lets CI/devops stay in sync without anyone having to ask.
 
+## Bonus fix #2: CORS rejecting the deployed frontend
+
+After fixing the frontend's API base URL, login still failed with "Network Error" in the browser. Network tab showed the preflight `OPTIONS` returning `204` but no follow-up `POST` — classic browser-side CORS rejection.
+
+`backend/Gr8/Api/Program.cs` hardcoded the allowed origin to `http://localhost:5173`. Locally that works because the frontend dev server runs there. On swarm the frontend origin is `https://gr8-<branch>.doe25.swarm.chas-lab.dev`, which wasn't in the allow-list, so the browser blocked the actual request after the preflight.
+
+### Changes
+
+**`backend/Gr8/Api/Program.cs`** — read allowed origins from configuration instead of hardcoding:
+
+```csharp
+var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+                  ?? new[] { "http://localhost:5173" };
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ReactApplication", policy =>
+    {
+        policy.WithOrigins(corsOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+```
+
+Default fallback is `localhost:5173` so local dev keeps working without setting any env var.
+
+**`docker-compose.yml`** — set the per-stack origins via env vars:
+
+```yaml
+- Cors__AllowedOrigins__0=https://${stack_name}.doe25.swarm.chas-lab.dev
+- Cors__AllowedOrigins__1=http://localhost:5173
+```
+
+`${stack_name}` is already substituted by `deploy.py` to `gr8-${CI_COMMIT_REF_SLUG}`, so each branch's api gets the correct frontend origin in its allow-list automatically. Localhost is kept in slot 1 so devs can still hit a deployed api from their local frontend if they ever want to.
+
 ## Future / when moving to K8s
 
 Microsoft's own guidance is that in-process `Migrate()` on boot is pragmatic for dev/staging but not recommended for production at scale (schema-modification rights on the app's DB user, no human review of SQL before apply, replica race without EF 9's locking). When migrating to K8s, extract this into a dedicated migration Job / init container that runs once before the api Deployment rolls out, and drop the `Migrate()` call from `Program.cs`.

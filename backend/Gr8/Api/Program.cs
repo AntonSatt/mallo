@@ -56,11 +56,14 @@ namespace Gr8
                 //});
             });
 
+            var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+                              ?? new[] { "http://localhost:5173" };
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("ReactApplication", policy =>
                 {
-                    policy.WithOrigins("http://localhost:5173")
+                    policy.WithOrigins(corsOrigins)
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                 });

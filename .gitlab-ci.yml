@@ -44,6 +44,7 @@ build frontend:
       docker buildx build \
         -f frontend/Gr8/Dockerfile \
         -t "$CI_REGISTRY_IMAGE/frontend:$TAG" \
+        --build-arg VITE_API_BASE_URL="https://api.gr8-${CI_COMMIT_REF_SLUG}.doe25.swarm.chas-lab.dev" \
         --cache-from=type=registry,ref="$CI_REGISTRY_IMAGE/frontend:cache-$TAG" \
         --cache-from=type=registry,ref="$CI_REGISTRY_IMAGE/frontend:cache-latest" \
         --cache-to=type=registry,ref="$CI_REGISTRY_IMAGE/frontend:cache-$TAG",mode=max \

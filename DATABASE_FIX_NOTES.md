@@ -34,8 +34,38 @@ Added `EnableRetryOnFailure()` to both `UseSqlServer` calls. The api container c
 
 ## What this does NOT touch
 
-- Dockerfile is fine, unchanged.
-- CI pipeline is fine, unchanged — we chose in-app migration over a separate migration job because Swarm runs api at `replicas: 1`, so there's no concurrent-migration race.
+- Backend Dockerfile is fine, unchanged.
+- We chose in-app migration over a separate migration job because Swarm runs api at `replicas: 1`, so there's no concurrent-migration race.
+
+## Bonus fix: frontend couldn't reach the api (separate bug, same root cause pattern)
+
+After the database fix the api was alive on swarm but login still failed with 404. Cause: `frontend/Gr8/src/api/ApiClient.jsx:5` reads `import.meta.env.VITE_API_BASE_URL`, which Vite inlines **at build time**. Locally the frontend devs each have a gitignored `.env` file with `VITE_API_BASE_URL=http://localhost:5225` that points axios at their local `dotnet run` backend — so it works on their machines. CI clones the repo without any `.env` (it's gitignored), so the variable was undefined and axios sent every request to relative paths on the frontend's own origin → nginx 404.
+
+Same "works on my machine because of state that's invisible to CI" pattern as the database issue.
+
+### Changes
+
+**`frontend/Gr8/Dockerfile`** — accept the URL as a build arg and expose it to Vite:
+
+```dockerfile
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+RUN npm run build
+```
+
+**`.gitlab-ci.yml`** (`build frontend` job) — pass the per-branch api URL as a build arg:
+
+```yaml
+--build-arg VITE_API_BASE_URL="https://api.gr8-${CI_COMMIT_REF_SLUG}.doe25.swarm.chas-lab.dev"
+```
+
+Works uniformly for review (`api.gr8-feature-foo...`), develop (`api.gr8-develop...`), and production (`api.gr8-main...`) because the api hostname pattern is `api.<stack_name>.doe25.swarm.chas-lab.dev` (`docker-compose.yml:52-56`) and `stack_name = gr8-${CI_COMMIT_REF_SLUG}` (`devops/scripts/deploy.py:28`).
+
+Cache impact is minor: `npm ci` layer is unaffected, only `npm run build` re-runs when the URL differs.
+
+### Open follow-up for the frontend team
+
+There is **no committed `.env.example`** in `frontend/Gr8/`. Devops can't know which `VITE_*` variables exist without grepping the source. Frontend should add a `.env.example` with every var the app reads, and update it whenever they introduce a new one. That's the contract that lets CI/devops stay in sync without anyone having to ask.
 
 ## Future / when moving to K8s
 

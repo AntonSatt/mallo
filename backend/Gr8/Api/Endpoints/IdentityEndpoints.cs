@@ -132,11 +132,21 @@ namespace Gr8.Api.Endpoints
                         return Results.NotFound("User not found.");
                     }
 
+                    var context = new ValidationContext(updatePasswordDto);
+                    var results = new List<ValidationResult>();
+
+                    bool isValid = Validator.TryValidateObject(updatePasswordDto, context, results, true);
+
+                    if (!isValid) 
+                    {
+                        return Results.BadRequest(results.Select(r => r.ErrorMessage));
+                    }
+
                     var changedPassword = await userManager.ChangePasswordAsync(appUser, updatePasswordDto.CurrentPassword, updatePasswordDto.NewPassword);
 
                     return changedPassword.Succeeded
                     ? Results.Ok("Password updated successfully")
-                    : Results.BadRequest(changedPassword.Errors);
+                    : Results.BadRequest(changedPassword.Errors.Select(e => e.Description));
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
         }

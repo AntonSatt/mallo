@@ -30,7 +30,7 @@ const PostServices = {
         const response = await ApiClient.post(
             "/forum/report/",
             {
-                reason: reportData.reason
+                postId, reason: reportData.reason
             }
         );
         return response.data;

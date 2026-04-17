@@ -1,4 +1,5 @@
 import * as React from "react";
+import ReportForm from "../../components/reportForm/ReportForm";
 import PostForm from "../../components/postForm/PostForm";
 import CommentForm from "../../components/commentForm/CommentForm";
 import {
@@ -14,7 +15,6 @@ import {
   DialogActions,
   Menu,
   MenuItem,
-  TextField,
 } from "@mui/material";
 
 import ShareIcon from "@mui/icons-material/Share";
@@ -31,7 +31,6 @@ const ForumPage = () => {
   const [openPostModal, setPostModalOpen] = useState(false);
   const [posts, setPosts] = useState([]);
   const [openReportModal, setOpenReportModal] = useState(false);
-  const [reportReason, setReportReason] = useState("");
 
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [selectedPostId, setSelectedPostId] = useState(null);
@@ -75,25 +74,9 @@ const ForumPage = () => {
 
   const handleReportClose = () => {
     setOpenReportModal(false);
-    setReportReason("");
     setSelectedPostId(null);
   };
 
-  const handleReportSubmit = async () => {
-    try {
-      if (!selectedPostId) {
-        console.error("No post selected for report.");
-        return;
-      }
-      await PostServices.report(selectedPostId, {
-        reason: reportReason.trim(),
-      });
-
-      handleReportClose();
-    } catch (error) {
-      console.error("Failed to report  post:", error);
-    }
-  };
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -154,43 +137,11 @@ const ForumPage = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Our Report-modal starts here */}
-      <Dialog
+      <ReportForm
         open={openReportModal}
+        postId={selectedPostId}
         onClose={handleReportClose}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle>Anmäl inlägg</DialogTitle>
-        <CardContent>
-          <Typography variant="body2" sx={{ mb: 2 }}>
-            Beskriv varför du vill anmäla inlägget:
-          </Typography>
-          <TextField
-            fullWidth
-            multiline
-            rows={4}
-            label="Anmälan"
-            placeholder="Ange anmälan..."
-            value={reportReason}
-            onChange={(e) => setReportReason(e.target.value)}
-          />
-        </CardContent>
-
-        <DialogActions>
-          <Button color="inherit" onClick={handleReportClose}>
-            Avbryt
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={handleReportSubmit}
-            disabled={!reportReason.trim()}
-          >
-            Skicka anmälan
-          </Button>
-        </DialogActions>
-      </Dialog>
+      />
 
       <Menu
         id="post-menu"

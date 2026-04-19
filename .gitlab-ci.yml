@@ -146,3 +146,19 @@ stop_review:
   rules:
     - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_COMMIT_BRANCH != "develop"
       when: manual
+
+
+# ---------------------------------------------------------------------------
+# Tillfälligt testjobb för att verifiera min DinD-setup
+# ---------------------------------------------------------------------------
+test-reza-dind:
+  stage: test
+  image: docker:29
+  services:
+    - docker:29-dind
+  tags:
+    - reza-runner
+  script:
+    - docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
+    - docker info
+    - echo "Om jag ser detta fungerar DinD lokalt!"

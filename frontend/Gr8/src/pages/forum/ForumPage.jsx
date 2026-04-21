@@ -19,7 +19,7 @@ import {
 
 import ShareIcon from "@mui/icons-material/Share";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
@@ -169,7 +169,7 @@ const ForumPage = () => {
                   aria-haspopup="true"
                   onClick={(event) => handleMenuOpen(event, post.id)}
                 >
-                  <MoreVertIcon />
+                  <MoreHorizIcon />
                 </IconButton>
               </>
             }

@@ -1,5 +1,7 @@
+import * as React from "react";
+import ReportForm from "../../components/reportForm/ReportForm";
 import PostForm from "../../components/postForm/PostForm";
-import CommentForm from "../../components/commentForm/CommentForm"
+import CommentForm from "../../components/commentForm/CommentForm";
 import {
     Dialog,
     Card,
@@ -10,12 +12,14 @@ import {
     Collapse,
     Button,
     DialogTitle,
-    DialogActions
+    DialogActions,
+    Menu,
+    MenuItem,
 } from "@mui/material";
 
 import ShareIcon from "@mui/icons-material/Share";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
@@ -24,12 +28,15 @@ import moment from "moment";
 
 const ForumPage = () => {
     const [expanded, setExpanded] = useState(null);
-    const [open, setOpen] = useState(false);
+    const [openPostModal, setPostModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
+    const [openReportModal, setOpenReportModal] = useState(false);
+
+    const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+    const [selectedPostId, setSelectedPostId] = useState(null);
 
     const ExpandMore = styled(IconButton, {
-        shouldForwardProp: (prop) => prop !== 'expand'
-
+        shouldForwardProp: (prop) => prop !== "expand",
     })(({ theme, expand }) => ({
         marginLeft: "auto",
         transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
@@ -39,15 +46,35 @@ const ForumPage = () => {
     }));
 
     const handleClickOpen = () => {
-        setOpen(true);
+        setPostModalOpen(true);
     };
 
     const handleClose = async () => {
-        setOpen(false);
+        setPostModalOpen(false);
     };
 
     const handleExpandClick = (postId) => {
-        setExpanded(expanded == postId ? null : postId);
+        setExpanded(expanded === postId ? null : postId);
+    };
+
+    const handleMenuOpen = (event, postId) => {
+        setMenuAnchorEl(event.currentTarget);
+        setSelectedPostId(postId);
+    };
+
+    const handleMenuClose = () => {
+        setMenuAnchorEl(null);
+        setSelectedPostId(null);
+    };
+
+    const handleReport = () => {
+        setMenuAnchorEl(null);
+        setOpenReportModal(true);
+    };
+
+    const handleReportClose = () => {
+        setOpenReportModal(false);
+        setSelectedPostId(null);
     };
 
     useEffect(() => {
@@ -59,8 +86,12 @@ const ForumPage = () => {
                     id: post.id,
                     title: post.title,
                     content: post.content ? post.content : "Innehåll saknas",
+                    userName: post.userName,
+                    createdAt: post.createdAt,
+                    category: post.category,
+                    tags: post.tags,
                 }));
-                setPosts([...allPosts, ...posts]);
+                setPosts(allPosts);
             } catch (error) {
                 console.error("Error fetching posts:", error);
             } finally {
@@ -79,7 +110,7 @@ const ForumPage = () => {
             userName: newPost.userName,
             createdAt: newPost.createdAt,
             category: newPost.category,
-            tags: newPost.tags
+            tags: newPost.tags,
         };
         setPosts((prevPosts) => [formattedPost, ...prevPosts]);
     };
@@ -89,26 +120,58 @@ const ForumPage = () => {
             <Button variant="outlined" color="error" onClick={handleClickOpen}>
                 Skapa nytt inlägg...
             </Button>
-            <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" >
+            <Dialog
+                open={openPostModal}
+                onClose={handleClose}
+                fullWidth
+                maxWidth="sm"
+            >
                 <DialogTitle>Skapa nytt inlägg</DialogTitle>
-                <PostForm
-                    onPostCreated={handlePostCreated}
-                    onClose={handleClose}
-                />
+                <PostForm onPostCreated={handlePostCreated} onClose={handleClose} />
                 <DialogActions>
-                    <Button variant="text " color="inherit" onClick={handleClose}>Avbryt</Button>
+                    <Button variant="text " color="inherit" onClick={handleClose}>
+                        Avbryt
+                    </Button>
                 </DialogActions>
             </Dialog>
 
+            <ReportForm
+                open={openReportModal}
+                postId={selectedPostId}
+                onClose={handleReportClose}
+            />
+
+            <Menu
+                id="post-menu"
+                anchorEl={menuAnchorEl}
+                open={Boolean(menuAnchorEl)}
+                onClose={handleMenuClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                transformOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+                <MenuItem onClick={handleReport}>Anmäl inlägg</MenuItem>
+            </Menu>
+
             {posts.map((post) => (
                 <Card key={post.id} sx={{ maxWidth: 500, marginBottom: 2 }}>
-                    <CardHeader title={post.title}
+                    <CardHeader
+                        title={post.title}
                         subheader={`${post.userName} • ${moment(post.createdAt).fromNow()}`}
                         action={
-                            <IconButton aria-label="settings">
-                                <MoreVertIcon />
-                            </IconButton>
-                        } />
+                            <>
+                                <IconButton
+                                    aria-label="more"
+                                    id={"post-menu-button-" + post.id}
+                                    aria-controls={menuAnchorEl ? "post-menu" : undefined}
+                                    aria-expanded={menuAnchorEl ? "true" : undefined}
+                                    aria-haspopup="true"
+                                    onClick={(event) => handleMenuOpen(event, post.id)}
+                                >
+                                    <MoreHorizIcon />
+                                </IconButton>
+                            </>
+                        }
+                    />
 
                     <CardContent>
                         <Typography variant="body2" color="text.secondary">
@@ -116,14 +179,22 @@ const ForumPage = () => {
                         </Typography>
 
                         {post.category && (
-                            <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>
+                            <Typography
+                                variant="subtitle2"
+                                color="text.secondary"
+                                sx={{ mt: 1 }}
+                            >
                                 Kategori: {post.category.name || post.category}
                             </Typography>
                         )}
 
                         {post.tags && post.tags.length > 0 && (
-                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-                                Trigger: {post.tags.map(tag => tag.name || tag).join(", ")}
+                            <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ mt: 1 }}
+                            >
+                                Trigger: {post.tags.map((tag) => tag.name || tag).join(", ")}
                             </Typography>
                         )}
                     </CardContent>
@@ -142,8 +213,12 @@ const ForumPage = () => {
                     </ExpandMore>
 
                     <Collapse in={expanded === post.id} timeout="auto" unmountOnExit>
-                        <CardContent sx={{ bgcolor: '#f9f9f9', borderTop: '1px solid #eee' }}>
-                            <Typography variant="subtitle2" gutterBottom>Kommentarer</Typography>
+                        <CardContent
+                            sx={{ bgcolor: "#f9f9f9", borderTop: "1px solid #eee" }}
+                        >
+                            <Typography variant="subtitle2" gutterBottom>
+                                Kommentarer
+                            </Typography>
                             <CommentForm postId={post.id} />
                         </CardContent>
                     </Collapse>
@@ -151,5 +226,5 @@ const ForumPage = () => {
             ))}
         </>
     );
-}
+};
 export default ForumPage;

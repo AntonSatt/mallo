@@ -92,7 +92,6 @@ const ForumPage = () => {
                     tags: post.tags,
                 }));
                 setPosts(allPosts);
-                //setPosts([...allPosts, ...posts]); comment this out to avoid duplicate
             } catch (error) {
                 console.error("Error fetching posts:", error);
             } finally {

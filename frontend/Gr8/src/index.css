@@ -1,0 +1,26 @@
+:root {
+    /* Primary UI / active states */
+    --action-primary: #FFC656;
+    --action-primary-soft: #FFD98C;
+    --action-primary-button: #FFB57C;
+    --action-secondary-button: #FFF0D4;
+
+    /* Inputs */
+    --input-background: #F5F5F5;
+
+    /* States */
+    --state-hover: #FFB38A;
+    --state-focus: #FFDCE8;
+
+    /* Text & Surfaces */
+    --brand-notification: #FFB2B6;
+    --text-link: #6E7DFF;
+    --text-primary: #374957;
+    --text-secondary: #3D3D3D;
+    --surface-primary: #FFF9F2;
+    --surface-secondary: #FFF9ED;
+    --surface-info: #EFF1FF;
+
+    /* Status / supportive */
+    --status-success: #B2C8BA;
+}

@@ -136,12 +136,13 @@ deploy production:
 stop_review:
   stage: cleanup
   image: $CI_REGISTRY_IMAGE/python-utils:latest
+  variables:
+    GIT_STRATEGY: none
   environment:
     name: review/$CI_COMMIT_REF_SLUG
     action: stop
   script:
-    - cd devops/scripts
-    - python delete-stack.py
+    - python /app/delete-stack.py
   rules:
     - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_COMMIT_BRANCH != "develop"
       when: manual

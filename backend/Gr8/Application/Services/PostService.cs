@@ -56,11 +56,10 @@ namespace Gr8.Application.Services
                 };
             }
 
-            var username = await _applicationRepository.GetUserNameByIdAsync(post.UserId);
+            var userName = await _applicationRepository.GetUserNameByIdAsync(post.UserId);
 
-            if (username != null)
-            {
-                postDto.UserName = username;
+            if (userName != null) {
+                postDto.UserName = userName;
             }
 
             return postDto;
@@ -89,11 +88,11 @@ namespace Gr8.Application.Services
                     }
                 };
 
-                var username = await _applicationRepository.GetUserNameByIdAsync(post.UserId);
+                var userName = await _applicationRepository.GetUserNameByIdAsync(post.UserId);
 
-                if (username != null)
+                if (userName != null) 
                 {
-                    postDto.UserName = username;
+                    postDto.UserName = userName;
                 }
 
                 postDtoList.Add(postDto);

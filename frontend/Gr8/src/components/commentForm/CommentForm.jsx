@@ -12,7 +12,7 @@ import{
     MenuItem
 } from "@mui/material";
 import moment from "moment";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 const CommentForm = ({postId}) =>{
     const [commentData, setCommentData] = useState({
@@ -114,15 +114,15 @@ const CommentForm = ({postId}) =>{
                         comments.map((c, index) => (
                             <Box key={c.id || index} sx={{ mb: 2, p: 2, bgcolor: 'white', borderRadius: 1, boxShadow: 1 }}>
 
-                                <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+                                <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                                 <Typography variant="caption" color="text.secondary" display="block">
                                     {`${c.userName} • ${moment(c.createdAt).fromNow()}`}
                                 </Typography>
                                 
                                 {c.id && (
                                     //3-dots button per comment.
-                                    <IconButton size="small" onClick={(event) => handleOpenMenu(event, c.id)}>
-                                        <MoreVertIcon fontSize="small" />
+                                    <IconButton size="small" onClick={(event) => handleOpenMenu(event, c.id)} sx={{alignSelf: "flex-start"}}>
+                                        <MoreHorizIcon fontSize="small" />
                                     </IconButton>
                                 )}
                                 </Box>

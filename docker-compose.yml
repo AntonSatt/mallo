@@ -8,21 +8,42 @@ services:
       - internal
     volumes:
       - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${DB_PASSWORD}' -C -Q 'SELECT 1' || /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P '${DB_PASSWORD}' -Q 'SELECT 1' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
     deploy:
       mode: replicated
       replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 120s
+      resources:
+        limits:
+          memory: 3G
+        reservations:
+          memory: 2G
 
   api:
     image: ${CI_REGISTRY_IMAGE}/backend:${image_tag}
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=db;Database=Gr8;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=true
+      - ConnectionStrings__DefaultConnection=Server=db;Database=CommunityDB;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=true
     networks:
       - internal
       - traefik-public
     deploy:
       mode: replicated
       replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 120s
       labels:
         - "traefik.enable=true"
         - "traefik.constraint-label=traefik-public"

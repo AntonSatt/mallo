@@ -9,9 +9,12 @@ import {
   Button,
 } from "@mui/material";
 import PostServices from "../../services/PostServices";
+import CommentServices from "../../services/CommentServices";
 
-const ReportForm = ({ open, postId, onClose }) => {
+const ReportForm = ({ open, postId, commentId, onClose }) => {
   const [reportReason, setReportReason] = useState("");
+
+  const isCommentReport = Boolean(commentId);
 
   const handleClose = () => {
     setReportReason("");
@@ -20,14 +23,17 @@ const ReportForm = ({ open, postId, onClose }) => {
 
   const handleSubmit = async () => {
     try {
-      if (!postId) {
-        console.error("No post selected for report.");
+      const reason = reportReason.trim();
+      if (!reason) return;
+
+      if (isCommentReport) {
+        await CommentServices.report(commentId, { reason });
+      } else if (postId) {
+        await PostServices.report(postId, { reason });
+      } else {
+        console.error("No post or comment selected for report.");
         return;
       }
-
-      await PostServices.report(postId, {
-        reason: reportReason.trim(),
-      });
 
       handleClose();
     } catch (error) {
@@ -37,11 +43,15 @@ const ReportForm = ({ open, postId, onClose }) => {
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-      <DialogTitle>Anmäl inlägg</DialogTitle>
+      <DialogTitle>
+        {isCommentReport ? "Anmäl kommentar" : "Anmäl inlägg"}
+      </DialogTitle>
 
       <CardContent>
         <Typography variant="body2" sx={{ mb: 2 }}>
-          Beskriv varför du vill anmäla inlägget:
+          {isCommentReport
+            ? "Beskriv varför du vill anmäla kommentaren:"
+            : "Beskriv varför du vill anmäla inlägget:"}
         </Typography>
         <TextField
           fullWidth

@@ -170,6 +170,13 @@ namespace Gr8.Api.Endpoints
                     return Results.Unauthorized();
                 }
 
+                var comment = await commentService.GetCommentByIdAsync(commentId);
+
+                if (comment == null)
+                {
+                    return Results.NotFound();
+                }
+
                 var result = await commentService.DeleteCommentAsync(commentId, appUser.Id);
 
                 if (!result)

@@ -1,7 +1,9 @@
-import * as React from "react";
 import ReportForm from "../../components/reportForm/ReportForm";
 import PostForm from "../../components/postForm/PostForm";
 import CommentForm from "../../components/commentForm/CommentForm";
+import DeletePost from "../../components/deleteForm/DeletePost.jsx";
+import PostServices from "../../services/PostServices";
+
 import {
     Dialog,
     Card,
@@ -20,10 +22,8 @@ import {
 import ShareIcon from "@mui/icons-material/Share";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-
 import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
-import PostServices from "../../services/PostServices";
 import moment from "moment";
 
 const ForumPage = () => {
@@ -34,6 +34,15 @@ const ForumPage = () => {
 
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
     const [selectedPostId, setSelectedPostId] = useState(null);
+    const [deletePostId, setDeletePostId] = useState(null);
+
+    const handleOpenPostDelete = (postId) => {
+        setDeletePostId(postId);
+    };
+
+    const handleClosePostDelete = () => {
+        setDeletePostId(null);
+    };
 
     const ExpandMore = styled(IconButton, {
         shouldForwardProp: (prop) => prop !== "expand",
@@ -88,8 +97,8 @@ const ForumPage = () => {
                     content: post.content ? post.content : "Innehåll saknas",
                     userName: post.userName,
                     createdAt: post.createdAt,
-                    category: post.category,
-                    tags: post.tags,
+                    category: post.category ? post.category : "Ingen kategori",
+                    tags: post.tags ? post.tags : []
                 }));
                 setPosts(allPosts);
             } catch (error) {
@@ -117,6 +126,16 @@ const ForumPage = () => {
 
     return (
         <>
+            <DeletePost
+                postId={deletePostId}
+                open={!!deletePostId} // Open when deletePostId is not null
+                onClose={handleClosePostDelete}
+                onPostDeleted={(id) => {
+                    setPosts(prev => prev.filter(p => p.id !== id));
+                    handleClosePostDelete();
+                }}
+            />
+
             <Button variant="outlined" color="error" onClick={handleClickOpen}>
                 Skapa nytt inlägg...
             </Button>
@@ -127,7 +146,12 @@ const ForumPage = () => {
                 maxWidth="sm"
             >
                 <DialogTitle>Skapa nytt inlägg</DialogTitle>
-                <PostForm onPostCreated={handlePostCreated} onClose={handleClose} />
+
+                <PostForm
+                    onPostCreated={handlePostCreated}
+                    onClose={handleClose}
+                />
+
                 <DialogActions>
                     <Button variant="text " color="inherit" onClick={handleClose}>
                         Avbryt
@@ -150,6 +174,9 @@ const ForumPage = () => {
                 transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
                 <MenuItem onClick={handleReport}>Anmäl inlägg</MenuItem>
+                <MenuItem onClick={() => {
+                    handleOpenPostDelete(selectedPostId);
+                }}>Radera inlägg</MenuItem>
             </Menu>
 
             {posts.map((post) => (
@@ -227,4 +254,5 @@ const ForumPage = () => {
         </>
     );
 };
+
 export default ForumPage;

@@ -23,9 +23,9 @@ namespace Gr8.Application.Services
         {
             var comments = await _communityRepository.GetCommentsByPostAsync(postId);
 
-            var commentsDtoList = new List <CommentDto>();
+            var commentsDtoList = new List<CommentDto>();
 
-            foreach(var comment in comments) 
+            foreach (var comment in comments)
             {
                 var commentDto = new CommentDto
                 {
@@ -39,16 +39,16 @@ namespace Gr8.Application.Services
 
                 var userName = await _applicationRepository.GetUserNameByIdAsync(comment.UserId);
 
-                if(userName != null)
+                if (userName != null)
                 {
                     commentDto.UserName = userName;
                 }
 
                 commentsDtoList.Add(commentDto);
-                
+
             }
-        
-            return commentsDtoList; 
+
+            return commentsDtoList;
         }
 
         public async Task<CommentDto?> CreateAsync(CommentDto commentDto, int postId, string userId)
@@ -79,9 +79,9 @@ namespace Gr8.Application.Services
                 IsEdited = comment.IsEdited
             };
 
-            if (userName != null) 
+            if (userName != null)
             {
-               resultDto.UserName = userName;       
+                resultDto.UserName = userName;
             }
 
             return resultDto;
@@ -105,6 +105,30 @@ namespace Gr8.Application.Services
 
             var result = await _communityRepository.SaveChangesAsync();
             return result > 0;
+        }
+
+        public async Task<CommentDto?> GetCommentByIdAsync(int commentId)
+        {
+            var comment = await _communityRepository.GetCommentByIdAsync(commentId);
+
+            if (comment == null)
+                return null;
+
+            var commentDto = new CommentDto
+            {
+                Id = comment.Id,
+                Content = comment.Content,
+                IsDeleted = comment.IsDeleted,
+                IsEdited = comment.IsEdited,
+                CreatedAt = comment.CreatedAt,
+                UpdatedAt = comment.UpdatedAt
+            };
+
+            var userName = await _applicationRepository.GetUserNameByIdAsync(comment.UserId);
+            if (userName != null)
+                commentDto.UserName = userName;
+
+            return commentDto;
         }
     }
 }

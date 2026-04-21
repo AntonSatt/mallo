@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import CommentServices from "../../services/CommentServices";
 import ReportForm from "../reportForm/ReportForm";
+import DeleteComment from "../../components/deleteForm/DeleteComment.jsx";
 
-import{
+import {
     Box,
     TextField,
     Button,
@@ -14,7 +15,7 @@ import{
 import moment from "moment";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-const CommentForm = ({postId}) =>{
+const CommentForm = ({ postId }) => {
     const [commentData, setCommentData] = useState({
         commentContent: "",
     });
@@ -25,31 +26,41 @@ const CommentForm = ({postId}) =>{
     const [menuAnchor, setMenuAnchor] = useState(null);
     const [selectedCommentId, setSelectedCommentId] = useState(null);
     const [reportOpen, setReportOpen] = useState(false);
-    
-    const handleCommentChange = (e) => {
-        setCommentData({...commentData, commentContent: e.target.value});
-        if(commentError) setCommentError("");
+    //State for delete comment
+    const [deleteCommentId, setDeleteCommentId] = useState(null);
+
+    const handleOpenDeleteComment = (commentId) => {
+        setDeleteCommentId(commentId);
     };
 
-    const handleCommentSubmit = async (e) =>{
+    const handleCloseDeleteComment = () => {
+        setDeleteCommentId(null);
+    };
+
+    const handleCommentChange = (e) => {
+        setCommentData({ ...commentData, commentContent: e.target.value });
+        if (commentError) setCommentError("");
+    };
+
+    const handleCommentSubmit = async (e) => {
         e.preventDefault();
         setCommentError("")
 
-        if(!commentData.commentContent.trim()){
+        if (!commentData.commentContent.trim()) {
             setCommentError("Kommentaren kan inte vara tom");
             return;
         };
 
-        if(commentData.commentContent.length > 8000){
+        if (commentData.commentContent.length > 8000) {
             setCommentError("Kommentaren får inte vara mer längre än 8000 tecken");
-            return; 
+            return;
         }
 
-        try{
-           await CommentServices.create(postId, commentData);
-           setCommentData({commentContent: ""});
+        try {
+            await CommentServices.create(postId, commentData);
+            setCommentData({ commentContent: "" });
         }
-        catch(error){
+        catch (error) {
             console.error("Tekniskt felet: ", error)
             setCommentError("Kunde inte spara kommentar");
         }
@@ -60,7 +71,7 @@ const CommentForm = ({postId}) =>{
             const result = await CommentServices.getAll(postId);
             setComments(result);
         };
-        if(postId) loadComments();
+        if (postId) loadComments();
     }, [postId]);
 
     // open menu for comment options (reporting).
@@ -86,7 +97,7 @@ const CommentForm = ({postId}) =>{
 
     return (
         <>
-            <Box component="form" onSubmit={handleCommentSubmit} sx={{mt:2}}>
+            <Box component="form" onSubmit={handleCommentSubmit} sx={{ mt: 2 }}>
                 <TextField
                     fullWidth
                     label="Skriv en kommentar"
@@ -103,51 +114,65 @@ const CommentForm = ({postId}) =>{
                     type="submit"
                     disabled={!commentData.commentContent.trim()}
                     variant="contained"
-                    sx={{mt: 1}}
+                    sx={{ mt: 1 }}
                 >
-                    Posta kommentar
+                    Skicka kommentar
                 </Button>
             </Box>
 
-            <Box sx={{mt:2}}>{
-                    comments.length > 0 ? (
-                        comments.map((c, index) => (
-                            <Box key={c.id || index} sx={{ mb: 2, p: 2, bgcolor: 'white', borderRadius: 1, boxShadow: 1 }}>
+            <Box sx={{ mt: 2 }}>{
+                comments.length > 0 ? (
+                    comments.map((c, index) => (
+                        <Box key={c.id || index} sx={{ mb: 2, p: 2, bgcolor: 'white', borderRadius: 1, boxShadow: 1 }}>
 
-                                <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                                 <Typography variant="caption" color="text.secondary" display="block">
                                     {`${c.userName} • ${moment(c.createdAt).fromNow()}`}
                                 </Typography>
-                                
+
                                 {c.id && (
                                     //3-dots button per comment.
-                                    <IconButton size="small" onClick={(event) => handleOpenMenu(event, c.id)} sx={{alignSelf: "flex-start"}}>
+                                    <IconButton size="small" onClick={(event) => handleOpenMenu(event, c.id)} sx={{ alignSelf: "flex-start" }}>
                                         <MoreHorizIcon fontSize="small" />
                                     </IconButton>
                                 )}
-                                </Box>
-
-                                <Typography variant="body2" sx={{ mt: 0.5 }}>
-                                    {c.content || c.Content} 
-                                </Typography>
                             </Box>
-                        ))
-                    ) : (
-                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                            Inga kommentarer ännu. Bli den första att kommentera!
-                        </Typography>
-                    )
-                }
+
+                            <Typography variant="body2" sx={{ mt: 0.5 }}>
+                                {c.content || c.Content}
+                            </Typography>
+                        </Box>
+                    ))
+                ) : (
+                    <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                        Inga kommentarer ännu. Bli den första att kommentera!
+                    </Typography>
+                )
+            }
             </Box>
-                {/* menu action for selected comment */}
+            {/* menu action for selected comment */}
             <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleCloseMenu}>
                 <MenuItem onClick={handleOpenReport}>Anmäl kommentar</MenuItem>
+                <MenuItem onClick={() => {
+                    handleCloseMenu();
+                    handleOpenDeleteComment(selectedCommentId);
+                }}>Radera kommentar</MenuItem>
             </Menu>
-                {/* report dialog receives selected comment id. */}
+            {/* report dialog receives selected comment id. */}
             <ReportForm
-            open={reportOpen}
-            commentId={selectedCommentId}
-            onClose={handleCloseReport} />
+                open={reportOpen}
+                commentId={selectedCommentId}
+                onClose={handleCloseReport} />
+            {/* delete comment dialog */}
+            <DeleteComment
+                open={Boolean(deleteCommentId)}
+                commentId={deleteCommentId}
+                onClose={handleCloseDeleteComment}
+                onCommentDeleted={(deletedCommentId) => {
+                    setComments((prev) => prev.filter(c => c.id !== deletedCommentId));
+                    handleCloseDeleteComment();
+                }}
+            />
         </>
     )
 };

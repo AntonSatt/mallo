@@ -14,6 +14,8 @@ namespace Gr8.Infrastructure.Persistence
         public DbSet<Comment> Comments => Set<Comment>();
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Report> Reports => Set<Report>();
+        public DbSet<PostHug> PostHugs => Set<PostHug>();
+        public DbSet<CommentHug> CommentHugs => Set<CommentHug>();
 
         public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
         {

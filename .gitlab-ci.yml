@@ -3,6 +3,7 @@ stages:
   - secret-detection
   - build
   - deploy
+  - smoke-test
   - cleanup
 
 include:
@@ -129,6 +130,53 @@ deploy production:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual
+
+# ---------------------------------------------------------------------------
+# Smoke test: verify the deployed api actually responds.
+# If the api boots, the database was reachable and migrations applied —
+# so a green smoke test proves the full DB + app startup path end-to-end.
+# Hits /openapi/v1.json (exposed because api runs with
+# ASPNETCORE_ENVIRONMENT=Development in docker-compose.yml).
+# ---------------------------------------------------------------------------
+
+.smoke-test: &smoke-test
+  stage: smoke-test
+  image: curlimages/curl:latest
+  script:
+    - |
+      URL="https://api.gr8-${CI_COMMIT_REF_SLUG}.doe25.swarm.chas-lab.dev/openapi/v1.json"
+      echo "Polling $URL"
+      for i in $(seq 1 30); do
+        if curl -fsS --max-time 5 "$URL" > /dev/null; then
+          echo "API up after attempt $i — DB + migrations + boot OK"
+          exit 0
+        fi
+        echo "attempt $i: not ready yet"
+        sleep 5
+      done
+      echo "API never responded within 150s — check api/db logs in Portainer"
+      exit 1
+
+smoke-test develop:
+  <<: *smoke-test
+  needs:
+    - job: deploy develop
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+smoke-test review:
+  <<: *smoke-test
+  needs:
+    - job: deploy review
+  rules:
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_COMMIT_BRANCH != "develop"
+
+smoke-test production:
+  <<: *smoke-test
+  needs:
+    - job: deploy production
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 # ---------------------------------------------------------------------------
 # Cleanup: manual stack teardown for review environments

@@ -131,6 +131,36 @@ namespace Gr8.Infrastructure.Persistence
                     .HasForeignKey(r => r.ReviewedByAdminId)
                     .OnDelete(DeleteBehavior.Restrict);
                 });
+
+            modelBuilder.Entity<PostHug>(entity => 
+            {
+                entity.HasKey(ph => new { ph.PostId, ph.UserId });
+
+                entity.HasOne(ph => ph.Post)
+                .WithMany(p => p.Hugs)
+                .HasForeignKey(ph => ph.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(ph => ph.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<CommentHug>(entity => 
+            {
+                entity.HasOne(ch => new { ch.CommentId, ch.UserId });
+
+                entity.HasOne(ch => ch.Comment)
+                .WithMany(c => c.Hugs)
+                .HasForeignKey(ch => ch.CommentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(ch => ch.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
         }
     }
 }

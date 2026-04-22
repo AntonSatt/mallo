@@ -8,7 +8,7 @@ namespace Gr8.Application.Services
     {
         private readonly ICommunityRepository _communityRepository;
 
-        private readonly IApplicationRepository _applicationRepository; 
+        private readonly IApplicationRepository _applicationRepository;
 
         public PostService(ICommunityRepository communityRepository, IApplicationRepository applicationRepository)
         {
@@ -16,7 +16,7 @@ namespace Gr8.Application.Services
             _applicationRepository = applicationRepository;
         }
 
-        public async Task<PostDto?> CreateAsync(CreatePostDto createPostDto, string userId) 
+        public async Task<PostDto?> CreateAsync(CreatePostDto createPostDto, string userId)
         {
             var tags = await _communityRepository.GetTagsByIdAsync(createPostDto.TagIds);
 
@@ -99,6 +99,30 @@ namespace Gr8.Application.Services
             }
 
             return postDtoList;
+        }
+
+        public async Task<bool> DeletePostAsync(int postId, string userId)
+        {
+            var post = await _communityRepository.GetPostByIdAsync(postId);
+            if (post == null)
+            {
+                return false;
+            }
+
+            if (post.UserId != userId)
+            {
+                return false;
+            }
+
+            var isDeleted = await _communityRepository.DeletePostAsync(postId);
+            
+            if (!isDeleted)
+            {
+                return false;
+            }
+
+            var result = await _communityRepository.SaveChangesAsync();
+            return result > 0;
         }
     }
 }

@@ -12,12 +12,16 @@ const CommentServices = {
     return response.data;
   },
   report: async (commentId, reportData) => {
-        const response = await ApiClient.post("/forum/report/", {
-            commentId,
-            reason: reportData.reason
-        });
-        return response.data;
-    }
+    const response = await ApiClient.post("/forum/report/", {
+      commentId,
+      reason: reportData.reason
+    });
+    return response.data;
+  },
+  deleteComment: async (commentId) => {
+    const response = await ApiClient.delete(`/forum/comments/${commentId}`);
+    return response.data;
+  },
 };
 
 export default CommentServices;

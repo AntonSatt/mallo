@@ -71,5 +71,31 @@ namespace Gr8.Infrastructure.Persistence.Repositories
         {
             await _communityDbContext.Reports.AddAsync(report);
         }
+
+        public async Task<Comment?> GetCommentByIdAsync(int commentId)
+        {
+            return await _communityDbContext.Comments.FirstOrDefaultAsync(c => c.Id == commentId);
+        }
+
+        public async Task UpdateCommentAsync(Comment comment)
+        {
+            _communityDbContext.Comments.Update(comment);
+            await Task.CompletedTask;
+        }
+
+        public async Task UpdatePostAsync(Post post)
+        {
+            _communityDbContext.Posts.Update(post);
+            await Task.CompletedTask;
+        }
+
+        public async Task<Post?> GetPostByIdAsync(int postId)
+        {
+            return await _communityDbContext.Posts
+                .Include(p => p.Category)
+                .Include(p => p.Tags)
+                .Include(p => p.Comments)
+                .FirstOrDefaultAsync(p => p.Id == postId);
+        }
     }
 }

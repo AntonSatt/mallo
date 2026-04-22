@@ -86,5 +86,45 @@ namespace Gr8.Application.Services
 
             return resultDto;
         }
+
+        public async Task<CommentDto?> GetCommentByIdAsync(int commentId)
+        {
+            var comment = await _communityRepository.GetCommentByIdAsync(commentId);
+
+            if (comment == null)
+                return null;
+
+            var commentDto = new CommentDto
+            {
+                Id = comment.Id,
+                Content = comment.Content,
+                IsDeleted = comment.IsDeleted,
+                IsEdited = comment.IsEdited,
+                CreatedAt = comment.CreatedAt,
+                UpdatedAt = comment.UpdatedAt
+            };
+
+            var userName = await _applicationRepository.GetUserNameByIdAsync(comment.UserId);
+            if (userName != null)
+                commentDto.UserName = userName;
+
+            return commentDto;
+        }
+
+        public async Task<int> UpdateCommentAsync(CommentDto commentDto)
+        {
+            var existing = await _communityRepository.GetCommentByIdAsync(commentDto.Id);
+            if (existing == null)
+            {
+                throw new InvalidOperationException("Comment not found.");
+            }
+
+            existing.Content = commentDto.Content;
+            existing.IsEdited = true;
+            existing.UpdatedAt = DateTime.UtcNow;
+
+            await _communityRepository.UpdateCommentAsync(existing);
+            return await _communityRepository.SaveChangesAsync();
+        }
     }
 }

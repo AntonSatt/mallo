@@ -22,6 +22,6 @@ namespace Gr8.Domain.Entities
         public Comment? ParentComment { get; set; }
 
         public ICollection<Comment> Replies { get; set; } = new List<Comment>();
-        public ICollection<CommentHug> Hugs { get; set; } = new List<CommentHug>();
+        public ICollection<Hug> Hugs { get; set; } = new List<Hug>();
     }
 }

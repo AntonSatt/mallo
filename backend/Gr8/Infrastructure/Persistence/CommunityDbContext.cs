@@ -14,8 +14,6 @@ namespace Gr8.Infrastructure.Persistence
         public DbSet<Comment> Comments => Set<Comment>();
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Report> Reports => Set<Report>();
-        public DbSet<PostHug> PostHugs => Set<PostHug>();
-        public DbSet<CommentHug> CommentHugs => Set<CommentHug>();
 
         public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
         {
@@ -131,36 +129,6 @@ namespace Gr8.Infrastructure.Persistence
                     .HasForeignKey(r => r.ReviewedByAdminId)
                     .OnDelete(DeleteBehavior.Restrict);
                 });
-
-            modelBuilder.Entity<PostHug>(entity => 
-            {
-                entity.HasKey(ph => new { ph.PostId, ph.UserId });
-
-                entity.HasOne(ph => ph.Post)
-                .WithMany(p => p.Hugs)
-                .HasForeignKey(ph => ph.PostId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne<ApplicationUser>()
-                .WithMany()
-                .HasForeignKey(ph => ph.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-            });
-
-            modelBuilder.Entity<CommentHug>(entity => 
-            {
-                entity.HasOne(ch => new { ch.CommentId, ch.UserId });
-
-                entity.HasOne(ch => ch.Comment)
-                .WithMany(c => c.Hugs)
-                .HasForeignKey(ch => ch.CommentId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne<ApplicationUser>()
-                .WithMany()
-                .HasForeignKey(ch => ch.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-            });
         }
     }
 }

@@ -1,7 +1,4 @@
 ﻿using Gr8.Application.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Gr8.Application.Interfaces
 {
@@ -11,6 +8,5 @@ namespace Gr8.Application.Interfaces
         Task<List<CommentDto>> GetCommentsByPostAsync(int postId);
         Task<bool> DeleteCommentAsync(int commentId, string userId);
         Task<CommentDto?> GetCommentByIdAsync(int commentId);
-
     }
 }

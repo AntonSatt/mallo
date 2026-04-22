@@ -78,13 +78,16 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             await _communityDbContext.Reports.AddAsync(report);
         }
 
-        public async Task<Post?> DeletePostAsync(int postId)
+        public async Task<bool> DeletePostAsync(int postId)
         {
-            return await _communityDbContext.Posts
-                .Where(p => !p.IsDeleted)
-                .Include(p => p.Comments.Where(c => !c.IsDeleted))
-                .Include(p => p.Tags)
-                .FirstOrDefaultAsync(p => p.Id == postId);
+            var post = await GetPostByIdAsync(postId);
+            if (post == null)
+            {
+                return false;
+            }
+
+            post.IsDeleted = true;
+            return true;
         }
 
         public async Task<Post?> GetPostByIdAsync(int postId)
@@ -97,12 +100,16 @@ namespace Gr8.Infrastructure.Persistence.Repositories
                 .FirstOrDefaultAsync(p => p.Id == postId);
         }
 
-        public async Task<Comment?> DeleteCommentAsync(int commentId)
+        public async Task<bool> DeleteCommentAsync(int commentId)
         {
-            return await _communityDbContext.Comments
-                .Where(c => !c.IsDeleted && !c.Post.IsDeleted)
-                .Include(c => c.Post)
-                .FirstOrDefaultAsync(c => c.Id == commentId);
+            var comment = await GetCommentByIdAsync(commentId);
+            if (comment == null)
+            {
+                return false;
+            }
+
+            comment.IsDeleted = true;
+            return true;
         }
 
         public async Task<Comment?> GetCommentByIdAsync(int commentId)

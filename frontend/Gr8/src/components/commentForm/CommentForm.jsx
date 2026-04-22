@@ -52,7 +52,7 @@ const CommentForm = ({ postId }) => {
         };
 
         if (commentData.commentContent.length > 8000) {
-            setCommentError("Kommentaren får inte vara mer längre än 8000 tecken");
+            setCommentError("Kommentaren får inte vara längre än 8000 tecken");
             return;
         }
 

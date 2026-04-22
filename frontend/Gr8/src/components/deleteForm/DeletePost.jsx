@@ -11,16 +11,6 @@ import {
     IconButton
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-//import { styled } from "@mui/material/styles";
-
-// const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-//     '& .MuiDialogContent-root': {
-//         padding: theme.spacing(2),
-//     },
-//     '& .MuiDialogActions-root': {
-//         padding: theme.spacing(1),
-//     },
-// }));
 
 const DeletePost = ({ postId, open, onClose, onPostDeleted }) => {
     const [error, setError] = useState("");

@@ -114,7 +114,12 @@ namespace Gr8.Application.Services
                 return false;
             }
 
-            post.IsDeleted = true;
+            var isDeleted = await _communityRepository.DeletePostAsync(postId);
+            
+            if (!isDeleted)
+            {
+                return false;
+            }
 
             var result = await _communityRepository.SaveChangesAsync();
             return result > 0;

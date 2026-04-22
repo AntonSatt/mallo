@@ -89,7 +89,7 @@ namespace Gr8.Application.Services
 
         public async Task<bool> DeleteCommentAsync(int commentId, string userId)
         {
-            var comment = _communityRepository.GetCommentByIdAsync(commentId).Result;
+            var comment = await _communityRepository.GetCommentByIdAsync(commentId);
 
             if (comment == null)
             {
@@ -101,7 +101,12 @@ namespace Gr8.Application.Services
                 return false;
             }
 
-            comment.IsDeleted = true;
+            var isDeleted = await _communityRepository.DeleteCommentAsync(commentId);
+            
+            if (!isDeleted)
+            {
+                return false;
+            }
 
             var result = await _communityRepository.SaveChangesAsync();
             return result > 0;

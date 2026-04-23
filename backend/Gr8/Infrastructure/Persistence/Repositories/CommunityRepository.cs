@@ -3,6 +3,7 @@ using Gr8.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Gr8.Infrastructure.Persistence.Repositories
@@ -70,6 +71,26 @@ namespace Gr8.Infrastructure.Persistence.Repositories
         public async Task AddReportAsync(Report report)
         {
             await _communityDbContext.Reports.AddAsync(report);
+        }
+
+        public async Task<Hug?> GetPostHugAsync(int postId, string userId) 
+        {
+            return await _communityDbContext.Hugs.FirstOrDefaultAsync(h => h.PostId == postId && h.UserId == userId);
+        }
+
+        public async Task<Hug?> GetCommentHugAsync(int commentId, string userId) 
+        {
+            return await _communityDbContext.Hugs.FirstOrDefaultAsync(h => h.CommentId == commentId && h.UserId == userId);
+        }
+
+        public async Task AddHugAsync(Hug hug) 
+        {
+            await _communityDbContext.Hugs.AddAsync(hug);
+        }
+
+        public void RemoveHug(Hug hug) 
+        {
+            _communityDbContext.Hugs.Remove(hug);
         }
     }
 }

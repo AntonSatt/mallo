@@ -139,7 +139,33 @@ namespace Gr8.Api.Endpoints
 
                 return Results.Ok(report);
 
-            }).RequireAuthorization(AuthorizationConstants.JwtOnly); 
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPost("/forum/posts/{postId}/hug", async (int postId, [FromBody] HugDto hugDto, [FromServices] IHugService hugService) =>
+            {
+                if (string.IsNullOrWhiteSpace(hugDto.UserId))
+                {
+                    return Results.BadRequest("UserId is required.");
+                }
+
+                var hugged = await hugService.TogglePostHugAsync(postId, hugDto.UserId);
+
+                return Results.Ok(new { hugged });
+            })
+                .RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPost("/forum/comments/{commentId}/hug", async (int commentId, [FromBody] HugDto hugDto, [FromServices] IHugService hugService) =>
+            {
+                if (string.IsNullOrWhiteSpace(hugDto.UserId))
+                {
+                    return Results.BadRequest("UserId is required.");
+                }
+
+                var hugged = await hugService.ToggleCommentHugAsync(commentId, hugDto.UserId);
+
+                return Results.Ok(new { hugged });
+            })
+                .RequireAuthorization(AuthorizationConstants.JwtOnly);
         }
     }
 }

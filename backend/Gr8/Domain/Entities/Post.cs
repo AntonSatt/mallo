@@ -37,6 +37,6 @@ namespace Gr8.Domain.Entities
 
         public ICollection<Tag> Tags { get; set; }
         public ICollection<Comment> Comments { get; set; }
-        public ICollection<PostHug> Hugs { get; set; } = new List<PostHug>();
+        public ICollection<Hug> Hugs { get; set; } = new List<Hug>();
     }
 }

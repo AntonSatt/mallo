@@ -14,5 +14,10 @@ namespace Gr8.Application.Interfaces
         Task<List<Tag>> GetTagsByIdAsync(List<int> tagIds);
         Task<Category?> GetCategoryByIdAsync(int categoryId);
         Task AddReportAsync(Report report);
+
+        Task<Hug?> GetPostHugAsync(int postId, string UserId);
+        Task<Hug?> GetCommentHugAsync(int commentId, string UserId);
+        Task AddHugAsync(Hug hug);
+        void RemoveHug(Hug hug);
     }
 }

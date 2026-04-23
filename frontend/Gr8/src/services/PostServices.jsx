@@ -34,6 +34,10 @@ const PostServices = {
             }
         );
         return response.data;
+    },
+    update: async (postId, data) => {
+        const response = await ApiClient.put(`/forum/posts/${postId}`, data);
+        return response.data;
     }
 };
 

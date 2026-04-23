@@ -34,7 +34,8 @@ namespace Gr8.Application.Services
                     IsDeleted = comment.IsDeleted,
                     IsEdited = comment.IsEdited,
                     CreatedAt = comment.CreatedAt,
-                    UpdatedAt = comment.UpdatedAt
+                    UpdatedAt = comment.UpdatedAt,
+                    CreatedByUser = comment.UserId,
                 };
 
                 var userName = await _applicationRepository.GetUserNameByIdAsync(comment.UserId);
@@ -102,7 +103,7 @@ namespace Gr8.Application.Services
             }
 
             var isDeleted = await _communityRepository.DeleteCommentAsync(commentId);
-            
+
             if (!isDeleted)
             {
                 return false;
@@ -112,7 +113,7 @@ namespace Gr8.Application.Services
             return result > 0;
         }
 
-        public async Task<CommentDto?> GetCommentByIdAsync(int commentId)
+        public async Task<CommentDto?> GetCommentByIdAsync(int commentId, string userId)
         {
             var comment = await _communityRepository.GetCommentByIdAsync(commentId);
 
@@ -134,6 +135,22 @@ namespace Gr8.Application.Services
                 commentDto.UserName = userName;
 
             return commentDto;
+        }
+
+        public async Task<int> UpdateCommentAsync(CommentDto commentDto)
+        {
+            var existing = await _communityRepository.GetCommentByIdAsync(commentDto.Id);
+            if (existing == null)
+            {
+                throw new InvalidOperationException("Comment not found.");
+            }
+
+            existing.Content = commentDto.Content;
+            existing.IsEdited = true;
+            existing.UpdatedAt = DateTime.UtcNow;
+
+            await _communityRepository.UpdateCommentAsync(existing);
+            return await _communityRepository.SaveChangesAsync();
         }
     }
 }

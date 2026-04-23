@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import CommentServices from "../../services/CommentServices";
 import ReportForm from "../reportForm/ReportForm";
 import DeleteComment from "../../components/deleteForm/DeleteComment.jsx";
+import { useAuth } from "../../hooks/useAuth";
 
 import {
     Box,
@@ -16,26 +17,22 @@ import moment from "moment";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 const CommentForm = ({ postId }) => {
+    const { currentUser } = useAuth();
     const [commentData, setCommentData] = useState({
         commentContent: "",
     });
-    // 3-dots menu anchor element and selected comment ID for reporting
     const [commentError, setCommentError] = useState("");
     const [comments, setComments] = useState([]);
-    // Menu state for comment options
     const [menuAnchor, setMenuAnchor] = useState(null);
     const [selectedCommentId, setSelectedCommentId] = useState(null);
     const [reportOpen, setReportOpen] = useState(false);
-    //State for delete comment
     const [deleteCommentId, setDeleteCommentId] = useState(null);
 
-    const handleOpenDeleteComment = (commentId) => {
-        setDeleteCommentId(commentId);
-    };
+    const [editingCommentId, setEditingCommentId] = useState(null);
+    const [editContent, setEditContent] = useState("");
 
-    const handleCloseDeleteComment = () => {
-        setDeleteCommentId(null);
-    };
+    const handleOpenDeleteComment = (commentId) => setDeleteCommentId(commentId);
+    const handleCloseDeleteComment = () => setDeleteCommentId(null);
 
     const handleCommentChange = (e) => {
         setCommentData({ ...commentData, commentContent: e.target.value });
@@ -44,12 +41,12 @@ const CommentForm = ({ postId }) => {
 
     const handleCommentSubmit = async (e) => {
         e.preventDefault();
-        setCommentError("")
+        setCommentError("");
 
         if (!commentData.commentContent.trim()) {
             setCommentError("Kommentaren kan inte vara tom");
             return;
-        };
+        }
 
         if (commentData.commentContent.length > 8000) {
             setCommentError("Kommentaren får inte vara längre än 8000 tecken");
@@ -59,10 +56,25 @@ const CommentForm = ({ postId }) => {
         try {
             await CommentServices.create(postId, commentData);
             setCommentData({ commentContent: "" });
-        }
-        catch (error) {
-            console.error("Tekniskt felet: ", error)
+        } catch (error) {
+            console.error("Tekniskt felet: ", error);
             setCommentError("Kunde inte spara kommentar");
+        }
+    };
+
+    const handleEditSubmit = async (commentId) => {
+        if (!editContent.trim()) return;
+
+        try {
+            const result = await CommentServices.update(postId, commentId, {
+                id: commentId,
+                content: editContent
+            });
+            setComments(prev => prev.map(c => c.id === commentId ? { ...c, content: result.content } : c));
+            setEditingCommentId(null);
+            setEditContent("");
+        } catch (err) {
+            console.error("Kunde inte uppdatera kommentar:", err);
         }
     };
 
@@ -74,21 +86,20 @@ const CommentForm = ({ postId }) => {
         if (postId) loadComments();
     }, [postId]);
 
-    // open menu for comment options (reporting).
     const handleOpenMenu = (event, commentId) => {
         setMenuAnchor(event.currentTarget);
-        setSelectedCommentId(commentId)
+        setSelectedCommentId(commentId);
     };
-    // close menu
+
     const handleCloseMenu = () => {
         setMenuAnchor(null);
     };
-    // open report dialog for selected comment.
+
     const handleOpenReport = () => {
         setMenuAnchor(null);
         setReportOpen(true);
     };
-    // close report dialog and reset selected comment.
+
     const handleCloseReport = () => {
         setReportOpen(false);
         setSelectedCommentId(null);
@@ -120,19 +131,16 @@ const CommentForm = ({ postId }) => {
                 </Button>
             </Box>
 
-            <Box sx={{ mt: 2 }}>{
-                comments.length > 0 ? (
+            <Box sx={{ mt: 2 }}>
+                {comments.length > 0 ? (
                     comments.map((c, index) => (
                         <Box key={c.id || index} sx={{ mb: 2, p: 2, bgcolor: 'white', borderRadius: 1, boxShadow: 1 }}>
-
                             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                                 <Typography variant="caption" color="text.secondary" display="block">
                                     {`${c.userName} • ${moment(c.createdAt).fromNow()}`}
                                 </Typography>
-
                                 {c.id && (
-                                    //3-dots button per comment.
-                                    <IconButton size="small" onClick={(event) => handleOpenMenu(event, c.id)} sx={{ alignSelf: "flex-start" }}>
+                                    <IconButton size="small" onClick={(event) => handleOpenMenu(event, c.id)}>
                                         <MoreHorizIcon fontSize="small" />
                                     </IconButton>
                                 )}
@@ -141,29 +149,73 @@ const CommentForm = ({ postId }) => {
                             <Typography variant="body2" sx={{ mt: 0.5 }}>
                                 {c.content || c.Content}
                             </Typography>
+                            {editingCommentId === c.id && (
+                                <Box sx={{ mt: 2 }}>
+                                    <TextField
+                                        fullWidth
+                                        label="Redigera kommentar"
+                                        variant="outlined"
+                                        multiline
+                                        minRows={3}
+                                        size="small"
+                                        value={editContent}
+                                        onChange={(e) => setEditContent(e.target.value)}
+                                    />
+                                    <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                                        <Button
+                                            variant="contained"
+                                            size="small"
+                                            disabled={!editContent.trim()}
+                                            onClick={() => handleEditSubmit(c.id)}
+                                        >
+                                            Spara
+                                        </Button>
+                                        <Button
+                                            variant="text"
+                                            size="small"
+                                            color="inherit"
+                                            onClick={() => {
+                                                setEditingCommentId(null);
+                                                setEditContent("");
+                                            }}
+                                        >
+                                            Avbryt
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            )}
                         </Box>
                     ))
                 ) : (
                     <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
                         Inga kommentarer ännu. Bli den första att kommentera!
                     </Typography>
-                )
-            }
+                )}
             </Box>
-            {/* menu action for selected comment */}
+
             <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleCloseMenu}>
                 <MenuItem onClick={handleOpenReport}>Anmäl kommentar</MenuItem>
-                <MenuItem onClick={() => {
-                    handleCloseMenu();
-                    handleOpenDeleteComment(selectedCommentId);
-                }}>Radera kommentar</MenuItem>
+                {currentUser?.sub === comments.find(c => c.id === selectedCommentId)?.createdByUser && (
+                    <>
+                        <MenuItem onClick={() => {
+                            handleCloseMenu();
+                            handleOpenDeleteComment(selectedCommentId);
+                        }}>Radera kommentar</MenuItem>
+                        <MenuItem onClick={() => {
+                            handleCloseMenu();
+                            setEditingCommentId(selectedCommentId);
+                            setEditContent(comments.find(c => c.id === selectedCommentId)?.content || "");
+                        }}>Redigera kommentar</MenuItem>
+                    </>
+                )}
             </Menu>
-            {/* report dialog receives selected comment id. */}
+
             <ReportForm
                 open={reportOpen}
                 commentId={selectedCommentId}
-                onClose={handleCloseReport} />
-            {/* delete comment dialog */}
+                onClose={handleCloseReport}
+            />
+
             <DeleteComment
                 open={Boolean(deleteCommentId)}
                 commentId={deleteCommentId}
@@ -174,7 +226,7 @@ const CommentForm = ({ postId }) => {
                 }}
             />
         </>
-    )
+    );
 };
 
-export default CommentForm; 
+export default CommentForm;

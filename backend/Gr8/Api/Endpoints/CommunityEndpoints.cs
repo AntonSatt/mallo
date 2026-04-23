@@ -3,6 +3,7 @@ using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Infrastructure.Identity;
 using Gr8.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -60,12 +61,12 @@ namespace Gr8.Api.Endpoints
             {
                 var comments = await commentService.GetCommentsByPostAsync(postId);
 
-                if (comments.Count == 0)
+                if (comments.Count != 0)
                 {
-                    return Results.NoContent();
+                    return Results.Ok(comments);
                 }
 
-                return Results.Ok(comments);
+                return Results.NoContent();
             })
               .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
@@ -113,10 +114,10 @@ namespace Gr8.Api.Endpoints
                     return Results.NoContent();
                 }
                 return Results.Ok(categories);
-             })
+            })
              .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPost("/forum/report", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IReportService reportService, [FromBody] ReportDto reportDto) => 
+            app.MapPost("/forum/report", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IReportService reportService, [FromBody] ReportDto reportDto) =>
             {
                 var context = new ValidationContext(reportDto);
                 var results = new List<ValidationResult>();
@@ -139,29 +140,9 @@ namespace Gr8.Api.Endpoints
 
                 return Results.Ok(report);
 
-            }).RequireAuthorization(AuthorizationConstants.JwtOnly); 
-
-            app.MapDelete("/forum/posts/{PostId}", async (int postId, ClaimsPrincipal user, UserManager<ApplicationUser> userManager, [FromServices] IPostService postService) =>
-            {
-                var appUser = await userManager.GetUserAsync(user);
-
-                if (appUser == null) 
-                {
-                    return Results.Unauthorized();
-                }
-
-                var result = await postService.DeletePostAsync(postId, appUser.Id);
-
-                if (!result)
-                {
-                    return Results.NotFound();
-                }
-
-                return Results.Ok();
-
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapDelete("/forum/comments/{CommentId}", async (int commentId, ClaimsPrincipal user, UserManager<ApplicationUser> userManager, [FromServices] ICommentService commentService) =>
+            app.MapPut("/forum/posts/{PostId}", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IPostService postService, [FromBody] UpdatePostDto editPostDto, int postId) =>
             {
                 var appUser = await userManager.GetUserAsync(user);
 
@@ -170,22 +151,57 @@ namespace Gr8.Api.Endpoints
                     return Results.Unauthorized();
                 }
 
-                var comment = await commentService.GetCommentByIdAsync(commentId);
+                var post = await postService.GetPostByIdAsync(postId, appUser.Id);
+
+                if (post == null)
+                {
+                    return Results.NotFound("Post not found.");
+                }
+
+                post.Id = editPostDto.Id;
+                post.Title = editPostDto.Title;
+                post.Content = editPostDto.Content;
+
+                var result = await postService.UpdatePostAsync(post);
+
+                if (result <= 0)
+                {
+                    return Results.BadRequest("Failed to update post.");
+                }
+
+                return Results.Ok(post);
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPut("/forum/posts/{postId}/comments/{commentId}", async ([FromServices] ICommentService commentService, UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdateCommentDto editCommentDto, int commentId) =>
+            {
+                var appUser = await userManager.GetUserAsync(user);
+
+                if (appUser == null)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var comment = await commentService.GetCommentByIdAsync(commentId, appUser.Id);
 
                 if (comment == null)
                 {
-                    return Results.NotFound();
+                    return Results.NotFound("Comment not found.");
                 }
 
-                var result = await commentService.DeleteCommentAsync(commentId, appUser.Id);
+                comment.Id = editCommentDto.Id;
+                comment.Content = editCommentDto.Content;
 
-                if (!result)
+                var result = await commentService.UpdateCommentAsync(comment);
+
+                if (result <= 0)
                 {
-                    return Results.NotFound();
+                    return Results.BadRequest("Failed to update comment.");
                 }
-                return Results.Ok();
 
-             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+                return Results.Ok(comment);
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
         }
     }
 }

@@ -3,6 +3,7 @@ using Gr8.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Text;
 
 namespace Gr8.Infrastructure.Persistence.Repositories
@@ -78,25 +79,29 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             await _communityDbContext.Reports.AddAsync(report);
         }
 
-        public async Task<bool> DeletePostAsync(int postId)
+        public async Task<Comment?> GetCommentByIdAsync(int commentId)
         {
-            var post = await GetPostByIdAsync(postId);
-            if (post == null)
-            {
-                return false;
-            }
+            return await _communityDbContext.Comments.FirstOrDefaultAsync(c => c.Id == commentId);
+        }
 
-            post.IsDeleted = true;
-            return true;
+        public async Task UpdateCommentAsync(Comment comment)
+        {
+            _communityDbContext.Comments.Update(comment);
+            await Task.CompletedTask;
+        }
+
+        public async Task UpdatePostAsync(Post post)
+        {
+            _communityDbContext.Posts.Update(post);
+            await Task.CompletedTask;
         }
 
         public async Task<Post?> GetPostByIdAsync(int postId)
         {
             return await _communityDbContext.Posts
-                .Where(p => !p.IsDeleted)
                 .Include(p => p.Category)
                 .Include(p => p.Tags)
-                .Include(p => p.Comments.Where(c => !c.IsDeleted))
+                .Include(p => p.Comments)
                 .FirstOrDefaultAsync(p => p.Id == postId);
         }
 
@@ -112,12 +117,16 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             return true;
         }
 
-        public async Task<Comment?> GetCommentByIdAsync(int commentId)
+        public async Task<bool> DeletePostAsync(int postId)
         {
-            return await _communityDbContext.Comments
-                .Where(c => !c.IsDeleted && !c.Post.IsDeleted)
-                .Include(c => c.Post)
-                .FirstOrDefaultAsync(c => c.Id == commentId);
+            var post = await GetPostByIdAsync(postId);
+            if (post == null)
+            {
+                return false;
+            }
+
+            post.IsDeleted = true;
+            return true;
         }
     }
 }

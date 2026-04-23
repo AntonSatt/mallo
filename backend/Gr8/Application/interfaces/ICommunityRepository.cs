@@ -14,9 +14,11 @@ namespace Gr8.Application.Interfaces
         Task<List<Tag>> GetTagsByIdAsync(List<int> tagIds);
         Task<Category?> GetCategoryByIdAsync(int categoryId);
         Task AddReportAsync(Report report);
-        Task<bool> DeletePostAsync(int postId);
-        Task<Post?> GetPostByIdAsync(int postId);
-        Task<bool> DeleteCommentAsync(int commentId);
         Task<Comment?> GetCommentByIdAsync(int commentId);
+        Task UpdateCommentAsync(Comment oldComment);
+        Task UpdatePostAsync(Post oldPost);
+        Task<Post> GetPostByIdAsync(int id);
+        Task<bool> DeletePostAsync(int postId);
+        Task<bool> DeleteCommentAsync(int commentId);
     }
 }

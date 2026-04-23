@@ -16,5 +16,6 @@ namespace Gr8.Application.DTOs
         public bool IsEdited { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public string CreatedByUser { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 FROM node:22-alpine AS build
 WORKDIR /app
-RUN corepack enable && corepack prepare npm@11.13.0 --activate
+RUN corepack enable npm && corepack prepare npm@11.13.0 --activate
 COPY package*.json ./
 RUN npm ci
 COPY . .

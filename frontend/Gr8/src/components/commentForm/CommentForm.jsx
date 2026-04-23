@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import CommentServices from "../../services/CommentServices";
 import ReportForm from "../reportForm/ReportForm";
 import DeleteComment from "../../components/deleteForm/DeleteComment.jsx";
+import { useAuth } from "../../hooks/useAuth";
 
 import {
     Box,
@@ -16,6 +17,7 @@ import moment from "moment";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 const CommentForm = ({ postId }) => {
+    const { currentUser } = useAuth();
     const [commentData, setCommentData] = useState({
         commentContent: "",
     });
@@ -193,15 +195,19 @@ const CommentForm = ({ postId }) => {
 
             <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleCloseMenu}>
                 <MenuItem onClick={handleOpenReport}>Anmäl kommentar</MenuItem>
-                <MenuItem onClick={() => {
-                    handleCloseMenu();
-                    handleOpenDeleteComment(selectedCommentId);
-                }}>Radera kommentar</MenuItem>
-                <MenuItem onClick={() => {
-                    handleCloseMenu();
-                    setEditingCommentId(selectedCommentId);
-                    setEditContent(comments.find(c => c.id === selectedCommentId)?.content || "");
-                }}>Redigera kommentar</MenuItem>
+                {currentUser?.sub === comments.find(c => c.id === selectedCommentId)?.createdByUser && (
+                    <>
+                        <MenuItem onClick={() => {
+                            handleCloseMenu();
+                            handleOpenDeleteComment(selectedCommentId);
+                        }}>Radera kommentar</MenuItem>
+                        <MenuItem onClick={() => {
+                            handleCloseMenu();
+                            setEditingCommentId(selectedCommentId);
+                            setEditContent(comments.find(c => c.id === selectedCommentId)?.content || "");
+                        }}>Redigera kommentar</MenuItem>
+                    </>
+                )}
             </Menu>
 
             <ReportForm

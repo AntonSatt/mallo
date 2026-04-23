@@ -5,27 +5,43 @@ import { registerAuthListener } from '../services/AuthServices';
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
 
+const getUser = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  try {
+    const decoded = JSON.parse(atob(token.split(".")[1]));
+    return decoded;
+  } catch {
+    return null;
+  }
+};
+
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+  const [currentUser, setCurrentUser] = useState(getUser());
 
   const login = async (credentials) => {
     await UserServices.login(credentials);
     setIsAuthenticated(true);
+    setCurrentUser(getUser());
   };
 
   const register = async (userData) => {
     await UserServices.register(userData);
     setIsAuthenticated(true);
+    setCurrentUser(getUser());
   };
 
   const logout = () => {
     UserServices.logout();
     setIsAuthenticated(false);
+    setCurrentUser(null);
   };
 
   const deleteAccount = async () => {
     await UserServices.delete();
     setIsAuthenticated(false);
+    setCurrentUser(null);
   };
 
   useEffect(() => {
@@ -34,7 +50,7 @@ export const AuthProvider = ({ children }) => {
   });
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, register, logout, deleteAccount }}>
+    <AuthContext.Provider value={{ isAuthenticated, currentUser, login, register, logout, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );

@@ -4,6 +4,7 @@ import CommentForm from "../../components/commentForm/CommentForm";
 import DeletePost from "../../components/deleteForm/DeletePost.jsx";
 import PostServices from "../../services/PostServices";
 import EditPostForm from "../../components/editPostForm/EditPostForm.jsx";
+import { useAuth } from "../../hooks/useAuth";
 
 import {
     Dialog,
@@ -28,6 +29,7 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 
 const ForumPage = () => {
+    const { currentUser } = useAuth();
     const [expanded, setExpanded] = useState(null);
     const [openPostModal, setPostModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
@@ -100,9 +102,11 @@ const ForumPage = () => {
                     id: post.id,
                     title: post.title,
                     content: post.content ? post.content : "Innehåll saknas",
+                    userId: post.userId,
                     userName: post.userName,
                     createdAt: post.createdAt,
                     category: post.category ? post.category : "Ingen kategori",
+                    createdByUser: post.createdByUser,
                     tags: post.tags ? post.tags : []
                 }));
                 setPosts(allPosts);
@@ -123,6 +127,7 @@ const ForumPage = () => {
             createdAt: newPost.createdAt,
             category: newPost.category,
             tags: newPost.tags,
+            createdByUser: newPost.createdByUser,
         };
         setPosts((prevPosts) => [formattedPost, ...prevPosts]);
     };
@@ -175,7 +180,7 @@ const ForumPage = () => {
                 postId={selectedPostId}
                 onClose={handleReportClose}
             />
-
+            
             <Menu
                 id="post-menu"
                 anchorEl={menuAnchorEl}
@@ -185,13 +190,17 @@ const ForumPage = () => {
                 transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
                 <MenuItem onClick={handleReport}>Anmäl inlägg</MenuItem>
-                <MenuItem onClick={() => {
-                    handleOpenPostDelete(selectedPostId);
-                }}>Radera inlägg</MenuItem>
-                <MenuItem onClick={() => {
-                    handleOpenEditPost(posts.find(p => p.id === selectedPostId));
-                    handleMenuClose();
-                }}>Redigera inlägg</MenuItem>
+                {currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser && (
+                    <>
+                        <MenuItem onClick={() => {
+                            handleOpenPostDelete(selectedPostId);
+                        }}>Radera inlägg</MenuItem>
+                        <MenuItem onClick={() => {
+                            handleOpenEditPost(posts.find(p => p.id === selectedPostId));
+                            handleMenuClose();
+                        }}>Redigera inlägg</MenuItem>
+                    </>
+                )}
             </Menu>
 
             {posts.map((post) => (

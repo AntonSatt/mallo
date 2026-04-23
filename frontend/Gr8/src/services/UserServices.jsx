@@ -31,17 +31,27 @@ const UserServices = {
         UserServices.logout();
         return response.data;
     },
+    getUser: async () => {
+        const response = await ApiClient.get("/user");
+        return response.data;
+    },
     update: async (userData) => {
-        const response = await ApiClient.put("/update", {
+        const response = await ApiClient.put("/user", {
             userName: userData.userName,
             firstName: userData.firstName,
             lastName: userData.lastName,
             email: userData.email,
         });
         return response.data;
+    },
+    updatePassword: async (userData) => {
+        const response = await ApiClient.patch("/password", {
+           currentPassWord: userData.currentPassword,
+           newPassword: userData.newPassword,
+           confirmNewPassword: userData.confirmNewPassword
+        });
+        return response.data;
     }
-
-    //TODO: add registerData. use async/await?
 };
 
 export default UserServices

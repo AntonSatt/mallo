@@ -17,7 +17,7 @@ namespace Gr8.Application.DTOs
         [DataType(DataType.Password)]
         public string CurrentPassword { get; set; }
         public string NewPassword { get; set; }
-        [Compare("NewPassword", ErrorMessage = "Password don't match")]
+        [Compare(nameof(NewPassword), ErrorMessage = "Password don't match")]
         public string ConfirmNewPassword { get; set; }
     }
 }

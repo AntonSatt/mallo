@@ -53,7 +53,11 @@ const UserSettings = () => {
         setOpen(true);
     };
 
+<<<<<<< HEAD
     const handleClose = () => {
+=======
+    const handleClose = (event) => {
+>>>>>>> develop
         setOpen(false);
     };
 

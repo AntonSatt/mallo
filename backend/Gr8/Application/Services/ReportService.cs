@@ -25,7 +25,7 @@ namespace Gr8.Application.Services
                 PostId = reportDto.PostId,
                 CommentId = reportDto.CommentId,
                 Description = reportDto.Description,
-                Status = reportDto.Status
+                Status = "Pending"
             };
 
             await _communityRepository.AddReportAsync(report);

@@ -103,7 +103,6 @@ namespace Gr8.Api.Endpoints
 
             app.MapGet("/user", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user) =>
             {
-                // ta in DTO 
                 var appUser = await userManger.GetUserAsync(user);
 
                 if(appUser == null)
@@ -139,9 +138,19 @@ namespace Gr8.Api.Endpoints
 
                     var changedProfil = await userManager.UpdateAsync(appUser);
 
-                    return changedProfil.Succeeded
-                    ? Results.Ok("User updated successfully")
-                    : Results.BadRequest(changedProfil.Errors);
+                    if (changedProfil.Succeeded) 
+                    {
+                        return Results.Ok("User updated successfully");
+                    }
+
+                    var isDuplicate = changedProfil.Errors.Any(e => e.Code.Contains("DuplicateUserName") || e.Code.Contains("DuplicateEmail"));
+
+                    if (isDuplicate) 
+                    {
+                        return Results.Conflict(changedProfil.Errors);
+                    }
+
+                    return Results.BadRequest(changedProfil.Errors);
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 

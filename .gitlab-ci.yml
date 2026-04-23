@@ -22,6 +22,22 @@ check-merge-source:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 # ---------------------------------------------------------------------------
+# Test stage: Frontend tests and coverage
+# ---------------------------------------------------------------------------
+frontend-test:
+  stage: test
+  image: node:20
+  allow_failure: true
+  script:
+    - cd frontend/Gr8
+    - echo "WARNING - No test scripts found in frontend package.json"
+    - echo "Pipeline configured for testing, but waiting for Devs to implement Jest/Vitest."
+
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+# ---------------------------------------------------------------------------
 # Build stage: build images, push to GitLab Container Registry with buildx cache
 # ---------------------------------------------------------------------------
 

@@ -101,6 +101,28 @@ namespace Gr8.Api.Endpoints
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
+            app.MapGet("/user", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user) =>
+            {
+                // ta in DTO 
+                var appUser = await userManger.GetUserAsync(user);
+
+                if(appUser == null)
+                {
+                    return Results.NotFound("User not found");
+                }
+
+                var userDto = new UserDto{
+                    Email = appUser.Email,
+                    FirstName = appUser.FirstName,
+                    LastName = appUser.LastName,
+                    UserName = appUser.UserName
+                };
+
+                return Results.Ok(userDto); 
+                
+            })
+             .RequireAuthorization(AuthorizationConstants.JwtOnly); 
+
             app.MapPut("/user", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) =>
                 {
                     var appUser = await userManager.GetUserAsync(user);

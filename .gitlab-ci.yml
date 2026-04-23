@@ -38,6 +38,22 @@ frontend-test:
     - if: $CI_COMMIT_BRANCH == "develop"
 
 # ---------------------------------------------------------------------------
+# Test stage: Backend tests and coverage
+# ---------------------------------------------------------------------------
+backend-test:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  allow_failure: true
+  script:
+    - cd backend/Gr8
+    - echo "WARNING - No test projects found in backend."
+    - echo "Pipeline configured for testing, but waiting for Devs to implement xUnit/NUnit tests."
+
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+# ---------------------------------------------------------------------------
 # Build stage: build images, push to GitLab Container Registry with buildx cache
 # ---------------------------------------------------------------------------
 

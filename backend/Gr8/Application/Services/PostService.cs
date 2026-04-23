@@ -83,6 +83,7 @@ namespace Gr8.Application.Services
                     UpdatedAt = post.UpdatedAt,
                     IsDeleted = post.IsDeleted,
                     IsEdited = post.IsEdited,
+                    CreatedByUser = post.UserId,
                     Category = new CategoryDto
                     {
                         Name = post.Category.Name,
@@ -102,7 +103,7 @@ namespace Gr8.Application.Services
 
             return postDtoList;
         }
-        public async Task<PostDto> GetPostByIdAsync(int postId)
+        public async Task<PostDto> GetPostByIdAsync(int postId, string userId)
         {
             var post = await _communityRepository.GetPostByIdAsync(postId);
 
@@ -110,7 +111,12 @@ namespace Gr8.Application.Services
             {
                 Category = new CategoryDto { Id = post.CategoryId, Name = post.Category.Name},
                 Content = post.Content,
-                Title = post.Title                
+                Title = post.Title,
+                CreatedAt = post.CreatedAt,
+                IsDeleted = post.IsDeleted, 
+                IsEdited = post.IsEdited,
+                UpdatedAt= post.UpdatedAt,
+                CreatedByUser = post.UserId
             };
             return postDto;
         }

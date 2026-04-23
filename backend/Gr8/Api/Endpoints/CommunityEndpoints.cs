@@ -142,9 +142,16 @@ namespace Gr8.Api.Endpoints
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPut("/forum/posts/{PostId}", async (UserManager<ApplicationUser> userManager, [FromServices] IPostService postService, [FromBody] UpdatePostDto editPostDto, int postId) =>
+            app.MapPut("/forum/posts/{PostId}", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IPostService postService, [FromBody] UpdatePostDto editPostDto, int postId) =>
             {
-                var post = await postService.GetPostByIdAsync(postId);
+                var appUser = await userManager.GetUserAsync(user);
+
+                if (appUser == null)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var post = await postService.GetPostByIdAsync(postId, appUser.Id);
 
                 if (post == null)
                 {
@@ -166,9 +173,16 @@ namespace Gr8.Api.Endpoints
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPut("/forum/posts/{postId}/comments/{commentId}", async ([FromServices] ICommentService commentService, [FromBody] UpdateCommentDto editCommentDto, int commentId) =>
+            app.MapPut("/forum/posts/{postId}/comments/{commentId}", async ([FromServices] ICommentService commentService, UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdateCommentDto editCommentDto, int commentId) =>
             {
-                var comment = await commentService.GetCommentByIdAsync(commentId);
+                var appUser = await userManager.GetUserAsync(user);
+
+                if (appUser == null)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var comment = await commentService.GetCommentByIdAsync(commentId, appUser.Id);
 
                 if (comment == null)
                 {

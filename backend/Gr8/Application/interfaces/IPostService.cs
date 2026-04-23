@@ -9,7 +9,7 @@ namespace Gr8.Application.Interfaces
     {
         Task<PostDto?> CreateAsync(CreatePostDto post, string userId);
         Task<List<PostDto>> GetAllPostsAsync();
-        Task<PostDto> GetPostByIdAsync(int postId);
+        Task<PostDto?> GetPostByIdAsync(int postId, string userId);
         Task<int> UpdatePostAsync(PostDto post);
         Task<bool> DeletePostAsync(int postId, string userId);
     }

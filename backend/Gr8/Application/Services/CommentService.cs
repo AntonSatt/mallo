@@ -34,7 +34,8 @@ namespace Gr8.Application.Services
                     IsDeleted = comment.IsDeleted,
                     IsEdited = comment.IsEdited,
                     CreatedAt = comment.CreatedAt,
-                    UpdatedAt = comment.UpdatedAt
+                    UpdatedAt = comment.UpdatedAt,
+                    CreatedByUser = comment.UserId,
                 };
 
                 var userName = await _applicationRepository.GetUserNameByIdAsync(comment.UserId);
@@ -112,7 +113,7 @@ namespace Gr8.Application.Services
             return result > 0;
         }
 
-        public async Task<CommentDto?> GetCommentByIdAsync(int commentId)
+        public async Task<CommentDto?> GetCommentByIdAsync(int commentId, string userId)
         {
             var comment = await _communityRepository.GetCommentByIdAsync(commentId);
 

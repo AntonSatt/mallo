@@ -39,6 +39,7 @@ frontend-test:
 
 # ---------------------------------------------------------------------------
 # Build stage: build images, push to GitLab Container Registry with buildx cache
+# Subtask UT8-91: Automated Docker image build process
 # ---------------------------------------------------------------------------
 
 .build-image: &build-image

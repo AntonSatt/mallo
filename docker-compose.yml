@@ -33,6 +33,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=db;Database=CommunityDB;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=true
+      - Cors__AllowedOrigins__0=https://${stack_name}.doe25.swarm.chas-lab.dev
+      - Cors__AllowedOrigins__1=http://localhost:5173
     networks:
       - internal
       - traefik-public

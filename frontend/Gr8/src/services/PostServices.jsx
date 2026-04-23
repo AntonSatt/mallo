@@ -25,6 +25,15 @@ const PostServices = {
     getCategories: async () => {
         const response = await ApiClient.get("/forum/categories");
         return response.data;
+    },
+    report: async (postId, reportData) => {
+        const response = await ApiClient.post(
+            "/forum/report/",
+            {
+                postId, reason: reportData.reason
+            }
+        );
+        return response.data;
     }
 };
 

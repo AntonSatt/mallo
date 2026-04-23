@@ -102,7 +102,6 @@ namespace Gr8.Application.Services
 
             return postDtoList;
         }
-
         public async Task<PostDto> GetPostByIdAsync(int postId)
         {
             var post = await _communityRepository.GetPostByIdAsync(postId);
@@ -131,6 +130,30 @@ namespace Gr8.Application.Services
 
             await _communityRepository.UpdatePostAsync(oldPost);
             return await _communityRepository.SaveChangesAsync();
+        }
+
+        public async Task<bool> DeletePostAsync(int postId, string userId)
+        {
+            var post = await _communityRepository.GetPostByIdAsync(postId);
+            if (post == null)
+            {
+                return false;
+            }
+
+            if (post.UserId != userId)
+            {
+                return false;
+            }
+
+            var isDeleted = await _communityRepository.DeletePostAsync(postId);
+            
+            if (!isDeleted)
+            {
+                return false;
+            }
+
+            var result = await _communityRepository.SaveChangesAsync();
+            return result > 0;
         }
     }
 }

@@ -61,12 +61,12 @@ namespace Gr8.Api.Endpoints
             {
                 var comments = await commentService.GetCommentsByPostAsync(postId);
 
-                if (comments.Count == 0)
+                if (comments.Count != 0)
                 {
-                    return Results.NoContent();
+                    return Results.Ok(comments);
                 }
 
-                return Results.Ok(comments);
+                return Results.NoContent();
             })
               .RequireAuthorization(AuthorizationConstants.JwtOnly);
 

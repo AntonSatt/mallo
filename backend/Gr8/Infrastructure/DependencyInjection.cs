@@ -16,11 +16,13 @@ namespace Gr8.Infrastructure
         {
             // Configure Entity Framework Core to use SQL Server with the connection string from configuration
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
             // Configure Entity Framework Core to use SQL Server for the CommunityDbContext
             services.AddDbContext<CommunityDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
             services.AddScoped<ICommunityRepository, CommunityRepository>();
             services.AddScoped<IPostService, PostService>();

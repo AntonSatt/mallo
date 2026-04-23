@@ -22,6 +22,10 @@ const CommentServices = {
     const response = await ApiClient.delete(`/forum/comments/${commentId}`);
     return response.data;
   },
+  update: async (postId, commentId, data) => {
+    const response = await ApiClient.put(`/forum/posts/${postId}/comments/${commentId}`, data);
+    return response.data;
+  },
 };
 
 export default CommentServices;

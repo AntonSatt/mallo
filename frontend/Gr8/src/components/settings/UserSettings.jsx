@@ -92,7 +92,7 @@ const UserSettings = () => {
         }
 
         try{
-            const result = await UserServices.update(profileData);
+            const result = await UserServices.updateUser(profileData);
             console.log("Inställningar sparade!", result);
         }
         catch(error){

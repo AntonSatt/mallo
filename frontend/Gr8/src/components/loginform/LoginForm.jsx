@@ -28,7 +28,7 @@ const LoginForm = () => {
 
     try {
       await login({ userName, password });
-      navigate('/');
+      navigate('/forum');
     } catch (err) {
       setError(err.message || 'Fel användarnamn eller lösenord.');
     }

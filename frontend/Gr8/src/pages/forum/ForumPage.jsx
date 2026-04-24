@@ -126,6 +126,8 @@ const ForumPage = () => {
 
     return (
         <>
+            <Navbar />
+
             <DeletePost
                 postId={deletePostId}
                 open={!!deletePostId} // Open when deletePostId is not null

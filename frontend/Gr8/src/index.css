@@ -1,26 +1,35 @@
 :root {
-    /* Primary UI / active states */
-    --action-primary: #FFC656;
-    --action-primary-soft: #FFD98C;
-    --action-primary-button: #FFB57C;
-    --action-secondary-button: #FFF0D4;
+    /* === Brand Colors === */
+    --color-primary: #FFB57C;
+    --color-primary-soft: #FFF0D4;
+    --color-primary-bg: #FFF9ED;
 
-    /* Inputs */
-    --input-background: #F5F5F5;
+    /* === Text Colors === */
+    --color-text-main: #374957;
+    --color-text-inverse: #FFFFFF;
 
-    /* States */
-    --state-hover: #FFB38A;
-    --state-focus: #FFDCE8;
+    /* === Backgrounds === */
+    --color-bg-main: #FFF9ED;
+    --color-bg-surface: #FFFFFF;
+    --color-bg-muted: #F5F5F5;
 
-    /* Text & Surfaces */
-    --brand-notification: #FFB2B6;
-    --text-link: #6E7DFF;
-    --text-primary: #374957;
-    --text-secondary: #3D3D3D;
-    --surface-primary: #FFF9F2;
-    --surface-secondary: #FFF9ED;
-    --surface-info: #EFF1FF;
+    /* === UI Elements === */
+    --color-border-light: #D9D9D9;
+    --color-ui-muted: #D9D9D9;
 
-    /* Status / supportive */
-    --status-success: #B2C8BA;
+    /* === Component Intent === */
+    --button-primary-bg: var(--color-primary);
+    --button-secondary-bg: var(--color-primary-soft);
+    --button-primary-text: var(--color-text-inverse);
+    --button-secondary-text: var(--color-text-main);
+
+    --progressbar-fill: var(--color-primary);
+    --progressbar-bg: var(--color-primary-soft);
+
+    --navbar-bg: var(--color-primary-soft);
+    --navbar-active: var(--color-primary);
+
+    --input-bg: var(--color-bg-muted);
+
+    --scrollbar-color: var(--color-ui-muted);
 }

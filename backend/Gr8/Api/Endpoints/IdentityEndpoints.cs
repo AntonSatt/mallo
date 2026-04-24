@@ -101,6 +101,27 @@ namespace Gr8.Api.Endpoints
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
+            app.MapGet("/user", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user) =>
+            {
+                var appUser = await userManger.GetUserAsync(user);
+
+                if(appUser == null)
+                {
+                    return Results.NotFound("User not found");
+                }
+
+                var userDto = new UserDto{
+                    Email = appUser.Email,
+                    FirstName = appUser.FirstName,
+                    LastName = appUser.LastName,
+                    UserName = appUser.UserName
+                };
+
+                return Results.Ok(userDto); 
+                
+            })
+             .RequireAuthorization(AuthorizationConstants.JwtOnly); 
+
             app.MapPut("/user", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) =>
                 {
                     var appUser = await userManager.GetUserAsync(user);
@@ -117,9 +138,19 @@ namespace Gr8.Api.Endpoints
 
                     var changedProfil = await userManager.UpdateAsync(appUser);
 
-                    return changedProfil.Succeeded
-                    ? Results.Ok("User updated successfully")
-                    : Results.BadRequest(changedProfil.Errors);
+                    if (changedProfil.Succeeded) 
+                    {
+                        return Results.Ok("User updated successfully");
+                    }
+
+                    var isDuplicate = changedProfil.Errors.Any(e => e.Code.Contains("DuplicateUserName") || e.Code.Contains("DuplicateEmail"));
+
+                    if (isDuplicate) 
+                    {
+                        return Results.Conflict(changedProfil.Errors);
+                    }
+
+                    return Results.BadRequest(changedProfil.Errors);
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
@@ -132,11 +163,21 @@ namespace Gr8.Api.Endpoints
                         return Results.NotFound("User not found.");
                     }
 
+                    var context = new ValidationContext(updatePasswordDto);
+                    var results = new List<ValidationResult>();
+
+                    bool isValid = Validator.TryValidateObject(updatePasswordDto, context, results, true);
+
+                    if (!isValid) 
+                    {
+                        return Results.BadRequest(results.Select(r => r.ErrorMessage));
+                    }
+
                     var changedPassword = await userManager.ChangePasswordAsync(appUser, updatePasswordDto.CurrentPassword, updatePasswordDto.NewPassword);
 
                     return changedPassword.Succeeded
                     ? Results.Ok("Password updated successfully")
-                    : Results.BadRequest(changedPassword.Errors);
+                    : Results.BadRequest(changedPassword.Errors.Select(e => e.Description));
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
         }

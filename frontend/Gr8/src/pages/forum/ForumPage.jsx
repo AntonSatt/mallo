@@ -1,7 +1,11 @@
-import * as React from "react";
 import ReportForm from "../../components/reportForm/ReportForm";
 import PostForm from "../../components/postForm/PostForm";
 import CommentForm from "../../components/commentForm/CommentForm";
+import DeletePost from "../../components/deleteForm/DeletePost.jsx";
+import PostServices from "../../services/PostServices";
+import EditPostForm from "../../components/editPostForm/EditPostForm.jsx";
+import { useAuth } from "../../hooks/useAuth";
+
 import {
     Dialog,
     Card,
@@ -20,13 +24,12 @@ import {
 import ShareIcon from "@mui/icons-material/Share";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-
 import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
-import PostServices from "../../services/PostServices";
 import moment from "moment";
 
 const ForumPage = () => {
+    const { currentUser } = useAuth();
     const [expanded, setExpanded] = useState(null);
     const [openPostModal, setPostModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
@@ -34,6 +37,19 @@ const ForumPage = () => {
 
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
     const [selectedPostId, setSelectedPostId] = useState(null);
+    const [deletePostId, setDeletePostId] = useState(null);
+
+    const [editPost, setEditPost] = useState(null);
+    const handleOpenEditPost = (post) => setEditPost(post);
+    const handleCloseEditPost = () => setEditPost(null);
+
+    const handleOpenPostDelete = (postId) => {
+        setDeletePostId(postId);
+    };
+
+    const handleClosePostDelete = () => {
+        setDeletePostId(null);
+    };
 
     const ExpandMore = styled(IconButton, {
         shouldForwardProp: (prop) => prop !== "expand",
@@ -86,16 +102,16 @@ const ForumPage = () => {
                     id: post.id,
                     title: post.title,
                     content: post.content ? post.content : "Innehåll saknas",
+                    userId: post.userId,
                     userName: post.userName,
                     createdAt: post.createdAt,
-                    category: post.category,
-                    tags: post.tags,
+                    category: post.category ? post.category : "Ingen kategori",
+                    createdByUser: post.createdByUser,
+                    tags: post.tags ? post.tags : []
                 }));
                 setPosts(allPosts);
             } catch (error) {
                 console.error("Error fetching posts:", error);
-            } finally {
-                // setLoading(false);
             }
         };
         fetchPosts();
@@ -111,12 +127,35 @@ const ForumPage = () => {
             createdAt: newPost.createdAt,
             category: newPost.category,
             tags: newPost.tags,
+            createdByUser: newPost.createdByUser,
         };
         setPosts((prevPosts) => [formattedPost, ...prevPosts]);
     };
 
     return (
         <>
+            <Navbar />
+
+            <DeletePost
+                postId={deletePostId}
+                open={!!deletePostId}
+                onClose={handleClosePostDelete}
+                onPostDeleted={(id) => {
+                    setPosts(prev => prev.filter(p => p.id !== id));
+                    handleClosePostDelete();
+                }}
+            />
+
+            <EditPostForm
+                post={editPost}
+                open={!!editPost}
+                onClose={handleCloseEditPost}
+                onPostUpdated={(updatedPost) => {
+                    setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
+                    handleCloseEditPost();
+                }}
+            />
+
             <Button variant="outlined" color="error" onClick={handleClickOpen}>
                 Skapa nytt inlägg...
             </Button>
@@ -127,9 +166,12 @@ const ForumPage = () => {
                 maxWidth="sm"
             >
                 <DialogTitle>Skapa nytt inlägg</DialogTitle>
-                <PostForm onPostCreated={handlePostCreated} onClose={handleClose} />
+                <PostForm
+                    onPostCreated={handlePostCreated}
+                    onClose={handleClose}
+                />
                 <DialogActions>
-                    <Button variant="text " color="inherit" onClick={handleClose}>
+                    <Button variant="text" color="inherit" onClick={handleClose}>
                         Avbryt
                     </Button>
                 </DialogActions>
@@ -140,7 +182,7 @@ const ForumPage = () => {
                 postId={selectedPostId}
                 onClose={handleReportClose}
             />
-
+            
             <Menu
                 id="post-menu"
                 anchorEl={menuAnchorEl}
@@ -150,6 +192,17 @@ const ForumPage = () => {
                 transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
                 <MenuItem onClick={handleReport}>Anmäl inlägg</MenuItem>
+                {currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser && (
+                    <>
+                        <MenuItem onClick={() => {
+                            handleOpenPostDelete(selectedPostId);
+                        }}>Radera inlägg</MenuItem>
+                        <MenuItem onClick={() => {
+                            handleOpenEditPost(posts.find(p => p.id === selectedPostId));
+                            handleMenuClose();
+                        }}>Redigera inlägg</MenuItem>
+                    </>
+                )}
             </Menu>
 
             {posts.map((post) => (
@@ -227,4 +280,5 @@ const ForumPage = () => {
         </>
     );
 };
+
 export default ForumPage;

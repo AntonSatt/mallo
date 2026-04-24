@@ -8,14 +8,14 @@ import LoginPage from './pages/login/LoginPage'
 import RegisterPage from './pages/register/RegisterPage'
 import Settings from './pages/settings/SettingsPage'
 import ForumPage from './pages/forum/ForumPage'
+import LandingPage from './pages/landing/LandingPage'
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <Navbar />
         <Routes>
-          <Route path='/' element={<HomePage />} />
+          <Route path='/' element={<LandingPage />} />
           <Route path='/login' element={<LoginPage />} />
           <Route path='/register' element={<RegisterPage />} />
           <Route path='/settings' element={<ProtectedRoute><Settings /></ProtectedRoute>} />

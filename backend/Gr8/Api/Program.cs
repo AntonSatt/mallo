@@ -1,9 +1,11 @@
 using Gr8.Api.Endpoints;
 using Gr8.Application.Common.Constants;
 using Gr8.Infrastructure;
+using Gr8.Infrastructure.Persistence;
 using Scalar.AspNetCore;
 using Gr8.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -54,11 +56,14 @@ namespace Gr8
                 //});
             });
 
+            var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+                              ?? new[] { "http://localhost:5173" };
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("ReactApplication", policy =>
                 {
-                    policy.WithOrigins("http://localhost:5173")
+                    policy.WithOrigins(corsOrigins)
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                 });
@@ -69,6 +74,12 @@ namespace Gr8
             builder.Services.AddInfrastructure(builder.Configuration);
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.MigrateAsync();
+                await scope.ServiceProvider.GetRequiredService<CommunityDbContext>().Database.MigrateAsync();
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

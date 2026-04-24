@@ -2,7 +2,7 @@ import ApiClient from "../api/ApiClient";
 
 const UserServices = {
     login: async (credentials) => {
-        const response = await ApiClient.post("/login", {
+        const response = await ApiClient.post("/auth/login", {
             userName: credentials.userName,
             password: credentials.password
         });
@@ -11,7 +11,7 @@ const UserServices = {
         return response.data;
     },
     register: async (userData) => {
-        const response = await ApiClient.post("/register", {
+        const response = await ApiClient.post("/auth/register", {
             userName: userData.userName,
             firstName: userData.firstName,
             lastName: userData.lastName,
@@ -27,16 +27,16 @@ const UserServices = {
         localStorage.removeItem("token");
     },
     delete: async () => {
-        const response = await ApiClient.delete("/delete");
+        const response = await ApiClient.delete("/users/me");
         UserServices.logout();
         return response.data;
     },
     getUser: async () => {
-        const response = await ApiClient.get("/user");
+        const response = await ApiClient.get("/users/me");
         return response.data;
     },
-    update: async (userData) => {
-        const response = await ApiClient.put("/user", {
+    updateUser: async (userData) => {
+        const response = await ApiClient.put("/users/me", {
             userName: userData.userName,
             firstName: userData.firstName,
             lastName: userData.lastName,
@@ -45,7 +45,7 @@ const UserServices = {
         return response.data;
     },
     updatePassword: async (userData) => {
-        const response = await ApiClient.patch("/password", {
+        const response = await ApiClient.patch("/users/me/password", {
            currentPassWord: userData.currentPassword,
            newPassword: userData.newPassword,
            confirmNewPassword: userData.confirmNewPassword

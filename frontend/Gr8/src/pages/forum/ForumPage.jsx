@@ -134,8 +134,6 @@ const ForumPage = () => {
 
     return (
         <>
-            <Navbar />
-
             <DeletePost
                 postId={deletePostId}
                 open={!!deletePostId}

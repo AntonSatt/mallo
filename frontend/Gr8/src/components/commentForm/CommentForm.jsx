@@ -195,7 +195,7 @@ const CommentForm = ({ postId }) => {
 
             <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleCloseMenu}>
                 <MenuItem onClick={handleOpenReport}>Anmäl kommentar</MenuItem>
-                {currentUser?.sub === comments.find(c => c.id === selectedCommentId)?.createdByUser && (
+                {(comments && (currentUser?.sub === comments.find(c => c.id === selectedCommentId)?.createdByUser)) && (
                     <>
                         <MenuItem onClick={() => {
                             handleCloseMenu();

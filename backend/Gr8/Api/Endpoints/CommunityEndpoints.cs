@@ -202,7 +202,7 @@ namespace Gr8.Api.Endpoints
                 return Results.Ok(comment);
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
-            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+           
 
             app.MapPost("/forum/posts/{postId}/hug", async (int postId, [FromBody] HugDto hugDto, [FromServices] IHugService hugService) =>
             {

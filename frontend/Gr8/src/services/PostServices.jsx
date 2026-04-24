@@ -1,5 +1,7 @@
 import ApiClient from "../api/ApiClient";
 
+// Here we define the PostServices object that contains methods for interacting with the forum posts API. 
+// Each method corresponds to a specific API endpoint and HTTP method, allowing us to create, delete, retrieve, report, and update posts.
 const PostServices = {
     create: async (postData) => {
         const response = await ApiClient.post("/forum/posts", {
@@ -38,6 +40,9 @@ const PostServices = {
     update: async (postId, data) => {
         const response = await ApiClient.put(`/forum/posts/${postId}`, data);
         return response.data;
+    },
+    hugPost: async (postId, userId) => {
+        const response = await ApiClient.Post('/forum/posts/')
     }
 };
 

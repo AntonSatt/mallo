@@ -44,7 +44,7 @@ namespace Gr8.Api.Endpoints
                         return Results.BadRequest(result.Errors);
                     }
 
-                    var token = jwtGenerator.GenerateToken(user.Id, user.Email);
+                    var token = jwtGenerator.GenerateToken(user.Id, user.Email, user.UserName!);
 
                     return Results.Ok(new { Token = token, Message = "User registered successfully." });
                 });
@@ -75,7 +75,7 @@ namespace Gr8.Api.Endpoints
                         return Results.Unauthorized();
                     }
 
-                    var token = jwtGenerator.GenerateToken(user.Id, user.Email!);
+                    var token = jwtGenerator.GenerateToken(user.Id, user.Email!, user.UserName!);
 
                     return Results.Ok(new { Token = token, Message = "User logged in successfully." });
                 });

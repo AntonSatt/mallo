@@ -42,7 +42,10 @@ const PostServices = {
         return response.data;
     },
     hugPost: async (postId, userId) => {
-        const response = await ApiClient.Post('/forum/posts/')
+        const response = await ApiClient.post(`/forum/posts/${postId}/hug`,{
+            userId
+        });
+        return response.data;
     }
 };
 

@@ -3,6 +3,7 @@ import CommentServices from "../../services/CommentServices";
 import ReportForm from "../reportForm/ReportForm";
 import DeleteComment from "../../components/deleteForm/DeleteComment.jsx";
 import { useAuth } from "../../hooks/useAuth";
+import HugButton from "../../components/hugButton/HugButton.jsx"
 
 import {
     Box,
@@ -149,6 +150,10 @@ const CommentForm = ({ postId }) => {
                             <Typography variant="body2" sx={{ mt: 0.5 }}>
                                 {c.content || c.Content}
                             </Typography>
+
+                            {c.id && (
+                                <HugButton type="comment" id={c.id}/>
+                            )}
                             {editingCommentId === c.id && (
                                 <Box sx={{ mt: 2 }}>
                                     <TextField

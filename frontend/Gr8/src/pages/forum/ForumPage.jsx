@@ -5,6 +5,7 @@ import DeletePost from "../../components/deleteForm/DeletePost.jsx";
 import PostServices from "../../services/PostServices";
 import EditPostForm from "../../components/editPostForm/EditPostForm.jsx";
 import { useAuth } from "../../hooks/useAuth";
+import Navbar from "../../components/layout/Navbar.jsx"
 
 import {
     Dialog,

@@ -5,7 +5,7 @@ import DeletePost from "../../components/deleteForm/DeletePost.jsx";
 import PostServices from "../../services/PostServices";
 import EditPostForm from "../../components/editPostForm/EditPostForm.jsx";
 import { useAuth } from "../../hooks/useAuth";
-import FilterListIcon from "@mui/icons-material/FilterList";
+import FilterPost from "../../components/postForm/FilterPost.jsx";
 
 import {
     Dialog,
@@ -20,12 +20,6 @@ import {
     DialogActions,
     Menu,
     MenuItem,
-    Chip,
-    Stack,
-    Checkbox,
-    FormControlLabel,
-    Divider,
-    Badge,
 } from "@mui/material";
 
 import ShareIcon from "@mui/icons-material/Share";
@@ -55,6 +49,8 @@ const ForumPage = () => {
     const [filterAnchorEl, setFilterAnchorEl] = useState(null);
     const [checkedCategories, setCheckedCategories] = useState([]);
     const [categories, setCategories] = useState([]);
+
+
 
     const handleOpenPostDelete = (postId) => {
         setDeletePostId(postId);
@@ -240,67 +236,17 @@ const ForumPage = () => {
                 Skapa nytt inlägg...
             </Button>
 
-            <Stack
-                direction="row"
-                spacing={1}
-                alignItems="center"
-                sx={{ mt: 2, mb: 2, flexWrap: "wrap" }}
-            >
-                <Chip
-                    label="Alla"
-                    onClick={() => handleNavCategoryClick("Alla")}
-                    color={activeNavCategory === "Alla" && checkedCategories.length === 0 ? "error" : "default"}
-                    variant={activeNavCategory === "Alla" && checkedCategories.length === 0 ? "filled" : "outlined"}
-                />
-                {categories.slice(0, 3).map(cat => (
-                    <Chip
-                        key={cat.id}
-                        label={cat.name}
-                        onClick={() => handleNavCategoryClick(cat.name)}
-                        color={activeNavCategory === cat.name && checkedCategories.length === 0 ? "error" : "default"}
-                        variant={activeNavCategory === cat.name && checkedCategories.length === 0 ? "filled" : "outlined"}
-                    />
-                ))}
-                <Badge badgeContent={checkedCategories.length} color="error">
-                    <IconButton onClick={handleFilterIconClick} size="small">
-                        <FilterListIcon />
-                    </IconButton>
-                </Badge>
-            </Stack>
-
-            <Menu
-                anchorEl={filterAnchorEl}
-                open={Boolean(filterAnchorEl)}
-                onClose={handleFilterClose}
-                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-                transformOrigin={{ vertical: "top", horizontal: "left" }}
-            >
-                <Typography variant="subtitle2" sx={{ px: 2, py: 1, fontWeight: "bold" }}>
-                    Filtrera på kategori
-                </Typography>
-                <Divider />
-                {categories.map(cat => (
-                    <MenuItem key={cat.id} dense disableRipple>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={checkedCategories.includes(cat.name)}
-                                    onChange={() => handleCheckboxChange(cat.name)}
-                                    color="error"
-                                    size="small"
-                                />
-                            }
-                            label={cat.name}
-                        />
-                    </MenuItem>
-                ))}
-                <Divider />
-                <MenuItem onClick={handleClearFilters} dense>
-                    <Typography variant="caption" color="error">
-                        Rensa filter
-                    </Typography>
-                </MenuItem>
-            </Menu>
+            <FilterPost
+                categories={categories}
+                activeNavCategory={activeNavCategory}
+                checkedCategories={checkedCategories}
+                filterAnchorEl={filterAnchorEl}
+                onNavCategoryClick={handleNavCategoryClick}
+                onFilterIconClick={handleFilterIconClick}
+                onFilterClose={handleFilterClose}
+                onCheckboxChange={handleCheckboxChange}
+                onClearFilters={handleClearFilters}
+            />
 
             <Dialog
                 open={openPostModal}
@@ -354,18 +300,16 @@ const ForumPage = () => {
                         title={post.title}
                         subheader={`${post.userName} • ${moment(post.createdAt).fromNow()}`}
                         action={
-                            <>
-                                <IconButton
-                                    aria-label="more"
-                                    id={"post-menu-button-" + post.id}
-                                    aria-controls={menuAnchorEl ? "post-menu" : undefined}
-                                    aria-expanded={menuAnchorEl ? "true" : undefined}
-                                    aria-haspopup="true"
-                                    onClick={(event) => handleMenuOpen(event, post.id)}
-                                >
-                                    <MoreHorizIcon />
-                                </IconButton>
-                            </>
+                            <IconButton
+                                aria-label="more"
+                                id={"post-menu-button-" + post.id}
+                                aria-controls={menuAnchorEl ? "post-menu" : undefined}
+                                aria-expanded={menuAnchorEl ? "true" : undefined}
+                                aria-haspopup="true"
+                                onClick={(event) => handleMenuOpen(event, post.id)}
+                            >
+                                <MoreHorizIcon />
+                            </IconButton>
                         }
                     />
 

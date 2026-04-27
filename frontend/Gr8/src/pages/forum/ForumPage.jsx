@@ -70,18 +70,6 @@ const ForumPage = () => {
         }),
     }));
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const catResult = await PostServices.getCategories();
-                setCategories(catResult.map(c => ({ id: c.id, name: c.name })));
-            } catch (error) {
-                console.error("Error fetching categories:", error);
-            }
-        };
-        fetchCategories();
-    }, []);
-
     const handleClickOpen = () => {
         setPostModalOpen(true);
     };

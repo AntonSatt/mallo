@@ -5,6 +5,7 @@ import DeletePost from "../../components/deleteForm/DeletePost.jsx";
 import PostServices from "../../services/PostServices";
 import EditPostForm from "../../components/editPostForm/EditPostForm.jsx";
 import { useAuth } from "../../hooks/useAuth";
+import FilterPost from "../../components/postForm/FilterPost.jsx";
 import Navbar from "../../components/layout/Navbar.jsx"
 
 import {
@@ -26,8 +27,10 @@ import ShareIcon from "@mui/icons-material/Share";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { styled } from "@mui/material/styles";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import moment from "moment";
+import HugButton from "../../components/hugButton/HugButton.jsx";
+import ProfileBar from "../../components/layout/ProfileBar.jsx";
 
 const ForumPage = () => {
     const { currentUser } = useAuth();
@@ -43,6 +46,13 @@ const ForumPage = () => {
     const [editPost, setEditPost] = useState(null);
     const handleOpenEditPost = (post) => setEditPost(post);
     const handleCloseEditPost = () => setEditPost(null);
+
+    const [activeNavCategory, setActiveNavCategory] = useState("Alla");
+    const [filterAnchorEl, setFilterAnchorEl] = useState(null);
+    const [checkedCategories, setCheckedCategories] = useState([]);
+    const [categories, setCategories] = useState([]);
+
+
 
     const handleOpenPostDelete = (postId) => {
         setDeletePostId(postId);
@@ -94,6 +104,61 @@ const ForumPage = () => {
         setSelectedPostId(null);
     };
 
+    const handleNavCategoryClick = (cat) => {
+        setActiveNavCategory(cat);
+        setCheckedCategories([]);
+    };
+
+    const handleFilterIconClick = (event) => {
+        setFilterAnchorEl(event.currentTarget);
+    };
+
+    const handleFilterClose = () => {
+        setFilterAnchorEl(null);
+    };
+
+    const filteredPosts = useMemo(() => {
+        if (checkedCategories.length > 0) {
+            return posts.filter(p => {
+                const cat = p.category?.name || p.category;
+                return checkedCategories.includes(cat);
+            });
+        }
+        if (activeNavCategory !== "Alla") {
+            return posts.filter(p => {
+                const cat = p.category?.name || p.category;
+                return cat === activeNavCategory;
+            });
+        }
+        return posts;
+    }, [posts, activeNavCategory, checkedCategories]);
+
+    const handleCheckboxChange = (categoryName) => {
+        setCheckedCategories(prev =>
+            prev.includes(categoryName)
+                ? prev.filter(c => c !== categoryName)
+                : [...prev, categoryName]
+        );
+        setActiveNavCategory("Alla");
+    };
+
+    const handleClearFilters = () => {
+        setCheckedCategories([]);
+        setActiveNavCategory("Alla");
+    };
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const catResult = await PostServices.getCategories();
+                setCategories(catResult.map(c => ({ id: c.id, name: c.name })));
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+            }
+        };
+        fetchCategories();
+    }, []);
+
     useEffect(() => {
         const fetchPosts = async () => {
             try {
@@ -135,6 +200,8 @@ const ForumPage = () => {
 
     return (
         <>
+            <ProfileBar />
+
             <DeletePost
                 postId={deletePostId}
                 open={!!deletePostId}
@@ -158,6 +225,19 @@ const ForumPage = () => {
             <Button variant="outlined" color="error" onClick={handleClickOpen}>
                 Skapa nytt inlägg...
             </Button>
+
+            <FilterPost
+                categories={categories}
+                activeNavCategory={activeNavCategory}
+                checkedCategories={checkedCategories}
+                filterAnchorEl={filterAnchorEl}
+                onNavCategoryClick={handleNavCategoryClick}
+                onFilterIconClick={handleFilterIconClick}
+                onFilterClose={handleFilterClose}
+                onCheckboxChange={handleCheckboxChange}
+                onClearFilters={handleClearFilters}
+            />
+
             <Dialog
                 open={openPostModal}
                 onClose={handleClose}
@@ -181,7 +261,7 @@ const ForumPage = () => {
                 postId={selectedPostId}
                 onClose={handleReportClose}
             />
-            
+
             <Menu
                 id="post-menu"
                 anchorEl={menuAnchorEl}
@@ -204,24 +284,22 @@ const ForumPage = () => {
                 )}
             </Menu>
 
-            {posts.map((post) => (
+            {filteredPosts.map((post) => (
                 <Card key={post.id} sx={{ maxWidth: 500, marginBottom: 2 }}>
                     <CardHeader
                         title={post.title}
                         subheader={`${post.userName} • ${moment(post.createdAt).fromNow()}`}
                         action={
-                            <>
-                                <IconButton
-                                    aria-label="more"
-                                    id={"post-menu-button-" + post.id}
-                                    aria-controls={menuAnchorEl ? "post-menu" : undefined}
-                                    aria-expanded={menuAnchorEl ? "true" : undefined}
-                                    aria-haspopup="true"
-                                    onClick={(event) => handleMenuOpen(event, post.id)}
-                                >
-                                    <MoreHorizIcon />
-                                </IconButton>
-                            </>
+                            <IconButton
+                                aria-label="more"
+                                id={"post-menu-button-" + post.id}
+                                aria-controls={menuAnchorEl ? "post-menu" : undefined}
+                                aria-expanded={menuAnchorEl ? "true" : undefined}
+                                aria-haspopup="true"
+                                onClick={(event) => handleMenuOpen(event, post.id)}
+                            >
+                                <MoreHorizIcon />
+                            </IconButton>
                         }
                     />
 
@@ -254,6 +332,8 @@ const ForumPage = () => {
                     <IconButton aria-label="share">
                         <ShareIcon />
                     </IconButton>
+
+                    <HugButton type="post" id={post.id} />
 
                     <ExpandMore
                         expand={expanded === post.id}

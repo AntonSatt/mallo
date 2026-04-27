@@ -31,6 +31,7 @@ namespace Gr8.Infrastructure
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IApplicationRepository, ApplicationRepository>();
             services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<IHugService, HugService>();
 
             // Configure ASP.NET Core Identity to use the ApplicationUser and ApplicationRole classes, and to use Entity Framework Core for storage
             services.AddIdentity<ApplicationUser, ApplicationRole>()

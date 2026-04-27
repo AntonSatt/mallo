@@ -14,6 +14,7 @@ namespace Gr8.Infrastructure.Persistence
         public DbSet<Comment> Comments => Set<Comment>();
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Report> Reports => Set<Report>();
+        public DbSet<Hug> Hugs => Set<Hug>();
 
         public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
         {
@@ -129,6 +130,30 @@ namespace Gr8.Infrastructure.Persistence
                     .HasForeignKey(r => r.ReviewedByAdminId)
                     .OnDelete(DeleteBehavior.Restrict);
                 });
+
+            modelBuilder.Entity<Hug>(entity => 
+            {
+                entity.HasKey(h => h.Id);
+
+                entity.HasOne(h => h.Post)
+                .WithMany(p => p.Hugs)
+                .HasForeignKey(h => h.PostId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(h => h.Comment)
+                .WithMany(c => c.Hugs)
+                .HasForeignKey(h => h.CommentId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(h => h.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                //Ensures that a user can only hug a specific post/comment once.
+                entity.HasIndex(h => new { h.UserId, h.PostId }).IsUnique();
+                entity.HasIndex(h => new { h.UserId, h.CommentId }).IsUnique();
+            });
         }
     }
 }

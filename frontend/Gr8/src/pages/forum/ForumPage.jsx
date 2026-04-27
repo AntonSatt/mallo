@@ -28,6 +28,7 @@ import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import moment from "moment";
 import HugButton from "../../components/hugButton/HugButton.jsx";
+import ProfileBar from "../../components/layout/ProfileBar.jsx";
 
 const ForumPage = () => {
     const { currentUser } = useAuth();
@@ -135,6 +136,8 @@ const ForumPage = () => {
 
     return (
         <>
+            <ProfileBar />
+            
             <DeletePost
                 postId={deletePostId}
                 open={!!deletePostId}

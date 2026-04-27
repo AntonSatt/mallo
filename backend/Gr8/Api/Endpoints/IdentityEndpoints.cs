@@ -16,7 +16,7 @@ namespace Gr8.Api.Endpoints
         /// </summary>
         public static void MapIdentityEndpoints(WebApplication app)
         {
-            app.MapPost("/register", async (UserManager<ApplicationUser> userManager, IJwtTokenGenerator jwtGenerator, [FromBody] RegisterDto userDto) =>
+            app.MapPost("/auth/register", async (UserManager<ApplicationUser> userManager, IJwtTokenGenerator jwtGenerator, [FromBody] RegisterDto userDto) =>
                 {
                     var context = new ValidationContext(userDto);
                     var results = new List<ValidationResult>();
@@ -44,12 +44,12 @@ namespace Gr8.Api.Endpoints
                         return Results.BadRequest(result.Errors);
                     }
 
-                    var token = jwtGenerator.GenerateToken(user.Id, user.Email);
+                    var token = jwtGenerator.GenerateToken(user.Id, user.Email, user.UserName!);
 
-                    return Results.Ok(new { Token = token, Message = "User registered successfully." });
+                    return Results.Created($"/users/{user.Id}", new { Token = token, User = new {user.Id, user.UserName, user.Email }});
                 });
 
-            app.MapPost("/login", async (UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtTokenGenerator jwtGenerator, [FromBody] LoginDto loginDto) =>
+            app.MapPost("/auth/login", async (UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtTokenGenerator jwtGenerator, [FromBody] LoginDto loginDto) =>
                 {
                     var context = new ValidationContext(loginDto);
                     var results = new List<ValidationResult>();
@@ -75,18 +75,18 @@ namespace Gr8.Api.Endpoints
                         return Results.Unauthorized();
                     }
 
-                    var token = jwtGenerator.GenerateToken(user.Id, user.Email!);
+                    var token = jwtGenerator.GenerateToken(user.Id, user.Email!, user.UserName!);
 
                     return Results.Ok(new { Token = token, Message = "User logged in successfully." });
                 });
 
-            app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager) =>
+            app.MapPost("/auth/logout", async (SignInManager<ApplicationUser> signInManager) =>
                 {
                     await signInManager.SignOutAsync();
                     return Results.Ok("User logged out successfully.");
                 });
 
-            app.MapDelete("/delete", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user) =>
+            app.MapDelete("/users/me", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user) =>
                 {
                     var appUser = await userManager.GetUserAsync(user);
                     if (appUser == null)
@@ -101,7 +101,7 @@ namespace Gr8.Api.Endpoints
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapGet("/user", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user) =>
+            app.MapGet("/users/me", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user) =>
             {
                 var appUser = await userManger.GetUserAsync(user);
 
@@ -122,7 +122,7 @@ namespace Gr8.Api.Endpoints
             })
              .RequireAuthorization(AuthorizationConstants.JwtOnly); 
 
-            app.MapPut("/user", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) =>
+            app.MapPut("/users/me", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) =>
                 {
                     var appUser = await userManager.GetUserAsync(user);
 
@@ -154,7 +154,7 @@ namespace Gr8.Api.Endpoints
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPatch("/password", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdatePasswordDto updatePasswordDto) =>
+            app.MapPatch("/users/me/password", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdatePasswordDto updatePasswordDto) =>
                 {
                     var appUser = await userManager.GetUserAsync(user);
 

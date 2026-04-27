@@ -20,7 +20,6 @@ namespace Gr8.Application.Interfaces
         Task<Post> GetPostByIdAsync(int id);
         Task<bool> DeletePostAsync(int postId);
         Task<bool> DeleteCommentAsync(int commentId);
-
         Task<Hug?> GetPostHugAsync(int postId, string UserId);
         Task<Hug?> GetCommentHugAsync(int commentId, string UserId);
         Task AddHugAsync(Hug hug);

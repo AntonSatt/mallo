@@ -5,6 +5,7 @@ import DeletePost from "../../components/deleteForm/DeletePost.jsx";
 import PostServices from "../../services/PostServices";
 import EditPostForm from "../../components/editPostForm/EditPostForm.jsx";
 import { useAuth } from "../../hooks/useAuth";
+import FilterListIcon from "@mui/icons-material/FilterList";
 
 import {
     Dialog,
@@ -19,13 +20,19 @@ import {
     DialogActions,
     Menu,
     MenuItem,
+    Chip,
+    Stack,
+    Checkbox,
+    FormControlLabel,
+    Divider,
+    Badge,
 } from "@mui/material";
 
 import ShareIcon from "@mui/icons-material/Share";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { styled } from "@mui/material/styles";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import moment from "moment";
 import ProfileBar from "../../components/layout/ProfileBar.jsx";
 
@@ -44,6 +51,11 @@ const ForumPage = () => {
     const handleOpenEditPost = (post) => setEditPost(post);
     const handleCloseEditPost = () => setEditPost(null);
 
+    const [activeNavCategory, setActiveNavCategory] = useState("Alla");
+    const [filterAnchorEl, setFilterAnchorEl] = useState(null);
+    const [checkedCategories, setCheckedCategories] = useState([]);
+    const [categories, setCategories] = useState([]);
+
     const handleOpenPostDelete = (postId) => {
         setDeletePostId(postId);
     };
@@ -61,6 +73,18 @@ const ForumPage = () => {
             duration: theme.transitions.duration.shortest,
         }),
     }));
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const catResult = await PostServices.getCategories();
+                setCategories(catResult.map(c => ({ id: c.id, name: c.name })));
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     const handleClickOpen = () => {
         setPostModalOpen(true);
@@ -93,6 +117,61 @@ const ForumPage = () => {
         setOpenReportModal(false);
         setSelectedPostId(null);
     };
+
+    const handleNavCategoryClick = (cat) => {
+        setActiveNavCategory(cat);
+        setCheckedCategories([]);
+    };
+
+    const handleFilterIconClick = (event) => {
+        setFilterAnchorEl(event.currentTarget);
+    };
+
+    const handleFilterClose = () => {
+        setFilterAnchorEl(null);
+    };
+
+    const filteredPosts = useMemo(() => {
+        if (checkedCategories.length > 0) {
+            return posts.filter(p => {
+                const cat = p.category?.name || p.category;
+                return checkedCategories.includes(cat);
+            });
+        }
+        if (activeNavCategory !== "Alla") {
+            return posts.filter(p => {
+                const cat = p.category?.name || p.category;
+                return cat === activeNavCategory;
+            });
+        }
+        return posts;
+    }, [posts, activeNavCategory, checkedCategories]);
+
+    const handleCheckboxChange = (categoryName) => {
+        setCheckedCategories(prev =>
+            prev.includes(categoryName)
+                ? prev.filter(c => c !== categoryName)
+                : [...prev, categoryName]
+        );
+        setActiveNavCategory("Alla");
+    };
+
+    const handleClearFilters = () => {
+        setCheckedCategories([]);
+        setActiveNavCategory("Alla");
+    };
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const catResult = await PostServices.getCategories();
+                setCategories(catResult.map(c => ({ id: c.id, name: c.name })));
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -136,7 +215,7 @@ const ForumPage = () => {
     return (
         <>
             <ProfileBar />
-            
+
             <DeletePost
                 postId={deletePostId}
                 open={!!deletePostId}
@@ -160,6 +239,69 @@ const ForumPage = () => {
             <Button variant="outlined" color="error" onClick={handleClickOpen}>
                 Skapa nytt inlägg...
             </Button>
+
+            <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                sx={{ mt: 2, mb: 2, flexWrap: "wrap" }}
+            >
+                <Chip
+                    label="Alla"
+                    onClick={() => handleNavCategoryClick("Alla")}
+                    color={activeNavCategory === "Alla" && checkedCategories.length === 0 ? "error" : "default"}
+                    variant={activeNavCategory === "Alla" && checkedCategories.length === 0 ? "filled" : "outlined"}
+                />
+                {categories.slice(0, 3).map(cat => (
+                    <Chip
+                        key={cat.id}
+                        label={cat.name}
+                        onClick={() => handleNavCategoryClick(cat.name)}
+                        color={activeNavCategory === cat.name && checkedCategories.length === 0 ? "error" : "default"}
+                        variant={activeNavCategory === cat.name && checkedCategories.length === 0 ? "filled" : "outlined"}
+                    />
+                ))}
+                <Badge badgeContent={checkedCategories.length} color="error">
+                    <IconButton onClick={handleFilterIconClick} size="small">
+                        <FilterListIcon />
+                    </IconButton>
+                </Badge>
+            </Stack>
+
+            <Menu
+                anchorEl={filterAnchorEl}
+                open={Boolean(filterAnchorEl)}
+                onClose={handleFilterClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                transformOrigin={{ vertical: "top", horizontal: "left" }}
+            >
+                <Typography variant="subtitle2" sx={{ px: 2, py: 1, fontWeight: "bold" }}>
+                    Filtrera på kategori
+                </Typography>
+                <Divider />
+                {categories.map(cat => (
+                    <MenuItem key={cat.id} dense disableRipple>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={checkedCategories.includes(cat.name)}
+                                    onChange={() => handleCheckboxChange(cat.name)}
+                                    color="error"
+                                    size="small"
+                                />
+                            }
+                            label={cat.name}
+                        />
+                    </MenuItem>
+                ))}
+                <Divider />
+                <MenuItem onClick={handleClearFilters} dense>
+                    <Typography variant="caption" color="error">
+                        Rensa filter
+                    </Typography>
+                </MenuItem>
+            </Menu>
+
             <Dialog
                 open={openPostModal}
                 onClose={handleClose}
@@ -183,7 +325,7 @@ const ForumPage = () => {
                 postId={selectedPostId}
                 onClose={handleReportClose}
             />
-            
+
             <Menu
                 id="post-menu"
                 anchorEl={menuAnchorEl}
@@ -206,7 +348,7 @@ const ForumPage = () => {
                 )}
             </Menu>
 
-            {posts.map((post) => (
+            {filteredPosts.map((post) => (
                 <Card key={post.id} sx={{ maxWidth: 500, marginBottom: 2 }}>
                     <CardHeader
                         title={post.title}

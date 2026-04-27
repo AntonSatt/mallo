@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import PostServices from "../../services/PostServices";
-// Page is not implemeted to backend yet, so this is just a mockup of the form.
 
-//import { useNavigate } from "react-router-dom";
 import {
   InputLabel,
   TextField,

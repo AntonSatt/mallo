@@ -116,7 +116,8 @@ namespace Gr8.Api.Endpoints
                     Email = appUser.Email,
                     FirstName = appUser.FirstName,
                     LastName = appUser.LastName,
-                    UserName = appUser.UserName
+                    UserName = appUser.UserName,
+                    //TODO: Add Avatar to UserDto
                 };
 
                 return Results.Ok(userDto); 
@@ -137,6 +138,7 @@ namespace Gr8.Api.Endpoints
                     appUser.FirstName = updateProfileDto.FirstName;
                     appUser.LastName = updateProfileDto.LastName;
                     appUser.Email = updateProfileDto.Email;
+                    //TODO: Update Avatar either here or in a separate endpoint
 
                     var changedProfil = await userManager.UpdateAsync(appUser);
 

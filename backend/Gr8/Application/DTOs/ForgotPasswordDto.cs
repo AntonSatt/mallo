@@ -10,6 +10,5 @@ namespace Gr8.Application.DTOs
         [Required]
         [EmailAddress]
         public string Email { get; set; } = null!;
-
     }
 }

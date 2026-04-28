@@ -36,7 +36,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
 
                     b.HasData(
                         new
@@ -98,7 +98,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Hug", b =>
@@ -133,34 +133,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                         .IsUnique()
                         .HasFilter("[PostId] IS NOT NULL");
 
-                    b.ToTable("Hugs");
-                });
-
-            modelBuilder.Entity("Gr8.Domain.Entities.PasswordResetToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Used")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PasswordResetTokens");
+                    b.ToTable("Hugs", (string)null);
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Post", b =>
@@ -204,7 +177,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Posts", (string)null);
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Report", b =>
@@ -255,7 +228,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasIndex("ReviewedByAdminId");
 
-                    b.ToTable("Reports");
+                    b.ToTable("Reports", (string)null);
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Tag", b =>
@@ -272,7 +245,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags");
+                    b.ToTable("Tags", (string)null);
 
                     b.HasData(
                         new

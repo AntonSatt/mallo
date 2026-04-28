@@ -12,9 +12,9 @@
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "Email__Username": "danielhultmark@gmail.com",
-        "Email__Password": "wack urwd xnay lkpy",
-        "Email__From": "danielhultmark@gmail.com"
+        "Email__Username": "saabtsh@gmail.com",
+        "Email__Password": "zqlu pibi avaq qykt",
+        "Email__From": "saabtsh@gmail.com"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7008;http://localhost:5225"

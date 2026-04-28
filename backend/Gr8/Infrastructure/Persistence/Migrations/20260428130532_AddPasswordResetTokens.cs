@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Gr8.Infrastructure.Migrations.CommunityDb
+namespace Gr8.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class AddPasswordResetTokens : Migration

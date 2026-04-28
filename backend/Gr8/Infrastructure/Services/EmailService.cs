@@ -1,4 +1,4 @@
-﻿using Gr8.Application.interfaces;
+﻿using Gr8.Application.Interfaces;
 using MailKit.Net.Smtp;
 using MimeKit;
 using Microsoft.Extensions.Configuration;

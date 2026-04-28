@@ -15,7 +15,6 @@ namespace Gr8.Infrastructure.Persistence
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Report> Reports => Set<Report>();
         public DbSet<Hug> Hugs => Set<Hug>();
-        public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
 
         public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
         {

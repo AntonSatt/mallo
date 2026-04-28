@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
-using Gr8.Application.interfaces;
-using Gr8.Infrastructure.Persistence;
 using Gr8.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -186,7 +184,7 @@ namespace Gr8.Api.Endpoints
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPost("/auth/forgot-password", async (ForgotPasswordDto forgotPasswordDto, CommunityDbContext dbContext, UserManager<ApplicationUser> userManager, [FromServices] IEmailService emailService, [FromServices] IConfiguration configuration) =>
+            app.MapPost("/auth/forgot-password", async (ForgotPasswordDto forgotPasswordDto, ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, [FromServices] IEmailService emailService, [FromServices] IConfiguration configuration) =>
             {
                 var user = await userManager.FindByEmailAsync(forgotPasswordDto.Email);
                 if (user == null)
@@ -217,7 +215,7 @@ namespace Gr8.Api.Endpoints
                 return Results.Ok("Om en användare med den e-postadressen finns, har en återställningslänk skickats.");
             });
 
-            app.MapPost("/auth/reset-password", async (ResetPasswordDto resetPasswordDto, CommunityDbContext dbContext, UserManager<ApplicationUser> userManager) =>
+            app.MapPost("/auth/reset-password", async (ResetPasswordDto resetPasswordDto, ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) =>
             {
                 var resetToken = await dbContext.PasswordResetTokens
                     .FirstOrDefaultAsync(t =>
@@ -233,7 +231,7 @@ namespace Gr8.Api.Endpoints
                 if (user == null)
                     return Results.NotFound("User not found.");
 
-                var result = await userManager.ResetPasswordAsync(user, resetToken.Token, resetPasswordDto.NewPassword); // 👈 fixed
+                var result = await userManager.ResetPasswordAsync(user, resetToken.Token, resetPasswordDto.NewPassword);
 
                 if (!result.Succeeded)
                     return Results.BadRequest(result.Errors.Select(e => e.Description));

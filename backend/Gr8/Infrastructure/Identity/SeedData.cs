@@ -23,8 +23,8 @@ namespace Gr8.Infrastructure.Identity
                 var newUser = new ApplicationUser
                 {
                     Id = "00000000-0000-0000-0000-000000000001", // fixed id (optional)
-                    UserName = "AnAl",
-                    NormalizedUserName = "ANAL",
+                    UserName = "Anna",
+                    NormalizedUserName = "ANNA",
                     Email = userEmail,
                     NormalizedEmail = userEmail.ToUpperInvariant(),
                     FirstName = "Anna",

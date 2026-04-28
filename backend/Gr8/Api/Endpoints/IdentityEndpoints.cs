@@ -186,7 +186,7 @@ namespace Gr8.Api.Endpoints
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPost("/auth/forgot-password", async (ForgotPasswordDto forgotPasswordDto, CommunityDbContext dbContext, UserManager<ApplicationUser> userManager, [FromServices] IEmailService emailService) =>
+            app.MapPost("/auth/forgot-password", async (ForgotPasswordDto forgotPasswordDto, CommunityDbContext dbContext, UserManager<ApplicationUser> userManager, [FromServices] IEmailService emailService, [FromServices] IConfiguration configuration) =>
             {
                 var user = await userManager.FindByEmailAsync(forgotPasswordDto.Email);
                 if (user == null)
@@ -206,7 +206,9 @@ namespace Gr8.Api.Endpoints
                 dbContext.PasswordResetTokens.Add(resetToken);
                 await dbContext.SaveChangesAsync();
 
-                var resetLink = $"https://yourfrontend.com/reset-password?token={Uri.EscapeDataString(token)}";
+                var appLink = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+                              ?? new[] { "http://localhost:5173" };
+                var resetLink = $"{appLink[0]}/reset-password?token={Uri.EscapeDataString(token)}";
 
                 await emailService.SendAsync(
                     user.Email,

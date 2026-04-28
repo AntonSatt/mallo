@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
+using Gr8.Application.interfaces;
+using Gr8.Infrastructure.Persistence;
+using Gr8.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gr8.Api.Endpoints
 {
@@ -46,7 +50,7 @@ namespace Gr8.Api.Endpoints
 
                     var token = jwtGenerator.GenerateToken(user.Id, user.Email, user.UserName!);
 
-                    return Results.Created($"/users/{user.Id}", new { Token = token, User = new {user.Id, user.UserName, user.Email }});
+                    return Results.Created($"/users/{user.Id}", new { Token = token, User = new { user.Id, user.UserName, user.Email } });
                 });
 
             app.MapPost("/auth/login", async (UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtTokenGenerator jwtGenerator, [FromBody] LoginDto loginDto) =>
@@ -105,22 +109,23 @@ namespace Gr8.Api.Endpoints
             {
                 var appUser = await userManger.GetUserAsync(user);
 
-                if(appUser == null)
+                if (appUser == null)
                 {
                     return Results.NotFound("User not found");
                 }
 
-                var userDto = new UserDto{
+                var userDto = new UserDto
+                {
                     Email = appUser.Email,
                     FirstName = appUser.FirstName,
                     LastName = appUser.LastName,
                     UserName = appUser.UserName
                 };
 
-                return Results.Ok(userDto); 
-                
+                return Results.Ok(userDto);
+
             })
-             .RequireAuthorization(AuthorizationConstants.JwtOnly); 
+             .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
             app.MapPut("/users/me", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) =>
                 {
@@ -138,14 +143,14 @@ namespace Gr8.Api.Endpoints
 
                     var changedProfil = await userManager.UpdateAsync(appUser);
 
-                    if (changedProfil.Succeeded) 
+                    if (changedProfil.Succeeded)
                     {
                         return Results.Ok("User updated successfully");
                     }
 
                     var isDuplicate = changedProfil.Errors.Any(e => e.Code.Contains("DuplicateUserName") || e.Code.Contains("DuplicateEmail"));
 
-                    if (isDuplicate) 
+                    if (isDuplicate)
                     {
                         return Results.Conflict(changedProfil.Errors);
                     }
@@ -168,7 +173,7 @@ namespace Gr8.Api.Endpoints
 
                     bool isValid = Validator.TryValidateObject(updatePasswordDto, context, results, true);
 
-                    if (!isValid) 
+                    if (!isValid)
                     {
                         return Results.BadRequest(results.Select(r => r.ErrorMessage));
                     }
@@ -180,6 +185,62 @@ namespace Gr8.Api.Endpoints
                     : Results.BadRequest(changedPassword.Errors.Select(e => e.Description));
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPost("/auth/forgot-password", async (ForgotPasswordDto forgotPasswordDto, CommunityDbContext dbContext, UserManager<ApplicationUser> userManager, [FromServices] IEmailService emailService) =>
+            {
+                var user = await userManager.FindByEmailAsync(forgotPasswordDto.Email);
+                if (user == null)
+                {
+                    return Results.Ok();
+                }
+
+                var token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+                var resetToken = new PasswordResetToken
+                {
+                    UserId = user.Id,
+                    Token = token,
+                    ExpiresAt = DateTime.UtcNow.AddHours(1)
+                };
+
+                dbContext.PasswordResetTokens.Add(resetToken);
+                await dbContext.SaveChangesAsync();
+
+                var resetLink = $"https://yourfrontend.com/reset-password?token={Uri.EscapeDataString(token)}";
+
+                await emailService.SendAsync(
+                    user.Email,
+                    "Önskan att återställa lösenord", $"<p>Du har begärt att återställa ditt lösenord. Klicka <a href='{resetLink}'>here</a> för att återställa ditt Lösenord. Länken går ut om 60 min.</p>");
+                Console.WriteLine("det funkar");
+                return Results.Ok("Om en användare med den e-postadressen finns, har en återställningslänk skickats.");
+            });
+
+            app.MapPost("/auth/reset-password", async (ResetPasswordDto resetPasswordDto, CommunityDbContext dbContext, UserManager<ApplicationUser> userManager) =>
+            {
+                var resetToken = await dbContext.PasswordResetTokens
+                    .FirstOrDefaultAsync(t =>
+                        t.Token == resetPasswordDto.Token &&
+                        !t.Used &&
+                        t.ExpiresAt > DateTime.UtcNow);
+
+                if (resetToken == null)
+                    return Results.BadRequest("Invalid or expired token.");
+
+                var user = await userManager.FindByIdAsync(resetToken.UserId);
+
+                if (user == null)
+                    return Results.NotFound("User not found.");
+
+                var result = await userManager.ResetPasswordAsync(user, resetToken.Token, resetPasswordDto.NewPassword); // 👈 fixed
+
+                if (!result.Succeeded)
+                    return Results.BadRequest(result.Errors.Select(e => e.Description));
+
+                resetToken.Used = true;
+                await dbContext.SaveChangesAsync();
+
+                return Results.Ok("Password reset successfully.");
+            });
         }
     }
 }

@@ -26,14 +26,15 @@ namespace Gr8.Infrastructure.Identity
         /// <param name="username">The username of the user to include in the token's preferred username claim. Cannot be null or empty.</param>
         /// <returns>A string representation of the generated JWT. The token includes the user identifier, email, and username as claims and
         /// is signed using the configured security key.</returns>
-        public string GenerateToken(string userId, string email, string username)
+        public string GenerateToken(string userId, string email, string username, int avatar = 1)
         {
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, userId),
                 new Claim(JwtRegisteredClaimNames.Email, email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.PreferredUsername, username)
+                new Claim(JwtRegisteredClaimNames.PreferredUsername, username),
+                new Claim(JwtRegisteredClaimNames.Picture, avatar.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));

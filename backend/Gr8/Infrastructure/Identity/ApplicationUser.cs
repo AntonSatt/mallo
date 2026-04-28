@@ -15,6 +15,7 @@ namespace Gr8.Infrastructure.Identity
         [MaxLength(10)]
         [Required]
         public string SocialNumber { get; set; }
-        //public int Avatar { get; set; } //TODO: Implement avatar selection (Probably just an int that corresponds to a predefined set of avatars)
+        [Range(1, 9)]
+        public int Avatar { get; set; }
     }
 }

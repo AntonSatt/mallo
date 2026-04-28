@@ -12,30 +12,61 @@ namespace Gr8.Infrastructure.Identity
             using var scope = services.CreateScope();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            var email = "anna@mail.com";
-            var user = await userManager.FindByEmailAsync(email);
-            if (user != null) return;
+            var userEmail = "anna@mail.com";
+            var appUser = await userManager.FindByEmailAsync(userEmail);
 
-            var newUser = new ApplicationUser
-            {
-                Id = "00000000-0000-0000-0000-000000000001", // fixed id (optional)
-                UserName = "AnAl",
-                NormalizedUserName = "ANAL",
-                Email = email,
-                NormalizedEmail = email.ToUpperInvariant(),
-                FirstName = "Anna",
-                LastName = "Larsson",
-                SocialNumber = "19930401",
-                EmailConfirmed = true,
-                SecurityStamp = Guid.NewGuid().ToString("D"),
-                ConcurrencyStamp = Guid.NewGuid().ToString("D")
-            };
+            var adminEmail = "sebastian.enerstrand@chasacademy.se";
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
-            var result = await userManager.CreateAsync(newUser, "Anna123!");
-            if (!result.Succeeded)
+            if (appUser == null)
             {
-                throw new Exception($"Failed to create seed user: {string.Join(';', result.Errors)}");
+                var newUser = new ApplicationUser
+                {
+                    Id = "00000000-0000-0000-0000-000000000001", // fixed id (optional)
+                    UserName = "AnAl",
+                    NormalizedUserName = "ANAL",
+                    Email = userEmail,
+                    NormalizedEmail = userEmail.ToUpperInvariant(),
+                    FirstName = "Anna",
+                    LastName = "Larsson",
+                    SocialNumber = "19930401",
+                    EmailConfirmed = true,
+                    SecurityStamp = Guid.NewGuid().ToString("D"),
+                    ConcurrencyStamp = Guid.NewGuid().ToString("D")
+                };
+
+                var result = await userManager.CreateAsync(newUser, "Anna123!");
+                if (!result.Succeeded)
+                {
+                    throw new Exception($"Failed to create seed user: {string.Join(';', result.Errors)}");
+                }
             }
+
+            if (adminUser == null)
+            {
+                var newUser = new ApplicationUser
+                {
+                    Id = "00000000-0000-0000-0000-000000000002", // fixed id (optional)
+                    UserName = "Admin",
+                    NormalizedUserName = "ADMIN",
+                    Email = adminEmail,
+                    NormalizedEmail = adminEmail.ToUpperInvariant(),
+                    FirstName = "Admin",
+                    LastName = "Adminsson",
+                    SocialNumber = "19700101",
+                    EmailConfirmed = true,
+                    SecurityStamp = Guid.NewGuid().ToString("D"),
+                    ConcurrencyStamp = Guid.NewGuid().ToString("D")
+                };
+
+                var result = await userManager.CreateAsync(newUser, "Admin123!");
+                if (!result.Succeeded)
+                {
+                    throw new Exception($"Failed to create seed user: {string.Join(';', result.Errors)}");
+                }
+            }
+
+            return;
         }
     }
 }

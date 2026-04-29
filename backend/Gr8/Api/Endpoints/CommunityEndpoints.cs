@@ -194,7 +194,12 @@ namespace Gr8.Api.Endpoints
                     return Results.NotFound("Comment not found.");
                 }
 
-                comment.Id = editCommentDto.Id;
+                if (comment.CreatedByUser != appUser.Id)
+                {
+                    return Results.Forbid();
+                }
+
+                comment.Id = commentId;
                 comment.Content = editCommentDto.Content;
 
                 var result = await commentService.UpdateCommentAsync(comment);

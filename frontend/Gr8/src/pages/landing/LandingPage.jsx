@@ -13,7 +13,7 @@ import "./LandingPage.css";
 const LandingPage = () => {
     const navigate = useNavigate();
     return (
-        <Grid container spacing={2} className="landing-container">
+        <Grid container spacing={0} className="landing-container">
 
             <Grid item xs={12} md={6} className="landing-picture">
                 <Box className="landing-image-wrapper">
@@ -24,7 +24,7 @@ const LandingPage = () => {
             <Grid item xs={12} md={6} className="landing-page">
 
                 <Box className="landing-content">
-                    <Typography variant="h3" sx={{ mt: 2, mb: 1 }}>
+                    <Typography variant="h3" sx={{ mt: 0, mb: 1 }}>
                         Hej!
                     </Typography>
 
@@ -58,12 +58,11 @@ const LandingPage = () => {
                         Skapa konto
                     </SecondaryButton>
                 </Box>
-
-                <Box component="img" src={heartRed} className="heart-red" />
-                <Box component="img" src={heartPink} className="heart-pink" />
-                <Box component="img" src={heartYellow} className="heart-yellow" />
-
             </Grid>
+
+            <Box component="img" src={heartRed} className="heart-red" />
+            <Box component="img" src={heartPink} className="heart-pink" />
+            <Box component="img" src={heartYellow} className="heart-yellow" />
         </Grid>
     );
 }

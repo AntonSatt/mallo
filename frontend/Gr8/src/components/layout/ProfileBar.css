@@ -17,7 +17,6 @@
   align-items: center;
   justify-content: space-between;
 
-  background: var(--color-bg-muted) !important;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1) !important;
 }
 

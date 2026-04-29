@@ -214,27 +214,31 @@ namespace Gr8.Api.Endpoints
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
            
 
-            app.MapPost("/forum/posts/{postId}/hug", async (int postId, [FromBody] HugDto hugDto, [FromServices] IHugService hugService) =>
+            app.MapPost("/forum/posts/{postId}/hug", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IHugService hugService, int postId) =>
             {
-                if (string.IsNullOrWhiteSpace(hugDto.UserId))
+                var appUser = await userManager.GetUserAsync(user);
+
+                if (appUser == null)
                 {
-                    return Results.BadRequest("UserId is required.");
+                    return Results.Unauthorized();
                 }
 
-                var hugged = await hugService.TogglePostHugAsync(postId, hugDto.UserId);
+                var hugged = await hugService.TogglePostHugAsync(postId, appUser.Id);
 
                 return Results.Ok(new { hugged });
             })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPost("/forum/comments/{commentId}/hug", async (int commentId, [FromBody] HugDto hugDto, [FromServices] IHugService hugService) =>
+            app.MapPost("/forum/comments/{commentId}/hug", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IHugService hugService, int commentId) =>
             {
-                if (string.IsNullOrWhiteSpace(hugDto.UserId))
+                var appUser = await userManager.GetUserAsync(user);
+
+                if (appUser == null)
                 {
-                    return Results.BadRequest("UserId is required.");
+                    return Results.Unauthorized();
                 }
 
-                var hugged = await hugService.ToggleCommentHugAsync(commentId, hugDto.UserId);
+                var hugged = await hugService.ToggleCommentHugAsync(commentId, appUser.Id);
 
                 return Results.Ok(new { hugged });
             })

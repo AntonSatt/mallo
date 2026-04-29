@@ -34,7 +34,7 @@ namespace Gr8.Api.Endpoints
                     var appUser = await userManager.GetUserAsync(user);
                     if (appUser == null)
                     {
-                        return Results.NotFound("User not found.");
+                        return Results.Unauthorized();
                     }
 
                     var context = new ValidationContext(postDto);

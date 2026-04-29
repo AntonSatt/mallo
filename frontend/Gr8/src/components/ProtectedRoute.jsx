@@ -13,7 +13,9 @@ const ProtectedRoute = ({ children }) => {
   return (
     <>
       <Navbar/>
-      {children}
+      <div className="protected-route-content">
+        {children}
+      </div>
     </>
   );
 };

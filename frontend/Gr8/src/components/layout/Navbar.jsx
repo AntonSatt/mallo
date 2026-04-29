@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import {Paper, BottomNavigation, BottomNavigationAction} from '@mui/material';
 import HomeIcon from '../../assets/icons/home.svg'
@@ -16,9 +16,7 @@ const NavIcon = ({src, alt}) => (
 );
 const Navbar = () => {
     const navigate = useNavigate();
-
-    const [value, setValue] = useState(0);
-
+    const { pathname } = useLocation();
 
     return (
    
@@ -42,38 +40,35 @@ const Navbar = () => {
             
             <BottomNavigation
                 showLabels={false}
-                value={value}
+                value={pathname}
                 sx={{
                     backgroundColor: "transparent",
                     height: "70px",
                     borderRadius: "35px"
                 }}
-                onChange={(event, newValue) => (
-                    setValue(newValue)
-                   
-                )}>
+                onChange={(event, newValue) => navigate(newValue)}>
                 <BottomNavigationAction
                     className="navbar-items"
+                    value="/forum"
                     icon={<NavIcon src={HomeIcon} alt="home" />} 
-                    onClick={() => navigate("/forum")}
                 />
                 <BottomNavigationAction
                     className="navbar-items"
                     key="maps"
+                    value="/maps"
                     icon={<NavIcon src={MapIcon} alt="map" />}
-                    onClick={() => navigate("/maps")}
                 />
                 <BottomNavigationAction
                     className="navbar-items"
                     key="message"
+                    value="/message"
                     icon={<NavIcon src={MessageIcon} alt="message"/>}
-                    onClick={() => navigate("/message")}
                 />
                 <BottomNavigationAction
                     className="navbar-items"
                     key="settings"
+                    value="/settings"
                     icon={<NavIcon src={UserIcon} alt="user"/>}
-                    onClick={() => navigate("/settings")}
                 />
             </BottomNavigation>
         </Paper>

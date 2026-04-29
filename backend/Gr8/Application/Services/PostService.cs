@@ -46,7 +46,8 @@ namespace Gr8.Application.Services
                 UpdatedAt = post.UpdatedAt,
                 IsEdited = post.IsEdited,
                 IsDeleted = post.IsDeleted,
-                CreatedByUser = post.UserId
+                CreatedByUser = post.UserId,
+                Tags = post.Tags.Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList()
             };
 
             if (category != null)
@@ -89,7 +90,8 @@ namespace Gr8.Application.Services
                     {
                         Name = post.Category.Name,
                         Id = post.Category.Id
-                    }
+                    },
+                    Tags = post.Tags.Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList()
                 };
 
                 var userName = await _applicationRepository.GetUserNameByIdAsync(post.UserId);
@@ -111,33 +113,79 @@ namespace Gr8.Application.Services
 
             var postDto = new PostDto
             {
-                Category = new CategoryDto { Id = post.CategoryId, Name = post.Category.Name},
+                Category = new CategoryDto { Id = post.CategoryId, Name = post.Category.Name },
                 Content = post.Content,
                 Title = post.Title,
                 CreatedAt = post.CreatedAt,
-                IsDeleted = post.IsDeleted, 
+                IsDeleted = post.IsDeleted,
                 IsEdited = post.IsEdited,
-                UpdatedAt= post.UpdatedAt,
-                CreatedByUser = post.UserId
+                UpdatedAt = post.UpdatedAt,
+                CreatedByUser = post.UserId,
+                Id = post.Id,
+                Tags = post.Tags.Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList()
             };
             return postDto;
         }
 
-        public async Task<int> UpdatePostAsync(PostDto postDto)
+        public async Task<PostDto?> UpdatePostAsync(int postId, UpdatePostDto updatePostDto, string userId)
         {
-            var oldPost = await _communityRepository.GetPostByIdAsync(postDto.Id);
+            var oldPost = await _communityRepository.GetPostByIdAsync(postId);
             if (oldPost == null)
             {
                 throw new InvalidOperationException("Post not found.");
             }
 
-            oldPost.Title = postDto.Title;
-            oldPost.Content = postDto.Content;
+            oldPost.Title = updatePostDto.Title;
+            oldPost.Content = updatePostDto.Content;
             oldPost.IsEdited = true;
-            oldPost.UpdatedAt = DateTime.UtcNow;
+            oldPost.UpdatedAt = DateTime.Now;
+
+            var updatedTags = await _communityRepository.GetTagsByIdAsync(updatePostDto.TagIds);
+            if (updatedTags.Count > 0)
+            {
+                oldPost.Tags = updatedTags;
+            }
+            else
+            {
+                oldPost.Tags.Clear();
+            }
+
+            var category = await _communityRepository.GetCategoryByIdAsync(updatePostDto.CategoryId);
+            if (category != null)
+            {
+                oldPost.Category = category;
+            }
 
             await _communityRepository.UpdatePostAsync(oldPost);
-            return await _communityRepository.SaveChangesAsync();
+            var result = await _communityRepository.SaveChangesAsync();
+
+            if (result > 0)
+            {
+                var postDto = new PostDto
+                {
+                    Id = oldPost.Id,
+                    Title = oldPost.Title,
+                    Content = oldPost.Content,
+                    CreatedAt = oldPost.CreatedAt,
+                    UpdatedAt = oldPost.UpdatedAt,
+                    IsEdited = oldPost.IsEdited,
+                    IsDeleted = oldPost.IsDeleted,
+                    CreatedByUser = oldPost.UserId,
+                    Tags = oldPost.Tags.Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList(),
+                    Category = new CategoryDto { Id = oldPost.CategoryId, Name = oldPost.Category.Name }
+                };
+
+                var userName = await _applicationRepository.GetUserNameByIdAsync(oldPost.UserId);
+
+                if (userName != null)
+                {
+                    postDto.UserName = userName;
+                }
+
+                return postDto;
+            }
+
+            return null;
         }
 
         public async Task<bool> DeletePostAsync(int postId, string userId)
@@ -154,7 +202,7 @@ namespace Gr8.Application.Services
             }
 
             var isDeleted = await _communityRepository.DeletePostAsync(postId);
-            
+
             if (!isDeleted)
             {
                 return false;

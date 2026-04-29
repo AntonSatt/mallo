@@ -139,7 +139,7 @@ namespace Gr8.Api.Endpoints
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPut("/forum/posts/{PostId}", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IPostService postService, [FromBody] UpdatePostDto editPostDto, int postId) =>
+            app.MapPut("/forum/posts/{PostId}", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IPostService postService, [FromBody] UpdatePostDto updatePostDto, int postId) =>
             {
                 var appUser = await userManager.GetUserAsync(user);
 
@@ -148,25 +148,9 @@ namespace Gr8.Api.Endpoints
                     return Results.Unauthorized();
                 }
 
-                var post = await postService.GetPostByIdAsync(postId, appUser.Id);
+                var post = await postService.UpdatePostAsync(postId, updatePostDto, appUser.Id);
 
                 if (post == null)
-                {
-                    return Results.NotFound("Post not found.");
-                }
-
-                if (post.CreatedByUser != appUser.Id)
-                {
-                    return Results.Forbid();
-                }
-
-                post.Id = postId;
-                post.Title = editPostDto.Title;
-                post.Content = editPostDto.Content;
-
-                var result = await postService.UpdatePostAsync(post);
-
-                if (result <= 0)
                 {
                     return Results.BadRequest("Failed to update post.");
                 }

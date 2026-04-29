@@ -1,0 +1,71 @@
+{{- if .Values.db.enabled -}}
+{{- $component := "db" -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "gr8.fullname" (dict "Release" .Release "component" $component) }}
+  labels:
+    {{- include "gr8.labels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ $component }}
+spec:
+  serviceName: {{ include "gr8.fullname" (dict "Release" .Release "component" $component) }}
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "gr8.selectorLabels" (dict "Release" .Release "component" $component) | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "gr8.labels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ $component }}
+    spec:
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        fsGroup: 10001
+      containers:
+        - name: mssql
+          image: {{ .Values.db.image | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: mssql
+              containerPort: {{ .Values.db.port }}
+              protocol: TCP
+          env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: MSSQL_PID
+              value: "Developer"
+            - name: MSSQL_SA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secretName }}
+                  key: DB_PASSWORD
+          resources:
+            {{- toYaml .Values.db.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/opt/mssql
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.db.port }}
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.db.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "gr8.labels" . | nindent 10 }}
+          app.kubernetes.io/component: {{ $component }}
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: {{ .Values.db.storageClassName | quote }}
+        resources:
+          requests:
+            storage: {{ .Values.db.storage }}
+{{- end }}

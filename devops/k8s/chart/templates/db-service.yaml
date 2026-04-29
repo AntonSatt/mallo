@@ -1,0 +1,19 @@
+{{- if .Values.db.enabled -}}
+{{- $component := "db" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "gr8.fullname" (dict "Release" .Release "component" $component) }}
+  labels:
+    {{- include "gr8.labels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ $component }}
+spec:
+  clusterIP: None
+  ports:
+    - name: mssql
+      port: {{ .Values.db.port }}
+      targetPort: {{ .Values.db.port }}
+      protocol: TCP
+  selector:
+    {{- include "gr8.selectorLabels" (dict "Release" .Release "component" $component) | nindent 4 }}
+{{- end }}

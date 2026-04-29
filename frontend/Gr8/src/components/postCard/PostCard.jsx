@@ -4,7 +4,7 @@ import moment from "moment";
 import {
     Avatar,
     Card,
-    CardAction,
+    CardActions,
     CardContent,
     CardHeader,
     Collapse,
@@ -13,10 +13,9 @@ import {
     IconButton
 } from "@mui/material";
 
-import ShareIcon from "@mui/icons-material/Share";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorderIcon";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutlineIcon";
+import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
+import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
 import HugButton from "../hugButton/HugButton";
 import CommentForm from "../commentForm/CommentForm";
 
@@ -28,7 +27,7 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen }) => {
             <Card className="post-card">
                 <CardHeader avatar={
                     <Avatar className="post-avatar">
-                        {post.userName?.charAt(0)?.toUpperCase()} // Check if userName exists before accessing charAt.
+                        {post.userName?.charAt(0)?.toUpperCase()} 
                     </Avatar>
 
                 }
@@ -43,25 +42,25 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen }) => {
                             </Typography>
                         </Box>
                     }
-                    subHeader={moment(post.createdAt).fromNow()}
+                    subheader={moment(post.createdAt).fromNow()}
                     action={
                         <IconButton aria-label="more" onClick={onMenuOpen} className="post-action-icon">
                             <MoreHorizIcon />
                         </IconButton>
                     }
                     className="post-header"
-                >
+                />
 
                     <CardContent className="post-card-content">
                         <Typography className="post-title">
                             {post.title}
                         </Typography>
 
-                        <Typograpgy variant="body2" className="post-content-preview">
+                        <Typography variant="body2" className="post-content-preview">
                             {post.content}
-                        </Typograpgy>
+                        </Typography>
 
-                // Check if there are tags and display them.
+                {/*Check if there are tags and display them.*/}
                         {post.tags && post.tags.length > 0 && (
                             <Typography variant="caption" className="post-tags">
                                 Trigger: {post.tags.map((tag) => tag.name || tag).join(", ")}
@@ -82,11 +81,11 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen }) => {
                             aria-label="Visa kommentarerna"
                             className="post-comment-button">
 
-                            <ChatBubbleOutlineIcon />
+                            <ChatBubbleOutlineOutlinedIcon />
                         </IconButton>
                     </CardActions>
 
-            // Collapsing comment section.
+            {/*Collapsing comment section.*/}
                     <Collapse in={expanded} timeout="auto" unmountOnExit>
                         <CardContent className="post-comments">
                             <Typography variant="subtitle2" gutterBottom>
@@ -97,7 +96,6 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen }) => {
 
                         </CardContent>
                     </Collapse>
-                </CardHeader>
             </Card>
         </>
     );

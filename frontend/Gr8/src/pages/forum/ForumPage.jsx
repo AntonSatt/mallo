@@ -1,35 +1,30 @@
 import ReportForm from "../../components/reportForm/ReportForm";
 import PostForm from "../../components/postForm/PostForm";
-import CommentForm from "../../components/commentForm/CommentForm";
+// import CommentForm from "../../components/commentForm/CommentForm";
 import DeletePost from "../../components/deleteForm/DeletePost.jsx";
 import PostServices from "../../services/PostServices";
 import EditPostForm from "../../components/editPostForm/EditPostForm.jsx";
 import { useAuth } from "../../hooks/useAuth";
 import FilterPost from "../../components/postForm/FilterPost.jsx";
-import Navbar from "../../components/layout/Navbar.jsx"
+// import Navbar from "../../components/layout/Navbar.jsx"
+import PostCard from "../../components/postCard/PostCard.jsx";
 
 import {
-    Dialog,
-    Card,
-    CardHeader,
-    CardContent,
-    IconButton,
-    Typography,
-    Collapse,
-    Button,
-    DialogTitle,
-    DialogActions,
-    Menu,
-    MenuItem,
+Button,
+Dialog,
+DialogTitle,
+DialogActions,
+Menu,
+MenuItem
 } from "@mui/material";
 
-import ShareIcon from "@mui/icons-material/Share";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { styled } from "@mui/material/styles";
+// import ShareIcon from "@mui/icons-material/Share";
+// import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+// import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+// import { styled } from "@mui/material/styles";
 import { useEffect, useState, useMemo } from "react";
-import moment from "moment";
-import HugButton from "../../components/hugButton/HugButton.jsx";
+// import moment from "moment";
+// import HugButton from "../../components/hugButton/HugButton.jsx";
 import ProfileBar from "../../components/layout/ProfileBar.jsx";
 
 const ForumPage = () => {
@@ -62,15 +57,15 @@ const ForumPage = () => {
         setDeletePostId(null);
     };
 
-    const ExpandMore = styled(IconButton, {
-        shouldForwardProp: (prop) => prop !== "expand",
-    })(({ theme, expand }) => ({
-        marginLeft: "auto",
-        transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
-        transition: theme.transitions.create("transform", {
-            duration: theme.transitions.duration.shortest,
-        }),
-    }));
+    // const ExpandMore = styled(IconButton, {
+    //     shouldForwardProp: (prop) => prop !== "expand",
+    // })(({ theme, expand }) => ({
+    //     marginLeft: "auto",
+    //     transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
+    //     transition: theme.transitions.create("transform", {
+    //         duration: theme.transitions.duration.shortest,
+    //     }),
+    // }));
 
     const handleClickOpen = () => {
         setPostModalOpen(true);
@@ -284,7 +279,7 @@ const ForumPage = () => {
                 )}
             </Menu>
 
-            {filteredPosts.map((post) => (
+            {/* {filteredPosts.map((post) => (
                 <Card key={post.id} sx={{ maxWidth: 500, marginBottom: 2 }}>
                     <CardHeader
                         title={post.title}
@@ -355,6 +350,16 @@ const ForumPage = () => {
                         </CardContent>
                     </Collapse>
                 </Card>
+            ))} */}
+
+            {filteredPosts.map((post) => (
+                <PostCard
+                    key={post.id}
+                    post={post}
+                    expanded={expanded === post.id}
+                    onExpand={() => handleExpandClick(post.id)}
+                    onMenuOpen={(event) => handleMenuOpen(event, post.id)}
+                />
             ))}
         </>
     );

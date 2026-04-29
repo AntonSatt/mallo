@@ -103,6 +103,7 @@ namespace Gr8.Application.Services
 
             return postDtoList;
         }
+
         public async Task<PostDto> GetPostByIdAsync(int postId, string userId)
         {
             var post = await _communityRepository.GetPostByIdAsync(postId);
@@ -126,7 +127,7 @@ namespace Gr8.Application.Services
             var oldPost = await _communityRepository.GetPostByIdAsync(postDto.Id);
             if (oldPost == null)
             {
-                throw new InvalidOperationException("Comment not found.");
+                throw new InvalidOperationException("Post not found.");
             }
 
             oldPost.Title = postDto.Title;

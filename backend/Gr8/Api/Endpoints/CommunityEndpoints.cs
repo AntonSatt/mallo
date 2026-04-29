@@ -158,7 +158,12 @@ namespace Gr8.Api.Endpoints
                     return Results.NotFound("Post not found.");
                 }
 
-                post.Id = editPostDto.Id;
+                if (post.CreatedByUser != appUser.Id)
+                {
+                    return Results.Forbid();
+                }
+
+                post.Id = postId;
                 post.Title = editPostDto.Title;
                 post.Content = editPostDto.Content;
 

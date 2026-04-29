@@ -164,6 +164,10 @@ const ForumPage = () => {
             try {
                 const data = await PostServices.getAll();
 
+                if (!data) {
+                    return;
+                }
+
                 const allPosts = data.map((post) => ({
                     id: post.id,
                     title: post.title,

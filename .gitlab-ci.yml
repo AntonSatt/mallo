@@ -149,6 +149,7 @@ deploy review:
     - |
       helm upgrade --install "gr8-$CI_COMMIT_REF_SLUG" ./devops/k8s/chart \
         --namespace "$NAMESPACE" \
+        -f ./devops/k8s/chart/values-feature.yaml \
         --set image.tag="$CI_COMMIT_REF_SLUG" \
         --wait --timeout 5m --atomic
   rules:

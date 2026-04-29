@@ -44,6 +44,9 @@ frontend:
 db:
   enabled: true
   image: mcr.microsoft.com/mssql/server:2022-latest
+  # MSSQL edition: Developer (full features, no memory cap) or Express (1.4 GiB cap, 10 GiB/db).
+  # Feature branches override to Express via values-feature.yaml.
+  pid: Developer
   port: 1433
   storage: 5Gi
   storageClassName: longhorn

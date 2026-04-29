@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace Gr8.Api.Endpoints
 {
@@ -26,6 +27,25 @@ namespace Gr8.Api.Endpoints
                     if (!isValid)
                     {
                         return Results.BadRequest(results);
+                    }
+
+                    if (!DateTime.TryParseExact(userDto.SocialNumber, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var birthDate))
+                    {
+                        return Results.BadRequest(new { Message = "Social security number must be in a valid format, yyyyMMdd" });
+                    }
+
+                    var today = DateTime.Today;
+                    var age = today.Year - birthDate.Year;
+                    var birthdayThisYear = birthDate.AddYears(age);
+                    
+                    if (today < birthdayThisYear)
+                    {
+                        age--;
+                    }
+
+                    if (age < 18)
+                    {
+                        return Results.BadRequest(new {Message = "You must be 18 years or older to register."});
                     }
 
                     var user = new ApplicationUser

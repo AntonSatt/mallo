@@ -39,13 +39,14 @@ namespace Gr8.Application.Services
 
             var postDto = new PostDto
             {
+                Id = post.Id,
                 Title = post.Title,
-
                 Content = post.Content,
                 CreatedAt = post.CreatedAt,
                 UpdatedAt = post.UpdatedAt,
                 IsEdited = post.IsEdited,
-                IsDeleted = post.IsDeleted
+                IsDeleted = post.IsDeleted,
+                CreatedByUser = post.UserId
             };
 
             if (category != null)

@@ -39,7 +39,7 @@ const LoginForm = () => {
   };
 
   const handleForgotPassword = () => {
-    // Handle forgot password logic
+    navigate('/forgot-password');
   };
 
   const handleRememberMe = () => {

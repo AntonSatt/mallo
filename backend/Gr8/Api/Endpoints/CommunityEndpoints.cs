@@ -210,6 +210,52 @@ namespace Gr8.Api.Endpoints
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
 
+            app.MapDelete("/forum/posts/{PostId}", async (int postId, ClaimsPrincipal user, UserManager<ApplicationUser> userManager, [FromServices] IPostService postService) =>
+            {
+                var appUser = await userManager.GetUserAsync(user);
+
+                if (appUser == null)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var result = await postService.DeletePostAsync(postId, appUser.Id);
+
+                if (!result)
+                {
+                    return Results.NotFound();
+                }
+
+                return Results.Ok();
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapDelete("/forum/comments/{CommentId}", async (int commentId, ClaimsPrincipal user, UserManager<ApplicationUser> userManager, [FromServices] ICommentService commentService) =>
+            {
+                var appUser = await userManager.GetUserAsync(user);
+
+                if (appUser == null)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var comment = await commentService.GetCommentByIdAsync(commentId, appUser.Id);
+
+                if (comment == null)
+                {
+                    return Results.NotFound();
+                }
+
+                var result = await commentService.DeleteCommentAsync(commentId, appUser.Id);
+
+                if (!result)
+                {
+                    return Results.NotFound();
+                }
+
+                return Results.Ok();
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
 
             app.MapPost("/forum/posts/{postId}/hug", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IHugService hugService, int postId) =>
             {

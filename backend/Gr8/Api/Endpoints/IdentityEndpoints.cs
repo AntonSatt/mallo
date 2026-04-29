@@ -36,7 +36,9 @@ namespace Gr8.Api.Endpoints
                         FirstName = userDto.FirstName,
                         LastName = userDto.LastName,
                         Email = userDto.Email,
-                        SocialNumber = userDto.SocialNumber
+                        SocialNumber = userDto.SocialNumber,
+                        //TODO: Add avatar selection in the registration process
+                        Avatar = new Random().Next(1, 10) // Assign a random avatar between 1 and 9 // REMOVE WHEN AVATAR REGISTRATION IS LIVE
                     };
 
                     var result = await userManager.CreateAsync(user, userDto.Password);
@@ -46,7 +48,7 @@ namespace Gr8.Api.Endpoints
                         return Results.BadRequest(result.Errors);
                     }
 
-                    var token = jwtGenerator.GenerateToken(user.Id, user.Email, user.UserName!);
+                    var token = jwtGenerator.GenerateToken(user.Id, user.Email, user.UserName!, user.Avatar);
 
                     return Results.Created($"/users/{user.Id}", new { Token = token, User = new { user.Id, user.UserName, user.Email } });
                 });
@@ -77,7 +79,7 @@ namespace Gr8.Api.Endpoints
                         return Results.Unauthorized();
                     }
 
-                    var token = jwtGenerator.GenerateToken(user.Id, user.Email!, user.UserName!);
+                    var token = jwtGenerator.GenerateToken(user.Id, user.Email!, user.UserName!, user.Avatar);
 
                     return Results.Ok(new { Token = token, Message = "User logged in successfully." });
                 });
@@ -117,7 +119,8 @@ namespace Gr8.Api.Endpoints
                     Email = appUser.Email,
                     FirstName = appUser.FirstName,
                     LastName = appUser.LastName,
-                    UserName = appUser.UserName
+                    UserName = appUser.UserName,
+                    //TODO: Add Avatar to UserDto
                 };
 
                 return Results.Ok(userDto);
@@ -138,6 +141,7 @@ namespace Gr8.Api.Endpoints
                     appUser.FirstName = updateProfileDto.FirstName;
                     appUser.LastName = updateProfileDto.LastName;
                     appUser.Email = updateProfileDto.Email;
+                    //TODO: Update Avatar either here or in a separate endpoint
 
                     var changedProfil = await userManager.UpdateAsync(appUser);
 

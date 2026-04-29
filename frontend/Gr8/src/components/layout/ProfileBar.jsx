@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
     Box,
     Paper,
-    Avatar,
     Typography,
     Button,
     ClickAwayListener,
@@ -18,6 +17,7 @@ import BookmarkOutlinedIcon from '@mui/icons-material/BookmarkOutlined';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { useAuth } from "../../hooks/useAuth";
+import Avatar from "../avatar/avatar";
 
 const ProfileBar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -31,7 +31,7 @@ const ProfileBar = () => {
             <Box className="profilebar-wrapper">
                 <Paper className="profilebar-container">
                     <Box className="profilebar-left">
-                        <Avatar />
+                        <Avatar avatar={currentUser?.picture} />
                         <Typography>{currentUser?.preferred_username || currentUser?.email || "Användarnamn saknas"}</Typography>
                     </Box>
 

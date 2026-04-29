@@ -25,6 +25,15 @@ namespace Gr8.Infrastructure.Identity
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ApplicationUser>(entity =>
+            {
+                entity.Property(u => u.Avatar)
+                    .HasDefaultValue(1);
+
+                entity.ToTable(t =>
+                    t.HasCheckConstraint("CK_AspNetUsers_Avatar_Range", "[Avatar] BETWEEN 1 AND 9"));
+            });
         }
     }
 }

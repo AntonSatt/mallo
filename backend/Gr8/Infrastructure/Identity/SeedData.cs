@@ -32,7 +32,8 @@ namespace Gr8.Infrastructure.Identity
                     SocialNumber = "19930401",
                     EmailConfirmed = true,
                     SecurityStamp = Guid.NewGuid().ToString("D"),
-                    ConcurrencyStamp = Guid.NewGuid().ToString("D")
+                    ConcurrencyStamp = Guid.NewGuid().ToString("D"),
+                    Avatar = 5
                 };
 
                 var result = await userManager.CreateAsync(newUser, "Anna123!");
@@ -56,7 +57,8 @@ namespace Gr8.Infrastructure.Identity
                     SocialNumber = "19700101",
                     EmailConfirmed = true,
                     SecurityStamp = Guid.NewGuid().ToString("D"),
-                    ConcurrencyStamp = Guid.NewGuid().ToString("D")
+                    ConcurrencyStamp = Guid.NewGuid().ToString("D"),
+                    Avatar = 9
                 };
 
                 var result = await userManager.CreateAsync(newUser, "Admin123!");

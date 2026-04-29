@@ -7,12 +7,16 @@ import InputField from "../../design/input/InputField";
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import InputAdornment from "@mui/material/InputAdornment";
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 
-
+// Handles user login: Manages state for credentials and "Remember Me" preference, 
+// validates input, and redirects the user to the forum upon successful authentication.
 const LoginForm = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
 
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -123,17 +127,21 @@ const LoginForm = () => {
         </Typography>
 
         <Box
-          onClick={handleRememberMe}
+          onClick={() => setRememberMe(!rememberMe)}
           sx={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             gap: 1,
-            mt: 1,
             cursor: "pointer",
+            userSelect: "none"
           }}
         >
-          <CheckCircleOutlinedIcon fontSize="small" sx={{ color: "var(--color-primary)" }} />
+          {rememberMe ? (
+            <CheckCircleIcon sx={{ color: "var(--color-primary)", fontSize: "16px" }} />
+          ) : (
+            <CircleOutlinedIcon sx={{ color: "var(--color-primary)", fontSize: "16px", mb: 0.3 }} />
+          )}
           <Typography variant="body2">
             Kom ihåg mina inloggningsuppgifter
           </Typography>

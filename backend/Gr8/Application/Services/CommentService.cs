@@ -127,7 +127,8 @@ namespace Gr8.Application.Services
                 IsDeleted = comment.IsDeleted,
                 IsEdited = comment.IsEdited,
                 CreatedAt = comment.CreatedAt,
-                UpdatedAt = comment.UpdatedAt
+                UpdatedAt = comment.UpdatedAt,
+                CreatedByUser = comment.UserId
             };
 
             var userName = await _applicationRepository.GetUserNameByIdAsync(comment.UserId);

@@ -15,6 +15,8 @@ namespace Gr8.Infrastructure.Identity
     /// </summary>
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
     {
+        public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 

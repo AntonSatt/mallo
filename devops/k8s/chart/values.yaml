@@ -8,7 +8,10 @@ image:
   frontend:
     repository: chas-challenge-2026/grupp-8/project/frontend
   tag: latest
-  pullPolicy: IfNotPresent
+  # Always: re-pull on every pod start so branch tags (develop, feature-*)
+  # actually pick up the new image after a CI rebuild. Trade-off is small for
+  # this project's deploy frequency.
+  pullPolicy: Always
   pullSecret: gitlab-registry
 
 # Single-host + path routing. School cluster's Traefik has wildcard cert at *.labb.k3s.chas-lab.dev.

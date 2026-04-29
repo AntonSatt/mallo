@@ -16,6 +16,10 @@ spec:
       labels:
         {{- include "gr8.labels" . | nindent 8 }}
         app.kubernetes.io/component: {{ $component }}
+      annotations:
+        # Forces a rollout on every helm upgrade even when image:tag is unchanged
+        # (e.g., develop pushes that just rebuild the same :develop tag).
+        gr8.k3s/release-revision: {{ .Release.Revision | quote }}
     spec:
       imagePullSecrets:
         - name: {{ .Values.image.pullSecret }}

@@ -16,6 +16,8 @@ spec:
       labels:
         {{- include "gr8.labels" . | nindent 8 }}
         app.kubernetes.io/component: {{ $component }}
+      annotations:
+        gr8.k3s/release-revision: {{ .Release.Revision | quote }}
     spec:
       imagePullSecrets:
         - name: {{ .Values.image.pullSecret }}

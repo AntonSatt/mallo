@@ -201,14 +201,15 @@ namespace Gr8.Application.Services
                 return false;
             }
 
-            var isDeleted = await _communityRepository.DeletePostAsync(postId);
+            post.IsDeleted = true;
 
-            if (!isDeleted)
+            foreach (var comment in post.Comments)
             {
-                return false;
+                comment.IsDeleted = true;
             }
 
             var result = await _communityRepository.SaveChangesAsync();
+
             return result > 0;
         }
     }

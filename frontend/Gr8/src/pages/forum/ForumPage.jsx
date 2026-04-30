@@ -1,13 +1,12 @@
 import ReportForm from "../../components/reportForm/ReportForm";
 import PostForm from "../../components/postForm/PostForm";
-// import CommentForm from "../../components/commentForm/CommentForm";
 import DeletePost from "../../components/deleteForm/DeletePost.jsx";
 import PostServices from "../../services/PostServices";
 import EditPostForm from "../../components/editPostForm/EditPostForm.jsx";
 import { useAuth } from "../../hooks/useAuth";
 import FilterPost from "../../components/postForm/FilterPost.jsx";
-// import Navbar from "../../components/layout/Navbar.jsx"
 import PostCard from "../../components/postCard/PostCard.jsx";
+import ProfileBar from "../../components/layout/ProfileBar.jsx";
 
 import {
 Button,
@@ -18,14 +17,7 @@ Menu,
 MenuItem
 } from "@mui/material";
 
-// import ShareIcon from "@mui/icons-material/Share";
-// import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-// import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-// import { styled } from "@mui/material/styles";
 import { useEffect, useState, useMemo } from "react";
-// import moment from "moment";
-// import HugButton from "../../components/hugButton/HugButton.jsx";
-import ProfileBar from "../../components/layout/ProfileBar.jsx";
 
 const ForumPage = () => {
     const { currentUser } = useAuth();
@@ -37,8 +29,8 @@ const ForumPage = () => {
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
     const [selectedPostId, setSelectedPostId] = useState(null);
     const [deletePostId, setDeletePostId] = useState(null);
-
     const [editPost, setEditPost] = useState(null);
+
     const handleOpenEditPost = (post) => setEditPost(post);
     const handleCloseEditPost = () => setEditPost(null);
 
@@ -48,7 +40,6 @@ const ForumPage = () => {
     const [categories, setCategories] = useState([]);
 
 
-
     const handleOpenPostDelete = (postId) => {
         setDeletePostId(postId);
     };
@@ -56,16 +47,6 @@ const ForumPage = () => {
     const handleClosePostDelete = () => {
         setDeletePostId(null);
     };
-
-    // const ExpandMore = styled(IconButton, {
-    //     shouldForwardProp: (prop) => prop !== "expand",
-    // })(({ theme, expand }) => ({
-    //     marginLeft: "auto",
-    //     transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
-    //     transition: theme.transitions.create("transform", {
-    //         duration: theme.transitions.duration.shortest,
-    //     }),
-    // }));
 
     const handleClickOpen = () => {
         setPostModalOpen(true);
@@ -112,6 +93,20 @@ const ForumPage = () => {
         setFilterAnchorEl(null);
     };
 
+    const handleCheckboxChange = (categoryName) => {
+        setCheckedCategories(prev =>
+            prev.includes(categoryName)
+                ? prev.filter(c => c !== categoryName)
+                : [...prev, categoryName]
+        );
+        setActiveNavCategory("Alla");
+    };
+
+    const handleClearFilters = () => {
+        setCheckedCategories([]);
+        setActiveNavCategory("Alla");
+    };
+
     const filteredPosts = useMemo(() => {
         if (checkedCategories.length > 0) {
             return posts.filter(p => {
@@ -127,20 +122,6 @@ const ForumPage = () => {
         }
         return posts;
     }, [posts, activeNavCategory, checkedCategories]);
-
-    const handleCheckboxChange = (categoryName) => {
-        setCheckedCategories(prev =>
-            prev.includes(categoryName)
-                ? prev.filter(c => c !== categoryName)
-                : [...prev, categoryName]
-        );
-        setActiveNavCategory("Alla");
-    };
-
-    const handleClearFilters = () => {
-        setCheckedCategories([]);
-        setActiveNavCategory("Alla");
-    };
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -265,6 +246,8 @@ const ForumPage = () => {
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                 transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
+                {/* This is the menu that opens when clicking the three dots on a post. It contains options to report, 
+                edit, or delete the post. The edit and delete options are only shown if the current user is the creator of the post. */}
                 <MenuItem onClick={handleReport}>Anmäl inlägg</MenuItem>
                 {currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser && (
                     <>
@@ -279,79 +262,9 @@ const ForumPage = () => {
                 )}
             </Menu>
 
-            {/* {filteredPosts.map((post) => (
-                <Card key={post.id} sx={{ maxWidth: 500, marginBottom: 2 }}>
-                    <CardHeader
-                        title={post.title}
-                        subheader={`${post.userName} • ${moment(post.createdAt).fromNow()}`}
-                        action={
-                            <IconButton
-                                aria-label="more"
-                                id={"post-menu-button-" + post.id}
-                                aria-controls={menuAnchorEl ? "post-menu" : undefined}
-                                aria-expanded={menuAnchorEl ? "true" : undefined}
-                                aria-haspopup="true"
-                                onClick={(event) => handleMenuOpen(event, post.id)}
-                            >
-                                <MoreHorizIcon />
-                            </IconButton>
-                        }
-                    />
-
-                    <CardContent>
-                        <Typography variant="body2" color="text.secondary">
-                            {post.content}
-                        </Typography>
-
-                        {post.category && (
-                            <Typography
-                                variant="subtitle2"
-                                color="text.secondary"
-                                sx={{ mt: 1 }}
-                            >
-                                Kategori: {post.category.name || post.category}
-                            </Typography>
-                        )}
-
-                        {post.tags && post.tags.length > 0 && (
-                            <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                sx={{ mt: 1 }}
-                            >
-                                Trigger: {post.tags.map((tag) => tag.name || tag).join(", ")}
-                            </Typography>
-                        )}
-                    </CardContent>
-
-                    <IconButton aria-label="share">
-                        <ShareIcon />
-                    </IconButton>
-
-                    <HugButton type="post" id={post.id} />
-
-                    <ExpandMore
-                        expand={expanded === post.id}
-                        onClick={() => handleExpandClick(post.id)}
-                        aria-expanded={expanded === post.id}
-                        aria-label="Visa kommentarerna"
-                    >
-                        <ExpandMoreIcon />
-                    </ExpandMore>
-
-                    <Collapse in={expanded === post.id} timeout="auto" unmountOnExit>
-                        <CardContent
-                            sx={{ bgcolor: "#f9f9f9", borderTop: "1px solid #eee" }}
-                        >
-                            <Typography variant="subtitle2" gutterBottom>
-                                Kommentarer
-                            </Typography>
-                            <CommentForm postId={post.id} />
-                        </CardContent>
-                    </Collapse>
-                </Card>
-            ))} */}
-
+            {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for each post. 
+            The PostCard component is responsible for displaying the post content, as well as handling the expand/collapse of the 
+            comment section and the menu actions for reporting, editing, and deleting posts. */}
             {filteredPosts.map((post) => (
                 <PostCard
                     key={post.id}

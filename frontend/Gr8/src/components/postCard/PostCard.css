@@ -52,6 +52,7 @@
     line-height: 1.5 !important;
    /* webkit - shows only the first 5 lines of the content, and adds 3 dots if there's more text. */
     display: -webkit-box;
+    line-clamp: 5;
     -webkit-line-clamp: 5;
     -webkit-box-orient: vertical;
     overflow: hidden;

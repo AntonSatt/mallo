@@ -21,6 +21,7 @@ import { useAuth } from "../../hooks/useAuth";
 import Avatar from "../avatar/avatar";
 import InputField from '../../design/input/InputField.jsx';
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
+import SearchHeartButton from "../../assets/icons/searchHeartForum.svg";
 
 // this is the profile bar that appears at the top of the forum page. It shows the user's avatar and name, 
 // and has a hamburger menu on the right side. The hamburger menu contains options for viewing badges, 
@@ -67,6 +68,13 @@ const ProfileBar = ({ showCreate = false, onCreatePost }) => {
                         <Typography className="profile-name">
                             {currentUser?.preferred_username || currentUser?.email || "Användarnamn saknas"}
                         </Typography>
+                    )}
+
+                    {/* this is the HeartSearch-button-icon */}
+                    {showCreate && (
+                        <Button type="button" className="profilebar-search-button" aria-label="Sök">
+                            <img src={SearchHeartButton} alt="" className="profilebar-search-icon" />
+                        </Button>
                     )}
 
                     <Box className="profilebar-right">

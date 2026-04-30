@@ -33,7 +33,7 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen }) => {
                 }
                     title={
                         <Box className="post-user-row">
-                            <Typography className="post-user-name">
+                            <Typography className="post-username">
                                 {post.userName}
                             </Typography>
 
@@ -72,7 +72,7 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen }) => {
 
                         <HugButton type="post" id={post.id} />
 
-                        <IconButton aria-label="save" className="post-action-icon">
+                        <IconButton aria-label="save" className="post-save-icon">
                             <BookmarkBorderIcon />
                         </IconButton>
 

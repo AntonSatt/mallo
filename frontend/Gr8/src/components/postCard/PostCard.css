@@ -3,10 +3,84 @@
     border-radius: 24px !important;
     box-shadow: 0 4px 14px rgba(55, 73, 87, 0.12) !important;
     overflow: hidden;
-    background-color: var(--color-bg-surface) 
+    background-color: var(--color-bg-surface) !important;
 }
 
 .post-header {
     padding-bottom: 4px !important;
 }
+
+.post-avatar {
+    width: 52px !important;
+    height: 52px !important;
+    background-color: var(--color-primary-soft) !important;
+    color: var(--color-text-main) !important;
+    font-weight: 700 !important;
+}
+
+.post-user-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.post-username {
+    font-weight: 700 !important;
+    color: var(--color-text-main) !important;
+}
+
+.post-category {
+    font-size: 0.75rem !important;
+    color: var(--color-text-main);
+    opacity: 5.7;
+}
+
+.post-card-content {
+    padding-top: 5px !important;
+}
+
+.post-title {
+    font-weight: 700 !important;
+    color: var(--color-text-main);
+    border-bottom: 1px solid var(--color-border-light);
+    padding-bottom: 2px;
+    margin-bottom: 8px !important;
+}
+
+.post-content-preview {
+    color: var(--color-text-main);
+    line-height: 1.5 !important;
+   /* webkit - shows only the first 5 lines of the content, and adds 3 dots if there's more text. */
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.post-tags {
+    display: block;
+    margin-top: 8px !important;
+    color: var(--color-text-main);
+    opacity: 0.7;
+}
+
+.post-actions {
+    border-top: 1px solid var(--color-border-light);
+    padding: 8px 16px !important;
+    display: flex;
+    align-items: center;
+}
+
+.post-save-icon,
+.post-comment-button {
+    color: var(--color-primary) !important;
+}
+
+.post-comments {
+    background-color: var(--color-bg-muted);
+    border-top: 1px solid var(--color-border-light);
+}
+
+
+
 

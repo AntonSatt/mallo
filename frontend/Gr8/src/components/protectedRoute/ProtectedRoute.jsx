@@ -1,7 +1,8 @@
 import React from 'react';
+import './ProtectedRoute.css';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from "../hooks/useAuth";
-import Navbar from "./layout/Navbar"
+import { useAuth } from "../../hooks/useAuth";
+import Navbar from "../layout/Navbar"
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();

@@ -10,6 +10,7 @@ import PostCard from "../../components/postCard/PostCard.jsx";
 import ProfileBar from "../../components/layout/ProfileBar.jsx";
 
 import {
+    Box,
     Button,
     Dialog,
     DialogTitle,
@@ -179,7 +180,7 @@ const ForumPage = () => {
         <>
             <div className="forum-page">
                 <div className="forum-container">
-                    <ProfileBar />
+                    <ProfileBar showCreate onCreatePost={handleClickOpen} />
 
                     <DeletePost
                         postId={deletePostId}
@@ -200,10 +201,6 @@ const ForumPage = () => {
                             handleCloseEditPost();
                         }}
                     />
-
-                    <Button variant="outlined" color="error" onClick={handleClickOpen}>
-                        Skapa nytt inlägg...
-                    </Button>
 
                     <FilterPost
                         categories={categories}
@@ -250,7 +247,8 @@ const ForumPage = () => {
                         transformOrigin={{ vertical: "top", horizontal: "right" }}
                     >
                         {/* This is the menu that opens when clicking the three dots on a post. It contains options to report, 
-                edit, or delete the post. The edit and delete options are only shown if the current user is the creator of the post. */}
+                        edit, or delete the post. The edit and delete options are only shown if the current user is 
+                        the creator of the post. */}
                         <MenuItem onClick={handleReport}>Anmäl inlägg</MenuItem>
                         {currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser && (
                             <>
@@ -265,9 +263,9 @@ const ForumPage = () => {
                         )}
                     </Menu>
 
-                    {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for each post. 
-            The PostCard component is responsible for displaying the post content, as well as handling the expand/collapse of the 
-            comment section and the menu actions for reporting, editing, and deleting posts. */}
+                    {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
+                    each post. The PostCard component is responsible for displaying the post content, as well as handling the 
+                    expand/collapse of the comment section and the menu actions for reporting, editing, and deleting posts. */}
                     {filteredPosts.map((post) => (
                         <PostCard
                             key={post.id}
@@ -282,5 +280,4 @@ const ForumPage = () => {
         </>
     );
 };
-
 export default ForumPage;

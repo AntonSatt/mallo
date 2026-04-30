@@ -8,3 +8,13 @@
     max-width: 430px;
     margin: 0 auto;
 }
+
+/* targeting MUI wrapper */
+.create-post .MuiInputAdornment-root {
+    margin-right: 8px;
+}
+
+.create-post-icon {
+    color: var(--color-primary);
+    font-size: 28px;
+}

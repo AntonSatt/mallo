@@ -5,7 +5,8 @@
     position: relative;
     height: 100vh;
     width: 100%;
-    overflow: hidden;
+    /* overflow: hidden; */
+    overflow: visible;
     display: flex;
     flex-direction: column;
 }
@@ -32,7 +33,7 @@
 .register-image {
     width: 100%;
     height: auto;
-    display: block;
+    display: flex;
     margin-top: 8px;
 }
 
@@ -60,6 +61,7 @@
     width: 100%;
     min-height: 100%;
     margin-top: 0;
+    overflow: visible;
 }
 
 .register-step2 {

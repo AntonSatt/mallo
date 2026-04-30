@@ -9,7 +9,7 @@ const activeColor = "var(--color-primary)";
 
 export default function Progressbar({ activeStep, onStepClick }) {
     return (
-        <Box sx={{ width: '100%', mb: 0 }}>
+        <Box sx={{ width: '100%', ml: 5, maxWidth: '80%' }}>
             <Stepper activeStep={activeStep}
                 sx={{
                     //  Circle (default / not reached yet)
@@ -59,9 +59,20 @@ export default function Progressbar({ activeStep, onStepClick }) {
                 }}
             >
                 {steps.map((_, index) => (
-                    <Step key={index}
-                        sx={{ cursor: 'pointer' }}
-                        onClick={() => onStepClick && onStepClick(index)}>
+                    <Step
+                        key={index}
+                        sx={{
+                            // Only show pointer for completed or current steps
+                            cursor: index <= activeStep ? 'pointer' : 'default'
+                        }}
+                        onClick={() => {
+                            // Allows navigation back to previous steps, but prevents 
+                            // skipping forward without validation.
+                            if (index < activeStep) {
+                                onStepClick(index);
+                            }
+                        }}
+                    >
                         <StepLabel />
                     </Step>
                 ))}

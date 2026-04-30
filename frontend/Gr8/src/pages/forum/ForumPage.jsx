@@ -72,33 +72,40 @@ const ForumPage = () => {
         }),
     }));
 
+    // Opens the post creation modal
     const handleClickOpen = () => {
         setPostModalOpen(true);
     };
 
+    // Closes the post creation modal
     const handleClose = async () => {
         setPostModalOpen(false);
     };
 
+    // Toggles the expansion of the comment section for a post
     const handleExpandClick = (postId) => {
         setExpanded(expanded === postId ? null : postId);
     };
 
+    // Handles opening the menu for a specific post, setting the anchor element and selected post ID
     const handleMenuOpen = (event, postId) => {
         setMenuAnchorEl(event.currentTarget);
         setSelectedPostId(postId);
     };
 
+    // Handles closing the menu, resetting the anchor element and selected post ID
     const handleMenuClose = () => {
         setMenuAnchorEl(null);
         setSelectedPostId(null);
     };
 
+    // Handles the report action for a post, opening the report modal
     const handleReport = () => {
         setMenuAnchorEl(null);
         setOpenReportModal(true);
     };
 
+    // Handles closing the report modal, resetting the open state and selected post ID
     const handleReportClose = () => {
         setOpenReportModal(false);
         setSelectedPostId(null);
@@ -188,7 +195,6 @@ const ForumPage = () => {
     }, []);
 
     const handlePostCreated = (newPost) => {
-        console.log("New post created:", newPost);
         const formattedPost = {
             id: newPost.id,
             title: newPost.title,
@@ -279,6 +285,7 @@ const ForumPage = () => {
                     <>
                         <MenuItem onClick={() => {
                             handleOpenPostDelete(selectedPostId);
+                            handleMenuClose();
                         }}>Radera inlägg</MenuItem>
                         <MenuItem onClick={() => {
                             handleOpenEditPost(posts.find(p => p.id === selectedPostId));

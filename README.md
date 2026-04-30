@@ -1,21 +1,17 @@
 # Grupp GR8
----
-### Sebastian, Elina, Daniel, Jonna, Jennifer, Reza, victoria, Chipego & Anton 
 
-## Getting Started
+Sebastian, Elina, Daniel, Jonna, Jennifer, Reza, Victoria, Chipego & Anton
 
-1. Install [Docker](https://docs.docker.com/get-started/get-docker/)
-2. Copy the example environment file and set a password:
-   ```
-   cp .env.example .env          # Linux/Mac
-   copy .env.example .env        # Windows
-   ```
-3. Start all services:
-   ```
-   docker compose up
-   ```
+See [TECHSTACK.md](TECHSTACK.md) for what we're using.
 
-The following services will be available:
-- **Frontend**: http://localhost:3000
-- **API**: http://localhost:8080
-- **SQL Server**: localhost:1433
+## Deploys
+
+Every branch gets its own URL on the school's k3s cluster:
+
+- `main` → https://gr8-main.labb.k3s.chas-lab.dev/
+- `develop` → https://gr8-develop.labb.k3s.chas-lab.dev/
+- `feature/foo` → https://gr8-feature-foo.labb.k3s.chas-lab.dev/
+
+`main` and `develop` keep their database between deploys. Feature branches get cleaned up when the MR is closed.
+
+The Helm chart lives in [`devops/k8s/chart/`](devops/k8s/chart/) and CI runs `helm upgrade` on every push.

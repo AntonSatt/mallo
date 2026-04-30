@@ -9,7 +9,7 @@ namespace Gr8.Application.DTOs
     {
         public int Id { get; set; }
         [Required(ErrorMessage = "Content is required")]
-        [MaxLength(500)]
+        [MaxLength(8000)]
         public string Content { get; set; } 
         public string UserName { get; set; }
         public bool IsDeleted { get; set; }

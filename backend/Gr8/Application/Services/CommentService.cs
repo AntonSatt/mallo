@@ -77,7 +77,8 @@ namespace Gr8.Application.Services
                 CreatedAt = comment.CreatedAt,
                 UpdatedAt = comment.UpdatedAt,
                 IsDeleted = comment.IsDeleted,
-                IsEdited = comment.IsEdited
+                IsEdited = comment.IsEdited,
+                CreatedByUser = comment.UserId
             };
 
             if (userName != null)
@@ -102,14 +103,10 @@ namespace Gr8.Application.Services
                 return false;
             }
 
-            var isDeleted = await _communityRepository.DeleteCommentAsync(commentId);
-
-            if (!isDeleted)
-            {
-                return false;
-            }
+            comment.IsDeleted = true;
 
             var result = await _communityRepository.SaveChangesAsync();
+
             return result > 0;
         }
 
@@ -127,7 +124,8 @@ namespace Gr8.Application.Services
                 IsDeleted = comment.IsDeleted,
                 IsEdited = comment.IsEdited,
                 CreatedAt = comment.CreatedAt,
-                UpdatedAt = comment.UpdatedAt
+                UpdatedAt = comment.UpdatedAt,
+                CreatedByUser = comment.UserId
             };
 
             var userName = await _applicationRepository.GetUserNameByIdAsync(comment.UserId);

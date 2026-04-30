@@ -1,0 +1,14 @@
+# Overrides for ephemeral feature/* branch releases.
+# Goal: fit more concurrent feature deploys in the namespace's resource quota.
+# Used by `deploy review` in .gitlab-ci.yml as: helm ... -f values-feature.yaml
+db:
+  # Express caps SQL Server's buffer pool at ~1.4 GiB and DB size at 10 GiB.
+  # Plenty for dev work; main/develop stay on Developer edition.
+  pid: Express
+  resources:
+    requests:
+      cpu: 200m
+      memory: 384Mi
+    limits:
+      cpu: 1000m
+      memory: 1500Mi

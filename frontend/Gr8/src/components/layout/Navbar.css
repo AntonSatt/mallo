@@ -1,4 +1,57 @@
-a.active {
-    color: hotpink;
-    text-decoration: underline;
+.MuiBottomNavigationAction-root.navbar-items {
+    min-width: auto;
+    transition: all 0.3s ease;
+}
+
+.protected-route-content {
+    min-height: 100dvh;
+    box-sizing: border-box;
+    padding-bottom: 90px;
+    background-color: var(--color-primary-bg);
+}
+
+.icon-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 60px; 
+  height: 60px; 
+  margin: 0 auto; 
+  z-index: 10;
+}
+
+.Mui-selected .icon-container::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    width: 90px; 
+    height: 50px;
+    background-color: var(--color-bg-surface);  
+    border-radius: 0 0 45px 45px;
+    z-index: -1;
+}
+
+.icon-ball{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: transparent;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);    
+}
+
+.Mui-selected .icon-ball{
+    background-color: var(--button-primary-bg);
+    width: 55px;
+    height: 55px;
+    transform: translateY(-20px);
+}
+
+.Mui-selected .icon-ball img {
+    filter: brightness(0) invert(1);
+    opacity: 1;
+    transform: scale(1.1);
 }

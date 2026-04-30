@@ -1,113 +1,159 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { Button } from "@mui/material"
+import Step1 from "./steps/Step1";
+import Step2 from "./steps/Step2";
+import Step3 from "./steps/Step3";
 
-
-const RegisterForm = () => {
+// Main container for the multi-step registration process. 
+// Manages form state, handles step-specific validation, and executes the final registration call.
+const RegisterForm = ({ step, setStep }) => {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    fullName: "",
     ssn: "",
     userName: "",
     password: "",
+    confirmPassword: "",
     email: ""
   });
 
   const [error, setError] = useState("");
-
   const navigate = useNavigate();
   const { register } = useAuth();
 
+  //  update fields in formData state on change
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value
+    });
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  // Step validations functions - returns or sets error if invalid, otherwise returns true and clears error.
+
+  const validateStep1 = () => {
+    if (!formData.userName.trim()) {
+      setError("Användarnamn måste vara ifyllt.");
+      return false;
+    }
     setError("");
+    return true;
+  };
 
-    if (
-      !formData.userName.trim() ||
-      !formData.firstName.trim() ||
-      !formData.lastName.trim() ||
-      !formData.ssn.trim() ||
-      !formData.email.trim() ||
-      !formData.password
-    ) {
+  const validateStep2 = () => {
+    if (!formData.fullName.trim() || !formData.ssn.trim()) {
       setError("Alla fält måste vara ifyllda.");
-      return;
+      return false;
     }
 
-    if (formData.ssn.length !==8 || !(/^\d+$/.test(formData.ssn)))
-      {
-        setError("Personnummer måste ha 8 siffror.");
-        return;
-      }
-
-    if (formData.password.length < 8) //TODO: add more password requirements
-    {
-      setError("Lösenord måste ha minst 8 tecken.");
-      return;
+    if (!formData.fullName.trim().includes(" ")) {
+      setError("Vänligen ange både för- och efternamn.");
+      return false;
     }
 
-    if (!formData.email.includes("@"))
-    {
+    if (formData.ssn.length !== 8 || !/^\d+$/.test(formData.ssn)) {
+      setError("Personnummer måste vara 8 siffror.");
+      return false;
+    }
+
+    setError("");
+    return true;
+  };
+
+  const validateStep3 = () => {
+    if (!formData.email.trim() || !formData.password.trim() || !formData.confirmPassword.trim()) {
+      setError("Alla fält måste vara ifyllda.");
+      return false;
+    }
+
+    if (!formData.email.includes("@")) {
       setError("Ogiltig e-post.");
-      return;
+      return false;
     }
 
+    if (formData.password.length < 8) {
+      setError("Lösenord måste vara minst 8 tecken.");
+      return false;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Lösenorden matchar inte.");
+      return false;
+    }
+
+    setError("");
+    return true;
+  };
+
+  // Final submit function - calls register from useAuth, if successful moves to step 4 (success screen)
+  // otherwise sets error message.
+  const handleSubmit = async () => {
     try {
-      await register(formData);
-      navigate('/');
+      setError("");
+
+      const nameParts = formData.fullName.trim().split(" ");
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(" ");
+
+      const dataToSubmit = {
+        userName: formData.userName,
+        firstName: firstName,
+        lastName: lastName || " ",
+        ssn: formData.ssn,
+        email: formData.email,
+        password: formData.password
+      };
+
+      await register(dataToSubmit);
+      setStep(4); // success screen 
+
     } catch (err) {
-      setError(err.message || 'Registrering misslyckades. Försök igen.');
+      setError(err?.message || "Registrering misslyckades.");
     }
   };
-    
+
+  console.log("Current step is:", step);
+
   return (
     <section>
-      <h2>Skapa konto</h2>
-      <form onSubmit={handleSubmit}>
-        <fieldset>
-          <legend>Personuppgifter</legend>
-          <p>
-            <label htmlFor="firstName">Förnamn </label>
-            <input type="text" id="firstName" name="firstName" 
-            value={formData.firstName} onChange={handleChange}/>
-          </p>
-          <p>
-            <label htmlFor="lastName">Efternamn </label>
-            <input type="text" id="lastName" name="lastName" 
-            value={formData.lastName} onChange={handleChange}/>
-          </p>
-          <p>
-            <label htmlFor="ssn">Personnummer </label>
-            <input type="text" id="ssn" name="ssn" placeholder="ÅÅÅÅMMDD"  
-            value={formData.ssn} onChange={handleChange}/>
-          </p>
-        </fieldset>
+      {error && <p>{error}</p>}
 
-        <p>
-          <label htmlFor="userName">Användarnamn </label>
-          <input type="text" id="userName" name="userName" placeholder="Välj ett namn" 
-          value={formData.userName} onChange={handleChange}/>
-        </p>
-        <p>
-          <label htmlFor="password">Lösenord </label>
-          <input type="password" id="password" name="password" placeholder="Välj ett lösenord" 
-          value={formData.password} onChange={handleChange}/>
-        </p>
-        <p>
-          <label htmlFor="email">Email </label>
-          <input type="email" id="email" name="email" placeholder="exempel@exempel.com"  
-          value={formData.email} onChange={handleChange}/>
-        </p>
+      {step === 1 && (
+        <Step1
+          formData={formData}
+          handleChange={handleChange}
+          onNext={() => {
+            if (!validateStep1()) return;
+            setStep(2);
+          }}
+        />
+      )}
 
-        {error && <p>{error}</p>}
 
-        <Button type="submit" variant="contained" color="primary">Registrera dig</Button>
-      </form>
+      {step === 2 && (
+        <Step2
+          formData={formData}
+          handleChange={handleChange}
+          onNext={() => {
+            if (!validateStep2()) return;
+            setStep(3);
+          }}
+          onBack={() => setStep(1)}
+        />
+      )}
+
+      {step === 3 && (
+        <Step3
+          formData={formData}
+          handleChange={handleChange}
+          onNext={() => {
+            if (!validateStep3()) return;
+            handleSubmit();
+          }}
+          onBack={() => setStep(2)}
+        />
+      )}
+
     </section>
   );
 };

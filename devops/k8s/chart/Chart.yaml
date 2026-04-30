@@ -1,0 +1,6 @@
+apiVersion: v2
+name: gr8
+description: Grupp GR8 — Chas Challenge full-stack deploy (api + frontend + mssql)
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

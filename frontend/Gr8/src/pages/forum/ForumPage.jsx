@@ -280,8 +280,7 @@ const ForumPage = () => {
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                 transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
-                <MenuItem onClick={handleReport}>Anmäl inlägg</MenuItem>
-                {currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser && (
+                {currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser ? (
                     <>
                         <MenuItem onClick={() => {
                             handleOpenPostDelete(selectedPostId);
@@ -292,6 +291,8 @@ const ForumPage = () => {
                             handleMenuClose();
                         }}>Redigera inlägg</MenuItem>
                     </>
+                ) : (
+                    <MenuItem onClick={handleReport}>Anmäl inlägg</MenuItem>
                 )}
             </Menu>
 

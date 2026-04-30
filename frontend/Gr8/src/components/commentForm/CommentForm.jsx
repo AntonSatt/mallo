@@ -200,8 +200,7 @@ const CommentForm = ({ postId }) => {
             </Box>
 
             <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleCloseMenu}>
-                <MenuItem onClick={handleOpenReport}>Anmäl kommentar</MenuItem>
-                {(comments && (currentUser?.sub === comments.find(c => c.id === selectedCommentId)?.createdByUser)) && (
+                {(comments && (currentUser?.sub === comments.find(c => c.id === selectedCommentId)?.createdByUser)) ? (
                     <>
                         <MenuItem onClick={() => {
                             handleCloseMenu();
@@ -213,6 +212,8 @@ const CommentForm = ({ postId }) => {
                             setEditContent(comments.find(c => c.id === selectedCommentId)?.content || "");
                         }}>Redigera kommentar</MenuItem>
                     </>
+                ) : (
+                    <MenuItem onClick={handleOpenReport}>Anmäl kommentar</MenuItem>
                 )}
             </Menu>
 

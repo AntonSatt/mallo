@@ -13,7 +13,7 @@ import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 
 // Step 3 of registration: Finalizes account creation by collecting email, password, 
 // and handling user consent for terms, privacy policy, and notifications.
-const Step3 = ({ formData, handleChange, onNext }) => {
+const Step3 = ({ formData, handleChange, onNext, error }) => {
 
     const navigate = useNavigate();
     const [allowNotifications, setAllowNotifications] = useState(false);
@@ -30,6 +30,8 @@ const Step3 = ({ formData, handleChange, onNext }) => {
                 placeholder="Exempel@epost.se"
                 value={formData.email}
                 onChange={handleChange}
+                error={!!error.email}
+                helperText={error.email}
                 sx={{
                     "& .MuiOutlinedInput-input": {
                         textAlign: "center",
@@ -60,6 +62,9 @@ const Step3 = ({ formData, handleChange, onNext }) => {
                 placeholder="********"
                 value={formData.password}
                 onChange={handleChange}
+                error={!!error.password}
+                helperText={error.password}
+                type="password"
                 sx={{
                     "& .MuiOutlinedInput-input": {
                         textAlign: "center",
@@ -90,6 +95,9 @@ const Step3 = ({ formData, handleChange, onNext }) => {
                 placeholder="********"
                 value={formData.confirmPassword}
                 onChange={handleChange}
+                error={!!error.confirmPassword}
+                helperText={error.confirmPassword}
+                type="password"
                 sx={{
                     "& .MuiOutlinedInput-input": {
                         textAlign: "center",

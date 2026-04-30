@@ -102,14 +102,10 @@ namespace Gr8.Application.Services
                 return false;
             }
 
-            var isDeleted = await _communityRepository.DeleteCommentAsync(commentId);
-
-            if (!isDeleted)
-            {
-                return false;
-            }
+            comment.IsDeleted = true;
 
             var result = await _communityRepository.SaveChangesAsync();
+
             return result > 0;
         }
 

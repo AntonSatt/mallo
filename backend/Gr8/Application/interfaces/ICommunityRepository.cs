@@ -18,7 +18,6 @@ namespace Gr8.Application.Interfaces
         Task UpdateCommentAsync(Comment oldComment);
         Task UpdatePostAsync(Post oldPost);
         Task<Post> GetPostByIdAsync(int id);
-        Task<bool> DeleteCommentAsync(int commentId);
         Task<Hug?> GetPostHugAsync(int postId, string UserId);
         Task<Hug?> GetCommentHugAsync(int commentId, string UserId);
         Task AddHugAsync(Hug hug);

@@ -106,18 +106,6 @@ namespace Gr8.Infrastructure.Persistence.Repositories
                 .FirstOrDefaultAsync(p => p.Id == postId);
         }
 
-        public async Task<bool> DeleteCommentAsync(int commentId)
-        {
-            var comment = await GetCommentByIdAsync(commentId);
-            if (comment == null)
-            {
-                return false;
-            }
-
-            comment.IsDeleted = true;
-            return true;
-        }
-
         public async Task<Hug?> GetPostHugAsync(int postId, string userId) 
         {
             return await _communityDbContext.Hugs.FirstOrDefaultAsync(h => h.PostId == postId && h.UserId == userId);

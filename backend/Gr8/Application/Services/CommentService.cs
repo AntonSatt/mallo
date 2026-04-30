@@ -77,7 +77,8 @@ namespace Gr8.Application.Services
                 CreatedAt = comment.CreatedAt,
                 UpdatedAt = comment.UpdatedAt,
                 IsDeleted = comment.IsDeleted,
-                IsEdited = comment.IsEdited
+                IsEdited = comment.IsEdited,
+                CreatedByUser = comment.UserId
             };
 
             if (userName != null)

@@ -55,7 +55,8 @@ const CommentForm = ({ postId }) => {
         }
 
         try {
-            await CommentServices.create(postId, commentData);
+            var data = await CommentServices.create(postId, commentData);
+            setComments(prev => [...prev, data]);
             setCommentData({ commentContent: "" });
         } catch (error) {
             console.error("Tekniskt felet: ", error);

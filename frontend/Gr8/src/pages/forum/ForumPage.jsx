@@ -1,3 +1,4 @@
+import './ForumPage.css';
 import ReportForm from "../../components/reportForm/ReportForm";
 import PostForm from "../../components/postForm/PostForm";
 import DeletePost from "../../components/deleteForm/DeletePost.jsx";
@@ -9,12 +10,12 @@ import PostCard from "../../components/postCard/PostCard.jsx";
 import ProfileBar from "../../components/layout/ProfileBar.jsx";
 
 import {
-Button,
-Dialog,
-DialogTitle,
-DialogActions,
-Menu,
-MenuItem
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogActions,
+    Menu,
+    MenuItem
 } from "@mui/material";
 
 import { useEffect, useState, useMemo } from "react";
@@ -176,104 +177,108 @@ const ForumPage = () => {
 
     return (
         <>
-            <ProfileBar />
+            <div className="forum-page">
+                <div className="forum-container">
+                    <ProfileBar />
 
-            <DeletePost
-                postId={deletePostId}
-                open={!!deletePostId}
-                onClose={handleClosePostDelete}
-                onPostDeleted={(id) => {
-                    setPosts(prev => prev.filter(p => p.id !== id));
-                    handleClosePostDelete();
-                }}
-            />
+                    <DeletePost
+                        postId={deletePostId}
+                        open={!!deletePostId}
+                        onClose={handleClosePostDelete}
+                        onPostDeleted={(id) => {
+                            setPosts(prev => prev.filter(p => p.id !== id));
+                            handleClosePostDelete();
+                        }}
+                    />
 
-            <EditPostForm
-                post={editPost}
-                open={!!editPost}
-                onClose={handleCloseEditPost}
-                onPostUpdated={(updatedPost) => {
-                    setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
-                    handleCloseEditPost();
-                }}
-            />
+                    <EditPostForm
+                        post={editPost}
+                        open={!!editPost}
+                        onClose={handleCloseEditPost}
+                        onPostUpdated={(updatedPost) => {
+                            setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
+                            handleCloseEditPost();
+                        }}
+                    />
 
-            <Button variant="outlined" color="error" onClick={handleClickOpen}>
-                Skapa nytt inlägg...
-            </Button>
-
-            <FilterPost
-                categories={categories}
-                activeNavCategory={activeNavCategory}
-                checkedCategories={checkedCategories}
-                filterAnchorEl={filterAnchorEl}
-                onNavCategoryClick={handleNavCategoryClick}
-                onFilterIconClick={handleFilterIconClick}
-                onFilterClose={handleFilterClose}
-                onCheckboxChange={handleCheckboxChange}
-                onClearFilters={handleClearFilters}
-            />
-
-            <Dialog
-                open={openPostModal}
-                onClose={handleClose}
-                fullWidth
-                maxWidth="sm"
-            >
-                <DialogTitle>Skapa nytt inlägg</DialogTitle>
-                <PostForm
-                    onPostCreated={handlePostCreated}
-                    onClose={handleClose}
-                />
-                <DialogActions>
-                    <Button variant="text" color="inherit" onClick={handleClose}>
-                        Avbryt
+                    <Button variant="outlined" color="error" onClick={handleClickOpen}>
+                        Skapa nytt inlägg...
                     </Button>
-                </DialogActions>
-            </Dialog>
 
-            <ReportForm
-                open={openReportModal}
-                postId={selectedPostId}
-                onClose={handleReportClose}
-            />
+                    <FilterPost
+                        categories={categories}
+                        activeNavCategory={activeNavCategory}
+                        checkedCategories={checkedCategories}
+                        filterAnchorEl={filterAnchorEl}
+                        onNavCategoryClick={handleNavCategoryClick}
+                        onFilterIconClick={handleFilterIconClick}
+                        onFilterClose={handleFilterClose}
+                        onCheckboxChange={handleCheckboxChange}
+                        onClearFilters={handleClearFilters}
+                    />
 
-            <Menu
-                id="post-menu"
-                anchorEl={menuAnchorEl}
-                open={Boolean(menuAnchorEl)}
-                onClose={handleMenuClose}
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                transformOrigin={{ vertical: "top", horizontal: "right" }}
-            >
-                {/* This is the menu that opens when clicking the three dots on a post. It contains options to report, 
+                    <Dialog
+                        open={openPostModal}
+                        onClose={handleClose}
+                        fullWidth
+                        maxWidth="sm"
+                    >
+                        <DialogTitle>Skapa nytt inlägg</DialogTitle>
+                        <PostForm
+                            onPostCreated={handlePostCreated}
+                            onClose={handleClose}
+                        />
+                        <DialogActions>
+                            <Button variant="text" color="inherit" onClick={handleClose}>
+                                Avbryt
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+
+                    <ReportForm
+                        open={openReportModal}
+                        postId={selectedPostId}
+                        onClose={handleReportClose}
+                    />
+
+                    <Menu
+                        id="post-menu"
+                        anchorEl={menuAnchorEl}
+                        open={Boolean(menuAnchorEl)}
+                        onClose={handleMenuClose}
+                        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                        transformOrigin={{ vertical: "top", horizontal: "right" }}
+                    >
+                        {/* This is the menu that opens when clicking the three dots on a post. It contains options to report, 
                 edit, or delete the post. The edit and delete options are only shown if the current user is the creator of the post. */}
-                <MenuItem onClick={handleReport}>Anmäl inlägg</MenuItem>
-                {currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser && (
-                    <>
-                        <MenuItem onClick={() => {
-                            handleOpenPostDelete(selectedPostId);
-                        }}>Radera inlägg</MenuItem>
-                        <MenuItem onClick={() => {
-                            handleOpenEditPost(posts.find(p => p.id === selectedPostId));
-                            handleMenuClose();
-                        }}>Redigera inlägg</MenuItem>
-                    </>
-                )}
-            </Menu>
+                        <MenuItem onClick={handleReport}>Anmäl inlägg</MenuItem>
+                        {currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser && (
+                            <>
+                                <MenuItem onClick={() => {
+                                    handleOpenPostDelete(selectedPostId);
+                                }}>Radera inlägg</MenuItem>
+                                <MenuItem onClick={() => {
+                                    handleOpenEditPost(posts.find(p => p.id === selectedPostId));
+                                    handleMenuClose();
+                                }}>Redigera inlägg</MenuItem>
+                            </>
+                        )}
+                    </Menu>
 
-            {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for each post. 
+                    {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for each post. 
             The PostCard component is responsible for displaying the post content, as well as handling the expand/collapse of the 
             comment section and the menu actions for reporting, editing, and deleting posts. */}
-            {filteredPosts.map((post) => (
-                <PostCard
-                    key={post.id}
-                    post={post}
-                    expanded={expanded === post.id}
-                    onExpand={() => handleExpandClick(post.id)}
-                    onMenuOpen={(event) => handleMenuOpen(event, post.id)}
-                />
-            ))}
+                    {filteredPosts.map((post) => (
+                        <PostCard
+                            key={post.id}
+                            post={post}
+                            expanded={expanded === post.id}
+                            onExpand={() => handleExpandClick(post.id)}
+                            onMenuOpen={(event) => handleMenuOpen(event, post.id)}
+                        />
+                    ))}
+                </div>
+            </div>
         </>
     );
 };

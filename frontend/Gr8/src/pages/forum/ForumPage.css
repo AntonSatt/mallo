@@ -1,0 +1,10 @@
+.forum-page {
+    min-height: 100vh;
+    background-color: var(--color-bg-main);
+    padding: 5px 3px;
+}
+
+.forum-container {
+    max-width: 430px;
+    margin: 0 auto;
+}

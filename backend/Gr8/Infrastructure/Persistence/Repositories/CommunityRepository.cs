@@ -3,6 +3,8 @@ using Gr8.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.ComponentModel.Design;
 using System.Text;
 
 namespace Gr8.Infrastructure.Persistence.Repositories
@@ -16,12 +18,15 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             _communityDbContext = communityDbContext;
         }
 
+        // Added isDeleted filter to ensure only active posts and comments are retrieved on all Get operations and Delete operations
+        // Not sure if this is the best way to handle soft deletes?
         public async Task<List<Post>> GetAllPostsAsync()
         {
             return await _communityDbContext.Posts
+                .Where(p => !p.IsDeleted)
                 .Include(p => p.Category)
                 .Include(p => p.Tags)
-                .Include(p => p.Comments)
+                .Include(p => p.Comments.Where(c => !c.IsDeleted))
                 .ToListAsync();
         }
 
@@ -37,7 +42,10 @@ namespace Gr8.Infrastructure.Persistence.Repositories
 
         public async Task<List<Comment>> GetCommentsByPostAsync(int postId)
         {
-            return await _communityDbContext.Comments.Where(c => c.PostId == postId).ToListAsync();
+            return await _communityDbContext.Comments
+                .Where(c => c.PostId == postId)
+                .Where(c => !c.IsDeleted)
+                .ToListAsync();
         }
 
         public async Task AddCommentAsync(Comment comment)
@@ -70,6 +78,52 @@ namespace Gr8.Infrastructure.Persistence.Repositories
         public async Task AddReportAsync(Report report)
         {
             await _communityDbContext.Reports.AddAsync(report);
+        }
+
+        public async Task<Comment?> GetCommentByIdAsync(int commentId)
+        {
+            return await _communityDbContext.Comments.FirstOrDefaultAsync(c => c.Id == commentId);
+        }
+
+        public async Task UpdateCommentAsync(Comment comment)
+        {
+            _communityDbContext.Comments.Update(comment);
+            await Task.CompletedTask;
+        }
+
+        public async Task UpdatePostAsync(Post post)
+        {
+            _communityDbContext.Posts.Update(post);
+            await Task.CompletedTask;
+        }
+
+        public async Task<Post?> GetPostByIdAsync(int postId)
+        {
+            return await _communityDbContext.Posts
+                .Include(p => p.Category)
+                .Include(p => p.Tags)
+                .Include(p => p.Comments)
+                .FirstOrDefaultAsync(p => p.Id == postId);
+        }
+
+        public async Task<Hug?> GetPostHugAsync(int postId, string userId) 
+        {
+            return await _communityDbContext.Hugs.FirstOrDefaultAsync(h => h.PostId == postId && h.UserId == userId);
+        }
+
+        public async Task<Hug?> GetCommentHugAsync(int commentId, string userId) 
+        {
+            return await _communityDbContext.Hugs.FirstOrDefaultAsync(h => h.CommentId == commentId && h.UserId == userId);
+        }
+
+        public async Task AddHugAsync(Hug hug) 
+        {
+            await _communityDbContext.Hugs.AddAsync(hug);
+        }
+
+        public void RemoveHug(Hug hug) 
+        {
+            _communityDbContext.Hugs.Remove(hug);
         }
     }
 }

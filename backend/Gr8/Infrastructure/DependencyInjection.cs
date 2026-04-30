@@ -3,6 +3,7 @@ using Gr8.Application.Services;
 using Gr8.Infrastructure.Identity;
 using Gr8.Infrastructure.Persistence;
 using Gr8.Infrastructure.Persistence.Repositories;
+using Gr8.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -16,11 +17,13 @@ namespace Gr8.Infrastructure
         {
             // Configure Entity Framework Core to use SQL Server with the connection string from configuration
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
             // Configure Entity Framework Core to use SQL Server for the CommunityDbContext
             services.AddDbContext<CommunityDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
             services.AddScoped<ICommunityRepository, CommunityRepository>();
             services.AddScoped<IPostService, PostService>();
@@ -29,6 +32,8 @@ namespace Gr8.Infrastructure
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IApplicationRepository, ApplicationRepository>();
             services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<IHugService, HugService>();
+            services.AddScoped<IEmailService, EmailService>();
 
             // Configure ASP.NET Core Identity to use the ApplicationUser and ApplicationRole classes, and to use Entity Framework Core for storage
             services.AddIdentity<ApplicationUser, ApplicationRole>()

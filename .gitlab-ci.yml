@@ -3,10 +3,15 @@ stages:
   - secret-detection
   - build
   - deploy
+  - smoke-test
   - cleanup
 
 include:
   - template: Security/Secret-Detection.gitlab-ci.yml
+
+variables:
+  NAMESPACE: doe25-anton-satterkvist
+  HOST_BASE: labb.k3s.chas-lab.dev
 
 # Only develop can be merged into main
 check-merge-source:
@@ -20,6 +25,38 @@ check-merge-source:
       echo "Merge source check passed"
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# ---------------------------------------------------------------------------
+# Test stage: Frontend tests and coverage
+# ---------------------------------------------------------------------------
+frontend-test:
+  stage: test
+  image: node:20
+  allow_failure: true
+  script:
+    - cd frontend/Gr8
+    - echo "WARNING - No test scripts found in frontend package.json"
+    - echo "Pipeline configured for testing, but waiting for Devs to implement Jest/Vitest."
+
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+# ---------------------------------------------------------------------------
+# Test stage: Backend tests and coverage
+# ---------------------------------------------------------------------------
+backend-test:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  allow_failure: true
+  script:
+    - cd backend/Gr8
+    - echo "WARNING - No test projects found in backend."
+    - echo "Pipeline configured for testing, but waiting for Devs to implement xUnit/NUnit tests."
+
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "develop"
 
 # ---------------------------------------------------------------------------
 # Build stage: build images, push to GitLab Container Registry with buildx cache
@@ -44,6 +81,7 @@ build frontend:
       docker buildx build \
         -f frontend/Gr8/Dockerfile \
         -t "$CI_REGISTRY_IMAGE/frontend:$TAG" \
+        --build-arg VITE_API_BASE_URL="/api" \
         --cache-from=type=registry,ref="$CI_REGISTRY_IMAGE/frontend:cache-$TAG" \
         --cache-from=type=registry,ref="$CI_REGISTRY_IMAGE/frontend:cache-latest" \
         --cache-to=type=registry,ref="$CI_REGISTRY_IMAGE/frontend:cache-$TAG",mode=max \
@@ -62,87 +100,156 @@ build backend:
         --cache-to=type=registry,ref="$CI_REGISTRY_IMAGE/backend:cache-$TAG",mode=max \
         --provenance=false --push backend/Gr8
 
-build python-utils:
-  <<: *build-image
-  script:
-    - docker buildx build -t "$CI_REGISTRY_IMAGE/python-utils:latest" --push devops/scripts
-  rules:
-    - if: $CI_COMMIT_BRANCH
+# ---------------------------------------------------------------------------
+# Deploy stage: helm upgrade --install per branch into the school k3s namespace.
+# Auth via KUBECONFIG_CHAS_LAB (File-type CI variable holding the kubeconfig).
+# ---------------------------------------------------------------------------
 
-# ---------------------------------------------------------------------------
-# Deploy stage
-# ---------------------------------------------------------------------------
+.deploy-k3s: &deploy-k3s
+  stage: deploy
+  image:
+    name: alpine/helm:3.20.2
+    entrypoint: [""]
+  before_script:
+    - apk add --no-cache curl bash
+    - curl -LO "https://dl.k8s.io/release/v1.33.0/bin/linux/amd64/kubectl"
+    - chmod +x kubectl && mv kubectl /usr/local/bin/
+    - export KUBECONFIG="$KUBECONFIG_CHAS_LAB"
+    - kubectl auth whoami
 
 # Develop deploy: persistent shared dev environment
 deploy develop:
-  stage: deploy
-  image: $CI_REGISTRY_IMAGE/python-utils:latest
+  <<: *deploy-k3s
   needs:
     - job: build frontend
     - job: build backend
-    - job: build python-utils
-      optional: true
   environment:
     name: develop
-    url: https://gr8-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
+    url: https://gr8-develop.labb.k3s.chas-lab.dev
   script:
-    - cd devops/scripts
-    - python deploy.py
+    - |
+      helm upgrade --install gr8-develop ./devops/k8s/chart \
+        --namespace "$NAMESPACE" \
+        --set image.tag=develop \
+        --wait --timeout 5m --atomic
   rules:
     - if: $CI_COMMIT_BRANCH == "develop"
 
-# Review deploy: ephemeral per-branch stacks for feature branches
+# Review deploy: ephemeral per-branch releases for feature branches
 deploy review:
-  stage: deploy
-  image: $CI_REGISTRY_IMAGE/python-utils:latest
+  <<: *deploy-k3s
   needs:
     - job: build frontend
     - job: build backend
-    - job: build python-utils
-      optional: true
   environment:
     name: review/$CI_COMMIT_REF_SLUG
-    url: https://gr8-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
+    url: https://gr8-$CI_COMMIT_REF_SLUG.labb.k3s.chas-lab.dev
     on_stop: stop_review
   script:
-    - cd devops/scripts
-    - python deploy.py
+    - |
+      helm upgrade --install "gr8-$CI_COMMIT_REF_SLUG" ./devops/k8s/chart \
+        --namespace "$NAMESPACE" \
+        -f ./devops/k8s/chart/values-feature.yaml \
+        --set image.tag="$CI_COMMIT_REF_SLUG" \
+        --wait --timeout 5m --atomic
   rules:
     - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_COMMIT_BRANCH != "develop"
 
 # Production deploy: only on main, manual approval gate
 deploy production:
-  stage: deploy
-  image: $CI_REGISTRY_IMAGE/python-utils:latest
+  <<: *deploy-k3s
   needs:
     - job: build frontend
     - job: build backend
-    - job: build python-utils
-      optional: true
   environment:
     name: production
-    url: https://gr8-main.doe25.swarm.chas-lab.dev
+    url: https://gr8-main.labb.k3s.chas-lab.dev
   script:
-    - cd devops/scripts
-    - python deploy.py
+    - |
+      helm upgrade --install gr8-main ./devops/k8s/chart \
+        --namespace "$NAMESPACE" \
+        --set image.tag=latest \
+        --wait --timeout 5m --atomic
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual
 
 # ---------------------------------------------------------------------------
-# Cleanup: manual stack teardown for review environments
+# Smoke test: verify the deployed api actually responds.
+# If the api boots, the database was reachable and migrations applied —
+# so a green smoke test proves the full DB + app startup path end-to-end.
+# Treats "any HTTP response from the app" as success (200, 404, etc.) so
+# the check works regardless of ASPNETCORE_ENVIRONMENT. Only Traefik
+# gateway errors (502/503/504) and connection failures count as down.
+# ---------------------------------------------------------------------------
+
+.smoke-test: &smoke-test
+  stage: smoke-test
+  image: curlimages/curl:latest
+  script:
+    - |
+      URL="https://gr8-${CI_COMMIT_REF_SLUG}.${HOST_BASE}/api/openapi/v1.json"
+      echo "Polling $URL"
+      for i in $(seq 1 30); do
+        status=$(curl -o /dev/null -s -w "%{http_code}" --max-time 5 "$URL" || echo "000")
+        case "$status" in
+          000|502|503|504)
+            echo "attempt $i: app not responding (status $status)"
+            sleep 5
+            ;;
+          *)
+            echo "API up (HTTP $status) — DB + migrations + boot OK"
+            exit 0
+            ;;
+        esac
+      done
+      echo "API never responded within 150s — check api/db logs with kubectl"
+      exit 1
+
+smoke-test develop:
+  <<: *smoke-test
+  needs:
+    - job: deploy develop
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+smoke-test review:
+  <<: *smoke-test
+  needs:
+    - job: deploy review
+  rules:
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_COMMIT_BRANCH != "develop"
+
+smoke-test production:
+  <<: *smoke-test
+  needs:
+    - job: deploy production
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# ---------------------------------------------------------------------------
+# Cleanup: manual teardown for review releases on MR close.
+# Deletes the helm release AND the StatefulSet PVCs (helm uninstall doesn't).
 # ---------------------------------------------------------------------------
 
 stop_review:
   stage: cleanup
-  image: $CI_REGISTRY_IMAGE/python-utils:latest
+  image:
+    name: alpine/helm:3.20.2
+    entrypoint: [""]
   variables:
     GIT_STRATEGY: none
+  before_script:
+    - apk add --no-cache curl bash
+    - curl -LO "https://dl.k8s.io/release/v1.33.0/bin/linux/amd64/kubectl"
+    - chmod +x kubectl && mv kubectl /usr/local/bin/
+    - export KUBECONFIG="$KUBECONFIG_CHAS_LAB"
   environment:
     name: review/$CI_COMMIT_REF_SLUG
     action: stop
   script:
-    - python /app/delete-stack.py
+    - helm uninstall "gr8-$CI_COMMIT_REF_SLUG" -n "$NAMESPACE" || true
+    - kubectl delete pvc -l app.kubernetes.io/instance="gr8-$CI_COMMIT_REF_SLUG" -n "$NAMESPACE" --ignore-not-found
   rules:
     - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_COMMIT_BRANCH != "develop"
       when: manual

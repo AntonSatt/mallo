@@ -17,7 +17,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -36,7 +36,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
 
                     b.HasData(
                         new
@@ -98,7 +98,42 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
+                });
+
+            modelBuilder.Entity("Gr8.Domain.Entities.Hug", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CommentId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommentId");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId", "CommentId")
+                        .IsUnique()
+                        .HasFilter("[CommentId] IS NOT NULL");
+
+                    b.HasIndex("UserId", "PostId")
+                        .IsUnique()
+                        .HasFilter("[PostId] IS NOT NULL");
+
+                    b.ToTable("Hugs", (string)null);
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Post", b =>
@@ -142,7 +177,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Posts", (string)null);
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Report", b =>
@@ -193,7 +228,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasIndex("ReviewedByAdminId");
 
-                    b.ToTable("Reports");
+                    b.ToTable("Reports", (string)null);
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Tag", b =>
@@ -210,7 +245,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags");
+                    b.ToTable("Tags", (string)null);
 
                     b.HasData(
                         new
@@ -323,6 +358,9 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<int>("Avatar")
+                        .HasColumnType("int");
+
                     b.Property<string>("ConcurrencyStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -421,6 +459,29 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                     b.Navigation("Post");
                 });
 
+            modelBuilder.Entity("Gr8.Domain.Entities.Hug", b =>
+                {
+                    b.HasOne("Gr8.Domain.Entities.Comment", "Comment")
+                        .WithMany("Hugs")
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Gr8.Domain.Entities.Post", "Post")
+                        .WithMany("Hugs")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Gr8.Infrastructure.Identity.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("Post");
+                });
+
             modelBuilder.Entity("Gr8.Domain.Entities.Post", b =>
                 {
                     b.HasOne("Gr8.Domain.Entities.Category", "Category")
@@ -488,12 +549,16 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
             modelBuilder.Entity("Gr8.Domain.Entities.Comment", b =>
                 {
+                    b.Navigation("Hugs");
+
                     b.Navigation("Replies");
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Post", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Hugs");
                 });
 #pragma warning restore 612, 618
         }

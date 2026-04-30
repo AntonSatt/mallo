@@ -1,13 +1,22 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { Button } from "@mui/material"
+import { Grid, Typography, Box } from "@mui/material"
+import PrimaryButton from "../../design/buttons/PrimaryButton";
+import InputField from "../../design/input/InputField";
+import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
+import InputAdornment from "@mui/material/InputAdornment";
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 
-
+// Handles user login: Manages state for credentials and "Remember Me" preference, 
+// validates input, and redirects the user to the forum upon successful authentication.
 const LoginForm = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
 
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -16,53 +25,136 @@ const LoginForm = () => {
     event.preventDefault();
     setError("");
 
-    if (!userName.trim() || !password) 
-    {
+    if (!userName.trim() || !password) {
       setError("Användarnamn och lösenord måste vara ifyllda.")
       return;
     }
 
     try {
       await login({ userName, password });
-      navigate('/');
+      navigate('/forum');
     } catch (err) {
       setError(err.message || 'Fel användarnamn eller lösenord.');
     }
   };
 
   const handleForgotPassword = () => {
-    // Handle forgot password logic
+    navigate('/forgot-password');
+  };
+
+  const handleRememberMe = () => {
+    // Handle remember me logic
   };
 
   return (
-    <section>
-      <h2>Logga in</h2>
-      <form onSubmit={handleSubmit}>
-        <fieldset>
-          <p>
-            <label htmlFor="userName">Användarnamn </label>
-            <input type="text" id="userName" name="userName"
-            value={userName} onChange={(event) => setUserName(event.target.value)} placeholder="Användarnamn" />
-          </p>
+    <form onSubmit={handleSubmit}>
+      <Grid container direction="column" spacing={2}>
 
-          <p>
-            <label htmlFor="password">Lösenord </label>
-            <input type="password" id="password" name="password" 
-            value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Lösenord" />
-          </p>
+        <Grid item>
+          <Typography variant="h6" align="center">
+            E-post
+          </Typography>
 
-          {error && <p>{error}</p>} 
-          <Button type="submit" variant="contained" color="primary">
+          <InputField
+            fullWidth
+            placeholder="Exempel@email.com"
+            sx={{
+              "& .MuiOutlinedInput-input": {
+                textAlign: "center",
+                paddingLeft: "40px"
+              },
+              "& .MuiOutlinedInput-root": {
+                height: 40,
+                borderRadius: 20,
+              },
+            }}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+          />
+        </Grid>
+
+        <Grid item>
+          <Typography variant="h6" align="center">
+            Lösenord
+          </Typography>
+
+          <InputField
+            fullWidth
+            type="password"
+            placeholder="********"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            sx={{
+              "& .MuiOutlinedInput-input": {
+                textAlign: "center",
+                paddingLeft: "40px",
+              },
+              "& .MuiOutlinedInput-root": {
+                height: 40,
+                borderRadius: 20,
+              },
+
+            }}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+        </Grid>
+
+        {error && (
+          <Grid item>
+            <Typography color="error">{error}</Typography>
+          </Grid>
+        )}
+
+        <Typography variant="h9" align="center" sx={{ cursor: "pointer", color: "var(--color-border-light)", fontWeight: 540 }} onClick={handleForgotPassword}>
+          Glömt ditt lösenord?
+        </Typography>
+
+        <Box
+          onClick={() => setRememberMe(!rememberMe)}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 1,
+            cursor: "pointer",
+            userSelect: "none"
+          }}
+        >
+          {rememberMe ? (
+            <CheckCircleIcon sx={{ color: "var(--color-primary)", fontSize: "16px" }} />
+          ) : (
+            <CircleOutlinedIcon sx={{ color: "var(--color-primary)", fontSize: "16px", mb: 0.3 }} />
+          )}
+          <Typography variant="body2">
+            Kom ihåg mina inloggningsuppgifter
+          </Typography>
+        </Box>
+
+        <Grid item>
+          <PrimaryButton type="submit" sx={{ height: 40, mt: 2 }}>
             Logga in
-          </Button>
-        </fieldset>
+          </PrimaryButton>
+        </Grid>
 
-        <h3>Glömt ditt lösenord?</h3>
-        <Button type="button" variant="outlined" color="secondary" onClick={handleForgotPassword}>
-          Klicka här
-        </Button>
-      </form>
-    </section>
+      </Grid>
+    </form>
   );
 };
 

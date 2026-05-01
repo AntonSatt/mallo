@@ -70,7 +70,7 @@ const ProfileBar = ({ showCreate = false, onCreatePost }) => {
                         </Typography>
                     )}
 
-                    {/* this is the HeartSearch-button-icon */}
+                    {/* Search button (only on ForumPage) */}
                     {showCreate && (
                         <Button type="button" className="profilebar-search-button" aria-label="Sök">
                             <img src={SearchHeartButton} alt="" className="profilebar-search-icon" />

@@ -11,7 +11,7 @@
   z-index: 11;
 
   border-radius: 16px !important;
-  padding: 6px 32px !important;
+  padding: 6px 16px !important;
 
   display: flex;
   align-items: center;
@@ -28,6 +28,7 @@
 .profilebar-left {
   display: flex;
   align-items: center;
+  flex-shrink: 0; /*we dont want the avatar to grow bigger on profilebar*/
   gap: 20px;
 }
 
@@ -79,7 +80,7 @@
 }
 
 .profilebar-create .MuiOutlinedInput-root {
-  height: 56px;
+  height: 46px;
   border-radius: 999px !important;
   background-color: var(--color-bg-muted) !important;
 }
@@ -98,9 +99,11 @@
   font-size: 30px !important;
 }
 
+/* The HeartSearch-button starts here*/
 .profilebar-search-button {
-  width: 56px !important;
-  height: 56px !important;
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
   flex-shrink: 0;
   border-radius: 50% !important;
   background-color: var(--color-bg-muted) !important;
@@ -111,8 +114,8 @@
 }
 
 .profilebar-search-icon {
-  width: 23px;
-  height: 23px;
+  width: 20px;
+  height: 20px;
   display: block; 
 }
 

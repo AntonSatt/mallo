@@ -1,0 +1,27 @@
+.MuiDialog-paper {
+    border-radius: 16px !important;
+    overflow: hidden;
+    background-color: var(--color-bg-surface) !important;
+}
+
+.actions-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.actions-title {
+    padding: 0 !important;
+    font-weight: 700 !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.actions-list {
+    padding: 0 !important;
+}
+
+.actions-item {
+    border-bottom: 1px solid var(--color-border-light) !important;
+}

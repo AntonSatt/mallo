@@ -33,7 +33,7 @@ const PostActionsDialog = ({
                     Inlägg
                 </DialogTitle>
                 <IconButton onClick={onClose} className="actions-item">
-                    <img src={CloseIcon} alt="" className="close-icon" />
+                    <img src={CloseIcon} alt="" />
                 </IconButton>
             </div>
 
@@ -41,8 +41,8 @@ const PostActionsDialog = ({
                 {/* Report is only shown if the user is the owner of the post */}
                 {!isOwner && (
                     <ListItemButton onClick={onReport} className="actions-item">
-                        <ListItemIcon className="actions-item">
-                            <img src={ReportIcon} alt="" className="report-icon" />
+                        <ListItemIcon>
+                            <img src={ReportIcon} alt="" />
                         </ListItemIcon>
                         <ListItemText primary="Anmäl inlägg" />
                     </ListItemButton>
@@ -52,15 +52,15 @@ const PostActionsDialog = ({
                 {isOwner && (
                     <>
                         <ListItemButton onClick={onDelete} className="actions-item">
-                            <ListItemIcon className="actions-item">
-                                <img src={DeleteIcon} alt="" className="delete-icon" />
+                            <ListItemIcon>
+                                <img src={DeleteIcon} alt="" />
                             </ListItemIcon>
                             <ListItemText primary="Radera inlägg" />
                         </ListItemButton>
 
                         <ListItemButton onClick={onEdit} className="actions-item">
-                            <ListItemIcon className="actions-item">
-                                <img src={EditIcon} alt="" className="edit-icon" />
+                            <ListItemIcon>
+                                <img src={EditIcon} alt="" />
                             </ListItemIcon>
                             <ListItemText primary="Redigera inlägg" />
                         </ListItemButton>

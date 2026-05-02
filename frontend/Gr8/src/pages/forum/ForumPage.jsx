@@ -8,6 +8,7 @@ import { useAuth } from "../../hooks/useAuth";
 import FilterPost from "../../components/filterPost/FilterPost.jsx";
 import PostCard from "../../components/postCard/PostCard.jsx";
 import ProfileBar from "../../components/layout/ProfileBar.jsx";
+import PostActionsDialog from "../../components/postActionsDialog/PostActionsDialog.jsx";
 
 import {
     Box,

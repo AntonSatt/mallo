@@ -11,13 +11,10 @@ import ProfileBar from "../../components/layout/ProfileBar.jsx";
 import PostActionsDialog from "../../components/postActionsDialog/PostActionsDialog.jsx";
 
 import {
-    Box,
     Button,
     Dialog,
     DialogTitle,
     DialogActions,
-    Menu,
-    MenuItem
 } from "@mui/material";
 
 import { useEffect, useState, useMemo } from "react";
@@ -238,31 +235,20 @@ const ForumPage = () => {
                         postId={selectedPostId}
                         onClose={handleReportClose}
                     />
-
-                    <Menu
-                        id="post-menu"
-                        anchorEl={menuAnchorEl}
+                    
+                    {/* This is the dialog that appears when you click the three dots on a post.*/}
+                    <PostActionsDialog
                         open={Boolean(menuAnchorEl)}
                         onClose={handleMenuClose}
-                        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                        transformOrigin={{ vertical: "top", horizontal: "right" }}
-                    >
-                        {/* This is the menu that opens when clicking the three dots on a post. It contains options to report, 
-                        edit, or delete the post. The edit and delete options are only shown if the current user is 
-                        the creator of the post. */}
-                        <MenuItem onClick={handleReport}>Anmäl inlägg</MenuItem>
-                        {currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser && (
-                            <>
-                                <MenuItem onClick={() => {
-                                    handleOpenPostDelete(selectedPostId);
-                                }}>Radera inlägg</MenuItem>
-                                <MenuItem onClick={() => {
-                                    handleOpenEditPost(posts.find(p => p.id === selectedPostId));
-                                    handleMenuClose();
-                                }}>Redigera inlägg</MenuItem>
-                            </>
-                        )}
-                    </Menu>
+                        onReport={handleReport}
+                        onDelete={() => handleOpenPostDelete(selectedPostId)}
+                        onEdit={() => {handleOpenEditPost(posts.find(p => p.id === selectedPostId)); 
+                        handleMenuClose();
+                        }}
+                        isOwner={
+                            currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser
+                        }
+                    />
 
                     {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
                     each post. The PostCard component is responsible for displaying the post content, as well as handling the 

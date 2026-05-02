@@ -1,30 +1,30 @@
 .filter-button {
-    width: 36px !important;
-    height: 36px !important;
+    width: 40px !important;
+    height: 40px !important;
     border-radius: 50% !important;
     background-color: var(--color-bg-surface) !important;
-    box-shadow: 0 3px 8px rgba(55, 73, 87, 0.12);
+    box-shadow: 0 4px 10px rgba(55, 73, 87, 0.12) !important;
 }
 
 .filter-icon-img {
-    width: 32px;
-    height: 25px;
+    width: 26px;
+    height: 26px;
     display: block;
 }
 
 .filter-chip {
-    height: 36px !important;
-    min-width: 30px !important;
-    border-radius: 999px;
+    height: 38px !important;
+    min-width: unset !important;
+    border-radius: 999px !important;
     background-color: var(--color-bg-surface) !important;
     border: none !important;
-    box-shadow: 0 4px 10px rgba(55, 73, 87, 0.14);
+    box-shadow: 0 4px 10px rgba(55, 73, 87, 0.12) !important;
     flex-shrink: 0;
 }
 
 .filter-chip .MuiChip-label {
-    padding: 0 18px !important;
-    font-size: 0.9rem !important;
+    padding: 0 16px !important;
+    font-size: 0.95rem !important;
 }
 
 .filter-chip.active {

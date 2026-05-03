@@ -44,47 +44,48 @@ const ProfileBar = ({ showCreate = false, onCreatePost }) => {
                 <Paper className={`profilebar-container ${showCreate ? "forum-profilebar" : ""}`}>
                     {showCreate ? (
                         <>
-                        <Box className="profilebar-top-row">
-                            <Box className="profilebar-left">
-                                <Avatar avatar={currentUser?.picture} />
-                            </Box>
+                            <Box className="profilebar-top-row">
+                                <Box className="profilebar-left">
+                                    <Avatar avatar={currentUser?.picture} />
+                                </Box>
 
-                            <Box className="profilebar-create">
-                                <InputField
-                                    fullWidth
-                                    placeholder="Skapa..."
-                                    onClick={onCreatePost}
-                                    slotProps={{
-                                        input: {
-                                            readOnly: true,
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <ControlPointIcon className="profilebar-create-icon" />
-                                                </InputAdornment>
-                                            ),
-                                        },
-                                    }}
-                                />
-                            </Box>
+                                <Box className="profilebar-create">
+                                    <InputField
+                                        fullWidth
+                                        placeholder="Skapa..."
+                                        onClick={onCreatePost}
+                                        slotProps={{
+                                            input: {
+                                                readOnly: true,
+                                                startAdornment: (
+                                                    <InputAdornment position="start">
+                                                        <ControlPointIcon className="profilebar-create-icon" />
+                                                    </InputAdornment>
+                                                ),
+                                            },
+                                        }}
+                                    />
+                                </Box>
 
-                            <Button type="button" className="profilebar-search-button" aria-label="Sök">
-                                <img src={SearchHeartButton} alt="" className="profilebar-search-icon" />
-                            </Button>
+                                <Button type="button" className="profilebar-search-button" aria-label="Sök">
+                                    <img src={SearchHeartButton} alt="" className="profilebar-search-icon" />
+                                </Button>
 
-                            <Box className="profilebar-right">
-                                <HamburgerMenu
-                                    open={menuOpen}
-                                    onToggle={toggleMenu}
-                                />
+                                <Box className="profilebar-right">
+                                    <HamburgerMenu
+                                        open={menuOpen}
+                                        onToggle={toggleMenu}
+                                    />
+                                </Box>
                             </Box>
-                        </Box>
-                                    {/* this is the fake row */}
+                            {/* this is the fake row */}
                             <Box className="progress-row">
                                 <img src={ProgressRing} alt="" className="progress-icon" />
-                                <Typography className="progress-text">
-                                    8 goda gärningar kvar till badge
-                                </Typography>
-
+                                <Box className="progress-text-bg">
+                                    <Typography className="progress-text">
+                                        8 goda gärningar kvar till badge
+                                    </Typography>
+                                </Box>
                                 <Box className="badge-action">
                                     <img src={BadgeRing} alt="" className="badge-icon" />
                                     <img src={NotificationRing} alt="" className="notification-icon" />

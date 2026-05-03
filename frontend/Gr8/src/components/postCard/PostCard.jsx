@@ -1,7 +1,3 @@
-//this file contains the PostCard component, which is used to display a post in the feed. 
-// It takes in the post data as props and displays the post's title, content, author, category, tags, 
-// and actions (hug, save, comment). It also has a collapsible section for comments.
-
 import "./PostCard.css";
 import moment from "moment";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -10,7 +6,6 @@ import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutline
 import HugButton from "../hugButton/HugButton";
 import CommentForm from "../commentForm/CommentForm";
 import CommentBubble from "../../assets/icons/commentBubble.svg";
-
 import {
     Avatar,
     Card,
@@ -22,6 +17,10 @@ import {
     Box,
     IconButton
 } from "@mui/material";
+
+//this file contains the PostCard component, which is used to display a post in the feed. 
+// It takes in the post data as props and displays the post's title, content, author, category, tags, 
+// and actions (hug, save, comment). It also has a collapsible section for comments.
 
 const PostCard = ({ post, expanded, onExpand, onMenuOpen }) => {
     const categoryName = post.category?.name || post.category || "Ingen kategori";

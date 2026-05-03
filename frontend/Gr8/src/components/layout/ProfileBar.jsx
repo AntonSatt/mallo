@@ -87,8 +87,8 @@ const ProfileBar = ({ showCreate = false, onCreatePost }) => {
                                     </Typography>
                                 </Box>
                                 <Box className="badge-action">
-                                    <img src={BadgeRing} alt="" className="badge-icon" />
-                                    <img src={NotificationRing} alt="" className="notification-icon" />
+                                    <img src={BadgeRing} alt="" />
+                                    <img src={NotificationRing} alt="" />
                                 </Box>
                             </Box>
                         </>

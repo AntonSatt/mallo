@@ -1,6 +1,6 @@
 .hug-popup {
-    width: 320px;
-    min-height: 240px;
+    width: 300px;
+    min-height: 200px;
     border-radius: 14px;
     background-color: var(--color-primary-bg);
     display: flex;
@@ -16,7 +16,7 @@
     text-align: center;
     color: var(--color-text-main);
     font-size: 1.5rem !important;
-    font-weight: 700 !important;
+    font-weight: 500 !important;
 }
 
 .hug-popup-icon {

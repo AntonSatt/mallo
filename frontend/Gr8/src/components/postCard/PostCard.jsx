@@ -1,5 +1,6 @@
 import "./PostCard.css";
 import moment from "moment";
+import { useState } from "react";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
@@ -22,8 +23,12 @@ import {
 // It takes in the post data as props and displays the post's title, content, author, category, tags, 
 // and actions (hug, save, comment). It also has a collapsible section for comments.
 
+
 const PostCard = ({ post, expanded, onExpand, onMenuOpen }) => {
     const categoryName = post.category?.name || post.category || "Ingen kategori";
+
+const [showFullContent, setShowFullContent] = useState(false);
+
 
     return (
         <>
@@ -59,9 +64,15 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen }) => {
                             {post.title}
                         </Typography>
 
-                        <Typography variant="body2" className="post-content-preview">
+                        <Typography className={showFullContent ? "post-content-preview-expanded" : "post-content-preview"}>
                             {post.content}
                         </Typography>
+
+                        {post.content?.length > 180 && (
+                            <span size="small" className="post-read-more" onClick={() => setShowFullContent(prev => !prev)}>
+                                {showFullContent ? "Visa mindre" : "läs mer"}
+                            </span>
+                        )}
 
                 {/*Check if there are tags and display them.*/}
                         {post.tags && post.tags.length > 0 && (

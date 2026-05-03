@@ -11,12 +11,14 @@
     align-items: flex-start !important;
 }
 
+/* The subheader contains the username and category. */
 .post-header .MuiCardHeader-subheader {
     font-size: 0.75rem !important;
     color: var(--color-text-main) !important;
     opacity: 0.80;
 }
 
+/*avatar is a circle with the first letter of the username, and a background color based on the username. */
 .post-avatar {
     width: 52px !important;
     height: 52px !important;
@@ -25,7 +27,7 @@
     font-weight: 700 !important;
 }
 
-/* contains the username and category. */
+/*contains the username and category. */
 .post-user-row {
     display: flex;
     align-items: center;
@@ -34,6 +36,7 @@
 
 .post-username {
     font-weight: 500 !important;
+    font-size: 0.875rem !important;
     color: var(--color-text-main) !important;
 }
 
@@ -44,28 +47,50 @@
 }
 
 .post-card-content {
-    padding: 0 20px 14px 92px !important;
+    padding: 0 20px 12px 87px !important; /*the length of the content preview*/
     margin-top: -10px;
 }
 
 .post-title {
-    font-weight: 700 !important;
-    font-size: 1rem !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
     color: var(--color-text-main) !important;
     border-bottom: 1px solid var(--color-border-light);
-    padding-bottom: 2px;
+    padding-bottom: 1px;
     margin-bottom: 8px !important;
+    max-width: 240px; /*length of the title*/
 }
 
+/* The content preview is the first few lines of the post content, and is truncated with an ellipsis if it's too long. */
 .post-content-preview {
     color: var(--color-text-main);
     line-height: 1.5 !important;
+    max-width: 2480px; /*length of the content preview*/
    /* webkit - shows only the first 5 lines of the content, and adds 3 dots if there's more text. */
     display: -webkit-box;
     line-clamp: 5;
     -webkit-line-clamp: 5;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+/* When the user clicks "read more", the content preview expands to show the full content. */
+.post-content-preview.expanded {
+    display: block;
+    overflow: visible;
+    line-clamp: unset;
+    -webkit-line-clamp: unset;
+}
+
+.post-content-wrapper {
+    position: relative;
+}
+
+.post-read-more {
+    color: var(--color-text-main) !important;
+    opacity: 0.55;
+    font-size: 0.85rem !important;
+    font-weight: 400 !important;
 }
 
 .post-tags {
@@ -77,7 +102,7 @@
 
 .post-actions {
     border-top: 1px solid var(--color-border-light);
-    padding: 0 20px 14px 82px !important;
+    padding: 0 10px 1px 78px !important;
     display: flex;
     align-items: center;
 }
@@ -91,6 +116,8 @@
     background-color: var(--color-bg-muted);
     border-top: 1px solid var(--color-border-light);
 }
+
+
 
 
 

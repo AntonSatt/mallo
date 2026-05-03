@@ -1,5 +1,15 @@
+//this file contains the PostCard component, which is used to display a post in the feed. 
+// It takes in the post data as props and displays the post's title, content, author, category, tags, 
+// and actions (hug, save, comment). It also has a collapsible section for comments.
+
 import "./PostCard.css";
 import moment from "moment";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
+import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
+import HugButton from "../hugButton/HugButton";
+import CommentForm from "../commentForm/CommentForm";
+import CommentBubble from "../../assets/icons/commentBubble.svg";
 
 import {
     Avatar,
@@ -12,12 +22,6 @@ import {
     Box,
     IconButton
 } from "@mui/material";
-
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
-import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
-import HugButton from "../hugButton/HugButton";
-import CommentForm from "../commentForm/CommentForm";
 
 const PostCard = ({ post, expanded, onExpand, onMenuOpen }) => {
     const categoryName = post.category?.name || post.category || "Ingen kategori";
@@ -81,7 +85,7 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen }) => {
                             aria-label="Visa kommentarerna"
                             className="post-comment-button">
 
-                            <ChatBubbleOutlineOutlinedIcon />
+                            <img src={CommentBubble} alt="" />
                         </IconButton>
                     </CardActions>
 
@@ -91,9 +95,7 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen }) => {
                             <Typography variant="subtitle2" gutterBottom>
                                 Kommentarer
                             </Typography>
-
                             <CommentForm postId={post.id} />
-
                         </CardContent>
                     </Collapse>
             </Card>

@@ -1,0 +1,31 @@
+.hug-popup {
+    width: 320px;
+    min-height: 240px;
+    border-radius: 14px;
+    background-color: var(--color-primary-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    box-shadow: 0 4px 14px rgba(55, 73, 87, 0.14);
+    padding: 32px 28px;
+}
+
+.hug-popup-title {
+    text-align: center;
+    color: var(--color-text-main);
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+}
+
+.hug-popup-icon {
+    width: 110px;
+    height: auto;
+}
+
+.hug-popup {
+    animation: hugPop 0.2s ease;
+}
+
+

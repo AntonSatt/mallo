@@ -26,6 +26,41 @@ check-merge-source:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
+frontend-lint:
+  stage: test
+  image: node:22-alpine
+  script:
+    - cd frontend/Gr8
+    - npm install
+    - npm run lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+backend-lint:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:10.0
+  script:
+    - dotnet format backend/Gr8/Gr8.slnx --verify-no-changes
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+frontend-security:
+  stage: test
+  image: node:22-alpine
+  script:
+    - cd frontend/Gr8
+    - npm audit --audit-level=high
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+backend-security:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:10.0
+  script:
+    - dotnet list backend/Gr8/Gr8.slnx package --vulnerable
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
 # ---------------------------------------------------------------------------
 # Test stage: Frontend tests and coverage
 # ---------------------------------------------------------------------------

@@ -32,7 +32,6 @@ check-merge-source:
 frontend-test:
   stage: test
   image: node:20
-  allow_failure: true
   script:
     - cd frontend/Gr8
     - echo "WARNING - No test scripts found in frontend package.json"
@@ -48,7 +47,6 @@ frontend-test:
 backend-test:
   stage: test
   image: mcr.microsoft.com/dotnet/sdk:8.0
-  allow_failure: true
   script:
     - cd backend/Gr8
     - echo "WARNING - No test projects found in backend."
@@ -71,6 +69,7 @@ backend-test:
     - docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
     - docker buildx create --use --name builder --driver docker-container || true
   rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH
 
 build frontend:

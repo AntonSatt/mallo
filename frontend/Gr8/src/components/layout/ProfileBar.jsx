@@ -22,9 +22,6 @@ import Avatar from "../avatar/avatar";
 import InputField from '../../design/input/InputField.jsx';
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
 import SearchHeartButton from "../../assets/icons/searchHeartForum.svg";
-import NotificationRing from "../../assets/icons/notificationRing.svg";
-import ProgressRing from "../../assets/icons/progressRing.svg";
-import BadgeRing from "../../assets/icons/badgeRing.svg";
 
 // this is the profile bar that appears at the top of the forum page. It shows the user's avatar and name, 
 // and has a hamburger menu on the right side. The hamburger menu contains options for viewing badges, 
@@ -45,8 +42,7 @@ const ProfileBar = ({ showCreate = false, onCreatePost }) => {
                     {showCreate ? (
                         <>
                             <Box className="profilebar-top-row">
-                                <Box className="profilebar-left">
-                                    <Avatar avatar={currentUser?.picture} />
+                                <Avatar avatar={currentUser?.picture} />
                                 </Box>
 
                                 <Box className="profilebar-create">
@@ -77,20 +73,6 @@ const ProfileBar = ({ showCreate = false, onCreatePost }) => {
                                         onToggle={toggleMenu}
                                     />
                                 </Box>
-                            </Box>
-                            {/* this is the fake row */}
-                            <Box className="progress-row">
-                                <img src={ProgressRing} alt="" className="progress-icon" />
-                                <Box className="progress-text-bg">
-                                    <Typography className="progress-text">
-                                        8 goda gärningar kvar till badge
-                                    </Typography>
-                                </Box>
-                                <Box className="badge-action">
-                                    <img src={BadgeRing} alt="" />
-                                    <img src={NotificationRing} alt="" />
-                                </Box>
-                            </Box>
                         </>
                     ) : (
                         <>

@@ -32,7 +32,6 @@ check-merge-source:
 frontend-test:
   stage: test
   image: node:20
-  allow_failure: true
   script:
     - cd frontend/Gr8
     - echo "WARNING - No test scripts found in frontend package.json"
@@ -48,7 +47,6 @@ frontend-test:
 backend-test:
   stage: test
   image: mcr.microsoft.com/dotnet/sdk:8.0
-  allow_failure: true
   script:
     - cd backend/Gr8
     - echo "WARNING - No test projects found in backend."
@@ -71,13 +69,14 @@ backend-test:
     - docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
     - docker buildx create --use --name builder --driver docker-container || true
   rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH
 
 build frontend:
   <<: *build-image
   script:
     - |
-      if [ "$CI_COMMIT_REF_NAME" = "$CI_DEFAULT_BRANCH" ]; then TAG=latest; else TAG=$CI_COMMIT_REF_SLUG; fi
+      if [ "$CI_COMMIT_REF_NAME" = "main" ]; then TAG=latest; else TAG=$CI_COMMIT_REF_SLUG; fi
       docker buildx build \
         -f frontend/Gr8/Dockerfile \
         -t "$CI_REGISTRY_IMAGE/frontend:$TAG" \
@@ -91,7 +90,7 @@ build backend:
   <<: *build-image
   script:
     - |
-      if [ "$CI_COMMIT_REF_NAME" = "$CI_DEFAULT_BRANCH" ]; then TAG=latest; else TAG=$CI_COMMIT_REF_SLUG; fi
+      if [ "$CI_COMMIT_REF_NAME" = "main" ]; then TAG=latest; else TAG=$CI_COMMIT_REF_SLUG; fi
       docker buildx build \
         -f backend/Gr8/Dockerfile \
         -t "$CI_REGISTRY_IMAGE/backend:$TAG" \
@@ -153,7 +152,7 @@ deploy review:
         --set image.tag="$CI_COMMIT_REF_SLUG" \
         --wait --timeout 5m --atomic
   rules:
-    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_COMMIT_BRANCH != "develop"
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop"
 
 # Production deploy: only on main, manual approval gate
 deploy production:
@@ -171,7 +170,7 @@ deploy production:
         --set image.tag=latest \
         --wait --timeout 5m --atomic
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
       when: manual
 
 # ---------------------------------------------------------------------------
@@ -218,14 +217,14 @@ smoke-test review:
   needs:
     - job: deploy review
   rules:
-    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_COMMIT_BRANCH != "develop"
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop"
 
 smoke-test production:
   <<: *smoke-test
   needs:
     - job: deploy production
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
 
 # ---------------------------------------------------------------------------
 # Cleanup: manual teardown for review releases on MR close.
@@ -251,5 +250,5 @@ stop_review:
     - helm uninstall "gr8-$CI_COMMIT_REF_SLUG" -n "$NAMESPACE" || true
     - kubectl delete pvc -l app.kubernetes.io/instance="gr8-$CI_COMMIT_REF_SLUG" -n "$NAMESPACE" --ignore-not-found
   rules:
-    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_COMMIT_BRANCH != "develop"
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop"
       when: manual

@@ -46,7 +46,13 @@ const PostServices = {
             userId
         });
         return response.data;
-    }
+    },
+   bookmarkPost: async (postId, userId) => {
+        const response = await ApiClient.post(`/forum/posts/${postId}/bookmark`,{
+            userId
+        });
+        return response.data;
+    },
 };
 
 export default PostServices;

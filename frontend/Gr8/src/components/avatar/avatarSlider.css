@@ -1,0 +1,10 @@
+.swiper-slide-active {
+    padding: 0 16px !important;
+}
+
+.swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+}

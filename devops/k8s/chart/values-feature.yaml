@@ -7,7 +7,7 @@ db:
   pid: Express
   resources:
     requests:
-      cpu: 200m
+      cpu: 100m
       memory: 384Mi
     limits:
       cpu: 1000m

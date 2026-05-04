@@ -1,3 +1,6 @@
+import './FilterPost.css';
+import FilterIcon from "../../assets/icons/filter.svg";
+
 import {
     Stack,
     Chip,
@@ -10,7 +13,6 @@ import {
     Checkbox,
     FormControlLabel,
 } from "@mui/material";
-import FilterListIcon from "@mui/icons-material/FilterList";
 
 const CategoryFilter = ({
     categories,
@@ -27,30 +29,44 @@ const CategoryFilter = ({
         <>
             <Stack
                 direction="row"
-                spacing={1}
+                spacing={1.5}
                 alignItems="center"
-                sx={{ mt: 2, mb: 2, flexWrap: "wrap" }}
+                // this is for scrolling the category chips on smaller screens without wrapping to a new line.
+                sx={{ mt: 2, mb: 2, flexWrap: "nowrap", 
+                    overflowX: "auto", scrollbarWidth: "none", 
+                    "&::-webkit-scrollbar": {display: "none"}}}
             >
+                <Badge badgeContent={checkedCategories.length} color="error">
+                    <IconButton onClick={onFilterIconClick} size="small" className="filter-button">
+                        <img src={FilterIcon} alt="" className="filter-icon-img" />
+                    </IconButton>
+                </Badge>
+
                 <Chip
                     label="Alla"
                     onClick={() => onNavCategoryClick("Alla")}
-                    color={activeNavCategory === "Alla" && checkedCategories.length === 0 ? "error" : "default"}
-                    variant={activeNavCategory === "Alla" && checkedCategories.length === 0 ? "filled" : "outlined"}
+                    className={activeNavCategory === "Alla" && checkedCategories.length === 0 ? "filter-chip active" : "filter-chip"}
                 />
+
+                <Chip label="Sparade"
+                onClick={() => onNavCategoryClick("Sparade")}
+                className={activeNavCategory === "Sparade" && checkedCategories.length === 0 ? "filter-chip active" : "filter-chip"} 
+                />
+
+                <Chip label="Dina inlägg"
+                onClick={() => onNavCategoryClick("Dina inlägg")}
+                className={activeNavCategory === "Dina inlägg" && checkedCategories.length === 0 ? "filter-chip active" : "filter-chip"} 
+                />
+
                 {categories.slice(0, 3).map(cat => (
                     <Chip
                         key={cat.id}
                         label={cat.name}
                         onClick={() => onNavCategoryClick(cat.name)}
-                        color={activeNavCategory === cat.name && checkedCategories.length === 0 ? "error" : "default"}
-                        variant={activeNavCategory === cat.name && checkedCategories.length === 0 ? "filled" : "outlined"}
+                        className={activeNavCategory === cat.name && checkedCategories.length === 0 ? "filter-chip active" : "filter-chip"}
                     />
                 ))}
-                <Badge badgeContent={checkedCategories.length} color="error">
-                    <IconButton onClick={onFilterIconClick} size="small">
-                        <FilterListIcon />
-                    </IconButton>
-                </Badge>
+                
             </Stack>
 
             <Menu

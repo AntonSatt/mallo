@@ -1,0 +1,20 @@
+.forum-page {
+    min-height: 100vh;
+    background-color: var(--color-bg-main);
+    padding: 5px 3px;
+}
+
+.forum-container {
+    max-width: 430px;
+    margin: 0 auto;
+}
+
+/* targeting MUI wrapper */
+.create-post .MuiInputAdornment-root {
+    margin-right: 8px;
+}
+
+.create-post-icon {
+    color: var(--color-primary);
+    font-size: 28px;
+}

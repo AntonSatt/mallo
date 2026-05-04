@@ -106,24 +106,47 @@ namespace Gr8.Infrastructure.Persistence.Repositories
                 .FirstOrDefaultAsync(p => p.Id == postId);
         }
 
-        public async Task<Hug?> GetPostHugAsync(int postId, string userId) 
+        public async Task<Hug?> GetPostHugAsync(int postId, string userId)
         {
             return await _communityDbContext.Hugs.FirstOrDefaultAsync(h => h.PostId == postId && h.UserId == userId);
         }
 
-        public async Task<Hug?> GetCommentHugAsync(int commentId, string userId) 
+        public async Task<Hug?> GetCommentHugAsync(int commentId, string userId)
         {
             return await _communityDbContext.Hugs.FirstOrDefaultAsync(h => h.CommentId == commentId && h.UserId == userId);
         }
 
-        public async Task AddHugAsync(Hug hug) 
+        public async Task AddHugAsync(Hug hug)
         {
             await _communityDbContext.Hugs.AddAsync(hug);
         }
 
-        public void RemoveHug(Hug hug) 
+        public void RemoveHug(Hug hug)
         {
             _communityDbContext.Hugs.Remove(hug);
+        }
+
+        public async Task<Bookmark?> GetPostBookmarkAsync(int postId, string userId) 
+        {
+            return await _communityDbContext.Bookmarks.FirstOrDefaultAsync(b => b.PostId == postId && b.UserId == userId);
+        }
+
+        public async Task<List<Bookmark>> GetAllBookmarksAsync(string userId)
+        {
+            return await _communityDbContext.Bookmarks
+                .Where(b => b.UserId == userId)
+                .Include(b => b.Post)
+                .ToListAsync();
+        }
+
+        public async Task AddBookmarkAsync(Bookmark bookmark)
+        {
+            await _communityDbContext.Bookmarks.AddAsync(bookmark);
+        }
+
+        public void RemoveBookmark(Bookmark bookmark) 
+        {
+            _communityDbContext.Bookmarks.Remove(bookmark);
         }
     }
 }

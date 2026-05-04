@@ -270,6 +270,20 @@ namespace Gr8.Api.Endpoints
                 return Results.Ok(new { hugged });
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPost("/forum/posts/{postId}/bookmark", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user, [FromServices] IBookmarkService bookService, int postId) =>
+            {
+                var appUser = await userManger.GetUserAsync(user);
+
+                if(appUser == null) 
+                {
+                    return Results.Unauthorized();
+                }
+
+                var bookmarked = await bookService.TogglePostBookmarkAsync(postId, appUser.Id);
+
+                return Results.Ok(new { bookmarked });
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
         }
     }
 }

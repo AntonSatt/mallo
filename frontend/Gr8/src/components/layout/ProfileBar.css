@@ -120,7 +120,7 @@
 }
 
 /* fake row starts here */
-.forum-profilebar {
+/* .forum-profilebar {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -138,7 +138,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: -2px; /*moves the second row higher up*/
+  margin-top: -2px; 
 }
 
 .progress-icon {
@@ -164,7 +164,7 @@
   align-items: center;
   justify-content: center;
   padding: 0 12px; 
-  margin: -15px; /*makes the row longer*/
+  margin: -15px; 
 }
 
 .badge-action {
@@ -172,4 +172,4 @@
   align-items: center;
   gap: 1px;
   flex-shrink: 0;
-}
+}  */

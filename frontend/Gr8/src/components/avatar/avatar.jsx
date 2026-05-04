@@ -31,6 +31,38 @@ const Avatar = ({
     style = {},
     alt = "Avatar",
 }) => {
+
+    // Default avatar
+    if (avatar === 0) {
+        return (
+            <div
+                className={className}
+                style={{
+                    width: size,
+                    height: size,
+                    borderRadius: "50%",
+                    border: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "var(--color-bg-muted)",
+                    padding: "2px",
+                    ...style,
+                }}
+            >
+                <span style={{
+                    fontSize: size > 60 ? "12px" : "8px",
+                    textAlign: "center",
+                    color: "var(--color-ui-muted)",
+                    fontWeight: 200,
+                    marginTop: "1px",
+                }}>
+                    Välj din ikon
+                </span>
+            </div>
+        );
+    }
+
     const avatarIndex = clampAvatar(avatar);
     const { x, y } = AVATAR_HEAD_POSITIONS[avatarIndex] ?? AVATAR_HEAD_POSITIONS[1];
 

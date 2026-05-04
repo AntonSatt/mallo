@@ -5,15 +5,15 @@ import { useNavigate } from "react-router-dom";
 import InputField from "../../../design/input/InputField";
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import InputAdornment from "@mui/material/InputAdornment";
+import AvatarSlider from "../../../components/avatar/avatarSlider.jsx"
 
 // Step 1 of registration: User selects an avatar and sets a username.
-
-const Step1 = ({ formData, handleChange, onNext }) => {
+const Step1 = ({ formData, handleChange, onNext, error }) => {
     const navigate = useNavigate();
     return (
-        <Box container className="register-step1" spacing={0}>
+        <Box className="register-step1">
 
-            <Typography variant="h5" sx={{ mb: 13, mt: 13 }}>Här ska man välja en avatar</Typography>
+            <AvatarSlider formData={formData} handleChange={handleChange} mt={5} mb={2} />
 
             <Typography variant="body2" sx={{ mb: 1 }}>Välj ett användarnamn</Typography>
 
@@ -23,6 +23,8 @@ const Step1 = ({ formData, handleChange, onNext }) => {
                 placeholder="Exempelnamn..."
                 value={formData.userName}
                 onChange={handleChange}
+                error={!!error.userName}
+                helperText={error.userName}
                 sx={{
                     "& .MuiOutlinedInput-input": {
                         textAlign: "center",
@@ -51,7 +53,7 @@ const Step1 = ({ formData, handleChange, onNext }) => {
                     Avsluta
                 </SecondaryButton>
 
-                <PrimaryButton onClick={onNext}>
+                <PrimaryButton onClick={onNext} disabled={!formData.avatar || formData.avatar === 0}>
                     Nästa
                 </PrimaryButton>
 

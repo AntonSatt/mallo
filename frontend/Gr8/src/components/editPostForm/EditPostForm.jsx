@@ -71,6 +71,8 @@ const EditPostForm = ({ post, open, onClose, onPostUpdated }) => {
         id: post.id,
         title: postData.title,
         content: postData.content,
+        tagIds: postData.tags,
+        categoryId: postData.categoryId
       });
       onPostUpdated(result);
       onClose();

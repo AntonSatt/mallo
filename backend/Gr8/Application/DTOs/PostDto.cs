@@ -13,6 +13,7 @@ namespace Gr8.Application.DTOs
         public bool IsEdited { get; set; }
         public bool IsDeleted { get; set; }
         public CategoryDto Category { get; set; }
+        public List<TagDto> Tags { get; set; }
         public string CreatedByUser { get; set; }
     }
 }

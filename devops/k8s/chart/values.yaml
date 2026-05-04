@@ -1,0 +1,67 @@
+# Default values for the gr8 chart.
+# CI overrides image.tag per-branch. Namespace comes from `helm install --namespace ...`.
+
+image:
+  registry: registry.chas-lab.dev
+  api:
+    repository: chas-challenge-2026/grupp-8/project/backend
+  frontend:
+    repository: chas-challenge-2026/grupp-8/project/frontend
+  tag: latest
+  # Always: re-pull on every pod start so branch tags (develop, feature-*)
+  # actually pick up the new image after a CI rebuild. Trade-off is small for
+  # this project's deploy frequency.
+  pullPolicy: Always
+  pullSecret: gitlab-registry
+
+# Single-host + path routing. School cluster's Traefik has wildcard cert at *.labb.k3s.chas-lab.dev.
+# Final URL: https://{{ .Release.Name }}.labb.k3s.chas-lab.dev/
+# API at:    https://{{ .Release.Name }}.labb.k3s.chas-lab.dev/api
+hostBase: labb.k3s.chas-lab.dev
+
+api:
+  replicas: 1
+  port: 8080
+  resources:
+    requests:
+      cpu: 25m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  env:
+    ASPNETCORE_ENVIRONMENT: Development
+  # ConnectionStrings__DefaultConnection and Jwt__Key come from the gr8-secrets Secret (envFrom).
+
+frontend:
+  replicas: 1
+  port: 80
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+db:
+  enabled: true
+  image: mcr.microsoft.com/mssql/server:2022-latest
+  # MSSQL edition: Developer (full features, no memory cap) or Express (1.4 GiB cap, 10 GiB/db).
+  # Feature branches override to Express via values-feature.yaml.
+  pid: Developer
+  port: 1433
+  storage: 5Gi
+  storageClassName: longhorn
+  resources:
+    requests:
+      cpu: 100m
+      memory: 1Gi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+  # MSSQL_SA_PASSWORD comes from gr8-secrets.DB_PASSWORD (env reference).
+
+# Name of the manually-created Secret holding DB_PASSWORD, Jwt__Key, ConnectionStrings__DefaultConnection,
+# and any SMTP creds. Bootstrap instructions in chart/README.md.
+secretName: gr8-secrets

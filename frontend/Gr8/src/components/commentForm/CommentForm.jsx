@@ -56,7 +56,8 @@ const CommentForm = ({ postId }) => {
         }
 
         try {
-            await CommentServices.create(postId, commentData);
+            var data = await CommentServices.create(postId, commentData);
+            setComments(prev => [...prev, data]);
             setCommentData({ commentContent: "" });
         } catch (error) {
             console.error("Tekniskt felet: ", error);
@@ -202,8 +203,7 @@ const CommentForm = ({ postId }) => {
             </Box>
 
             <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleCloseMenu}>
-                <MenuItem onClick={handleOpenReport}>Anmäl kommentar</MenuItem>
-                {(comments && (currentUser?.sub === comments.find(c => c.id === selectedCommentId)?.createdByUser)) && (
+                {(comments && (currentUser?.sub === comments.find(c => c.id === selectedCommentId)?.createdByUser)) ? (
                     <>
                         <MenuItem onClick={() => {
                             handleCloseMenu();
@@ -215,6 +215,8 @@ const CommentForm = ({ postId }) => {
                             setEditContent(comments.find(c => c.id === selectedCommentId)?.content || "");
                         }}>Redigera kommentar</MenuItem>
                     </>
+                ) : (
+                    <MenuItem onClick={handleOpenReport}>Anmäl kommentar</MenuItem>
                 )}
             </Menu>
 

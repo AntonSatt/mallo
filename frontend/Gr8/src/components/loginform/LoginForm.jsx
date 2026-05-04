@@ -6,7 +6,6 @@ import PrimaryButton from "../../design/buttons/PrimaryButton";
 import InputField from "../../design/input/InputField";
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import InputAdornment from "@mui/material/InputAdornment";
-import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 
@@ -23,18 +22,36 @@ const LoginForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError("");
+    setError({});
 
-    if (!userName.trim() || !password) {
-      setError("Användarnamn och lösenord måste vara ifyllda.")
+    let newError = {};
+    if (!userName.trim()) {
+      newError.userName = "Användarnamn/E-post krävs.";
+    }
+    if (!password) {
+      newError.password = "Lösenord krävs.";
+    }
+
+    if (Object.keys(newError).length > 0) {
+      setError(newError);
       return;
     }
 
     try {
-      await login({ userName, password });
+      await login({ userName, password, rememberMe });
       navigate('/forum');
     } catch (err) {
-      setError(err.message || 'Fel användarnamn eller lösenord.');
+
+      if (err.response && err.response.status === 401) {
+        setError({
+          userName: " ",
+          password: "Fel användarnamn eller lösenord."
+        });
+      } else {
+        setError({
+          general: "Kunde inte ansluta till servern. Försök igen senare."
+        });
+      }
     }
   };
 
@@ -49,6 +66,11 @@ const LoginForm = () => {
   return (
     <form onSubmit={handleSubmit}>
       <Grid container direction="column" spacing={2}>
+        {error.general && (
+          <Grid item>
+            <Typography color="error" align="center">{error.general}</Typography>
+          </Grid>
+        )}
 
         <Grid item>
           <Typography variant="h6" align="center">
@@ -58,6 +80,8 @@ const LoginForm = () => {
           <InputField
             fullWidth
             placeholder="Exempel@email.com"
+            error={!!error.userName}
+            helperText={error.userName}
             sx={{
               "& .MuiOutlinedInput-input": {
                 textAlign: "center",
@@ -92,6 +116,8 @@ const LoginForm = () => {
             type="password"
             placeholder="********"
             value={password}
+            error={!!error.password}
+            helperText={error.password}
             onChange={(e) => setPassword(e.target.value)}
             sx={{
               "& .MuiOutlinedInput-input": {
@@ -116,9 +142,11 @@ const LoginForm = () => {
           />
         </Grid>
 
-        {error && (
+        {error.general && (
           <Grid item>
-            <Typography color="error">{error}</Typography>
+            <Typography color="error" align="center">
+              {error.general}
+            </Typography>
           </Grid>
         )}
 

@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    {{- include "gr8.labels" . | nindent 4 }}
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: {{ printf "%s-%s-api-strip-prefix@kubernetescrd" .Release.Namespace .Release.Name | quote }}
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: {{ include "gr8.host" . }}
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "gr8.fullname" (dict "Release" .Release "component" "api") }}
+                port:
+                  number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "gr8.fullname" (dict "Release" .Release "component" "frontend") }}
+                port:
+                  number: 80

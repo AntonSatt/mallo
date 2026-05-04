@@ -1,3 +1,19 @@
+/* Breakpoints:
+   mobile: do not use media query, just use default styles (below 768px).
+   tablet: 768px (768px - 1023px).
+   desktop: 1024px (1024px and above).
+*/
+
+/* Global styles and CSS variables for the Gr8 app. */
+@media (min-width: 768px) { /* Tablet styles can be added here if needed. */
+  
+}
+
+@media (min-width: 1024px) { /* Desktop styles can be added here if needed. */
+  
+}
+/* Global styles and CSS variables for the Gr8 app. */
+
 :root {
     /* === Brand Colors === */
     --color-primary: #FFB57C;

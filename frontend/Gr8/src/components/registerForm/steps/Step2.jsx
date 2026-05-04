@@ -18,7 +18,7 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 
 // Step 2 of registration: Handles user verification by collecting full name and SSN, 
 // ensuring the user meets the 18+ age requirement.
-const Step2 = ({ formData, handleChange, onNext }) => {
+const Step2 = ({ formData, handleChange, onNext, error }) => {
     const navigate = useNavigate();
     const [openAlert, setOpenAlert] = useState(false);
 
@@ -69,6 +69,8 @@ const Step2 = ({ formData, handleChange, onNext }) => {
                 placeholder="Förnamn Efternamn"
                 value={formData.fullName}
                 onChange={handleChange}
+                error={!!error.fullName}
+                helperText={error.fullName}
                 sx={{
                     "& .MuiOutlinedInput-input": {
                         textAlign: "center",
@@ -99,6 +101,8 @@ const Step2 = ({ formData, handleChange, onNext }) => {
                 placeholder="ÅÅÅÅMMDD"
                 value={formData.ssn}
                 onChange={handleChange}
+                error={!!error.ssn}
+                helperText={error.ssn}
                 sx={{
                     "& .MuiOutlinedInput-input": {
                         textAlign: "center",

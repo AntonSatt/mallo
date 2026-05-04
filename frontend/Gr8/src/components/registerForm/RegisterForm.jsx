@@ -14,83 +14,81 @@ const RegisterForm = ({ step, setStep }) => {
     userName: "",
     password: "",
     confirmPassword: "",
-    email: ""
+    email: "",
+    avatar: 0
   });
 
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { register } = useAuth();
 
-  //  update fields in formData state on change
+  // Updates form state and manages field-specific error clearing
   const handleChange = (e) => {
+    const field = e.target.id || e.target.name;
+    const value = e.target.value;
+
     setFormData({
       ...formData,
-      [e.target.id]: e.target.value
+      [field]: value
     });
+
+    if (error[field]) {
+      setError({ ...error, [field]: "" });
+    }
   };
 
   // Step validations functions - returns or sets error if invalid, otherwise returns true and clears error.
-
   const validateStep1 = () => {
-    if (!formData.userName.trim()) {
-      setError("Användarnamn måste vara ifyllt.");
-      return false;
-    }
-    setError("");
-    return true;
+    let newError = {};
+    if (!formData.userName.trim()) newError.userName = "Användarnamn måste vara ifyllt.";
+
+    setError(newError);
+    return Object.keys(newError).length === 0;
   };
 
   const validateStep2 = () => {
-    if (!formData.fullName.trim() || !formData.ssn.trim()) {
-      setError("Alla fält måste vara ifyllda.");
-      return false;
-    }
+    let newError = {};
 
-    if (!formData.fullName.trim().includes(" ")) {
-      setError("Vänligen ange både för- och efternamn.");
-      return false;
-    }
+    if (!formData.fullName.trim()) newError.fullName = "Namn måste fyllas i.";
+    else if (!formData.fullName.trim().includes(" ")) newError.fullName = "Ange både för- och efternamn.";
 
-    if (formData.ssn.length !== 8 || !/^\d+$/.test(formData.ssn)) {
-      setError("Personnummer måste vara 8 siffror.");
-      return false;
-    }
+    if (!formData.ssn.trim()) newError.ssn = "Personnummer krävs.";
+    else if (formData.ssn.length !== 8) newError.ssn = "Personnummer måste vara 8 siffror.";
 
-    setError("");
-    return true;
+    setError(newError);
+    return Object.keys(newError).length === 0;
   };
 
   const validateStep3 = () => {
-    if (!formData.email.trim() || !formData.password.trim() || !formData.confirmPassword.trim()) {
-      setError("Alla fält måste vara ifyllda.");
-      return false;
+    let newError = {};
+
+    if (!formData.email.trim()) {
+      newError.email = "E-post krävs.";
+    } else if (!formData.email.includes("@")) {
+      newError.email = "Ogiltig e-postadress.";
     }
 
-    if (!formData.email.includes("@")) {
-      setError("Ogiltig e-post.");
-      return false;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+    if (!formData.password) {
+      newError.password = "Lösenord krävs.";
+    } else if (!passwordRegex.test(formData.password)) {
+      newError.password = "Lösenordet måste vara minst 8 tecken, ha en stor bokstav (A-Z), en siffra (0-9) och ett specialtecken.";
     }
 
-    if (formData.password.length < 8) {
-      setError("Lösenord måste vara minst 8 tecken.");
-      return false;
+    if (formData.confirmPassword !== formData.password) {
+      newError.confirmPassword = "Lösenorden matchar inte.";
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Lösenorden matchar inte.");
-      return false;
-    }
-
-    setError("");
-    return true;
+    setError(newError);
+    return Object.keys(newError).length === 0;
   };
 
-  // Final submit function - calls register from useAuth, if successful moves to step 4 (success screen)
-  // otherwise sets error message.
+  // Final submit function - calls register from useAuth, if successful moves to 
+  // step 4 (success screen) otherwise sets error message.
   const handleSubmit = async () => {
     try {
-      setError("");
-
+      setError({});
       const nameParts = formData.fullName.trim().split(" ");
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(" ");
@@ -112,16 +110,14 @@ const RegisterForm = ({ step, setStep }) => {
     }
   };
 
-  console.log("Current step is:", step);
-
   return (
     <section>
-      {error && <p>{error}</p>}
 
       {step === 1 && (
         <Step1
           formData={formData}
           handleChange={handleChange}
+          error={error}
           onNext={() => {
             if (!validateStep1()) return;
             setStep(2);
@@ -134,6 +130,7 @@ const RegisterForm = ({ step, setStep }) => {
         <Step2
           formData={formData}
           handleChange={handleChange}
+          error={error}
           onNext={() => {
             if (!validateStep2()) return;
             setStep(3);
@@ -146,6 +143,7 @@ const RegisterForm = ({ step, setStep }) => {
         <Step3
           formData={formData}
           handleChange={handleChange}
+          error={error}
           onNext={() => {
             if (!validateStep3()) return;
             handleSubmit();

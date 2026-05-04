@@ -1,36 +1,23 @@
+import './ForumPage.css';
 import ReportForm from "../../components/reportForm/ReportForm";
 import PostForm from "../../components/postForm/PostForm";
-import CommentForm from "../../components/commentForm/CommentForm";
 import DeletePost from "../../components/deleteForm/DeletePost.jsx";
 import PostServices from "../../services/PostServices";
 import EditPostForm from "../../components/editPostForm/EditPostForm.jsx";
 import { useAuth } from "../../hooks/useAuth";
-import FilterPost from "../../components/postForm/FilterPost.jsx";
-import Navbar from "../../components/layout/Navbar.jsx"
+import FilterPost from "../../components/filterPost/FilterPost.jsx";
+import PostCard from "../../components/postCard/PostCard.jsx";
+import ProfileBar from "../../components/layout/ProfileBar.jsx";
+import PostActionsDialog from "../../components/postActionsDialog/PostActionsDialog.jsx";
 
 import {
-    Dialog,
-    Card,
-    CardHeader,
-    CardContent,
-    IconButton,
-    Typography,
-    Collapse,
     Button,
+    Dialog,
     DialogTitle,
     DialogActions,
-    Menu,
-    MenuItem,
 } from "@mui/material";
 
-import ShareIcon from "@mui/icons-material/Share";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { styled } from "@mui/material/styles";
 import { useEffect, useState, useMemo } from "react";
-import moment from "moment";
-import HugButton from "../../components/hugButton/HugButton.jsx";
-import ProfileBar from "../../components/layout/ProfileBar.jsx";
 
 const ForumPage = () => {
     const { currentUser } = useAuth();
@@ -42,35 +29,24 @@ const ForumPage = () => {
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
     const [selectedPostId, setSelectedPostId] = useState(null);
     const [deletePostId, setDeletePostId] = useState(null);
-
     const [editPost, setEditPost] = useState(null);
-    const handleOpenEditPost = (post) => setEditPost(post);
-    const handleCloseEditPost = () => setEditPost(null);
 
     const [activeNavCategory, setActiveNavCategory] = useState("Alla");
     const [filterAnchorEl, setFilterAnchorEl] = useState(null);
     const [checkedCategories, setCheckedCategories] = useState([]);
     const [categories, setCategories] = useState([]);
 
-
+    const handleOpenEditPost = (post) => setEditPost(post);
+    const handleCloseEditPost = () => setEditPost(null);
 
     const handleOpenPostDelete = (postId) => {
         setDeletePostId(postId);
+        handleMenuClose();
     };
 
     const handleClosePostDelete = () => {
         setDeletePostId(null);
     };
-
-    const ExpandMore = styled(IconButton, {
-        shouldForwardProp: (prop) => prop !== "expand",
-    })(({ theme, expand }) => ({
-        marginLeft: "auto",
-        transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
-        transition: theme.transitions.create("transform", {
-            duration: theme.transitions.duration.shortest,
-        }),
-    }));
 
     // Opens the post creation modal
     const handleClickOpen = () => {
@@ -124,6 +100,20 @@ const ForumPage = () => {
         setFilterAnchorEl(null);
     };
 
+    const handleCheckboxChange = (categoryName) => {
+        setCheckedCategories(prev =>
+            prev.includes(categoryName)
+                ? prev.filter(c => c !== categoryName)
+                : [...prev, categoryName]
+        );
+        setActiveNavCategory("Alla");
+    };
+
+    const handleClearFilters = () => {
+        setCheckedCategories([]);
+        setActiveNavCategory("Alla");
+    };
+
     const filteredPosts = useMemo(() => {
         if (checkedCategories.length > 0) {
             return posts.filter(p => {
@@ -139,20 +129,6 @@ const ForumPage = () => {
         }
         return posts;
     }, [posts, activeNavCategory, checkedCategories]);
-
-    const handleCheckboxChange = (categoryName) => {
-        setCheckedCategories(prev =>
-            prev.includes(categoryName)
-                ? prev.filter(c => c !== categoryName)
-                : [...prev, categoryName]
-        );
-        setActiveNavCategory("Alla");
-    };
-
-    const handleClearFilters = () => {
-        setCheckedCategories([]);
-        setActiveNavCategory("Alla");
-    };
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -210,166 +186,95 @@ const ForumPage = () => {
 
     return (
         <>
-            <ProfileBar />
+            <div className="forum-page">
+                <div className="forum-container">
+                    <ProfileBar showCreate onCreatePost={handleClickOpen} />
 
-            <DeletePost
-                postId={deletePostId}
-                open={!!deletePostId}
-                onClose={handleClosePostDelete}
-                onPostDeleted={(id) => {
-                    setPosts(prev => prev.filter(p => p.id !== id));
-                    handleClosePostDelete();
-                }}
-            />
+                    <DeletePost
+                        postId={deletePostId}
+                        open={!!deletePostId}
+                        onClose={handleClosePostDelete}
+                        onPostDeleted={(id) => {
+                            setPosts(prev => prev.filter(p => p.id !== id));
+                            handleClosePostDelete();
+                        }}
+                    />
 
-            <EditPostForm
-                post={editPost}
-                open={!!editPost}
-                onClose={handleCloseEditPost}
-                onPostUpdated={(updatedPost) => {
-                    setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
-                    handleCloseEditPost();
-                }}
-            />
+                    <EditPostForm
+                        post={editPost}
+                        open={!!editPost}
+                        onClose={handleCloseEditPost}
+                        onPostUpdated={(updatedPost) => {
+                            setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
+                            handleCloseEditPost();
+                        }}
+                    />
 
-            <Button variant="outlined" color="error" onClick={handleClickOpen}>
-                Skapa nytt inlägg...
-            </Button>
+                    <FilterPost
+                        categories={categories}
+                        activeNavCategory={activeNavCategory}
+                        checkedCategories={checkedCategories}
+                        filterAnchorEl={filterAnchorEl}
+                        onNavCategoryClick={handleNavCategoryClick}
+                        onFilterIconClick={handleFilterIconClick}
+                        onFilterClose={handleFilterClose}
+                        onCheckboxChange={handleCheckboxChange}
+                        onClearFilters={handleClearFilters}
+                    />
 
-            <FilterPost
-                categories={categories}
-                activeNavCategory={activeNavCategory}
-                checkedCategories={checkedCategories}
-                filterAnchorEl={filterAnchorEl}
-                onNavCategoryClick={handleNavCategoryClick}
-                onFilterIconClick={handleFilterIconClick}
-                onFilterClose={handleFilterClose}
-                onCheckboxChange={handleCheckboxChange}
-                onClearFilters={handleClearFilters}
-            />
+                    <Dialog
+                        open={openPostModal}
+                        onClose={handleClose}
+                        fullWidth
+                        maxWidth="sm"
+                    >
+                        <DialogTitle>Skapa nytt inlägg</DialogTitle>
+                        <PostForm
+                            onPostCreated={handlePostCreated}
+                            onClose={handleClose}
+                        />
+                        <DialogActions>
+                            <Button variant="text" color="inherit" onClick={handleClose}>
+                                Avbryt
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
 
-            <Dialog
-                open={openPostModal}
-                onClose={handleClose}
-                fullWidth
-                maxWidth="sm"
-            >
-                <DialogTitle>Skapa nytt inlägg</DialogTitle>
-                <PostForm
-                    onPostCreated={handlePostCreated}
-                    onClose={handleClose}
-                />
-                <DialogActions>
-                    <Button variant="text" color="inherit" onClick={handleClose}>
-                        Avbryt
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            <ReportForm
-                open={openReportModal}
-                postId={selectedPostId}
-                onClose={handleReportClose}
-            />
-
-            <Menu
-                id="post-menu"
-                anchorEl={menuAnchorEl}
-                open={Boolean(menuAnchorEl)}
-                onClose={handleMenuClose}
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                transformOrigin={{ vertical: "top", horizontal: "right" }}
-            >
-                {currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser ? (
-                    <>
-                        <MenuItem onClick={() => {
-                            handleOpenPostDelete(selectedPostId);
-                            handleMenuClose();
-                        }}>Radera inlägg</MenuItem>
-                        <MenuItem onClick={() => {
-                            handleOpenEditPost(posts.find(p => p.id === selectedPostId));
-                            handleMenuClose();
-                        }}>Redigera inlägg</MenuItem>
-                    </>
-                ) : (
-                    <MenuItem onClick={handleReport}>Anmäl inlägg</MenuItem>
-                )}
-            </Menu>
-
-            {filteredPosts.map((post) => (
-                <Card key={post.id} sx={{ maxWidth: 500, marginBottom: 2 }}>
-                    <CardHeader
-                        title={post.title}
-                        subheader={`${post.userName} • ${moment(post.createdAt).fromNow()}`}
-                        action={
-                            <IconButton
-                                aria-label="more"
-                                id={"post-menu-button-" + post.id}
-                                aria-controls={menuAnchorEl ? "post-menu" : undefined}
-                                aria-expanded={menuAnchorEl ? "true" : undefined}
-                                aria-haspopup="true"
-                                onClick={(event) => handleMenuOpen(event, post.id)}
-                            >
-                                <MoreHorizIcon />
-                            </IconButton>
+                    <ReportForm
+                        open={openReportModal}
+                        postId={selectedPostId}
+                        onClose={handleReportClose}
+                    />
+                    
+                    {/* This is the dialog that appears when you click the three dots on a post.*/}
+                    <PostActionsDialog
+                        open={Boolean(menuAnchorEl)}
+                        onClose={handleMenuClose}
+                        onReport={handleReport}
+                        onDelete={() => handleOpenPostDelete(selectedPostId)}
+                        onEdit={() => {handleOpenEditPost(posts.find(p => p.id === selectedPostId)); 
+                        handleMenuClose();
+                        }}
+                        isOwner={
+                            currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser
                         }
                     />
 
-                    <CardContent>
-                        <Typography variant="body2" color="text.secondary">
-                            {post.content}
-                        </Typography>
-
-                        {post.category && (
-                            <Typography
-                                variant="subtitle2"
-                                color="text.secondary"
-                                sx={{ mt: 1 }}
-                            >
-                                Kategori: {post.category.name || post.category}
-                            </Typography>
-                        )}
-
-                        {post.tags && post.tags.length > 0 && (
-                            <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                sx={{ mt: 1 }}
-                            >
-                                Trigger: {post.tags.map((tag) => tag.name || tag).join(", ")}
-                            </Typography>
-                        )}
-                    </CardContent>
-
-                    <IconButton aria-label="share">
-                        <ShareIcon />
-                    </IconButton>
-
-                    <HugButton type="post" id={post.id} />
-
-                    <ExpandMore
-                        expand={expanded === post.id}
-                        onClick={() => handleExpandClick(post.id)}
-                        aria-expanded={expanded === post.id}
-                        aria-label="Visa kommentarerna"
-                    >
-                        <ExpandMoreIcon />
-                    </ExpandMore>
-
-                    <Collapse in={expanded === post.id} timeout="auto" unmountOnExit>
-                        <CardContent
-                            sx={{ bgcolor: "#f9f9f9", borderTop: "1px solid #eee" }}
-                        >
-                            <Typography variant="subtitle2" gutterBottom>
-                                Kommentarer
-                            </Typography>
-                            <CommentForm postId={post.id} />
-                        </CardContent>
-                    </Collapse>
-                </Card>
-            ))}
+                    {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
+                    each post. The PostCard component is responsible for displaying the post content, as well as handling the 
+                    expand/collapse of the comment section and the menu actions for reporting, editing, and deleting posts. */}
+                    {filteredPosts.map((post) => (
+                        <PostCard
+                            key={post.id}
+                            post={post}
+                            expanded={expanded === post.id}
+                            onExpand={() => handleExpandClick(post.id)}
+                            onMenuOpen={(event) => handleMenuOpen(event, post.id)}
+                        />
+                    ))}
+                </div>
+            </div>
         </>
     );
 };
-
 export default ForumPage;

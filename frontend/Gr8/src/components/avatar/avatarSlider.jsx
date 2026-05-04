@@ -70,7 +70,6 @@ export default function AvatarSlider({ formData, handleChange, mt = 2, mb = 2 })
                                         transform: isActive ? 'scale(1.5)' : 'scale(0.9)',
                                         opacity: 1,
                                         px: 1,
-                                        //zIndex: isActive ? 10 : 1
                                     }}
                                 >
                                     <CustomAvatar

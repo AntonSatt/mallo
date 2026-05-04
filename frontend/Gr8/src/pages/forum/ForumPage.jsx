@@ -31,14 +31,13 @@ const ForumPage = () => {
     const [deletePostId, setDeletePostId] = useState(null);
     const [editPost, setEditPost] = useState(null);
 
-    const handleOpenEditPost = (post) => setEditPost(post);
-    const handleCloseEditPost = () => setEditPost(null);
-
     const [activeNavCategory, setActiveNavCategory] = useState("Alla");
     const [filterAnchorEl, setFilterAnchorEl] = useState(null);
     const [checkedCategories, setCheckedCategories] = useState([]);
     const [categories, setCategories] = useState([]);
 
+    const handleOpenEditPost = (post) => setEditPost(post);
+    const handleCloseEditPost = () => setEditPost(null);
 
     const handleOpenPostDelete = (postId) => {
         setDeletePostId(postId);

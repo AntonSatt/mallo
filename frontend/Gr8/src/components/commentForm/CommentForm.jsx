@@ -1,3 +1,4 @@
+import './CommentForm.css';
 import { useEffect, useState } from "react";
 import CommentServices from "../../services/CommentServices";
 import ReportForm from "../reportForm/ReportForm";
@@ -153,7 +154,9 @@ const CommentForm = ({ postId }) => {
                             </Typography>
 
                             {c.id && (
-                                <HugButton type="comment" id={c.id}/>
+                                <div className="comment-hug-button">
+                                    <HugButton type="comment" id={c.id}/>
+                                </div>
                             )}
                             {editingCommentId === c.id && (
                                 <Box sx={{ mt: 2 }}>

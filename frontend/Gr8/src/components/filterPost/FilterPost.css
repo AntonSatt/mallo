@@ -1,0 +1,33 @@
+.filter-button {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    background-color: var(--color-bg-surface) !important;
+    box-shadow: 0 4px 10px rgba(55, 73, 87, 0.12) !important;
+}
+
+.filter-icon-img {
+    width: 26px;
+    height: 26px;
+    display: block;
+}
+
+.filter-chip {
+    height: 38px !important;
+    min-width: unset !important;
+    border-radius: 999px !important;
+    background-color: var(--color-bg-surface) !important;
+    border: none !important;
+    box-shadow: 0 4px 10px rgba(55, 73, 87, 0.12) !important;
+    flex-shrink: 0;
+}
+
+.filter-chip .MuiChip-label {
+    padding: 0 16px !important;
+    font-size: 0.95rem !important;
+}
+
+.filter-chip.active {
+    background-color: var(--color-primary) !important;
+    color: var(--color-text-inverse);
+}

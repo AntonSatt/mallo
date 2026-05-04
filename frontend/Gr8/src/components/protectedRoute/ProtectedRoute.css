@@ -1,0 +1,6 @@
+.protected-route-content {
+    min-height: 100dvh;
+    box-sizing: border-box;
+    padding-bottom: 90px;
+    background-color: var(--color-primary-bg);
+}

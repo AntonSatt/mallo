@@ -191,107 +191,113 @@ const ForumPage = () => {
         <>
             <div className="forum-page">
                 <div className="forum-container">
-                    <Box className="scrollbar" sx={{
-                        width: "100%",
 
-                        height: {xs: "auto", md: "calc(100vh - 90px)"},
-                        
-                        overflowY: {xs: "visible",md: "auto"},
-                        overflowX: "hidden",
+                    {!isDesktop && <ProfileBar showCreate onCreatePost={handleClickOpen} />}
 
-                        '&::-webkit-scrollbar': {width: '8px',},
+                    <DeletePost
+                        postId={deletePostId}
+                        open={!!deletePostId}
+                        onClose={handleClosePostDelete}
+                        onPostDeleted={(id) => {
+                            setPosts(prev => prev.filter(p => p.id !== id));
+                            handleClosePostDelete();
+                        }}
+                    />
 
-                        '&::-webkit-scrollbar-track': {background: 'transparent',},
+                    <EditPostForm
+                        post={editPost}
+                        open={!!editPost}
+                        onClose={handleCloseEditPost}
+                        onPostUpdated={(updatedPost) => {
+                            setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
+                            handleCloseEditPost();
+                        }}
+                    />
 
-                        '&::-webkit-scrollbar-thumb': {
-                            backgroundColor: '#fff',
-                            borderRadius: '10px',},
-                    }}>
-                        {!isDesktop && <ProfileBar showCreate onCreatePost={handleClickOpen} />}
+                    <FilterPost
+                        categories={categories}
+                        activeNavCategory={activeNavCategory}
+                        checkedCategories={checkedCategories}
+                        filterAnchorEl={filterAnchorEl}
+                        onNavCategoryClick={handleNavCategoryClick}
+                        onFilterIconClick={handleFilterIconClick}
+                        onFilterClose={handleFilterClose}
+                        onCheckboxChange={handleCheckboxChange}
+                        onClearFilters={handleClearFilters}
+                    />
 
-                        <DeletePost
-                            postId={deletePostId}
-                            open={!!deletePostId}
-                            onClose={handleClosePostDelete}
-                            onPostDeleted={(id) => {
-                                setPosts(prev => prev.filter(p => p.id !== id));
-                                handleClosePostDelete();
-                            }}
-                        />
-
-                        <EditPostForm
-                            post={editPost}
-                            open={!!editPost}
-                            onClose={handleCloseEditPost}
-                            onPostUpdated={(updatedPost) => {
-                                setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
-                                handleCloseEditPost();
-                            }}
-                        />
-
-                        <FilterPost
-                            categories={categories}
-                            activeNavCategory={activeNavCategory}
-                            checkedCategories={checkedCategories}
-                            filterAnchorEl={filterAnchorEl}
-                            onNavCategoryClick={handleNavCategoryClick}
-                            onFilterIconClick={handleFilterIconClick}
-                            onFilterClose={handleFilterClose}
-                            onCheckboxChange={handleCheckboxChange}
-                            onClearFilters={handleClearFilters}
-                        />
-
-                        <Dialog
-                            open={openPostModal}
+                    <Dialog
+                        open={openPostModal}
+                        onClose={handleClose}
+                        fullWidth
+                        maxWidth="sm"
+                    >
+                        <DialogTitle>Skapa nytt inlägg</DialogTitle>
+                        <PostForm
+                            onPostCreated={handlePostCreated}
                             onClose={handleClose}
-                            fullWidth
-                            maxWidth="sm"
-                        >
-                            <DialogTitle>Skapa nytt inlägg</DialogTitle>
-                            <PostForm
-                                onPostCreated={handlePostCreated}
-                                onClose={handleClose}
-                            />
-                            <DialogActions>
-                                <Button variant="text" color="inherit" onClick={handleClose}>
-                                    Avbryt
-                                </Button>
-                            </DialogActions>
-                        </Dialog>
-
-                        <ReportForm
-                            open={openReportModal}
-                            postId={selectedPostId}
-                            onClose={handleReportClose}
                         />
+                        <DialogActions>
+                            <Button variant="text" color="inherit" onClick={handleClose}>
+                                Avbryt
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
 
-                        {/* This is the dialog that appears when you click the three dots on a post.*/}
-                        <PostActionsDialog
-                            open={Boolean(menuAnchorEl)}
-                            onClose={handleMenuClose}
-                            onReport={handleReport}
-                            onDelete={() => handleOpenPostDelete(selectedPostId)}
-                            onEdit={() => {
-                                handleOpenEditPost(posts.find(p => p.id === selectedPostId));
-                                handleMenuClose();
-                            }}
-                            isOwner={
-                                currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser
-                            }
-                        />
+                    <ReportForm
+                        open={openReportModal}
+                        postId={selectedPostId}
+                        onClose={handleReportClose}
+                    />
 
-                        {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
+                    {/* This is the dialog that appears when you click the three dots on a post.*/}
+                    <PostActionsDialog
+                        open={Boolean(menuAnchorEl)}
+                        onClose={handleMenuClose}
+                        onReport={handleReport}
+                        onDelete={() => handleOpenPostDelete(selectedPostId)}
+                        onEdit={() => {
+                            handleOpenEditPost(posts.find(p => p.id === selectedPostId));
+                            handleMenuClose();
+                        }}
+                        isOwner={
+                            currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser
+                        }
+                    />
+
+                    <Box className="scrollbar"
+                        sx={{
+                            width: "100%",
+
+                            height: { xs: "auto", md: "calc(100vh - 30px)" },
+
+                            overflowY: { xs: "visible", md: "auto" },
+                            overflowX: "hidden",
+
+                            '&::-webkit-scrollbar': { width: '6px', },
+
+                            '&::-webkit-scrollbar-track': { background: 'transparent', },
+
+                            '&::-webkit-scrollbar-thumb': {
+                                backgroundColor: '#fff',
+                                borderRadius: '10px',
+                            },
+                        }}>
+
+                        <Box sx={{ pr: { md: 2 } }}> {/*adds padding for scrollbar.*/}
+                            {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
                     each post. The PostCard component is responsible for displaying the post content, as well as handling the 
                     expand/collapse of the comment section and the menu actions for reporting, editing, and deleting posts. */}
-                        {filteredPosts.map((post) => (
-                            <PostCard
-                                key={post.id}
-                                post={post}
-                                expanded={expanded === post.id}
-                                onExpand={() => handleExpandClick(post.id)}
-                                onMenuOpen={(event) => handleMenuOpen(event, post.id)}
-                            />
-                        ))}
+                            {filteredPosts.map((post) => (
+                                <PostCard
+                                    key={post.id}
+                                    post={post}
+                                    expanded={expanded === post.id}
+                                    onExpand={() => handleExpandClick(post.id)}
+                                    onMenuOpen={(event) => handleMenuOpen(event, post.id)}
+                                />
+                            ))}
+                        </Box>
                     </Box>
                 </div>
             </div>

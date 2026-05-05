@@ -15,25 +15,21 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: flex-end;
     padding: 0;
-    height: 280px;
+    height: 245px;
     overflow: visible;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .landing-image-wrapper {
-    transform: translateY(50px);
-    z-index: 2;
+    height: 100%;
     display: flex;
-    justify-content: center;
 }
 
 .landing-image {
     width: 100%;
-    height: auto;
-    display: block;
-    margin-top: 7px;
+    max-width: 1440px;
 }
 
 .landing-page {
@@ -42,39 +38,104 @@
     flex-direction: column;
     justify-content: flex-start !important;
     align-items: center;
-    margin-top: 0px;
+    margin-top: 30px;
 }
 
 .landing-content {
-    width: 100%;
-    max-width: 320px;
     text-align: center;
-    margin-top: -150px;
 }
 
-.heart-red,
-.heart-pink,
-.heart-yellow {
+.heart {
     position: absolute;
     pointer-events: none;
 }
 
-.heart-red {
+#heart-red-left {
     bottom: -20px;
     left: -20px;
     width: 150px;
 }
 
-.heart-pink {
+#heart-red-right {
+    bottom: -20px;
+    right: -20px;
+    width: 150px;
+}
+
+#heart-pink {
     bottom: 70px;
     left: 85px;
-    width: 100px;
+    width: 90px;
     z-index: -1;
 }
 
-.heart-yellow {
+#heart-yellow {
     bottom: 20px;
     left: 150px;
     width: 50px;
     z-index: -1;
+}
+
+@media (min-width: 1024px) {
+    .landing-picture {
+        height: 300px;
+    }
+
+    .landing-page {
+        margin-top: 50px;
+    }
+
+    #heart-pink {
+        bottom: 120px;
+        left: 300px;
+        width: 70px;
+        z-index: -1;
+    }
+
+    #heart-yellow {
+        bottom: 60px;
+        left: 420px;
+        width: 50px;
+        z-index: -1;
+    }
+
+    #mini-red-heart {
+        bottom: 40px;
+        left: auto;
+        right: 200px;
+        width: 80px;
+        z-index: -1;
+    }
+
+    #heart-pink-right {
+        margin-top: 370px;
+        left: auto;
+        right: 2px;
+        width: 120px;
+        z-index: -1;
+    }
+
+    #heart-red-bottom {
+        bottom: 5px;
+        left: 150px;
+        width: 180px;
+        z-index: -1;
+    }
+
+    #heart-yellow-right {
+        bottom: 200px;
+        left: auto;
+        right: 130px;
+        width: 90px;
+        z-index: -1;
+    }
+
+    #heart-mini-pink-right {
+        bottom: 120px;
+        left: auto;
+        right: 90px;
+        width: 60px;
+        z-index: -1;
+    }
+
 }

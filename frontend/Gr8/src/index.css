@@ -48,6 +48,9 @@
     --input-bg: var(--color-bg-muted);
 
     --scrollbar-color: var(--color-ui-muted);
+
+    --content-width-mobile: 430px;
+    --content-width-desktop: 490px;
 }
 
 html,

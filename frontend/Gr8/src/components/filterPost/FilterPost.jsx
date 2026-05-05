@@ -1,5 +1,6 @@
 import './FilterPost.css';
 import FilterIcon from "../../assets/icons/filter.svg";
+import useViewport from "../../hooks/useViewport.js";
 
 import {
     Stack,
@@ -25,6 +26,9 @@ const CategoryFilter = ({
     onCheckboxChange,
     onClearFilters,
 }) => {
+
+    const { isDesktop } = useViewport();
+
     return (
         <>
             <Stack
@@ -57,8 +61,9 @@ const CategoryFilter = ({
                 onClick={() => onNavCategoryClick("Dina inlägg")}
                 className={activeNavCategory === "Dina inlägg" && checkedCategories.length === 0 ? "filter-chip active" : "filter-chip"} 
                 />
-
-                {categories.slice(0, 3).map(cat => (
+                
+                {/*isDEsktop is used to determine wheter to show all categories as chips or not.*/}
+                {!isDesktop && categories.slice(0, 3).map(cat => (
                     <Chip
                         key={cat.id}
                         label={cat.name}

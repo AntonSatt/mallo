@@ -5,12 +5,14 @@ import DeletePost from "../../components/deleteForm/DeletePost.jsx";
 import PostServices from "../../services/PostServices";
 import EditPostForm from "../../components/editPostForm/EditPostForm.jsx";
 import { useAuth } from "../../hooks/useAuth";
+import useViewport from "../../hooks/useViewport";
 import FilterPost from "../../components/filterPost/FilterPost.jsx";
 import PostCard from "../../components/postCard/PostCard.jsx";
 import ProfileBar from "../../components/layout/ProfileBar.jsx";
 import PostActionsDialog from "../../components/postActionsDialog/PostActionsDialog.jsx";
 
 import {
+    Box,
     Button,
     Dialog,
     DialogTitle,
@@ -21,6 +23,7 @@ import { useEffect, useState, useMemo } from "react";
 
 const ForumPage = () => {
     const { currentUser } = useAuth();
+    const { isDesktop } = useViewport();
     const [expanded, setExpanded] = useState(null);
     const [openPostModal, setPostModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
@@ -188,90 +191,108 @@ const ForumPage = () => {
         <>
             <div className="forum-page">
                 <div className="forum-container">
-                    <ProfileBar showCreate onCreatePost={handleClickOpen} />
+                    <Box className="scrollbar" sx={{
+                        width: "100%",
 
-                    <DeletePost
-                        postId={deletePostId}
-                        open={!!deletePostId}
-                        onClose={handleClosePostDelete}
-                        onPostDeleted={(id) => {
-                            setPosts(prev => prev.filter(p => p.id !== id));
-                            handleClosePostDelete();
-                        }}
-                    />
+                        height: {xs: "auto", md: "calc(100vh - 90px)"},
+                        
+                        overflowY: {xs: "visible",md: "auto"},
+                        overflowX: "hidden",
 
-                    <EditPostForm
-                        post={editPost}
-                        open={!!editPost}
-                        onClose={handleCloseEditPost}
-                        onPostUpdated={(updatedPost) => {
-                            setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
-                            handleCloseEditPost();
-                        }}
-                    />
+                        '&::-webkit-scrollbar': {width: '8px',},
 
-                    <FilterPost
-                        categories={categories}
-                        activeNavCategory={activeNavCategory}
-                        checkedCategories={checkedCategories}
-                        filterAnchorEl={filterAnchorEl}
-                        onNavCategoryClick={handleNavCategoryClick}
-                        onFilterIconClick={handleFilterIconClick}
-                        onFilterClose={handleFilterClose}
-                        onCheckboxChange={handleCheckboxChange}
-                        onClearFilters={handleClearFilters}
-                    />
+                        '&::-webkit-scrollbar-track': {background: 'transparent',},
 
-                    <Dialog
-                        open={openPostModal}
-                        onClose={handleClose}
-                        fullWidth
-                        maxWidth="sm"
-                    >
-                        <DialogTitle>Skapa nytt inlägg</DialogTitle>
-                        <PostForm
-                            onPostCreated={handlePostCreated}
-                            onClose={handleClose}
+                        '&::-webkit-scrollbar-thumb': {
+                            backgroundColor: '#fff',
+                            borderRadius: '10px',},
+                    }}>
+                        {!isDesktop && <ProfileBar showCreate onCreatePost={handleClickOpen} />}
+
+                        <DeletePost
+                            postId={deletePostId}
+                            open={!!deletePostId}
+                            onClose={handleClosePostDelete}
+                            onPostDeleted={(id) => {
+                                setPosts(prev => prev.filter(p => p.id !== id));
+                                handleClosePostDelete();
+                            }}
                         />
-                        <DialogActions>
-                            <Button variant="text" color="inherit" onClick={handleClose}>
-                                Avbryt
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
 
-                    <ReportForm
-                        open={openReportModal}
-                        postId={selectedPostId}
-                        onClose={handleReportClose}
-                    />
-                    
-                    {/* This is the dialog that appears when you click the three dots on a post.*/}
-                    <PostActionsDialog
-                        open={Boolean(menuAnchorEl)}
-                        onClose={handleMenuClose}
-                        onReport={handleReport}
-                        onDelete={() => handleOpenPostDelete(selectedPostId)}
-                        onEdit={() => {handleOpenEditPost(posts.find(p => p.id === selectedPostId)); 
-                        handleMenuClose();
-                        }}
-                        isOwner={
-                            currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser
-                        }
-                    />
+                        <EditPostForm
+                            post={editPost}
+                            open={!!editPost}
+                            onClose={handleCloseEditPost}
+                            onPostUpdated={(updatedPost) => {
+                                setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
+                                handleCloseEditPost();
+                            }}
+                        />
 
-                    {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
+                        <FilterPost
+                            categories={categories}
+                            activeNavCategory={activeNavCategory}
+                            checkedCategories={checkedCategories}
+                            filterAnchorEl={filterAnchorEl}
+                            onNavCategoryClick={handleNavCategoryClick}
+                            onFilterIconClick={handleFilterIconClick}
+                            onFilterClose={handleFilterClose}
+                            onCheckboxChange={handleCheckboxChange}
+                            onClearFilters={handleClearFilters}
+                        />
+
+                        <Dialog
+                            open={openPostModal}
+                            onClose={handleClose}
+                            fullWidth
+                            maxWidth="sm"
+                        >
+                            <DialogTitle>Skapa nytt inlägg</DialogTitle>
+                            <PostForm
+                                onPostCreated={handlePostCreated}
+                                onClose={handleClose}
+                            />
+                            <DialogActions>
+                                <Button variant="text" color="inherit" onClick={handleClose}>
+                                    Avbryt
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+
+                        <ReportForm
+                            open={openReportModal}
+                            postId={selectedPostId}
+                            onClose={handleReportClose}
+                        />
+
+                        {/* This is the dialog that appears when you click the three dots on a post.*/}
+                        <PostActionsDialog
+                            open={Boolean(menuAnchorEl)}
+                            onClose={handleMenuClose}
+                            onReport={handleReport}
+                            onDelete={() => handleOpenPostDelete(selectedPostId)}
+                            onEdit={() => {
+                                handleOpenEditPost(posts.find(p => p.id === selectedPostId));
+                                handleMenuClose();
+                            }}
+                            isOwner={
+                                currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser
+                            }
+                        />
+
+                        {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
                     each post. The PostCard component is responsible for displaying the post content, as well as handling the 
                     expand/collapse of the comment section and the menu actions for reporting, editing, and deleting posts. */}
-                    {filteredPosts.map((post) => (
-                        <PostCard
-                            key={post.id}
-                            post={post}
-                            expanded={expanded === post.id}
-                            onExpand={() => handleExpandClick(post.id)}
-                            onMenuOpen={(event) => handleMenuOpen(event, post.id)}
-                        />
-                    ))}
+                        {filteredPosts.map((post) => (
+                            <PostCard
+                                key={post.id}
+                                post={post}
+                                expanded={expanded === post.id}
+                                onExpand={() => handleExpandClick(post.id)}
+                                onMenuOpen={(event) => handleMenuOpen(event, post.id)}
+                            />
+                        ))}
+                    </Box>
                 </div>
             </div>
         </>

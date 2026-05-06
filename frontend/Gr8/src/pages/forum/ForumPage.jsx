@@ -5,6 +5,7 @@ import DeletePost from "../../components/deleteForm/DeletePost.jsx";
 import PostServices from "../../services/PostServices";
 import EditPostForm from "../../components/editPostForm/EditPostForm.jsx";
 import { useAuth } from "../../hooks/useAuth";
+import useViewport from "../../hooks/useViewport";
 import FilterPost from "../../components/filterPost/FilterPost.jsx";
 import PostCard from "../../components/postCard/PostCard.jsx";
 import ProfileBar from "../../components/layout/ProfileBar.jsx";
@@ -21,6 +22,8 @@ import { useEffect, useState, useMemo } from "react";
 
 const ForumPage = () => {
     const { currentUser } = useAuth();
+    const { isDesktop } = useViewport();
+    
     const [expanded, setExpanded] = useState(null);
     const [openPostModal, setPostModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
@@ -188,7 +191,7 @@ const ForumPage = () => {
         <>
             <div className="forum-page">
                 <div className="forum-container">
-                    <ProfileBar showCreate onCreatePost={handleClickOpen} />
+                    { !isDesktop && <ProfileBar showCreate onCreatePost={handleClickOpen} /> }
 
                     <DeletePost
                         postId={deletePostId}

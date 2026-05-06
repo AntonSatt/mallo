@@ -48,3 +48,15 @@
     opacity: 1;
     transform: scale(1.1);
 }
+
+@media (min-width: 1024px) {
+    .Mui-selected .icon-container::before {
+        top: auto;
+        bottom: -6px;
+        border-radius: 45px 45px 0 0;
+    }
+
+    .Mui-selected .icon-ball {
+        transform: translateY(20px);
+    }
+}

@@ -40,13 +40,14 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import PostServices from "../../services/PostServices";
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import SettingsButtonStyles from "../../design/buttons/SettingsButton.jsx";
 
 // User Settings Page: Provides an interface for users to update their profile information, change their password, and delete their account. 
 // Utilizes accordions for organized sections and handles form validation and API interactions for user data management.
 
 const UserSettings = () => {
 
-    const { currentUser, logout } = useAuth();
+    const { logout } = useAuth();
     const { deleteAccount } = useAuth();
     const [profileData, setProfileData] = useState({
         firstName: "",
@@ -206,48 +207,23 @@ const UserSettings = () => {
         setOpen(false);
     };
 
-    const handleShowCurrentPassword = async () => {
-        setShowCurrentPassword((show) => !show);
-    };
-
-    const handleShowNewPassword = async () => {
-        setShowNewPassword((show) => !show);
-    };
-
-    const handleShowConfirmPassword = async () => {
-        setShowConfirmPassword((show) => !show);
-    };
-
-    const handleMouseDownPassword = (e) => {
-        e.preventDefault();
-    };
-
     return (
         <>
             <Grid sx={{ display: 'flex', justifyContent: 'center', gap: 2, margin: '16px 0', padding: '0 16px' }}>
-                <Button
+                <Button 
                     onClick={logout}
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        backgroundColor: '#FFF0D4',
-                        borderRadius: 4,
-                        padding: '12px 16px',
-                        minWidth: 90,
-                        color: 'inherit',
-                        gap: 1,
-                        '&:hover': { backgroundColor: '#ffe4b5' }
-                    }}
+                    sx={SettingsButtonStyles}
                 >
                     <LogoutIcon sx={{ color: '#FFB57C' }} />
                     Logga ut
                 </Button>
 
-                <Box sx={{
+                <Box 
+                    className="settingsButton"
+                    sx={{
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    backgroundColor: '#FFF0D4',
                     borderRadius: 4,
                     padding: '12px 16px',
                     minWidth: 90,
@@ -258,18 +234,8 @@ const UserSettings = () => {
                 </Box>
 
                 <Button
-                    onClick={() => window.location.href = "/forum"}
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        backgroundColor: '#FFF0D4',
-                        borderRadius: 4,
-                        padding: '12px 16px',
-                        minWidth: 90,
-                        color: 'inherit',
-                        gap: 1,
-                        '&:hover': { backgroundColor: '#ffe4b5' }
-                    }}
+                    // onClick={() => window.location.href = "/forum"}
+                    sx={SettingsButtonStyles}
                 >
                     <InfoOutlinedIcon sx={{ color: '#FFB57C' }} />
                     Om appen
@@ -277,9 +243,8 @@ const UserSettings = () => {
             </Grid>
 
             <form onSubmit={handleProfileSubmit}>
-                <Accordion sx={{
+                <Accordion className="dropdown" sx={{
                     borderRadius: '20px !important',
-                    backgroundColor: 'white',
                     boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.08)',
                     '&:before': { display: 'none' },
                     mt: 2,
@@ -464,9 +429,8 @@ const UserSettings = () => {
             </form>
 
             <form onSubmit={handlePasswordSubmit}>
-                <Accordion sx={{
+                <Accordion className="dropdown" sx={{
                     borderRadius: '20px !important',
-                    backgroundColor: 'white',
                     boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.08)',
                     '&:before': { display: 'none' },
                     mt: 2,
@@ -521,7 +485,7 @@ const UserSettings = () => {
                                 }}
                             />
 
-                            <Typography variant="body2" color="textSecondary" align="center">
+                            <Typography variant="body2" color="Secondary" align="center">
                                 Nytt Lösenord
                             </Typography>
                             <InputField
@@ -606,10 +570,9 @@ const UserSettings = () => {
             </form>
 
             <form>
-                <Accordion
+                <Accordion className="dropdown"
                     sx={{
                         borderRadius: '20px !important',
-                        backgroundColor: 'white',
                         boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.08)',
                         '&:before': { display: 'none' },
                         mt: 2,

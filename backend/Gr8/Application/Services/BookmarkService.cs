@@ -1,4 +1,5 @@
-﻿using Gr8.Application.Interfaces;
+﻿using Gr8.Application.DTOs;
+using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -14,9 +15,16 @@ namespace Gr8.Application.Services
             _communityRepository = communityRepository;
         }
 
-        public Task<List<Bookmark?>> GetAllBookmarksAsync(string userId)
+        public async Task<List<BookmarkDto>> GetAllBookmarksByUserIdAsync(string userId, int postId)
         {
-            throw new NotImplementedException();
+            var bookmarks = await _communityRepository.GetAllBookmarksByUserIdAsync(userId, postId);
+
+            return bookmarks.Select(b => new BookmarkDto
+            {
+                UserId = b.UserId,
+                PostId = b.PostId
+
+            }).ToList();
         }
 
         public async Task<bool> TogglePostBookmarkAsync(int postId, string userId)

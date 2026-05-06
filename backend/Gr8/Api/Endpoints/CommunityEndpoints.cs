@@ -4,6 +4,7 @@ using Gr8.Application.Interfaces;
 using Gr8.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
@@ -283,6 +284,27 @@ namespace Gr8.Api.Endpoints
                 var bookmarked = await bookService.TogglePostBookmarkAsync(postId, appUser.Id);
 
                 return Results.Ok(new { bookmarked });
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapGet("/forum/bookmarks", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user, [FromServices] IBookmarkService bookService) =>
+            {
+                var appUser = await userManger.GetUserAsync(user);
+
+                if(appUser == null) 
+                {
+                    return Results.Unauthorized();
+                }
+
+                var savedBookmarks = await bookService.GetAllBookmarksByUserIdAsync(appUser.Id, 0);
+
+                if(savedBookmarks.Count == 0) 
+                {
+                    return Results.NoContent();
+                }
+
+                return Results.Ok(savedBookmarks);
+
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
         }
     }

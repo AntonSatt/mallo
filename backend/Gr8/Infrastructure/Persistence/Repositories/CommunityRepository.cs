@@ -131,11 +131,10 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             return await _communityDbContext.Bookmarks.FirstOrDefaultAsync(b => b.PostId == postId && b.UserId == userId);
         }
 
-        public async Task<List<Bookmark>> GetAllBookmarksAsync(string userId)
+        public async Task<List<Bookmark>> GetAllBookmarksByUserIdAsync(string userId, int postId)
         {
             return await _communityDbContext.Bookmarks
                 .Where(b => b.UserId == userId)
-                .Include(b => b.Post)
                 .ToListAsync();
         }
 

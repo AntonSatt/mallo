@@ -1,6 +1,33 @@
-.protected-route-content {
-    min-height: 100dvh;
-    box-sizing: border-box;
-    padding-bottom: 90px;
+.protected-route-layout {
+    height: 100dvh;
     background-color: var(--color-primary-bg);
+    overflow: hidden;
+}
+
+.protected-route-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.protected-route-content {
+    min-height: 0;
+    box-sizing: border-box;
+    padding-bottom: var(--protected-nav-height);
+    background-color: inherit;
+    overflow-y: auto;
+}
+
+@media (min-width: 1024px) {
+    .protected-route-layout {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+    }
+
+    .protected-route-content {
+        min-height: calc(100dvh - var(--protected-nav-height));
+        padding-bottom: 0;
+        overflow: visible;
+    }
 }

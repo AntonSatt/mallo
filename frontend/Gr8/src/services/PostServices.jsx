@@ -53,6 +53,10 @@ const PostServices = {
         });
         return response.data;
     },
+    getBookmarks: async () => {
+        const response = await ApiClient.get(`/forum/bookmarks`)
+        return response.data; 
+    }
 };
 
 export default PostServices;

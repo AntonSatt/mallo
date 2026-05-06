@@ -35,6 +35,7 @@ const ForumPage = () => {
     const [filterAnchorEl, setFilterAnchorEl] = useState(null);
     const [checkedCategories, setCheckedCategories] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [userBookmarks, setUserBookmarks] = useState([]);
 
     const handleOpenEditPost = (post) => setEditPost(post);
     const handleCloseEditPost = () => setEditPost(null);
@@ -121,14 +122,20 @@ const ForumPage = () => {
                 return checkedCategories.includes(cat);
             });
         }
-        if (activeNavCategory !== "Alla") {
+        if (activeNavCategory !== "Alla" && activeNavCategory !== "Sparade") {
             return posts.filter(p => {
                 const cat = p.category?.name || p.category;
                 return cat === activeNavCategory;
             });
         }
+        if (activeNavCategory == "Sparade") {
+            return posts.filter(p => {
+                return userBookmarks.some(b => b.postId === p.id);
+            });
+
+        }
         return posts;
-    }, [posts, activeNavCategory, checkedCategories]);
+    }, [posts, activeNavCategory, checkedCategories, userBookmarks]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -146,7 +153,6 @@ const ForumPage = () => {
         const fetchPosts = async () => {
             try {
                 const data = await PostServices.getAll();
-
                 if (!data) {
                     return;
                 }
@@ -155,7 +161,6 @@ const ForumPage = () => {
                     id: post.id,
                     title: post.title,
                     content: post.content ? post.content : "Innehåll saknas",
-                    userId: post.userId,
                     userName: post.userName,
                     createdAt: post.createdAt,
                     category: post.category ? post.category : "Ingen kategori",
@@ -168,6 +173,24 @@ const ForumPage = () => {
             }
         };
         fetchPosts();
+    }, []);
+
+    useEffect( () => {
+        const fetchBookmarks = async () => {
+            try{
+                const data = await PostServices.getBookmarks();
+
+                if(!data){
+                    return; 
+                }
+
+                setUserBookmarks(data);
+            }
+            catch(error){
+                console.error("Error fetching bookmarks:", error)
+            }
+        };
+        fetchBookmarks();
     }, []);
 
     const handlePostCreated = (newPost) => {
@@ -270,6 +293,9 @@ const ForumPage = () => {
                             expanded={expanded === post.id}
                             onExpand={() => handleExpandClick(post.id)}
                             onMenuOpen={(event) => handleMenuOpen(event, post.id)}
+                            userBookmarks={userBookmarks}
+                            currentUser={currentUser}
+                            setUserBookmarks={setUserBookmarks}
                         />
                     ))}
                 </div>

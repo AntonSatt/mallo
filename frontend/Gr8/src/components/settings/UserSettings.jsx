@@ -50,6 +50,7 @@ const UserSettings = () => {
     const { logout } = useAuth();
     const { deleteAccount } = useAuth();
     const [profileData, setProfileData] = useState({
+        avatar: null,
         firstName: "",
         lastName: "",
         ssn: "",
@@ -63,18 +64,20 @@ const UserSettings = () => {
         confirmNewPassword: ""
     });
     const [open, setOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const [tags, setTags] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
 
     const [errors, setErrors] = useState({});
 
-    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-    const [showNewPassword, setShowNewPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showCurrentPassword] = useState(false);
+    const [showNewPassword] = useState(false);
+    const [showConfirmPassword] = useState(false);
 
     const handleProfileChange = (e) => {
-        setProfileData({ ...profileData, [e.target.id]: e.target.value });
+        const key = e.target.id || e.target.name;
+        setProfileData({ ...profileData, [key]: e.target.value });
     };
 
     const handlePasswordChange = (e) => {
@@ -98,6 +101,7 @@ const UserSettings = () => {
                 const data = await UserServices.getUser();
 
                 setProfileData({
+                    avatar: data.avatar || null,
                     firstName: data.firstName || "",
                     lastName: data.lastName || "",
                     ssn: data.ssn || "",
@@ -107,6 +111,8 @@ const UserSettings = () => {
             }
             catch (error) {
                 console.error("Kunde inte hämta användardata", error);
+            } finally {
+                setIsLoading(false);
             }
         };
         fetchUserData();
@@ -147,6 +153,7 @@ const UserSettings = () => {
         }
 
         try {
+            console.log("Saving profileData:", profileData);
             const result = await UserServices.updateUser(profileData);
             console.log("Inställningar sparade!", result);
         }
@@ -210,7 +217,7 @@ const UserSettings = () => {
     return (
         <>
             <Grid sx={{ display: 'flex', justifyContent: 'center', gap: 2, margin: '16px 0', padding: '0 16px' }}>
-                <Button 
+                <Button
                     onClick={logout}
                     sx={SettingsButtonStyles}
                 >
@@ -218,17 +225,17 @@ const UserSettings = () => {
                     Logga ut
                 </Button>
 
-                <Box 
+                <Box
                     className="settingsButton"
                     sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    borderRadius: 4,
-                    padding: '12px 16px',
-                    minWidth: 90,
-                    gap: 1,
-                }}>
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        borderRadius: 4,
+                        padding: '12px 16px',
+                        minWidth: 90,
+                        gap: 1,
+                    }}>
                     <Switch defaultChecked size="small" />
                     <Typography variant="body2">Anonym</Typography>
                 </Box>
@@ -265,7 +272,9 @@ const UserSettings = () => {
                             justifyContent: 'center',
                             overflow: 'hidden',
                         }}>
-                            <AvatarSlider profileData={profileData} handleChange={handleProfileChange} mt={5} mb={2} />
+                            {!isLoading && (
+                                <AvatarSlider formData={profileData} handleChange={handleProfileChange} mt={5} mb={2} />
+                            )}
                         </Box>
                         <Box sx={{
                             display: 'flex',

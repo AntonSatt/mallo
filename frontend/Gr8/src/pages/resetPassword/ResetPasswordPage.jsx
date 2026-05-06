@@ -1,4 +1,4 @@
-import react, {useState} from 'react';
+import {useState} from 'react';
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Grid, Typography } from "@mui/material";
 import PrimaryButton from "../../design/buttons/PrimaryButton";

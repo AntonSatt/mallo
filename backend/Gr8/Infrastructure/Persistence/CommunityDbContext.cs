@@ -15,6 +15,7 @@ namespace Gr8.Infrastructure.Persistence
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Report> Reports => Set<Report>();
         public DbSet<Hug> Hugs => Set<Hug>();
+        public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
 
         public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
         {
@@ -153,6 +154,23 @@ namespace Gr8.Infrastructure.Persistence
                 //Ensures that a user can only hug a specific post/comment once.
                 entity.HasIndex(h => new { h.UserId, h.PostId }).IsUnique();
                 entity.HasIndex(h => new { h.UserId, h.CommentId }).IsUnique();
+            });
+
+            modelBuilder.Entity<Bookmark>(entity =>
+            {
+                entity.HasKey(b => b.Id);
+
+                entity.HasOne(b => b.Post)
+                .WithMany(p => p.Bookmarks)
+                .HasForeignKey(b => b.PostId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(b => b.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(b => new {b.UserId, b.PostId}).IsUnique();
             });
         }
     }

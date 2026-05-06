@@ -99,7 +99,8 @@ const RegisterForm = ({ step, setStep }) => {
         lastName: lastName || " ",
         ssn: formData.ssn,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        avatar: formData.avatar
       };
 
       await register(dataToSubmit);

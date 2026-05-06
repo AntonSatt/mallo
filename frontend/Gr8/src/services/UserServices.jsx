@@ -17,7 +17,8 @@ const UserServices = {
             lastName: userData.lastName,
             email: userData.email,
             password: userData.password,
-            socialNumber: userData.ssn
+            socialNumber: userData.ssn,
+            avatar: userData.avatar
         });
         const token = response.data.token;
         localStorage.setItem("token", token);
@@ -37,6 +38,7 @@ const UserServices = {
     },
     updateUser: async (userData) => {
         const response = await ApiClient.put("/users/me", {
+            avatar: userData.avatar,
             userName: userData.userName,
             firstName: userData.firstName,
             lastName: userData.lastName,

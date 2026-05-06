@@ -24,6 +24,7 @@ import { useEffect, useState, useMemo } from "react";
 const ForumPage = () => {
     const { currentUser } = useAuth();
     const { isDesktop } = useViewport();
+    
     const [expanded, setExpanded] = useState(null);
     const [openPostModal, setPostModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
@@ -38,6 +39,7 @@ const ForumPage = () => {
     const [filterAnchorEl, setFilterAnchorEl] = useState(null);
     const [checkedCategories, setCheckedCategories] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [userBookmarks, setUserBookmarks] = useState([]);
 
     const handleOpenEditPost = (post) => setEditPost(post);
     const handleCloseEditPost = () => setEditPost(null);
@@ -124,14 +126,20 @@ const ForumPage = () => {
                 return checkedCategories.includes(cat);
             });
         }
-        if (activeNavCategory !== "Alla") {
+        if (activeNavCategory !== "Alla" && activeNavCategory !== "Sparade") {
             return posts.filter(p => {
                 const cat = p.category?.name || p.category;
                 return cat === activeNavCategory;
             });
         }
+        if (activeNavCategory == "Sparade") {
+            return posts.filter(p => {
+                return userBookmarks.some(b => b.postId === p.id);
+            });
+
+        }
         return posts;
-    }, [posts, activeNavCategory, checkedCategories]);
+    }, [posts, activeNavCategory, checkedCategories, userBookmarks]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -149,7 +157,6 @@ const ForumPage = () => {
         const fetchPosts = async () => {
             try {
                 const data = await PostServices.getAll();
-
                 if (!data) {
                     return;
                 }
@@ -158,7 +165,6 @@ const ForumPage = () => {
                     id: post.id,
                     title: post.title,
                     content: post.content ? post.content : "Innehåll saknas",
-                    userId: post.userId,
                     userName: post.userName,
                     createdAt: post.createdAt,
                     category: post.category ? post.category : "Ingen kategori",
@@ -171,6 +177,24 @@ const ForumPage = () => {
             }
         };
         fetchPosts();
+    }, []);
+
+    useEffect( () => {
+        const fetchBookmarks = async () => {
+            try{
+                const data = await PostServices.getBookmarks();
+
+                if(!data){
+                    return; 
+                }
+
+                setUserBookmarks(data);
+            }
+            catch(error){
+                console.error("Error fetching bookmarks:", error)
+            }
+        };
+        fetchBookmarks();
     }, []);
 
     const handlePostCreated = (newPost) => {
@@ -288,17 +312,18 @@ const ForumPage = () => {
                             {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
                     each post. The PostCard component is responsible for displaying the post content, as well as handling the 
                     expand/collapse of the comment section and the menu actions for reporting, editing, and deleting posts. */}
-                            {filteredPosts.map((post) => (
-                                <PostCard
-                                    key={post.id}
-                                    post={post}
-                                    expanded={expanded === post.id}
-                                    onExpand={() => handleExpandClick(post.id)}
-                                    onMenuOpen={(event) => handleMenuOpen(event, post.id)}
-                                />
-                            ))}
-                        </Box>
-                    </Box>
+                    {filteredPosts.map((post) => (
+                        <PostCard
+                            key={post.id}
+                            post={post}
+                            expanded={expanded === post.id}
+                            onExpand={() => handleExpandClick(post.id)}
+                            onMenuOpen={(event) => handleMenuOpen(event, post.id)}
+                            userBookmarks={userBookmarks}
+                            currentUser={currentUser}
+                            setUserBookmarks={setUserBookmarks}
+                        />
+                    ))}
                 </div>
             </div>
         </>

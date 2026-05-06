@@ -138,6 +138,7 @@ const UserSettings = () => {
         if (!profileData.userName.trim()) newErrors.userName = "Användarnamn krävs";
         if (!profileData.firstName.trim()) newErrors.firstName = "Förnamn krävs"
         if (!profileData.lastName.trim()) newErrors.lastName = "Efternamn krävs"
+        if (!profileData.email.trim()) newErrors.email = "Email krävs"
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);

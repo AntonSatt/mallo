@@ -4,7 +4,6 @@ using Gr8.Application.Interfaces;
 using Gr8.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 

@@ -24,7 +24,7 @@ import { useEffect, useState, useMemo } from "react";
 const ForumPage = () => {
     const { currentUser } = useAuth();
     const { isDesktop } = useViewport();
-    
+
     const [expanded, setExpanded] = useState(null);
     const [openPostModal, setPostModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
@@ -179,18 +179,18 @@ const ForumPage = () => {
         fetchPosts();
     }, []);
 
-    useEffect( () => {
+    useEffect(() => {
         const fetchBookmarks = async () => {
-            try{
+            try {
                 const data = await PostServices.getBookmarks();
 
-                if(!data){
-                    return; 
+                if (!data) {
+                    return;
                 }
 
                 setUserBookmarks(data);
             }
-            catch(error){
+            catch (error) {
                 console.error("Error fetching bookmarks:", error)
             }
         };
@@ -312,18 +312,20 @@ const ForumPage = () => {
                             {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
                     each post. The PostCard component is responsible for displaying the post content, as well as handling the 
                     expand/collapse of the comment section and the menu actions for reporting, editing, and deleting posts. */}
-                    {filteredPosts.map((post) => (
-                        <PostCard
-                            key={post.id}
-                            post={post}
-                            expanded={expanded === post.id}
-                            onExpand={() => handleExpandClick(post.id)}
-                            onMenuOpen={(event) => handleMenuOpen(event, post.id)}
-                            userBookmarks={userBookmarks}
-                            currentUser={currentUser}
-                            setUserBookmarks={setUserBookmarks}
-                        />
-                    ))}
+                            {filteredPosts.map((post) => (
+                                <PostCard
+                                    key={post.id}
+                                    post={post}
+                                    expanded={expanded === post.id}
+                                    onExpand={() => handleExpandClick(post.id)}
+                                    onMenuOpen={(event) => handleMenuOpen(event, post.id)}
+                                    userBookmarks={userBookmarks}
+                                    currentUser={currentUser}
+                                    setUserBookmarks={setUserBookmarks}
+                                />
+                            ))}
+                        </Box>
+                    </Box>
                 </div>
             </div>
         </>

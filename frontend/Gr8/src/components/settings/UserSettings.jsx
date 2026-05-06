@@ -218,7 +218,7 @@ const UserSettings = () => {
                     onClick={logout}
                     sx={SettingsButtonStyles}
                 >
-                    <LogoutIcon sx={{ color: '#FFB57C' }} />
+                    <LogoutIcon sx={{ color: '--color-primary' }} />
                     Logga ut
                 </Button>
 
@@ -241,7 +241,7 @@ const UserSettings = () => {
                     // onClick={() => window.location.href = "/forum"}
                     sx={SettingsButtonStyles}
                 >
-                    <InfoOutlinedIcon sx={{ color: '#FFB57C' }} />
+                    <InfoOutlinedIcon sx={{ color: '--color-primary' }} />
                     Om appen
                 </Button>
             </Grid>
@@ -253,7 +253,7 @@ const UserSettings = () => {
                     '&:before': { display: 'none' },
                     mt: 2,
                 }}>
-                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: '#FFB57C' }} />}>
+                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: '--color-primary' }} />}>
                         <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <img src={Settings} alt="edit" style={{
                                 width: 20,
@@ -424,7 +424,7 @@ const UserSettings = () => {
                         </Box>
 
                         <Box item sx={{ display: 'flex', justifyContent: 'center' }}>
-                            <SecondaryButton onClick={handleClickOpen} sx={{ borderRadius: 50, backgroundColor: '#f5f5f5', width: '50%', alignItems: 'center', mt: 2 }}>
+                        <SecondaryButton onClick={handleClickOpen} sx={{ borderRadius: 50, backgroundColor: '--color-bg-muted', width: '50%', alignItems: 'center', mt: 2 }}>
                                 Radera konto
                             </SecondaryButton>
                         </Box>
@@ -583,7 +583,7 @@ const UserSettings = () => {
                         '&:before': { display: 'none' },
                         mt: 2,
                     }}>
-                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: '#FFB57C' }} />} >
+                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />} >
                         <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1, }}>
                             <img src={Settings} alt="edit" style={{
                                 width: 20,

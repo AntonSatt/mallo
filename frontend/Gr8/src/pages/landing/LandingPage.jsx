@@ -8,17 +8,30 @@ import heartPink from "../../assets/icons/heartPink.svg";
 import heartYellow from "../../assets/icons/heartYellow.svg";
 import PrimaryButton from "../../design/buttons/PrimaryButton";
 import SecondaryButton from "../../design/buttons/SecondaryButton";
+import HoldingHands2 from "../../assets/images/holdingHands2.png";
+import useViewport from "../../hooks/useViewport";
+import heartMiniRed from "../../assets/icons/heartMiniRed.svg";
+import heartPinkRight from "../../assets/icons/heartPinkRight.svg";
+import heartRedBottom from "../../assets/icons/heartRedBottom.svg";
 import "./LandingPage.css";
 
 const LandingPage = () => {
     const navigate = useNavigate();
+    const { isMobile, isDesktop } = useViewport();
+
     return (
-        <Grid container spacing={0} className="landing-container">
+        <Grid container direction='column' className="landing-container">
 
             <Grid item xs={12} md={6} className="landing-picture">
-                <Box className="landing-image-wrapper">
-                    <img src={hold1} alt="Holding hands" className="landing-image" />
-                </Box>
+                {isMobile ? (
+                    <Box className="landing-image-wrapper">
+                        <img src={hold1} alt="Holding hands" className="landing-image" />
+                    </Box>
+                ) : (
+                    <Box>
+                        <img src={HoldingHands2} alt="Holding hands" className="landing-image" />
+                    </Box>
+                )}
             </Grid>
 
             <Grid item xs={12} md={6} className="landing-page">
@@ -60,9 +73,23 @@ const LandingPage = () => {
                 </Box>
             </Grid>
 
-            <Box component="img" src={heartRed} className="heart-red" />
-            <Box component="img" src={heartPink} className="heart-pink" />
-            <Box component="img" src={heartYellow} className="heart-yellow" />
+            {isDesktop ? (
+                <>
+                    <Box component="img" src={heartMiniRed} className="heart" id="mini-red-heart" />
+                    <Box component="img" src={heartPinkRight} className="heart" id="heart-pink-right" />
+                    <Box component="img" src={heartRedBottom} className="heart" id="heart-red-bottom" />
+                    <Box component="img" src={heartPink} className="heart" id="heart-pink" />
+                    <Box component="img" src={heartYellow} className="heart" id="heart-yellow" />
+                    <Box component="img" src={heartPink} className="heart" id="heart-mini-pink-right" />
+                    <Box component="img" src={heartYellow} className="heart" id="heart-yellow-right" />
+                </>
+            ) : (
+                <>
+                    <Box component="img" src={heartRed} className="heart" id="heart-red-left" />
+                    <Box component="img" src={heartPink} className="heart" id="heart-pink" />
+                    <Box component="img" src={heartYellow} className="heart" id="heart-yellow" />
+                </>
+            )}
         </Grid>
     );
 }

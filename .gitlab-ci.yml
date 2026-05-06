@@ -41,40 +41,6 @@ frontend-test:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "develop"
 
-# Catches package-lock.json drift before the build stage runs `npm ci` and
-# fails with a cryptic error. Replicates the build's `npm ci` check (with
-# --dry-run, so no install) and wraps the failure with a friendly hint.
-frontend-lockfile-check:
-  stage: test
-  image: node:22-alpine
-  script:
-    - cd frontend/Gr8
-    - corepack enable npm && corepack prepare npm@11.13.0 --activate
-    - |
-      if ! npm ci --dry-run --ignore-scripts 2>npm-error.log; then
-        echo ""
-        echo "==============================================================="
-        echo "ERROR: frontend/Gr8/package-lock.json is out of sync with package.json."
-        echo "The build stage will fail with 'npm ci' if this is not fixed."
-        echo ""
-        echo "To fix it, run this locally and push the result:"
-        echo ""
-        echo "  cd frontend/Gr8"
-        echo "  npm run sync-lock"
-        echo "  git add package-lock.json"
-        echo "  git commit -m 'Update package-lock.json'"
-        echo "  git push"
-        echo ""
-        echo "Original npm error:"
-        echo "==============================================================="
-        cat npm-error.log
-        exit 1
-      fi
-      echo "package-lock.json is in sync with package.json"
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH
-
 # ---------------------------------------------------------------------------
 # Test stage: Backend tests and coverage
 # ---------------------------------------------------------------------------

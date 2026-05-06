@@ -279,12 +279,12 @@ const ForumPage = () => {
                             '&::-webkit-scrollbar-track': { background: 'transparent', },
 
                             '&::-webkit-scrollbar-thumb': {
-                                backgroundColor: '#fff',
+                                backgroundColor: 'white',
                                 borderRadius: '10px',
                             },
                         }}>
 
-                        <Box sx={{ pr: { md: 2 } }}> {/*adds padding for scrollbar.*/}
+                        <Box sx={{ px: { md: 1 } }}> {/*adds padding for scrollbar.*/}
                             {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
                     each post. The PostCard component is responsible for displaying the post content, as well as handling the 
                     expand/collapse of the comment section and the menu actions for reporting, editing, and deleting posts. */}

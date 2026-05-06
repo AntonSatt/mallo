@@ -47,7 +47,7 @@ const CategoryFilter = ({
 
                     ml: {
                         xs: 0,
-                        md: "99px", //controls the distance from the left edge of the screen to the filter bar in desktop view.
+                        md: "110px", //controls the distance from the left edge of the screen to the filter bar in desktop view.
                     },
 
                     overflowX: { 

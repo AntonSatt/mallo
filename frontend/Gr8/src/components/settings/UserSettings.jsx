@@ -153,9 +153,7 @@ const UserSettings = () => {
         }
 
         try {
-            console.log("Saving profileData:", profileData);
             const result = await UserServices.updateUser(profileData);
-            console.log("Inställningar sparade!", result);
         }
         catch (error) {
             if (error.response && error.response.status === 409) {
@@ -181,7 +179,6 @@ const UserSettings = () => {
 
         try {
             const result = await UserServices.updatePassword(passwordData);
-            console.log("Lösenord sparad", result);
             setPasswordData({ currentPassword: "", newPassword: "", confirmNewPassword: "" });
         }
         catch (e) {
@@ -282,7 +279,7 @@ const UserSettings = () => {
                             alignItems: 'center',
                         }}>
 
-                            <Typography variant="body2" color="textSecondary" align="center">
+                            <Typography variant="body2" color="var(--color-text-main)" align="center">
                                 Användarnamn
                             </Typography>
 
@@ -316,7 +313,7 @@ const UserSettings = () => {
                                 }}
                             />
 
-                            <Typography variant="body2" color="textSecondary" align="center">
+                            <Typography variant="body2" color="var(--color-text-main)" align="center">
                                 Förnamn
                             </Typography>
 
@@ -350,7 +347,7 @@ const UserSettings = () => {
                                 }}
                             />
 
-                            <Typography variant="body2" color="textSecondary" align="center">
+                            <Typography variant="body2" color="var(--color-text-main)" align="center">
                                 Efternamn
                             </Typography>
 
@@ -383,7 +380,7 @@ const UserSettings = () => {
                                     },
                                 }}
                             />
-                            <Typography variant="body2" color="textSecondary" align="center">
+                            <Typography variant="body2" color="var(--color-text-main)" align="center">
                                 Email
                             </Typography>
 
@@ -444,7 +441,7 @@ const UserSettings = () => {
                     '&:before': { display: 'none' },
                     mt: 2,
                 }}>
-                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: '#FFB57C' }} />}>
+                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{color: 'var(--color-primary)'}} />}>
                         <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <img src={Settings} alt="edit" style={{
                                 width: 20,
@@ -460,7 +457,7 @@ const UserSettings = () => {
                             alignItems: 'center',
                         }}>
 
-                            <Typography variant="body2" color="textSecondary" align="center">
+                            <Typography variant="body2" color="var(--color-text-main)" align="center">
                                 Nuvarande Lösenord
                             </Typography>
                             <InputField fullWidth
@@ -494,7 +491,7 @@ const UserSettings = () => {
                                 }}
                             />
 
-                            <Typography variant="body2" color="Secondary" align="center">
+                            <Typography variant="body2" color="var(--color-text-main)" align="center">
                                 Nytt Lösenord
                             </Typography>
                             <InputField
@@ -529,7 +526,7 @@ const UserSettings = () => {
                                 }}
                             />
 
-                            <Typography variant="body2" color="textSecondary" align="center">
+                            <Typography variant="body2" color="var(--color-text-main)" align="center">
                                 Bekräfta Lösenordet
                             </Typography>
 

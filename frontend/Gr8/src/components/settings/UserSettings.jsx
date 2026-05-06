@@ -253,7 +253,7 @@ const UserSettings = () => {
                     '&:before': { display: 'none' },
                     mt: 2,
                 }}>
-                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: '--color-primary' }} />}>
+                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{color: 'var(--color-primary)'}} />}>
                         <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <img src={Settings} alt="edit" style={{
                                 width: 20,

@@ -12,6 +12,7 @@ import ProfileBar from "../../components/layout/ProfileBar.jsx";
 import PostActionsDialog from "../../components/postActionsDialog/PostActionsDialog.jsx";
 
 import {
+    Box,
     Button,
     Dialog,
     DialogTitle,
@@ -23,7 +24,7 @@ import { useEffect, useState, useMemo } from "react";
 const ForumPage = () => {
     const { currentUser } = useAuth();
     const { isDesktop } = useViewport();
-    
+
     const [expanded, setExpanded] = useState(null);
     const [openPostModal, setPostModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
@@ -178,18 +179,18 @@ const ForumPage = () => {
         fetchPosts();
     }, []);
 
-    useEffect( () => {
+    useEffect(() => {
         const fetchBookmarks = async () => {
-            try{
+            try {
                 const data = await PostServices.getBookmarks();
 
-                if(!data){
-                    return; 
+                if (!data) {
+                    return;
                 }
 
                 setUserBookmarks(data);
             }
-            catch(error){
+            catch (error) {
                 console.error("Error fetching bookmarks:", error)
             }
         };
@@ -214,7 +215,8 @@ const ForumPage = () => {
         <>
             <div className="forum-page">
                 <div className="forum-container">
-                    { !isDesktop && <ProfileBar showCreate onCreatePost={handleClickOpen} /> }
+
+                    {!isDesktop && <ProfileBar showCreate onCreatePost={handleClickOpen} />}
 
                     <DeletePost
                         postId={deletePostId}
@@ -271,36 +273,59 @@ const ForumPage = () => {
                         postId={selectedPostId}
                         onClose={handleReportClose}
                     />
-                    
+
                     {/* This is the dialog that appears when you click the three dots on a post.*/}
                     <PostActionsDialog
                         open={Boolean(menuAnchorEl)}
                         onClose={handleMenuClose}
                         onReport={handleReport}
                         onDelete={() => handleOpenPostDelete(selectedPostId)}
-                        onEdit={() => {handleOpenEditPost(posts.find(p => p.id === selectedPostId)); 
-                        handleMenuClose();
+                        onEdit={() => {
+                            handleOpenEditPost(posts.find(p => p.id === selectedPostId));
+                            handleMenuClose();
                         }}
                         isOwner={
                             currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser
                         }
                     />
 
-                    {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
+                    <Box className="scrollbar"
+                        sx={{
+                            width: "100%",
+
+                            height: { xs: "auto", md: "calc(100vh - 30px)" },
+
+                            overflowY: { xs: "visible", md: "auto" },
+                            overflowX: "hidden",
+
+                            '&::-webkit-scrollbar': { width: '6px', },
+
+                            '&::-webkit-scrollbar-track': { background: 'transparent', },
+
+                            '&::-webkit-scrollbar-thumb': {
+                                backgroundColor: 'white',
+                                borderRadius: '10px',
+                            },
+                        }}>
+
+                        <Box sx={{ px: { md: 1 } }}> {/*adds padding for scrollbar.*/}
+                            {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
                     each post. The PostCard component is responsible for displaying the post content, as well as handling the 
                     expand/collapse of the comment section and the menu actions for reporting, editing, and deleting posts. */}
-                    {filteredPosts.map((post) => (
-                        <PostCard
-                            key={post.id}
-                            post={post}
-                            expanded={expanded === post.id}
-                            onExpand={() => handleExpandClick(post.id)}
-                            onMenuOpen={(event) => handleMenuOpen(event, post.id)}
-                            userBookmarks={userBookmarks}
-                            currentUser={currentUser}
-                            setUserBookmarks={setUserBookmarks}
-                        />
-                    ))}
+                            {filteredPosts.map((post) => (
+                                <PostCard
+                                    key={post.id}
+                                    post={post}
+                                    expanded={expanded === post.id}
+                                    onExpand={() => handleExpandClick(post.id)}
+                                    onMenuOpen={(event) => handleMenuOpen(event, post.id)}
+                                    userBookmarks={userBookmarks}
+                                    currentUser={currentUser}
+                                    setUserBookmarks={setUserBookmarks}
+                                />
+                            ))}
+                        </Box>
+                    </Box>
                 </div>
             </div>
         </>

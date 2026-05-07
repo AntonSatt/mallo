@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import Step1 from "./steps/Step1";
 import Step2 from "./steps/Step2";
@@ -19,7 +18,6 @@ const RegisterForm = ({ step, setStep }) => {
   });
 
   const [error, setError] = useState("");
-  const navigate = useNavigate();
   const { register } = useAuth();
 
   // Updates form state and manages field-specific error clearing

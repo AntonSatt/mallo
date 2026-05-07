@@ -6,32 +6,6 @@
     display: flex;
 }
 
-.login-header {
-    background-color: "var(--color-primary-soft)";
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start !important;
-    padding: 0;
-    height: 280px;
-    overflow: visible;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.image-wrapper {
-    transform: translateY(50px);
-    z-index: 2;
-    display: flex;
-    justify-content: center;
-}
-
-.image-wrapper img {
-    width: 100%;
-    height: auto;
-    display: block;
-    margin-top: 8px;
-}
-
 .login-content {
     flex-grow: 1;
     display: flex;

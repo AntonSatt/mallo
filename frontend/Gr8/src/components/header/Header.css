@@ -1,0 +1,27 @@
+.header-picture {
+    background-color: var(--color-primary-soft);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 0;
+    height: 245px;
+    overflow: visible;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.header-image-wrapper {
+    height: 100%;
+    display: flex;
+}
+
+.header-image {
+    width: 100%;
+    max-width: 1440px;
+}
+
+@media (min-width: 1024px) {
+    .header-picture {
+        height: 300px;
+    }
+}

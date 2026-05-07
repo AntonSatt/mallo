@@ -20,7 +20,9 @@
 }
 
 /*---------- MEDIA QUERIES --------*/
-@media (min-width: 1024px) {/* Desktop styles can be added here if needed. */
+@media (min-width: 1024px) {
+
+    /* Desktop styles can be added here if needed. */
     .forum-container {
         width: var(--content-width-desktop);
         max-width: var(--content-width-desktop);
@@ -28,5 +30,7 @@
         background-color: var(--button-secondary-bg);
         border-radius: 10px;
         padding: 16px;
+        margin-top: 13px;
+        border: 1px solid var(--color-border-light),
     }
 }

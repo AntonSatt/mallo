@@ -96,7 +96,7 @@ export default function AvatarSlider({ formData, handleChange, mt = 2, mb = 2 })
                 </Swiper>
             </Box>
             {/* Custom Navigation Controls */}
-            <Box sx={{ display: 'flex', gap: 0.5, marginLeft: 1, mt: 2, mb: 1 }}>
+            <Box sx={{ display: 'flex', gap: 0.5, marginLeft: isMobile ? 1 : 0, mt: 2, mb: 1 }}>
                 <IconButton
                     className="swiper-button-prev-custom"
                     sx={{

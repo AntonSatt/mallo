@@ -7,7 +7,7 @@ const Header = ({ desktopImage, mobileImage }) => {
     const imageSrc = isMobile ? mobileImage : desktopImage;
 
     return (
-        <Grid item xs={4} md={4} className="header-picture">
+        <Grid item="true" xs={4} md={4} className="header-picture">
             <Box className="header-image-wrapper">
                 <img src={imageSrc} alt="Holding hands" className="header-image" />
             </Box>

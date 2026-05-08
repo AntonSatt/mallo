@@ -62,8 +62,8 @@ export default function AvatarSlider({ formData, handleChange, mt = 2, mb = 2 })
                             {({ isActive }) => (
                                 <Box
                                     display="flex"
-                                    justifyContent="center"
-                                    alignItems="center"
+                                    justifycontent="center"
+                                    alignitems="center"
                                     sx={{
                                         height: '100px',
                                         transition: 'all 0.3s ease',

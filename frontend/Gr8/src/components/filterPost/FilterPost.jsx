@@ -1,5 +1,6 @@
 import './FilterPost.css';
 import FilterIcon from "../../assets/icons/filter.svg";
+import useViewport from "../../hooks/useViewport.js";
 
 import {
     Stack,
@@ -25,16 +26,40 @@ const CategoryFilter = ({
     onCheckboxChange,
     onClearFilters,
 }) => {
+
+    const { isDesktop } = useViewport();
+
     return (
         <>
             <Stack
                 direction="row"
                 spacing={1.5}
                 alignItems="center"
-                // this is for scrolling the category chips on smaller screens without wrapping to a new line.
-                sx={{ mt: 2, mb: 2, flexWrap: "nowrap", 
-                    overflowX: "auto", scrollbarWidth: "none", 
-                    "&::-webkit-scrollbar": {display: "none"}}}
+                sx={{
+                    mt: 0, // controls the distance from the top edge of the screen to the filter bar.
+                    mb: 1, // controls the distance from the bottom edge of the filter bar to the first post.
+                    flexWrap: "nowrap",
+
+                    width: {
+                        xs: "100%", //mobile swipe
+                        md: "fit-content" //desktop view
+                    },
+
+                    ml: {
+                        xs: 0,
+                        md: "110px", //controls the distance from the left edge of the screen to the filter bar in desktop view.
+                    },
+
+                    overflowX: { 
+                        xs: "auto",
+                        md: "visible",
+                    },
+
+                    scrollbarWidth: "none", 
+                    "&::-webkit-scrollbar": { 
+                        display: "none", 
+                    }
+                }}
             >
                 <Badge badgeContent={checkedCategories.length} color="error">
                     <IconButton onClick={onFilterIconClick} size="small" className="filter-button">
@@ -49,16 +74,17 @@ const CategoryFilter = ({
                 />
 
                 <Chip label="Sparade"
-                onClick={() => onNavCategoryClick("Sparade")}
-                className={activeNavCategory === "Sparade" && checkedCategories.length === 0 ? "filter-chip active" : "filter-chip"} 
+                    onClick={() => onNavCategoryClick("Sparade")}
+                    className={activeNavCategory === "Sparade" && checkedCategories.length === 0 ? "filter-chip active" : "filter-chip"}
                 />
 
                 <Chip label="Dina inlägg"
-                onClick={() => onNavCategoryClick("Dina inlägg")}
-                className={activeNavCategory === "Dina inlägg" && checkedCategories.length === 0 ? "filter-chip active" : "filter-chip"} 
+                    onClick={() => onNavCategoryClick("Dina inlägg")}
+                    className={activeNavCategory === "Dina inlägg" && checkedCategories.length === 0 ? "filter-chip active" : "filter-chip"}
                 />
 
-                {categories.slice(0, 3).map(cat => (
+                {/*isDEsktop is used to determine wheter to show all categories as chips or not.*/}
+                {!isDesktop && categories.slice(0, 3).map(cat => (
                     <Chip
                         key={cat.id}
                         label={cat.name}
@@ -66,7 +92,7 @@ const CategoryFilter = ({
                         className={activeNavCategory === cat.name && checkedCategories.length === 0 ? "filter-chip active" : "filter-chip"}
                     />
                 ))}
-                
+
             </Stack>
 
             <Menu

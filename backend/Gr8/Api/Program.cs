@@ -127,7 +127,7 @@ namespace Gr8
 
             app.MapEndpoints();
 
-            app.MapHub<ChatHub>("/chathub");
+            app.MapHub<ChatHub>("/chat/hub");
 
             app.Run();
         }

@@ -1,5 +1,6 @@
 ﻿using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
+using Gr8.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System;
@@ -13,18 +14,28 @@ namespace Gr8.Infrastructure.Hubs
     // When it is activated, a valid JWT-token is required to even open a connection to the HUB.
     public class ChatHub : Hub<IChatClient>
     {
-        public override async Task OnConnectedAsync() 
+        private readonly CommunityDbContext _context;
+        public ChatHub(CommunityDbContext context) 
         {
-            await base.OnConnectedAsync();
+            _context = context;
         }
 
-        public async Task SendPrivateMessasge(ChatMessageDto messageDto)
+        // This method is called when a client connects to the hub.
+        public override async Task OnConnectedAsync() 
         {
+            await base.OnConnectedAsync(); //Send the message to the right client in real time.
+        }
+
+        public async Task SendPrivateMessage(ChatMessageDto messageDto)
+        {
+            //Finding out who is sending the message.
             var senderId = Context.UserIdentifier ?? "Anonym";
 
+            //Send the message to the receiver.
             await Clients.User(messageDto.ReceiverId)
                 .ReceiveMessage(senderId, messageDto.Content);
 
+            //Show the message to the sender.
             await Clients.Caller.ReceiveMessage(senderId, messageDto.Content);
         }
     }

@@ -160,10 +160,6 @@ deploy review:
     on_stop: stop_review
   script:
     - |
-      # TEMP: forcing failure to verify merge gate blocks MRs on red deploy.
-      # REVERT THIS COMMIT BEFORE MERGING TO DEVELOP.
-      echo "Deliberate failure to test merge gate — see commit message"
-      exit 1
       helm upgrade --install "gr8-$CI_COMMIT_REF_SLUG" ./devops/k8s/chart \
         --namespace "$NAMESPACE" \
         -f ./devops/k8s/chart/values-feature.yaml \

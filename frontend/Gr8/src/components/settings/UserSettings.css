@@ -1,0 +1,30 @@
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 16px 0;
+    padding: 0 16px;
+}
+
+.button-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background-color: var(--color-primary-soft);
+    border-radius: 16px;
+    padding: 12px 16px;
+    min-width: 90px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+}
+
+.settingsButton {
+    background-color: var(--color-primary-soft);
+}
+
+.dropdown {
+    background-color: var(--color-bg-surface);
+}

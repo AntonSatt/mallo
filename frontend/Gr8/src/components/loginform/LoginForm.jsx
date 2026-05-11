@@ -74,12 +74,12 @@ const LoginForm = () => {
 
         <Grid item>
           <Typography variant="h6" align="center">
-            E-post
+            Användarnamn
           </Typography>
 
           <InputField
             fullWidth
-            placeholder="Exempel@email.com"
+            placeholder="Användarnamn"
             error={!!error.userName}
             helperText={error.userName}
             sx={{

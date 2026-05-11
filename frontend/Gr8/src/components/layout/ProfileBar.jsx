@@ -76,7 +76,7 @@ const ProfileBar = ({ showCreate = false, onCreatePost }) => {
                         </>
                     ) : (
                         <>
-                            <Box className="profilebar-left">
+                            <Box className="profilebar-left"> 
                                 <Avatar avatar={currentUser?.picture} />
                                 <Typography className="profile-name">
                                     {currentUser?.preferred_username || currentUser?.email || "Användarnamn saknas"}

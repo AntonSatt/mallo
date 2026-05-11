@@ -22,6 +22,10 @@ namespace Gr8.Application.Interfaces
         Task<Hug?> GetCommentHugAsync(int commentId, string UserId);
         Task AddHugAsync(Hug hug);
         void RemoveHug(Hug hug);
+        Task<List<Bookmark?>> GetAllBookmarksByUserIdAsync(string userId, int postId);
+        Task<Bookmark?> GetPostBookmarkAsync(int postId, string userId);
+        Task AddBookmarkAsync(Bookmark bookmark);
+        void RemoveBookmark(Bookmark bookmark);
         Task<List<Activity>> GetAllActivitiesAsync();
         Task<Activity?> GetActivityByIdAsync(int id);
         Task AddActivityAsync(Activity activity);

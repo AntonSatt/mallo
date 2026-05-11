@@ -4,6 +4,7 @@ using Gr8.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gr8.Infrastructure.Migrations.CommunityDb
 {
     [DbContext(typeof(CommunityDbContext))]
-    partial class CommunityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260430084513_AddBookmarkTable")]
+    partial class AddBookmarkTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,60 +48,6 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                         .IsUnique();
 
                     b.ToTable("Bookmarks");
-                });
-
-            modelBuilder.Entity("Gr8.Domain.Entities.Activity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("EndAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsEdited")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("Latitude")
-                        .HasPrecision(18, 6)
-                        .HasColumnType("decimal(18,6)");
-
-                    b.Property<decimal>("Longitude")
-                        .HasPrecision(18, 6)
-                        .HasColumnType("decimal(18,6)");
-
-                    b.Property<DateTime>("StartAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("Latitude", "Longitude");
-
-                    b.ToTable("Activities", t =>
-                        {
-                            t.HasCheckConstraint("CK_Activity_Dates_NotDefault", "[StartAt] > '2000-01-01' AND [EndAt] > '2000-01-01'");
-
-                            t.HasCheckConstraint("CK_Activity_EndAfterStart", "[EndAt] >= [StartAt]");
-                        });
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Category", b =>
@@ -512,15 +461,6 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                     b.HasIndex("TagsId");
 
                     b.ToTable("PostTags", (string)null);
-                });
-
-            modelBuilder.Entity("Gr8.Domain.Entities.Activity", b =>
-                {
-                    b.HasOne("Gr8.Infrastructure.Identity.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Bookmark", b =>

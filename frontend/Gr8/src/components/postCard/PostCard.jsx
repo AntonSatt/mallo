@@ -18,13 +18,13 @@ import {
     Box,
     IconButton
 } from "@mui/material";
+import BookmarkButton from "../../components/bookmarkButton/BookmarkButton.jsx";
 
 //this file contains the PostCard component, which is used to display a post in the feed. 
 // It takes in the post data as props and displays the post's title, content, author, category, tags, 
 // and actions (hug, save, comment). It also has a collapsible section for comments.
-const PostCard = ({ post, expanded, onExpand, onMenuOpen }) => {
+const PostCard = ({ post, expanded, onExpand, onMenuOpen, userBookmarks, currentUser, setUserBookmarks }) => {
     const categoryName = post.category?.name || post.category || "Ingen kategori";
-
     const [showFullContent, setShowFullContent] = useState(false);
 
     return (
@@ -83,9 +83,8 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen }) => {
 
                         <HugButton type="post" id={post.id} />
 
-                        <IconButton aria-label="save" className="post-save-icon">
-                            <BookmarkBorderIcon />
-                        </IconButton>
+                            <BookmarkButton postId={post.id} userBookmarks={userBookmarks} currentUser={currentUser} setUserBookmarks={setUserBookmarks} />
+                    
 
                         <IconButton onClick={onExpand}
                             aria-expanded={expanded}

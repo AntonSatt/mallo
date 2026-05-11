@@ -6,10 +6,11 @@ import CommentServices from "../../services/CommentServices";
 import Hug from "../../assets/icons/hug.svg";
 import Hugged from "../../assets/icons/hugged.svg";
 import HugPopup from "../../assets/icons/hugPopup.svg";
+import useViewport from '../../hooks/useViewport';
 
-import { 
-    IconButton, 
-    Dialog, 
+import {
+    IconButton,
+    Dialog,
     Box,
     Typography
 } from "@mui/material";
@@ -17,11 +18,12 @@ import {
 //this component is used for both posts and comments, it takes in the type and id of the post/comment to know which one to hug.
 const HugButton = ({ type, id }) => {
     const { currentUser } = useAuth();
+    const { isDesktop } = useViewport();
     const [hugged, setHugged] = useState(false);
     const [open, setOpen] = useState(false);
 
-//this function is called when the user clicks the hug button, it sends a request to the backend to 
-// hug the post/comment and updates the state accordingly.
+    //this function is called when the user clicks the hug button, it sends a request to the backend to 
+    // hug the post/comment and updates the state accordingly.
     const handleHug = async () => {
         try {
             if (!currentUser?.sub) {
@@ -52,7 +54,7 @@ const HugButton = ({ type, id }) => {
 
     // timeout to close the hug popup after 1.8 seconds.
     useEffect(() => {
-        if(open) {
+        if (open) {
             setTimeout(() => setOpen(false), 1800);
         }
     }, [open]);
@@ -63,8 +65,28 @@ const HugButton = ({ type, id }) => {
                 <img src={hugged ? Hugged : Hug} alt="" className="hug-icon"></img>
             </IconButton>
 
-            <Dialog open={open} onClose={() => setOpen(false)} className="hug-dialog">
-                <Box className="hug-popup">
+            <Dialog open={open} onClose={() => setOpen(false)} className="hug-dialog"
+                sx={{
+                    "& .MuiPaper-root": {
+                        borderRadius: isDesktop ? "24px" : undefined,
+                        maxWidth: isDesktop ? "260px" : undefined
+                    }
+                }}
+            >
+                <Box className="hug-popup"
+                    sx={{
+                        ...(isDesktop && {
+                            width: "260px",
+                            padding: "20px",
+                            boxSizing: "border-box",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            textAlign: "center",
+                        }),
+                    }}
+                >
                     <Typography className="hug-popup-title">
                         Du har gett en kram
                     </Typography>
@@ -72,7 +94,8 @@ const HugButton = ({ type, id }) => {
                 </Box>
             </Dialog>
         </>
-)}
+    )
+}
 export default HugButton;
 
 

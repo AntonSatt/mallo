@@ -6,6 +6,7 @@ import HomeIcon from '../../assets/icons/home.svg'
 import MapIcon from '../../assets/icons/map.svg'
 import MessageIcon from '../../assets/icons/message.svg'
 import UserIcon from '../../assets/icons/user.svg'
+import useViewport from '../../hooks/useViewport';
 
 const NavIcon = ({ src, alt }) => (
     <div className="icon-container">
@@ -16,26 +17,40 @@ const NavIcon = ({ src, alt }) => (
 );
 const Navbar = () => {
     const navigate = useNavigate();
+    const { isDesktop } = useViewport();
     const { pathname } = useLocation();
+
+    const desktopSxStyle = {
+        position: "sticky",
+        top: 0,
+        zIndex: 1000,
+        backgroundColor: "var(--color-primary-soft)",
+        borderRadius: "0px 0px 20px 20px",
+        overflow: "visible",
+        border: "1px solid var(--color-border-light)",
+        maxWidth: "var(--content-width-desktop)",
+        width: "100%",
+        margin: "0 auto",
+    }
+
+    const mobileSxStyle = {
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
+        backgroundColor: "var(--color-primary-soft)",
+        borderRadius: "20px 20px 0 0",
+        overflow: "visible",
+        border: "1px solid var(--color-border-light)",
+    }
 
     return (
 
         <Paper
-            className="navbar-paper"
             component="nav"
             elevation={0}
-            sx={{
-                position: "fixed",
-                bottom: 0,
-                left: 0,
-                right: 0,
-                zIndex: 1000,
-                backgroundColor: "secondary.main",
-                borderRadius: "15px 15px 0 0",
-                overflow: "visible",
-                borderTop: "1px solid var(--color-border-light)",
-
-            }}
+            sx={isDesktop ? desktopSxStyle : mobileSxStyle}
         >
 
             <BottomNavigation
@@ -43,7 +58,7 @@ const Navbar = () => {
                 value={pathname}
                 sx={{
                     backgroundColor: "transparent",
-                    height: "70px",
+                    height: "var(--protected-nav-height)",
                     borderRadius: "35px"
                 }}
                 onChange={(event, newValue) => navigate(newValue)}>

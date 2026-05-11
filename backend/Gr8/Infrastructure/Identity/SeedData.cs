@@ -12,21 +12,23 @@ namespace Gr8.Infrastructure.Identity
             using var scope = services.CreateScope();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            var userEmail = "anna@mail.com";
-            var appUser = await userManager.FindByEmailAsync(userEmail);
+            var userId = "00000000-0000-0000-0000-000000000001";
+            var appUser = await userManager.FindByIdAsync(userId);
+            var appUserEmail = "Anna@mail.se";
 
-            var adminEmail = "sebastian.enerstrand@chasacademy.se";
-            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+            var adminId = "00000000-0000-0000-0000-000000000002";
+            var adminUser = await userManager.FindByIdAsync(adminId);
+            var adminEmail = "Sebastian.enerstrand@chasacademy.se";
 
             if (appUser == null)
             {
                 var newUser = new ApplicationUser
                 {
-                    Id = "00000000-0000-0000-0000-000000000001", // fixed id (optional)
+                    Id = userId, // fixed id (optional)
                     UserName = "Anna",
                     NormalizedUserName = "ANNA",
-                    Email = userEmail,
-                    NormalizedEmail = userEmail.ToUpperInvariant(),
+                    Email = appUserEmail,
+                    NormalizedEmail = appUserEmail.ToUpperInvariant(),
                     FirstName = "Anna",
                     LastName = "Larsson",
                     SocialNumber = "19930401",
@@ -47,7 +49,7 @@ namespace Gr8.Infrastructure.Identity
             {
                 var newUser = new ApplicationUser
                 {
-                    Id = "00000000-0000-0000-0000-000000000002", // fixed id (optional)
+                    Id = adminId, // fixed id (optional)
                     UserName = "Admin",
                     NormalizedUserName = "ADMIN",
                     Email = adminEmail,

@@ -267,5 +267,7 @@ stop_review:
     - helm uninstall "gr8-$CI_COMMIT_REF_SLUG" -n "$NAMESPACE" || true
     - kubectl delete pvc -l app.kubernetes.io/instance="gr8-$CI_COMMIT_REF_SLUG" -n "$NAMESPACE" --ignore-not-found
   rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "main"
+      when: manual
     - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop"
       when: manual

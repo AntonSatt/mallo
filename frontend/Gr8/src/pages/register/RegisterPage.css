@@ -3,11 +3,11 @@
     padding: 0;
     color: var(--color-text-main);
     position: relative;
-    height: 100vh;
     width: 100%;
     overflow: visible;
     display: flex;
     flex-direction: column;
+    margin-top: 24px;
 }
 
 .register-picture {
@@ -43,13 +43,14 @@
     justify-content: flex-start !important;
     align-items: center;
     margin-top: 0px;
+    overflow: hidden;
 }
 
 .register-content {
     width: 100%;
     max-width: 320px;
     text-align: center;
-    margin-top: -20px;
+    padding-bottom: 8px;
 }
 
 .register-step1 {
@@ -60,7 +61,6 @@
     width: 100%;
     min-height: 100%;
     margin-top: 0;
-    overflow: visible;
 }
 
 .register-step2 {

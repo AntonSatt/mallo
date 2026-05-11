@@ -26,5 +26,10 @@ namespace Gr8.Application.Interfaces
         Task<Bookmark?> GetPostBookmarkAsync(int postId, string userId);
         Task AddBookmarkAsync(Bookmark bookmark);
         void RemoveBookmark(Bookmark bookmark);
+        Task<List<Activity>> GetAllActivitiesAsync();
+        Task<Activity?> GetActivityByIdAsync(int id);
+        Task AddActivityAsync(Activity activity);
+        Task UpdateActivityAsync(Activity activity);
+        Task DeleteActivityAsync(Activity activity);
     }
 }

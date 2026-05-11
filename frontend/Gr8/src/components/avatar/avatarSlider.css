@@ -8,3 +8,15 @@
     align-items: center;
     width: auto;
 }
+
+@media (min-width: 768px) { /* Tablet styles can be added here if needed. */
+    .swiper-slide-active {
+        padding: 0 !important;
+    }
+}
+
+@media (min-width: 1024px) { /* Desktop styles can be added here if needed. */
+    .swiper-slide-active {
+        padding: 0 !important;
+    }
+}

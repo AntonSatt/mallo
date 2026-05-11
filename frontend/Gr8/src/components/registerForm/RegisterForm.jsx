@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
 import { useAuth } from "../../hooks/useAuth";
 import Step1 from "./steps/Step1";
 import Step2 from "./steps/Step2";
@@ -48,12 +49,25 @@ const RegisterForm = ({ step, setStep }) => {
 
   const validateStep2 = () => {
     let newError = {};
+    const cleanSsn = formData.ssn.trim();
 
     if (!formData.fullName.trim()) newError.fullName = "Namn måste fyllas i.";
     else if (!formData.fullName.trim().includes(" ")) newError.fullName = "Ange både för- och efternamn.";
 
-    if (!formData.ssn.trim()) newError.ssn = "Personnummer krävs.";
-    else if (formData.ssn.length !== 8) newError.ssn = "Personnummer måste vara 8 siffror.";
+    if (!cleanSsn) {
+      newError.ssn = "Personnummer krävs.";
+    } else if (!/^\d{8}$/.test(cleanSsn)) {
+      newError.ssn = "Personnummer måste vara 8 siffror.";
+    } else {
+      const ssnDate = moment(cleanSsn, "YYYYMMDD", true);
+      const minDate = moment("19000101", "YYYYMMDD", true);
+
+      if (!ssnDate.isValid()) {
+        newError.ssn = "Personnummer innehåller ogiltigt datum.";
+      } else if (ssnDate.isBefore(minDate)) {
+        newError.ssn = "Det verkar som att datumet är väldigt gammalt. Vänligen kontrollera så att året stämmer.";
+      }
+    }
 
     setError(newError);
     return Object.keys(newError).length === 0;

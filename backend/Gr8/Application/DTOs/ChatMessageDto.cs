@@ -7,8 +7,13 @@ namespace Gr8.Application.DTOs
 {
     public class ChatMessageDto
     {
-        [Required(ErrorMessage = "Content can not be empty")]
-        [MaxLength(4000, ErrorMessage = "Content is to long. Max 4000 characters.")]
-        public string Content { get; set; } = string.Empty;
+        [Required]
+        public string ReceiverId { get; set; } = null!;
+
+        [Required]
+        public int ActivityId { get; set; }
+
+        [Required, MaxLength(4000)]
+        public string Content { get; set; } = null!;
     }
 }

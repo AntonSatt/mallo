@@ -19,11 +19,12 @@ import {
     DialogActions,
 } from "@mui/material";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 
 const ForumPage = () => {
     const { currentUser } = useAuth();
     const { isDesktop } = useViewport();
+    const scrollAreaRef = useRef(null);
 
     const [expanded, setExpanded] = useState(null);
     const [openPostModal, setPostModalOpen] = useState(false);
@@ -197,6 +198,35 @@ const ForumPage = () => {
         fetchBookmarks();
     }, []);
 
+    useEffect(() => {
+        if (!isDesktop) {
+            return;
+        }
+
+        const handleWheel = (event) => {
+            const scrollArea = scrollAreaRef.current;
+            if (!scrollArea || !event.deltaY) {
+                return;
+            }
+
+            const inDialog = event.target instanceof Element && !!event.target.closest(".MuiDialog-root");
+            if (inDialog) {
+                return;
+            }
+
+            const targetInScrollArea = event.target instanceof Node && scrollArea.contains(event.target);
+            if (targetInScrollArea) {
+                return;
+            }
+
+            scrollArea.scrollTop += event.deltaY;
+            event.preventDefault();
+        };
+
+        window.addEventListener("wheel", handleWheel, { passive: false });
+        return () => window.removeEventListener("wheel", handleWheel);
+    }, [isDesktop]);
+
     const handlePostCreated = (newPost) => {
         const formattedPost = {
             id: newPost.id,
@@ -290,10 +320,11 @@ const ForumPage = () => {
                     />
 
                     <Box className="scrollbar"
+                        ref={scrollAreaRef}
                         sx={{
                             width: "100%",
 
-                            height: { xs: "auto", md: "calc(100vh - 30px)" },
+                            height: { xs: "auto", md: "auto" },
 
                             overflowY: { xs: "visible", md: "auto" },
                             overflowX: "hidden",

@@ -22,5 +22,10 @@ namespace Gr8.Application.Interfaces
         Task<Hug?> GetCommentHugAsync(int commentId, string UserId);
         Task AddHugAsync(Hug hug);
         void RemoveHug(Hug hug);
+        Task<List<Activity>> GetAllActivitiesAsync();
+        Task<Activity?> GetActivityByIdAsync(int id);
+        Task AddActivityAsync(Activity activity);
+        Task UpdateActivityAsync(Activity activity);
+        Task DeleteActivityAsync(Activity activity);
     }
 }

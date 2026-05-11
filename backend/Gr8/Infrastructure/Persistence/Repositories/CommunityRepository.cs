@@ -125,5 +125,36 @@ namespace Gr8.Infrastructure.Persistence.Repositories
         {
             _communityDbContext.Hugs.Remove(hug);
         }
+
+        public async Task<List<Activity>> GetAllActivitiesAsync()
+        {
+            return await _communityDbContext.Activities
+                .Where(a => !a.IsDeleted)
+                .ToListAsync();
+        }
+
+        public async Task<Activity?> GetActivityByIdAsync(int id)
+        {
+            return await _communityDbContext.Activities
+                .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
+        }
+
+        public async Task AddActivityAsync(Activity activity)
+        {
+            await _communityDbContext.Activities.AddAsync(activity);
+        }
+
+        public async Task UpdateActivityAsync(Activity activity)
+        {
+            _communityDbContext.Activities.Update(activity);
+            await Task.CompletedTask;
+        }
+
+        public async Task DeleteActivityAsync(Activity activity)
+        {
+            activity.IsDeleted = true;
+            _communityDbContext.Activities.Update(activity);
+            await Task.CompletedTask;
+        }
     }
 }

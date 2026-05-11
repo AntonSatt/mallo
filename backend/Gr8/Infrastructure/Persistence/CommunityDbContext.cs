@@ -16,6 +16,7 @@ namespace Gr8.Infrastructure.Persistence
         public DbSet<Report> Reports => Set<Report>();
         public DbSet<Hug> Hugs => Set<Hug>();
         public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
+        public DbSet<ChatMessage> ChatMessages { get; set; } //fake one
 
         public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
         {

@@ -1,12 +1,14 @@
 using Gr8.Api.Endpoints;
 using Gr8.Application.Common.Constants;
 using Gr8.Infrastructure;
-using Gr8.Infrastructure.Persistence;
-using Scalar.AspNetCore;
+using Gr8.Infrastructure.Hubs;
 using Gr8.Infrastructure.Identity;
+using Gr8.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 using System.Text;
 
 namespace Gr8
@@ -38,6 +40,25 @@ namespace Gr8
                         IssuerSigningKey = new SymmetricSecurityKey(
                             Encoding.UTF8.GetBytes(jwtSettings.Key))
                     };
+
+                    //signalRtest
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+
+                            // Om begäran går till vår hub-väg
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                (path.StartsWithSegments("/chathub")))
+                            {
+                                // Läs in token från query-strängen så att [Authorize] i Hubben fungerar
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             builder.Services.AddAuthorization(options =>
@@ -59,19 +80,27 @@ namespace Gr8
             var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
                               ?? new[] { "http://localhost:5173" };
 
+            // Lägg till testverktygets adress i listan
+            var allOrigins = corsOrigins.Append("https://gourav-d.github.io").ToArray();
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("ReactApplication", policy =>
                 {
-                    policy.WithOrigins(corsOrigins)
+                    policy.SetIsOriginAllowed(origin => true)
+                    //policy.WithOrigins(corsOrigins)
                         .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        .AllowAnyMethod()
+                        .AllowCredentials(); // For Websockets
                 });
             });
 
             builder.Services.AddOpenApi();
 
             builder.Services.AddInfrastructure(builder.Configuration);
+
+            // SignalR
+            builder.Services.AddSignalR();
 
             var app = builder.Build();
 
@@ -97,6 +126,8 @@ namespace Gr8
             app.UseAuthorization();
 
             app.MapEndpoints();
+
+            app.MapHub<ChatHub>("/chathub");
 
             app.Run();
         }

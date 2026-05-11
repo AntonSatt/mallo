@@ -6,6 +6,9 @@ import InputField from "../../design/input/InputField";
 import InputAdornment from "@mui/material/InputAdornment";
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import PasswordServices from "../../services/PasswordServices";
+import Header from "../../components/header/Header";
+import holdingHands2 from "../../assets/images/holdingHands2.png";
+import hold2 from "../../assets/images/hold2.png";
 
 const ForgotPasswordPage = () => {
     const [email, setEmail] = useState("");
@@ -25,7 +28,7 @@ const ForgotPasswordPage = () => {
         try {
             await PasswordServices.forgotPassword(email);
             setStatus("sent");
-        } 
+        }
 
         catch {
             setError("Något gick fel, försök igen.");
@@ -33,63 +36,67 @@ const ForgotPasswordPage = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <Grid container direction="column" spacing={2}>
-                <Grid item>
-                    <Typography variant="h6" align="center">
-                        Ange din e-postadress
-                    </Typography>
-                    <InputField
-                        fullWidth
-                        placeholder="Exempel@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        sx={{
-                            "& .MuiOutlinedInput-input": { textAlign: "center", paddingLeft: "40px" },
-                            "& .MuiOutlinedInput-root": { height: 40, borderRadius: 20 },
-                        }}
-                        slotProps={{
-                            input: {
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                    </InputAdornment>
-                                ),
-                            },
-                        }}
-                    />
-                </Grid>
+        <>
+            <Header mobileImage={hold2} desktopImage={holdingHands2} />
 
-                {error && (
+            <form onSubmit={handleSubmit}>
+                <Grid container direction="column" spacing={2} sx={{ mt: 4 }}>
                     <Grid item>
-                        <Typography color="error">{error}</Typography>
-                    </Grid>
-                )}
-
-                {status === "sent" && (
-                    <Grid item>
-                        <Typography align="center" sx={{ color: "var(--color-primary)" }}>
-                            Om en användare med den e-postadressen finns har en återställningslänk skickats.
+                        <Typography variant="h6" align="center">
+                            Ange din e-postadress
                         </Typography>
+                        <InputField
+                            fullWidth
+                            placeholder="Exempel@email.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            sx={{
+                                "& .MuiOutlinedInput-input": { textAlign: "center", paddingLeft: "40px" },
+                                "& .MuiOutlinedInput-root": { height: 40, borderRadius: 20 },
+                            }}
+                            slotProps={{
+                                input: {
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
+                                        </InputAdornment>
+                                    ),
+                                },
+                            }}
+                        />
                     </Grid>
-                )}
 
-                <Grid item>
-                    <PrimaryButton type="submit" sx={{ height: 40, mt: 2 }}>
-                        Skicka återställningslänk
-                    </PrimaryButton>
+                    {error && (
+                        <Grid item>
+                            <Typography color="error">{error}</Typography>
+                        </Grid>
+                    )}
+
+                    {status === "sent" && (
+                        <Grid item>
+                            <Typography align="center" sx={{ color: "var(--color-primary)" }}>
+                                Om en användare med den e-postadressen finns har en återställningslänk skickats.
+                            </Typography>
+                        </Grid>
+                    )}
+
+                    <Grid item>
+                        <PrimaryButton type="submit" sx={{ height: 40, mt: 2 }}>
+                            Skicka återställningslänk
+                        </PrimaryButton>
+                    </Grid>
+
+                    <Typography
+                        variant="body2"
+                        align="center"
+                        sx={{ cursor: "pointer", color: "var(--color-border-light)", mt: 1 }}
+                        onClick={() => navigate('/login')}
+                    >
+                        Tillbaka till inloggning
+                    </Typography>
                 </Grid>
-
-                <Typography
-                    variant="body2"
-                    align="center"
-                    sx={{ cursor: "pointer", color: "var(--color-border-light)", mt: 1 }}
-                    onClick={() => navigate('/login')}
-                >
-                    Tillbaka till inloggning
-                </Typography>
-            </Grid>
-        </form>
+            </form>
+        </>
     );
 };
 

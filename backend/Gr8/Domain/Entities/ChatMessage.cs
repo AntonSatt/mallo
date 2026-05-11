@@ -6,12 +6,14 @@ namespace Gr8.Domain.Entities
 {
     public class ChatMessage
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
-        public string SenderId { get; set; } = string.Empty;
-        public string ReceiverId { get; set; } = string.Empty;
-        public Guid ActivityId { get; set; } //the fake activity.
-        public string Content { get; set; } = string.Empty;
+        public int Id { get; set; }
+        public int SenderId { get; set; } 
+        public int ReceiverId { get; set; }
+        public string Content { get; set; } = null!;
         public DateTime SendAt { get; set; } = DateTime.UtcNow;
         public bool IsRead { get; set; } = false;
+
+        public int ActivityId { get; set; } //FK
+        public Activity Activity { get; set; } = null!;
     }
 }

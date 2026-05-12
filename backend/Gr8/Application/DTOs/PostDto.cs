@@ -15,5 +15,6 @@ namespace Gr8.Application.DTOs
         public CategoryDto Category { get; set; }
         public List<TagDto> Tags { get; set; }
         public string CreatedByUser { get; set; }
+        public int CountOfComments { get; set; }
     }
 }

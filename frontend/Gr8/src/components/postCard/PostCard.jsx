@@ -92,6 +92,9 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen, userBookmarks, current
                             className="post-comment-button">
 
                             <img src={CommentBubble} alt="" />
+                            <Typography variant="caption" className="post-comment-count">
+                                {post.countOfComments || 0}
+                            </Typography>
                         </IconButton>
                     </CardActions>
 

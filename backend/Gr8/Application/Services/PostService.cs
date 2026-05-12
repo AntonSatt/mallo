@@ -76,6 +76,8 @@ namespace Gr8.Application.Services
 
             foreach (var post in posts)
             {
+                var commentsOnPostCount = await _communityRepository.CountCommentsByPostIdAsync(post.Id);
+
                 var postDto = new PostDto
                 {
                     Id = post.Id,
@@ -91,7 +93,8 @@ namespace Gr8.Application.Services
                         Name = post.Category.Name,
                         Id = post.Category.Id
                     },
-                    Tags = post.Tags.Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList()
+                    Tags = post.Tags.Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList(),
+                    CountOfComments = commentsOnPostCount
                 };
 
                 var userName = await _applicationRepository.GetUserNameByIdAsync(post.UserId);

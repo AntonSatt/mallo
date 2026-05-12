@@ -173,7 +173,8 @@ const ForumPage = () => {
                     createdAt: post.createdAt,
                     category: post.category ? post.category : "Ingen kategori",
                     createdByUser: post.createdByUser,
-                    tags: post.tags ? post.tags : []
+                    tags: post.tags ? post.tags : [],
+                    countOfComments: post.countOfComments || 0,
                 }));
                 setPosts(allPosts);
             } catch (error) {

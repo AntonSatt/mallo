@@ -104,7 +104,7 @@ namespace Gr8.Application.Services
                 postDtoList.Add(postDto);
             }
 
-            return postDtoList;
+            return postDtoList.OrderByDescending(p => p.CreatedAt).ToList();
         }
 
         public async Task<PostDto> GetPostByIdAsync(int postId, string userId)

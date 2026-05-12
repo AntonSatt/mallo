@@ -123,6 +123,14 @@ const CommentForm = ({ postId }) => {
                     error={Boolean(commentError)}
                     helperText={commentError}
                     size="small"
+                    sx={{
+                        "& .MuiOutlinedInput-root": {
+                            borderRadius: 4,
+                            "& fieldset": {
+                                borderRadius: 4,
+                            },
+                        },
+                    }}
                 />
                 <Button
                     type="submit"
@@ -137,7 +145,7 @@ const CommentForm = ({ postId }) => {
             <Box sx={{ mt: 2 }}>
                 {comments.length > 0 ? (
                     comments.map((c, index) => (
-                        <Box key={c.id || index} sx={{ mb: 2, p: 2, bgcolor: 'white', borderRadius: 1, boxShadow: 1 }}>
+                        <Box key={c.id || index} sx={{ mb: 2, p: 2, bgcolor: 'white', borderRadius: 4, boxShadow: 1 }}>
                             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                                 <Typography variant="caption" color="text.secondary" display="block">
                                     {`${c.userName} • ${moment(c.createdAt).fromNow()}`}
@@ -155,7 +163,7 @@ const CommentForm = ({ postId }) => {
 
                             {c.id && (
                                 <div className="comment-hug-button">
-                                    <HugButton type="comment" id={c.id}/>
+                                    <HugButton type="comment" id={c.id} />
                                 </div>
                             )}
                             {editingCommentId === c.id && (

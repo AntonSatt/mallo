@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Grid, Typography } from "@mui/material";
 import PrimaryButton from "../../design/buttons/PrimaryButton";
@@ -6,6 +6,9 @@ import InputField from "../../design/input/InputField";
 import InputAdornment from "@mui/material/InputAdornment";
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import PasswordServices from "../../services/PasswordServices";
+import Header from "../../components/header/Header";
+import holdingHands2 from "../../assets/images/holdingHands2.png";
+import hold2 from "../../assets/images/hold2.png";
 
 const ResetPasswordPage = () => {
     const [newPassword, setNewPassword] = useState("");
@@ -33,8 +36,8 @@ const ResetPasswordPage = () => {
             await PasswordServices.resetPassword(token, newPassword);
 
             navigate('/login');
-        } 
-       
+        }
+
         catch (error) {
             setError("Ett fel uppstod vid återställning av lösenord.");
         }
@@ -51,41 +54,45 @@ const ResetPasswordPage = () => {
 
 
     return (
-        <form onSubmit={handleSubmit}>
-            <Grid container direction="column" spacing={2}>
-                <Grid item>
-                    <Typography variant="h6" align="center">
-                        Ange ditt nya lösenord
-                    </Typography>
-                    <InputField
-                        fullWidth
-                        type="password"
-                        label="Nytt lösenord"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                    />
-                </Grid>
-                <Grid item>
-                    <InputField
-                        fullWidth
-                        type="password"
-                        label="Bekräfta nytt lösenord"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
-                </Grid>
-                {error && (
+        <>
+            <Header mobileImage={hold2} desktopImage={holdingHands2} />
+
+            <form onSubmit={handleSubmit}>
+                <Grid container direction="column" spacing={2} sx={{ mt: 4 }}>
                     <Grid item>
-                        <Typography color="error">{error}</Typography>
+                        <Typography variant="h6" align="center">
+                            Ange ditt nya lösenord
+                        </Typography>
+                        <InputField
+                            fullWidth
+                            type="password"
+                            label="Nytt lösenord"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                        />
                     </Grid>
-                )}
-                <Grid item>
-                    <PrimaryButton type="submit" fullWidth>
-                        Återställ lösenord
-                    </PrimaryButton>
+                    <Grid item>
+                        <InputField
+                            fullWidth
+                            type="password"
+                            label="Bekräfta nytt lösenord"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
+                    </Grid>
+                    {error && (
+                        <Grid item>
+                            <Typography color="error">{error}</Typography>
+                        </Grid>
+                    )}
+                    <Grid item>
+                        <PrimaryButton type="submit" fullWidth>
+                            Återställ lösenord
+                        </PrimaryButton>
+                    </Grid>
                 </Grid>
-            </Grid>
-        </form>
+            </form>
+        </>
     );
 }
 

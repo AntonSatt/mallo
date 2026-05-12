@@ -18,6 +18,17 @@
     overflow-y: auto;
 }
 
+.protected-route-layout:has(.forum-page) {
+    height: auto;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: visible;
+}
+
+.protected-route-layout:has(.forum-page) .protected-route-content {
+    overflow: visible;
+}
+
 @media (min-width: 1024px) {
     .protected-route-layout {
         height: auto;
@@ -26,7 +37,7 @@
     }
 
     .protected-route-content {
-        min-height: calc(100dvh - var(--protected-nav-height));
+        min-height: calc(100dvh - var(--protected-nav-height) - 2px);
         padding-bottom: 0;
         overflow: visible;
     }

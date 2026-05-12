@@ -6,6 +6,18 @@ namespace Gr8.Domain.Entities
 {
     public class ChatMessage
     {
+        public ChatMessage()
+        {
+
+        }
+
+        public ChatMessage(string senderId, string receiverId, string content) : this() 
+        {
+            SenderId = senderId;
+            ReceiverId = receiverId;
+            Content = content;
+            SendAt = DateTime.UtcNow;
+        }
         public int Id { get; set; }
         public string Content { get; set; } = null!;
         public DateTime SendAt { get; set; } = DateTime.UtcNow;

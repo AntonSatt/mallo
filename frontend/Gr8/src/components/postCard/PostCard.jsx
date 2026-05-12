@@ -7,6 +7,7 @@ import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutline
 import HugButton from "../hugButton/HugButton";
 import CommentForm from "../commentForm/CommentForm";
 import CommentBubble from "../../assets/icons/commentBubble.svg";
+import FilledCommentBubble from "../../assets/icons/filledcommentBubble.svg";
 import {
     Avatar,
     Card,
@@ -91,7 +92,7 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen, userBookmarks, current
                             aria-label="Visa kommentarerna"
                             className="post-comment-button">
 
-                            <img src={CommentBubble} alt="" />
+                            {expanded ? <img src={FilledCommentBubble} alt="" /> : <img src={CommentBubble} alt="" /> }
                             <Typography variant="caption" className="post-comment-count">
                                 {post.countOfComments || 0}
                             </Typography>

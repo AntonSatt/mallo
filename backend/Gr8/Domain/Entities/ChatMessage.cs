@@ -26,7 +26,7 @@ namespace Gr8.Domain.Entities
         public string ReceiverId { get; set; } = null!;
 
         public int? ActivityId { get; set; } //FK
-        public Activity Activity { get; set; } = null!;
+        public Activity? Activity { get; set; } = null!;
 
         public bool DeletedBySender { get; set; } = false;
         public bool DeletedByReceiver { get; set; } = false;

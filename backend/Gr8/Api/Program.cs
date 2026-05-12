@@ -51,7 +51,7 @@ namespace Gr8
                             // Om begäran går till vår hub-väg
                             var path = context.HttpContext.Request.Path;
                             if (!string.IsNullOrEmpty(accessToken) &&
-                                (path.StartsWithSegments("/chathub")))
+                                (path.StartsWithSegments("/chat/hub")))
                             {
                                 // Läs in token från query-strängen så att [Authorize] i Hubben fungerar
                                 context.Token = accessToken;

@@ -224,7 +224,7 @@ namespace Gr8.Infrastructure.Persistence
                 entity.HasOne(cm => cm.Activity)
                 .WithMany()
                 .HasForeignKey(cm => cm.ActivityId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull); //The chat can continue when the activity deletes. 
 
                 entity.HasOne<ApplicationUser>()
                 .WithMany()

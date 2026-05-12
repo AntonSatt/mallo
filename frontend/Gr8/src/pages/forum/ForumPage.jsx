@@ -126,7 +126,7 @@ const ForumPage = () => {
                 return checkedCategories.includes(cat);
             });
         }
-        if (activeNavCategory !== "Alla" && activeNavCategory !== "Sparade") {
+        if (activeNavCategory !== "Alla" && activeNavCategory !== "Sparade" && activeNavCategory !== "Dina inlägg") {
             return posts.filter(p => {
                 const cat = p.category?.name || p.category;
                 return cat === activeNavCategory;
@@ -136,8 +136,11 @@ const ForumPage = () => {
             return posts.filter(p => {
                 return userBookmarks.some(b => b.postId === p.id);
             });
-
         }
+        if (activeNavCategory == "Dina inlägg") {
+            return posts.filter(p => p.createdByUser === currentUser?.sub);
+        }
+
         return posts;
     }, [posts, activeNavCategory, checkedCategories, userBookmarks]);
 

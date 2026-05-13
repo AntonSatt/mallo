@@ -102,9 +102,6 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen, userBookmarks, current
             {/*Collapsing comment section.*/}
                     <Collapse in={expanded} timeout="auto" unmountOnExit>
                         <CardContent className="post-comments">
-                            <Typography variant="subtitle2" gutterBottom>
-                                Kommentarer
-                            </Typography>
                             <CommentForm postId={post.id} />
                         </CardContent>
                     </Collapse>

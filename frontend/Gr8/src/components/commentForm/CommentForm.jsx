@@ -4,10 +4,11 @@ import CommentServices from "../../services/CommentServices";
 import ReportForm from "../reportForm/ReportForm";
 import DeleteComment from "../../components/deleteForm/DeleteComment.jsx";
 import { useAuth } from "../../hooks/useAuth";
-import HugButton from "../../components/hugButton/HugButton.jsx"
+import HugButton from "../../components/hugButton/HugButton.jsx";
 
 import {
     Box,
+    Avatar,
     TextField,
     Button,
     Typography,
@@ -56,11 +57,11 @@ const CommentForm = ({ postId }) => {
         }
 
         try {
-            var data = await CommentServices.create(postId, commentData);
+            const data = await CommentServices.create(postId, commentData);
             setComments(prev => [...prev, data]);
             setCommentData({ commentContent: "" });
         } catch (error) {
-            console.error("Tekniskt felet: ", error);
+            console.error("Tekniskt fel:", error);
             setCommentError("Kunde inte spara kommentar");
         }
     };
@@ -84,9 +85,12 @@ const CommentForm = ({ postId }) => {
     useEffect(() => {
         const loadComments = async () => {
             const result = await CommentServices.getAll(postId);
-            setComments(result);
+            setComments(result || []);
         };
-        if (postId) loadComments();
+
+        if (postId) {
+            loadComments();
+        }
     }, [postId]);
 
     const handleOpenMenu = (event, commentId) => {

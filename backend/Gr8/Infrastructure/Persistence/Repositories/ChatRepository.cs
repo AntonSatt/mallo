@@ -24,7 +24,6 @@ namespace Gr8.Infrastructure.Persistence.Repositories
         {
             return await _communityDbContext.ChatMessages.Where(m =>
                 (m.SenderId == currentUserId && m.ReceiverId == otherUserId && !m.DeletedBySender) ||
-
                 (m.SenderId == otherUserId && m.ReceiverId == currentUserId && !m.DeletedByReceiver)) 
                 .OrderBy(m => m.SendAt)
                 .ToListAsync();

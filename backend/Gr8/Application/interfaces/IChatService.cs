@@ -2,9 +2,9 @@
 
 namespace Gr8.Application.Interfaces
 {
+    //handles chat logic between the application and the database layer.
     public interface IChatService
     {
-        //handles chat logic between the application and the database layer.
         Task<ChatMessageResponseDto> SendMessageAsync(string senderId, SendChatMessageDto dto);
 
         Task<List<ChatMessageResponseDto>> GetChatHistoryAsync(string currentUserId, string otherUserId);

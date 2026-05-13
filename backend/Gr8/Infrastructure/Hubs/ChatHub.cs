@@ -1,42 +1,75 @@
 ﻿using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
-using Gr8.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
+using System.Security.Claims;
 
 namespace Gr8.Infrastructure.Hubs
 {
-    //[Authorize] - Comment out for local testing
-    // When it is activated, a valid JWT-token is required to even open a connection to the HUB.
+    [Authorize] 
     public class ChatHub : Hub<IChatClient>
     {
-        private readonly CommunityDbContext _context;
-        public ChatHub(CommunityDbContext context) 
+        private readonly IChatService _chatService;
+
+        public ChatHub(IChatService chatService) 
         {
-            _context = context;
+            _chatService = chatService;
         }
 
-        // This method is called when a client connects to the hub.
-        public override async Task OnConnectedAsync() 
+        // Sends a chat message and broadcasts it to the receiver in real time.
+        public async Task SendMessage(SendChatMessageDto dto) 
         {
-            await base.OnConnectedAsync(); //Send the message to the right client in real time.
+            var senderId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(senderId)) 
+            {
+                throw new HubException("User is not authenticated.");
+            }
+
+            var message = await _chatService.SendMessageAsync(senderId, dto);
+
+            await Clients.User(dto.ReceiverId).ReceiveMessage(message);
+
+            await Clients.Caller.ReceiveMessage(message);
         }
 
-        public async Task SendPrivateMessage(ChatMessageDto messageDto)
+        // Retrieves the full chat history between two users.
+        public async Task<List<ChatMessageResponseDto>> GetChatHistory(string otherUserId) 
         {
-            //Finding out who is sending the message.
-            var senderId = Context.UserIdentifier ?? "Anonym";
+            var currentUserId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            //Send the message to the receiver.
-            await Clients.User(messageDto.ReceiverId)
-                .ReceiveMessage(senderId, messageDto.Content);
+            if (string.IsNullOrEmpty(currentUserId)) 
+            {
+                throw new HubException("User is not authenticated.");
+            }
 
-            //Show the message to the sender.
-            await Clients.Caller.ReceiveMessage(senderId, messageDto.Content);
+            return await _chatService.GetChatHistoryAsync(currentUserId, otherUserId);
+        }
+
+        // Retrieves all conversations for the current user.
+        public async Task<List<ChatConversationDto>> GetConversations() 
+        {
+            var currentUserId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId)) 
+            {
+                throw new HubException("User is not authenticated.");
+            }
+
+            return await _chatService.GetUserConversationsAsync(currentUserId);
+        }
+
+        // Soft deletes a conversation for the current user.
+        public async Task DeleteConversation(string otherUserId) 
+        {
+            var currentUserId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId)) 
+            {
+                throw new HubException("User is not authenticated.");
+            }
+
+            await _chatService.DeleteConversationForUserAsync(currentUserId, otherUserId);
         }
     }
 }

@@ -65,15 +65,17 @@ namespace Gr8.Application.Services
             var conversations = messages.GroupBy(m => m.SenderId == userId ? m.ReceiverId : m.SenderId)
                 .Select(group =>
                 {
-                    var latestMessage = group.OrderByDescending(m => m.SendAt).First(); 
+                    var latestMessage = group.OrderByDescending(m => m.SendAt).First();
 
                     return new ChatConversationDto
                     {
-                        OtherUserId = latestMessage.SenderId == userId ? latestMessage.ReceiverId : latestMessage.SenderId, 
+                        OtherUserId = latestMessage.SenderId == userId ? latestMessage.ReceiverId : latestMessage.SenderId,
                         ActivityId = latestMessage.ActivityId,
-                        LastMessage = latestMessage.Content, 
+                        LastMessage = latestMessage.Content,
                         LastMessageAt = latestMessage.SendAt,
-                        HasUnreadMessage = group.Any(m => m.ReceiverId == userId && !m.IsRead) 
+                        HasUnreadMessage = group.Any(m => m.ReceiverId == userId && !m.IsRead)
+                    };
+
                 }).OrderByDescending(c => c.LastMessageAt).ToList();
 
             return conversations;

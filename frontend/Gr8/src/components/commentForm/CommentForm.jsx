@@ -8,7 +8,6 @@ import HugButton from "../../components/hugButton/HugButton.jsx";
 
 import {
     Box,
-    Avatar,
     TextField,
     Button,
     Typography,
@@ -18,6 +17,7 @@ import {
 } from "@mui/material";
 import moment from "moment";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import Avatar from "../avatar/avatar.jsx";
 
 const CommentForm = ({ postId }) => {
     const { currentUser } = useAuth();
@@ -121,14 +121,12 @@ const CommentForm = ({ postId }) => {
                         comments.map((c, index) => (
                             <Box key={c.id || index} className="comment-card">
                                 <Box className="comment-card-main">
-                                    <Avatar className="comment-avatar">
-                                        {c.userName?.charAt(0)?.toUpperCase() || "?"}
-                                    </Avatar>
+                                    <Avatar className="comment-avatar" avatar={c.authorInfo.avatarId} />
 
                                     <Box className="comment-content">
                                         <Box className="comment-card-header">
                                             <Typography className="comment-meta" display="block">
-                                                {`${c.userName} \u2022 ${moment(c.createdAt).fromNow()}`}
+                                                {`${c.authorInfo.userName} \u2022 ${moment(c.createdAt).fromNow()}`}
                                             </Typography>
                                             {c.id && (
                                                 <IconButton size="small" className="comment-menu-button" onClick={(event) => handleOpenMenu(event, c.id)}>
@@ -220,7 +218,7 @@ const CommentForm = ({ postId }) => {
             </Box>
 
             <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleCloseMenu}>
-                {(comments && (currentUser?.sub === comments.find(c => c.id === selectedCommentId)?.createdByUser)) ? (
+                {(comments && (currentUser?.sub === comments.find(c => c.id === selectedCommentId)?.authorInfo.id)) ? (
                     <>
                         <MenuItem onClick={() => {
                             handleCloseMenu();

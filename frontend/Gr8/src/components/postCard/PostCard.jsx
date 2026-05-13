@@ -32,12 +32,12 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen, userBookmarks, current
         <>
             <Card className="post-card">
                 <CardHeader avatar={
-                    <Avatar className="post-avatar" avatar={currentUser.picture} />
+                    <Avatar className="post-avatar" avatar={post.authorInfo.avatarId} />
                 }
                     title={
                         <Box className="post-user-row">
                             <Typography className="post-username">
-                                {post.userName}
+                                {post.authorInfo.userName}
                             </Typography>
 
                             <Typography className="post-category">

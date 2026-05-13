@@ -9,7 +9,6 @@ import CommentForm from "../commentForm/CommentForm";
 import CommentBubble from "../../assets/icons/commentBubble.svg";
 import FilledCommentBubble from "../../assets/icons/filledcommentBubble.svg";
 import {
-    Avatar,
     Card,
     CardActions,
     CardContent,
@@ -20,6 +19,7 @@ import {
     IconButton
 } from "@mui/material";
 import BookmarkButton from "../../components/bookmarkButton/BookmarkButton.jsx";
+import Avatar from "../avatar/avatar.jsx";
 
 //this file contains the PostCard component, which is used to display a post in the feed. 
 // It takes in the post data as props and displays the post's title, content, author, category, tags, 
@@ -32,10 +32,7 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen, userBookmarks, current
         <>
             <Card className="post-card">
                 <CardHeader avatar={
-                    <Avatar className="post-avatar">
-                        {post.userName?.charAt(0)?.toUpperCase()} 
-                    </Avatar>
-
+                    <Avatar className="post-avatar" avatar={currentUser.picture} />
                 }
                     title={
                         <Box className="post-user-row">

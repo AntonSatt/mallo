@@ -7,7 +7,7 @@ import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutline
 import HugButton from "../hugButton/HugButton";
 import CommentForm from "../commentForm/CommentForm";
 import CommentBubble from "../../assets/icons/commentBubble.svg";
-import FilledCommentBubble from "../../assets/icons/filledcommentBubble.svg";
+import FilledCommentBubble from "../../assets/icons/filledCommentBubble.svg";
 import {
     Card,
     CardActions,

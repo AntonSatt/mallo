@@ -115,103 +115,108 @@ const CommentForm = ({ postId }) => {
 
     return (
         <>
-            <Box component="form" onSubmit={handleCommentSubmit} sx={{ mt: 2 }}>
-                <TextField
-                    fullWidth
-                    label="Skriv en kommentar"
-                    variant="outlined"
-                    multiline
-                    minRows={3}
-                    value={commentData.commentContent}
-                    onChange={handleCommentChange}
-                    error={Boolean(commentError)}
-                    helperText={commentError}
-                    size="small"
-                    sx={{
-                        "& .MuiOutlinedInput-root": {
-                            borderRadius: 4,
-                            "& fieldset": {
-                                borderRadius: 4,
-                            },
-                        },
-                    }}
-                />
-                <Button
-                    type="submit"
-                    disabled={!commentData.commentContent.trim()}
-                    variant="contained"
-                    sx={{ mt: 1 }}
-                >
-                    Skicka kommentar
-                </Button>
-            </Box>
+            <Box className="comment-panel">
+                <Box className="comment-list-viewport">
+                    {comments.length > 0 ? (
+                        comments.map((c, index) => (
+                            <Box key={c.id || index} className="comment-card">
+                                <Box className="comment-card-main">
+                                    <Avatar className="comment-avatar">
+                                        {c.userName?.charAt(0)?.toUpperCase() || "?"}
+                                    </Avatar>
 
-            <Box sx={{ mt: 2 }}>
-                {comments.length > 0 ? (
-                    comments.map((c, index) => (
-                        <Box key={c.id || index} sx={{ mb: 2, p: 2, bgcolor: 'white', borderRadius: 4, boxShadow: 1 }}>
-                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                                <Typography variant="caption" color="text.secondary" display="block">
-                                    {`${c.userName} • ${moment(c.createdAt).fromNow()}`}
-                                </Typography>
-                                {c.id && (
-                                    <IconButton size="small" onClick={(event) => handleOpenMenu(event, c.id)}>
-                                        <MoreHorizIcon fontSize="small" />
-                                    </IconButton>
-                                )}
-                            </Box>
+                                    <Box className="comment-content">
+                                        <Box className="comment-card-header">
+                                            <Typography className="comment-meta" display="block">
+                                                {`${c.userName} \u2022 ${moment(c.createdAt).fromNow()}`}
+                                            </Typography>
+                                            {c.id && (
+                                                <IconButton size="small" className="comment-menu-button" onClick={(event) => handleOpenMenu(event, c.id)}>
+                                                    <MoreHorizIcon fontSize="small" />
+                                                </IconButton>
+                                            )}
+                                        </Box>
 
-                            <Typography variant="body2" sx={{ mt: 0.5 }}>
-                                {c.content || c.Content}
-                            </Typography>
+                                        <Typography className="comment-text">
+                                            {c.content || c.Content}
+                                        </Typography>
 
-                            {c.id && (
-                                <div className="comment-hug-button">
-                                    <HugButton type="comment" id={c.id} />
-                                </div>
-                            )}
-                            {editingCommentId === c.id && (
-                                <Box sx={{ mt: 2 }}>
-                                    <TextField
-                                        fullWidth
-                                        label="Redigera kommentar"
-                                        variant="outlined"
-                                        multiline
-                                        minRows={3}
-                                        size="small"
-                                        value={editContent}
-                                        onChange={(e) => setEditContent(e.target.value)}
-                                    />
-                                    <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                                        <Button
-                                            variant="contained"
-                                            size="small"
-                                            disabled={!editContent.trim()}
-                                            onClick={() => handleEditSubmit(c.id)}
-                                        >
-                                            Spara
-                                        </Button>
-                                        <Button
-                                            variant="text"
-                                            size="small"
-                                            color="inherit"
-                                            onClick={() => {
-                                                setEditingCommentId(null);
-                                                setEditContent("");
-                                            }}
-                                        >
-                                            Avbryt
-                                        </Button>
+                                        {c.id && (
+                                            <div className="comment-hug-button">
+                                                <HugButton type="comment" id={c.id} />
+                                            </div>
+                                        )}
                                     </Box>
                                 </Box>
-                            )}
-                        </Box>
-                    ))
-                ) : (
-                    <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                        Inga kommentarer ännu. Bli den första att kommentera!
-                    </Typography>
-                )}
+
+                                {editingCommentId === c.id && (
+                                    <Box sx={{ mt: 1.5 }}>
+                                        <TextField
+                                            fullWidth
+                                            label="Redigera kommentar"
+                                            variant="outlined"
+                                            multiline
+                                            minRows={3}
+                                            size="small"
+                                            value={editContent}
+                                            onChange={(e) => setEditContent(e.target.value)}
+                                        />
+                                        <Box sx={{ display: 'flex', gap: 1, mt: 1.25 }}>
+                                            <Button
+                                                variant="contained"
+                                                size="small"
+                                                disabled={!editContent.trim()}
+                                                onClick={() => handleEditSubmit(c.id)}
+                                            >
+                                                Spara
+                                            </Button>
+                                            <Button
+                                                variant="text"
+                                                size="small"
+                                                color="inherit"
+                                                onClick={() => {
+                                                    setEditingCommentId(null);
+                                                    setEditContent("");
+                                                }}
+                                            >
+                                                Avbryt
+                                            </Button>
+                                        </Box>
+                                    </Box>
+                                )}
+                            </Box>
+                        ))
+                    ) : (
+                        <Typography className="comment-empty-state">
+                            Inga kommentarer ännu. Bli den första att kommentera!
+                        </Typography>
+                    )}
+                </Box>
+
+                <Box component="form" onSubmit={handleCommentSubmit} className="comment-composer">
+                    <TextField
+                        fullWidth
+                        placeholder="Skriv en kommentar..."
+                        variant="outlined"
+                        multiline
+                        minRows={1}
+                        maxRows={3}
+                        value={commentData.commentContent}
+                        onChange={handleCommentChange}
+                        error={Boolean(commentError)}
+                        helperText={commentError}
+                        size="small"
+                        className="comment-input"
+                    />
+                    <Button
+                        type="submit"
+                        disabled={!commentData.commentContent.trim()}
+                        variant="contained"
+                        className="comment-submit-button"
+                    >
+                        Skicka
+                    </Button>
+                </Box>
             </Box>
 
             <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleCloseMenu}>

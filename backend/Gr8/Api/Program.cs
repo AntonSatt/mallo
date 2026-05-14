@@ -6,7 +6,6 @@ using Gr8.Infrastructure.Identity;
 using Gr8.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
@@ -41,19 +40,17 @@ namespace Gr8
                             Encoding.UTF8.GetBytes(jwtSettings.Key))
                     };
 
-                    //signalRtest
+                    // Allows SignalR connections to authenticate using JWT tokens from the query string.
                     options.Events = new JwtBearerEvents
                     {
                         OnMessageReceived = context =>
                         {
                             var accessToken = context.Request.Query["access_token"];
 
-                            // Om begäran går till vår hub-väg
                             var path = context.HttpContext.Request.Path;
                             if (!string.IsNullOrEmpty(accessToken) &&
                                 (path.StartsWithSegments("/chat/hub")))
                             {
-                                // Läs in token från query-strängen så att [Authorize] i Hubben fungerar
                                 context.Token = accessToken;
                             }
                             return Task.CompletedTask;
@@ -80,18 +77,15 @@ namespace Gr8
             var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
                               ?? new[] { "http://localhost:5173" };
 
-            // Lägg till testverktygets adress i listan
-            var allOrigins = corsOrigins.Append("https://gourav-d.github.io").ToArray();
 
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("ReactApplication", policy =>
                 {
-                    policy.SetIsOriginAllowed(origin => true)
-                    //policy.WithOrigins(corsOrigins)
+                    policy.WithOrigins(corsOrigins)
                         .AllowAnyHeader()
                         .AllowAnyMethod()
-                        .AllowCredentials(); // For Websockets
+                        .AllowCredentials(); // authentication via JWT/websocket.
                 });
             });
 
@@ -99,7 +93,6 @@ namespace Gr8
 
             builder.Services.AddInfrastructure(builder.Configuration);
 
-            // SignalR
             builder.Services.AddSignalR();
 
             var app = builder.Build();

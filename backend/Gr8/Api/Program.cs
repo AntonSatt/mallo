@@ -45,14 +45,20 @@ namespace Gr8
                     {
                         OnMessageReceived = context =>
                         {
-                            var accessToken = context.Request.Query["access_token"];
+                            var accessToken = context.Request.Query["access_token"].FirstOrDefault();
 
-                            var path = context.HttpContext.Request.Path;
                             if (!string.IsNullOrEmpty(accessToken) &&
-                                (path.StartsWithSegments("/chat/hub")))
+                                accessToken.StartsWith("Bearer "))
+                            {
+                                accessToken = accessToken["Bearer ".Length..].Trim();
+                            }
+
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                context.HttpContext.Request.Path.StartsWithSegments("/chat"))
                             {
                                 context.Token = accessToken;
                             }
+
                             return Task.CompletedTask;
                         }
                     };

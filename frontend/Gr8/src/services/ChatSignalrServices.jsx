@@ -10,9 +10,10 @@ class ChatSignalrService {
 
     async startConnection() {
         const token = localStorage.getItem("token");
+        console.log("SignalR token:", token);
 
         this.connection = new signalR.HubConnectionBuilder().withUrl(`${import.meta.env.VITE_API_BASE_URL}/chat/hub`, {
-            accessTokenFactory: () => token
+            accessTokenFactory: () => localStorage.getItem("token")
         })
         .withAutomaticReconnect()
         .build();

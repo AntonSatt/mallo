@@ -11,6 +11,7 @@ import ForumPage from './pages/forum/ForumPage'
 import LandingPage from './pages/landing/LandingPage'
 import ForgotPasswordPage from './pages/resetPassword/ForgotPasswordPage'
 import ResetPasswordPage from './pages/resetPassword/ResetPasswordPage'
+import ChatTestPage from './pages/chat/ChatTestPage'
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path='/reset-password' element={<ResetPasswordPage />} />
           <Route path='/settings' element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           <Route path='/forum' element={<ProtectedRoute><ForumPage /></ProtectedRoute>} />
+          <Route path='/chat-test' element={<ProtectedRoute><ChatTestPage /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

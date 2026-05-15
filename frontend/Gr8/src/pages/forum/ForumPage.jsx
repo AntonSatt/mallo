@@ -139,7 +139,7 @@ const ForumPage = () => {
             });
         }
         if (activeNavCategory == "Dina inlägg") {
-            return posts.filter(p => p.createdByUser === currentUser?.sub);
+            return posts.filter(p => p.authorInfo.id === currentUser?.sub);
         }
 
         return posts;
@@ -169,11 +169,11 @@ const ForumPage = () => {
                     id: post.id,
                     title: post.title,
                     content: post.content ? post.content : "Innehåll saknas",
-                    userName: post.userName,
                     createdAt: post.createdAt,
                     category: post.category ? post.category : "Ingen kategori",
-                    createdByUser: post.createdByUser,
-                    tags: post.tags ? post.tags : []
+                    tags: post.tags ? post.tags : [],
+                    countOfComments: post.countOfComments || 0,
+                    authorInfo: post.authorInfo || { avatarId: 1 },
                 }));
                 setPosts(allPosts);
             } catch (error) {
@@ -235,11 +235,10 @@ const ForumPage = () => {
             id: newPost.id,
             title: newPost.title,
             content: newPost.content,
-            userName: newPost.userName,
             createdAt: newPost.createdAt,
             category: newPost.category,
             tags: newPost.tags,
-            createdByUser: newPost.createdByUser,
+            authorInfo: newPost.authorInfo || { avatarId: 1 },
         };
         setPosts((prevPosts) => [formattedPost, ...prevPosts]);
     };
@@ -318,7 +317,7 @@ const ForumPage = () => {
                             handleMenuClose();
                         }}
                         isOwner={
-                            currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser
+                            currentUser?.sub === posts.find(p => p.id === selectedPostId)?.authorInfo.id
                         }
                     />
 

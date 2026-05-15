@@ -3,10 +3,11 @@ using Gr8.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
+using Gr8.Application.Common.Constants;
 
 namespace Gr8.Infrastructure.Hubs
 {
-    [Authorize] 
+    [Authorize(Policy = AuthorizationConstants.JwtOnly)]
     public class ChatHub : Hub<IChatClient>
     {
         private readonly IChatService _chatService;

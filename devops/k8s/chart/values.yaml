@@ -71,6 +71,12 @@ redis:
   enabled: true
   architecture: standalone
 
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/redis
+    tag: 7.2.3-debian-11-r9
+    pullPolicy: IfNotPresent
+
   serviceAccount:
     create: false
   rbac:

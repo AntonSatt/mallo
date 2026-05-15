@@ -65,3 +65,38 @@ db:
 # Name of the manually-created Secret holding DB_PASSWORD, Jwt__Key, ConnectionStrings__DefaultConnection,
 # and any SMTP creds. Bootstrap instructions in chart/README.md.
 secretName: gr8-secrets
+
+# --- REDIS CONFIGURATION ---
+redis:
+  enabled: true
+  architecture: standalone
+  
+  # Master replica (standalone mode)
+  master:
+    persistence:
+      enabled: true
+      size: 1Gi
+      storageClass: longhorn
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+  
+  auth:
+    enabled: true
+    existingSecret: gr8-secrets
+    existingSecretPasswordKey: REDIS_PASSWORD
+  
+  # Service configuration for SignalR
+  service:
+    ports:
+      redis: 6379
+  
+  # Health checks
+  readinessProbe:
+    enabled: true
+  livenessProbe:
+    enabled: true

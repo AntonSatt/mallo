@@ -45,16 +45,21 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /var/opt/mssql
+          # MSSQL can take 1–5 min to bootstrap (especially first boot on a fresh PVC).
+          # startupProbe gates liveness/readiness until the port is open, then they kick in at normal cadence.
+          startupProbe:
+            tcpSocket:
+              port: {{ .Values.db.port }}
+            periodSeconds: 10
+            failureThreshold: 30
           livenessProbe:
             tcpSocket:
               port: {{ .Values.db.port }}
-            initialDelaySeconds: 60
             periodSeconds: 30
             failureThreshold: 3
           readinessProbe:
             tcpSocket:
               port: {{ .Values.db.port }}
-            initialDelaySeconds: 30
             periodSeconds: 10
   volumeClaimTemplates:
     - metadata:

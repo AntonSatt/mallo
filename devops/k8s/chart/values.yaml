@@ -70,6 +70,17 @@ secretName: gr8-secrets
 redis:
   enabled: true
   architecture: standalone
+
+  image:
+    registry: docker.io
+    repository: bitnami/redis
+    tag: "latest"
+    pullPolicy: Always
+
+  serviceAccount:
+    create: false
+  rbac:
+    create: false
   
   # Master replica (standalone mode)
   master:

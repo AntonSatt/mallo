@@ -130,6 +130,7 @@ build backend:
     - chmod 600 /tmp/kubeconfig
     - export KUBECONFIG=/tmp/kubeconfig
     - kubectl auth whoami
+    - helm dependency update ./devops/k8s/chart
 
 # Develop deploy: persistent shared dev environment
 deploy develop:

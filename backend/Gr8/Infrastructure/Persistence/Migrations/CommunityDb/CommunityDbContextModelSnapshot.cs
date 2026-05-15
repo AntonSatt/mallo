@@ -22,6 +22,31 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Gr8.Domain.Entities.Bookmark", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId", "PostId")
+                        .IsUnique();
+
+                    b.ToTable("Bookmarks");
+                });
+
             modelBuilder.Entity("Gr8.Domain.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -36,7 +61,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
 
                     b.HasData(
                         new
@@ -98,7 +123,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Hug", b =>
@@ -133,7 +158,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                         .IsUnique()
                         .HasFilter("[PostId] IS NOT NULL");
 
-                    b.ToTable("Hugs", (string)null);
+                    b.ToTable("Hugs");
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Post", b =>
@@ -177,7 +202,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Posts", (string)null);
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Report", b =>
@@ -228,7 +253,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasIndex("ReviewedByAdminId");
 
-                    b.ToTable("Reports", (string)null);
+                    b.ToTable("Reports");
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Tag", b =>
@@ -245,7 +270,7 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags", (string)null);
+                    b.ToTable("Tags");
 
                     b.HasData(
                         new
@@ -435,6 +460,23 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                     b.ToTable("PostTags", (string)null);
                 });
 
+            modelBuilder.Entity("Gr8.Domain.Entities.Bookmark", b =>
+                {
+                    b.HasOne("Gr8.Domain.Entities.Post", "Post")
+                        .WithMany("Bookmarks")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Gr8.Infrastructure.Identity.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+                });
+
             modelBuilder.Entity("Gr8.Domain.Entities.Comment", b =>
                 {
                     b.HasOne("Gr8.Domain.Entities.Comment", "ParentComment")
@@ -556,6 +598,8 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
             modelBuilder.Entity("Gr8.Domain.Entities.Post", b =>
                 {
+                    b.Navigation("Bookmarks");
+
                     b.Navigation("Comments");
 
                     b.Navigation("Hugs");

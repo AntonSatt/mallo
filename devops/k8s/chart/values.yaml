@@ -14,10 +14,10 @@ image:
   pullPolicy: Always
   pullSecret: gitlab-registry
 
-# Single-host + path routing. School cluster's Traefik has wildcard cert at *.labb.k3s.chas-lab.dev.
-# Final URL: https://{{ .Release.Name }}.labb.k3s.chas-lab.dev/
-# API at:    https://{{ .Release.Name }}.labb.k3s.chas-lab.dev/api
-hostBase: labb.k3s.chas-lab.dev
+# Single-host + path routing. School cluster's Traefik has wildcard cert at *.cc.k3s.chas-lab.dev.
+# Final URL: https://{{ .Release.Name }}.cc.k3s.chas-lab.dev/
+# API at:    https://{{ .Release.Name }}.cc.k3s.chas-lab.dev/api
+hostBase: cc.k3s.chas-lab.dev
 
 api:
   replicas: 1

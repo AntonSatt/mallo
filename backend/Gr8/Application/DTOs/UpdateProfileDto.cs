@@ -9,6 +9,7 @@ namespace Gr8.Application.DTOs
 {
     public class UpdateProfileDto
     {
+        public int Avatar { get; set; }
         [MaxLength(50)]
         public string Username { get; set; }
         [MaxLength(50)]

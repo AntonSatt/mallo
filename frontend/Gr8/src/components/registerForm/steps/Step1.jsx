@@ -6,14 +6,17 @@ import InputField from "../../../design/input/InputField";
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import InputAdornment from "@mui/material/InputAdornment";
 import AvatarSlider from "../../../components/avatar/avatarSlider.jsx"
+import useViewport from "../../../hooks/useViewport";
 
 // Step 1 of registration: User selects an avatar and sets a username.
 const Step1 = ({ formData, handleChange, onNext, error }) => {
     const navigate = useNavigate();
+    const { isDesktop } = useViewport();
+
     return (
         <Box className="register-step1">
 
-            <AvatarSlider formData={formData} handleChange={handleChange} mt={5} mb={2} />
+            <AvatarSlider formData={formData} handleChange={handleChange} mt={isDesktop ? 2.5 : 5} mb={2} />
 
             <Typography variant="body2" sx={{ mb: 1 }}>Välj ett användarnamn</Typography>
 

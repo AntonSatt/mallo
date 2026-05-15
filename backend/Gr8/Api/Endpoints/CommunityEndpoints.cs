@@ -175,7 +175,7 @@ namespace Gr8.Api.Endpoints
                     return Results.NotFound("Comment not found.");
                 }
 
-                if (comment.CreatedByUser != appUser.Id)
+                if (comment.AuthorInfo.Id != appUser.Id)
                 {
                     return Results.Forbid();
                 }
@@ -268,6 +268,41 @@ namespace Gr8.Api.Endpoints
                 var hugged = await hugService.ToggleCommentHugAsync(commentId, appUser.Id);
 
                 return Results.Ok(new { hugged });
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPost("/forum/posts/{postId}/bookmark", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user, [FromServices] IBookmarkService bookService, int postId) =>
+            {
+                var appUser = await userManger.GetUserAsync(user);
+
+                if(appUser == null) 
+                {
+                    return Results.Unauthorized();
+                }
+
+                var bookmarked = await bookService.TogglePostBookmarkAsync(postId, appUser.Id);
+
+                return Results.Ok(new { bookmarked });
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapGet("/forum/bookmarks", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user, [FromServices] IBookmarkService bookService) =>
+            {
+                var appUser = await userManger.GetUserAsync(user);
+
+                if(appUser == null) 
+                {
+                    return Results.Unauthorized();
+                }
+
+                var savedBookmarks = await bookService.GetAllBookmarksByUserIdAsync(appUser.Id, 0);
+
+                if(savedBookmarks.Count == 0) 
+                {
+                    return Results.NoContent();
+                }
+
+                return Results.Ok(savedBookmarks);
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
         }

@@ -45,16 +45,22 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /var/opt/mssql
+          # First boot on a fresh PVC: MSSQL image's templatedata is older than the binary,
+          # so it runs schema upgrades on master/msdb/model. Observed ~3-4 min before port opens.
+          # 600s budget covers that with margin.
+          startupProbe:
+            tcpSocket:
+              port: {{ .Values.db.port }}
+            periodSeconds: 10
+            failureThreshold: 60
           livenessProbe:
             tcpSocket:
               port: {{ .Values.db.port }}
-            initialDelaySeconds: 60
             periodSeconds: 30
             failureThreshold: 3
           readinessProbe:
             tcpSocket:
               port: {{ .Values.db.port }}
-            initialDelaySeconds: 30
             periodSeconds: 10
   volumeClaimTemplates:
     - metadata:

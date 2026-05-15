@@ -10,7 +10,8 @@ import hold1 from "../../assets/images/hold1.png";
 import hold2 from "../../assets/images/hold2.png";
 import hold3 from "../../assets/images/hold3.png";
 import groupPhoto from "../../assets/images/groupPhoto.png";
-
+import Header from "../../components/header/Header";
+import holdingHands2 from "../../assets/images/holdingHands2.png";
 
 // Registration Page: A layout wrapper that manages step state, 
 // dynamic image & title rendering, and navigation between form stages.
@@ -38,19 +39,11 @@ const RegisterPage = () => {
     }
 
     return (
-        <main>
-            <Grid container className="register-container">
+        <>
+            <Header mobileImage={getImageForStep(step)} desktopImage={holdingHands2} />
 
-                <Grid item xs={12} md={6} className="register-picture">
-                    <Box className="register-image-wrapper">
-                        <img
-                            src={getImageForStep(step)}
-                            alt={`Step ${step}`}
-                            className="register-image"
-                        />
-                    </Box>
-                </Grid>
-                <Grid className="register-page" item xs={12} md={6}>
+            <Grid container className="register-container">
+                <Grid className="register-page" item="true" xs={12} md={6}>
                     <Box className="register-content">
                         <Typography variant="h4" >
                             Skapa konto
@@ -64,7 +57,7 @@ const RegisterPage = () => {
                     </Box>
                 </Grid>
             </Grid>
-        </main>
+        </>
     );
 };
 

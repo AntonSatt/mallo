@@ -609,6 +609,13 @@ const UserSettings = () => {
                                 value={selectedTags}
                                 onChange={(e) => setSelectedTags(e.target.value)}
                                 input={<OutlinedInput />}
+                                MenuProps={{
+                                    slotProps: {
+                                        paper: {
+                                            sx: { maxHeight: 240 },
+                                        },
+                                    },
+                                }}
                                 renderValue={(selected) =>
                                     selected
                                         .map(id => tags.find(t => t.id === id)?.name)

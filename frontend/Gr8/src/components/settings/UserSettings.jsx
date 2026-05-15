@@ -1,13 +1,10 @@
-import React from "react";
 import { useState, useEffect } from "react";
 import {
     Dialog,
     DialogTitle,
     DialogActions,
     Button,
-    IconButton,
     InputAdornment,
-    TextField,
     Accordion,
     AccordionSummary,
     AccordionDetails,
@@ -19,15 +16,10 @@ import {
     OutlinedInput,
     ListItemText
 } from "@mui/material";
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import UserServices from "../../services/UserServices";
 import { useAuth } from "../../hooks/useAuth";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ArrowDropDownCircleOutlinedIcon from '@mui/icons-material/ArrowDropDownCircleOutlined';
 import InputField from "../../design/input/InputField";
-import ProfileBar from "../../components/layout/ProfileBar.jsx";
-import EditPencil from "../../assets/icons/editPencil.svg";
 import Settings from "../../assets/icons/settings.svg";
 import AvatarSlider from "../../components/avatar/avatarSlider.jsx";
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
@@ -154,7 +146,7 @@ const UserSettings = () => {
         }
 
         try {
-            const result = await UserServices.updateUser(profileData);
+            await UserServices.updateUser(profileData);
         }
         catch (error) {
             if (error.response && error.response.status === 409) {
@@ -179,7 +171,7 @@ const UserSettings = () => {
         }
 
         try {
-            const result = await UserServices.updatePassword(passwordData);
+            await UserServices.updatePassword(passwordData);
             setPasswordData({ currentPassword: "", newPassword: "", confirmNewPassword: "" });
         }
         catch (e) {
@@ -262,9 +254,7 @@ const UserSettings = () => {
                         className="dropdown"
                         expanded={expandedSection === "profile"}
                         onChange={handleAccordionChange("profile")}
-                        sx={{
-
-                        }}>
+                    >
                         <AccordionSummary className="dropdown" expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />}>
                             <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                 <img src={Settings} alt="edit" style={{
@@ -429,14 +419,14 @@ const UserSettings = () => {
 
                             </Box>
 
-                            <Box item="true" sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                                 <PrimaryButton type="submit" sx={{ mt: 2, borderRadius: 50, width: '75%' }}>
                                     Spara profil
                                 </PrimaryButton>
                             </Box>
 
-                            <Box item="true" sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <SecondaryButton onClick={handleClickOpen} sx={{ borderRadius: 50, backgroundColor: '--color-bg-muted', width: '50%', alignItems: 'center', mt: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                <SecondaryButton onClick={handleClickOpen} sx={{ borderRadius: 50, backgroundColor: 'var(--color-bg-muted)', width: '50%', alignItems: 'center', mt: 2 }}>
                                     Radera konto
                                 </SecondaryButton>
                             </Box>
@@ -576,7 +566,7 @@ const UserSettings = () => {
 
                             </Box>
 
-                            <Grid item="true" sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <Grid sx={{ display: 'flex', justifyContent: 'center' }}>
                                 <PrimaryButton type="submit" sx={{ mt: 2, borderRadius: 50, width: '75%' }}>
                                     Spara lösenord
                                 </PrimaryButton>

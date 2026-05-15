@@ -139,7 +139,7 @@ deploy develop:
     - job: build backend
   environment:
     name: develop
-    url: https://gr8-develop.labb.k3s.chas-lab.dev
+    url: https://gr8-develop.${HOST_BASE}
   script:
     - |
       helm upgrade --install gr8-develop ./devops/k8s/chart \
@@ -158,7 +158,7 @@ deploy review:
     - job: build backend
   environment:
     name: review/$CI_COMMIT_REF_SLUG
-    url: https://gr8-$CI_COMMIT_REF_SLUG.labb.k3s.chas-lab.dev
+    url: https://gr8-$CI_COMMIT_REF_SLUG.${HOST_BASE}
     on_stop: stop_review
   script:
     - |
@@ -179,7 +179,7 @@ deploy production:
     - job: build backend
   environment:
     name: production
-    url: https://gr8-main.labb.k3s.chas-lab.dev
+    url: https://gr8-main.${HOST_BASE}
   script:
     - |
       helm upgrade --install gr8-main ./devops/k8s/chart \

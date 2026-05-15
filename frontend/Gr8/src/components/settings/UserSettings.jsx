@@ -70,6 +70,7 @@ const UserSettings = () => {
     const [selectedTags, setSelectedTags] = useState([]);
 
     const [errors, setErrors] = useState({});
+    const [expandedSection, setExpandedSection] = useState(false);
 
     const [showCurrentPassword] = useState(false);
     const [showNewPassword] = useState(false);
@@ -211,6 +212,10 @@ const UserSettings = () => {
         setOpen(false);
     };
 
+    const handleAccordionChange = (section) => (_, isExpanded) => {
+        setExpandedSection(isExpanded ? section : false);
+    };
+
     return (
         <>
             <Box className="settingsContainer">
@@ -253,9 +258,13 @@ const UserSettings = () => {
                 </Grid>
 
                 <form onSubmit={handleProfileSubmit}>
-                    <Accordion className="dropdown" sx={{
+                    <Accordion
+                        className="dropdown"
+                        expanded={expandedSection === "profile"}
+                        onChange={handleAccordionChange("profile")}
+                        sx={{
 
-                    }}>
+                        }}>
                         <AccordionSummary className="dropdown" expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />}>
                             <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                 <img src={Settings} alt="edit" style={{
@@ -438,7 +447,11 @@ const UserSettings = () => {
                 </form>
 
                 <form onSubmit={handlePasswordSubmit}>
-                    <Accordion className="dropdown">
+                    <Accordion
+                        className="dropdown"
+                        expanded={expandedSection === "password"}
+                        onChange={handleAccordionChange("password")}
+                    >
                         <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />}>
                             <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                 <img src={Settings} alt="edit" style={{
@@ -574,7 +587,11 @@ const UserSettings = () => {
                 </form>
 
                 <form>
-                    <Accordion className="dropdown">
+                    <Accordion
+                        className="dropdown"
+                        expanded={expandedSection === "triggers"}
+                        onChange={handleAccordionChange("triggers")}
+                    >
                         <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />} >
                             <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1, }}>
                                 <img src={Settings} alt="edit" style={{

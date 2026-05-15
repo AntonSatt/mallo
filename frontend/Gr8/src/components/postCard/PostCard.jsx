@@ -7,6 +7,7 @@ import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutline
 import HugButton from "../hugButton/HugButton";
 import CommentForm from "../commentForm/CommentForm";
 import CommentBubble from "../../assets/icons/commentBubble.svg";
+import FilledCommentBubble from "../../assets/icons/filledCommentBubble.svg";
 import {
     Card,
     CardActions,
@@ -31,12 +32,12 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen, userBookmarks, current
         <>
             <Card className="post-card">
                 <CardHeader avatar={
-                    <Avatar className="post-avatar" avatar={currentUser.picture} />
+                    <Avatar className="post-avatar" avatar={post.authorInfo.avatarId} />
                 }
                     title={
                         <Box className="post-user-row">
                             <Typography className="post-username">
-                                {post.userName}
+                                {post.authorInfo.userName}
                             </Typography>
 
                             <Typography className="post-category">
@@ -88,16 +89,16 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen, userBookmarks, current
                             aria-label="Visa kommentarerna"
                             className="post-comment-button">
 
-                            <img src={CommentBubble} alt="" />
+                            {expanded ? <img src={FilledCommentBubble} alt="" /> : <img src={CommentBubble} alt="" /> }
+                            <Typography variant="caption" className="post-comment-count">
+                                {post.countOfComments || 0}
+                            </Typography>
                         </IconButton>
                     </CardActions>
 
             {/*Collapsing comment section.*/}
                     <Collapse in={expanded} timeout="auto" unmountOnExit>
                         <CardContent className="post-comments">
-                            <Typography variant="subtitle2" gutterBottom>
-                                Kommentarer
-                            </Typography>
                             <CommentForm postId={post.id} />
                         </CardContent>
                     </Collapse>

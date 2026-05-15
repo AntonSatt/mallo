@@ -145,7 +145,7 @@ deploy develop:
       helm upgrade --install gr8-develop ./devops/k8s/chart \
         --namespace "$NAMESPACE" \
         --set image.tag=develop \
-        --wait --timeout 10m --atomic
+        --wait --timeout 20m --atomic
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "develop" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
@@ -166,7 +166,7 @@ deploy review:
         --namespace "$NAMESPACE" \
         -f ./devops/k8s/chart/values-feature.yaml \
         --set image.tag="$CI_COMMIT_REF_SLUG" \
-        --wait --timeout 10m --atomic
+        --wait --timeout 20m --atomic
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "main"
     - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop"
@@ -185,7 +185,7 @@ deploy production:
       helm upgrade --install gr8-main ./devops/k8s/chart \
         --namespace "$NAMESPACE" \
         --set image.tag=latest \
-        --wait --timeout 10m --atomic
+        --wait --timeout 20m --atomic
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: manual

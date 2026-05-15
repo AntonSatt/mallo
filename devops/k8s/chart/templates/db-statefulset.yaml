@@ -45,13 +45,14 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /var/opt/mssql
-          # MSSQL can take 1–5 min to bootstrap (especially first boot on a fresh PVC).
-          # startupProbe gates liveness/readiness until the port is open, then they kick in at normal cadence.
+          # First boot on a fresh PVC: MSSQL image's templatedata is older than the binary,
+          # so it runs schema upgrades on master/msdb/model. Observed ~3-4 min before port opens.
+          # 600s budget covers that with margin.
           startupProbe:
             tcpSocket:
               port: {{ .Values.db.port }}
             periodSeconds: 10
-            failureThreshold: 30
+            failureThreshold: 60
           livenessProbe:
             tcpSocket:
               port: {{ .Values.db.port }}

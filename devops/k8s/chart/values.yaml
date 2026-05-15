@@ -73,8 +73,8 @@ redis:
 
   image:
     registry: docker.io
-    repository: bitnamilegacy/redis
-    tag: 7.2.3-debian-11-r9
+    repository: bitnami/redis
+    tag: "7.2"
     pullPolicy: IfNotPresent
 
   serviceAccount:

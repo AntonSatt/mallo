@@ -429,13 +429,13 @@ const UserSettings = () => {
 
                             </Box>
 
-                            <Box item sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <Box item="true" sx={{ display: 'flex', justifyContent: 'center' }}>
                                 <PrimaryButton type="submit" sx={{ mt: 2, borderRadius: 50, width: '75%' }}>
                                     Spara profil
                                 </PrimaryButton>
                             </Box>
 
-                            <Box item sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <Box item="true" sx={{ display: 'flex', justifyContent: 'center' }}>
                                 <SecondaryButton onClick={handleClickOpen} sx={{ borderRadius: 50, backgroundColor: '--color-bg-muted', width: '50%', alignItems: 'center', mt: 2 }}>
                                     Radera konto
                                 </SecondaryButton>
@@ -576,7 +576,7 @@ const UserSettings = () => {
 
                             </Box>
 
-                            <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <Grid item="true" sx={{ display: 'flex', justifyContent: 'center' }}>
                                 <PrimaryButton type="submit" sx={{ mt: 2, borderRadius: 50, width: '75%' }}>
                                     Spara lösenord
                                 </PrimaryButton>

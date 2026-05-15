@@ -214,14 +214,17 @@ const UserSettings = () => {
     return (
         <>
             <Box className="settingsContainer">
-                <Grid sx={{ display: 'flex', justifyContent: 'center', gap: 2, margin: '16px 0', padding: '0 16px' }}>
+                <Grid
+                    className="settings-top-row"
+                    sx={{ display: 'flex', justifyContent: 'center', gap: 1.5, margin: '16px 0', padding: '0 8px' }}
+                >
                     <Button
                         className="settings-button"
                         onClick={logout}
                         sx={SettingsButtonStyles}
                     >
-                        <LogoutIcon sx={{ color: '--color-primary' }} />
                         Logga ut
+                        <LogoutIcon sx={{ color: 'var(--color-primary)' }} />
                     </Button>
 
                     <Box
@@ -233,10 +236,10 @@ const UserSettings = () => {
                             borderRadius: 4,
                             padding: '12px 16px',
                             minWidth: 90,
-                            gap: 1,
+                            gap: 0.75,
                         }}>
+                        <Typography className="switch-label" variant="body2">Anonym</Typography>
                         <Switch className="settingsSwitch" defaultChecked size="small" />
-                        <Typography variant="body2">Anonym</Typography>
                     </Box>
 
                     <Button
@@ -244,8 +247,8 @@ const UserSettings = () => {
                         // onClick={() => window.location.href = "/forum"}
                         sx={SettingsButtonStyles}
                     >
-                        <InfoOutlinedIcon sx={{ color: '--color-primary' }} />
                         Om appen
+                        <InfoOutlinedIcon sx={{ color: 'var(--color-primary)' }} />
                     </Button>
                 </Grid>
 

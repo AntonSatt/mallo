@@ -606,6 +606,9 @@ const UserSettings = () => {
                             </Typography>
                         </AccordionSummary>
                         <AccordionDetails>
+                            <Typography variant="body2" color="var(--color-text-main)" sx={{ mb: 1 }}>
+                                Välj triggers
+                            </Typography>
                             <Select
                                 multiple
                                 fullWidth

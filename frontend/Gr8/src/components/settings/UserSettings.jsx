@@ -256,13 +256,13 @@ const UserSettings = () => {
                         onChange={handleAccordionChange("profile")}
                     >
                         <AccordionSummary className="dropdown" expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />}>
-                            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                 <img src={Settings} alt="edit" style={{
                                     width: 20,
                                     height: 20,
                                     filter: 'invert(78%) sepia(50%) saturate(500%) hue-rotate(330deg)'
                                 }} />
-                                Profil inställningar
+                                Profilinställningar
                             </Typography>
                         </AccordionSummary>
                         <AccordionDetails>
@@ -456,12 +456,12 @@ const UserSettings = () => {
                         onChange={handleAccordionChange("password")}
                     >
                         <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />}>
-                            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                 <img src={Settings} alt="edit" style={{
                                     width: 20,
                                     height: 20,
                                     filter: 'invert(78%) sepia(50%) saturate(500%) hue-rotate(330deg)'
-                                }} />Lösenords inställningar</Typography>
+                                }} />Lösenordsinställningar</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
 
@@ -596,7 +596,7 @@ const UserSettings = () => {
                         onChange={handleAccordionChange("triggers")}
                     >
                         <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />} >
-                            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1, }}>
+                            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                 <img src={Settings} alt="edit" style={{
                                     width: 20,
                                     height: 20,

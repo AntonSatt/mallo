@@ -74,8 +74,8 @@ redis:
   image:
     registry: docker.io
     repository: bitnami/redis
-    tag: "7.2"
-    pullPolicy: IfNotPresent
+    tag: "latest"
+    pullPolicy: Always
 
   serviceAccount:
     create: false

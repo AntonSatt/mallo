@@ -426,7 +426,20 @@ const UserSettings = () => {
                             </Box>
 
                             <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <SecondaryButton onClick={handleClickOpen} sx={{ borderRadius: 50, backgroundColor: 'var(--color-bg-muted)', width: '50%', alignItems: 'center', mt: 2 }}>
+                                <SecondaryButton
+                                    onClick={handleClickOpen}
+                                    sx={{
+                                        borderRadius: 50,
+                                        backgroundColor: 'var(--button-danger-bg)',
+                                        color: 'var(--color-text-inverse)',
+                                        width: '50%',
+                                        alignItems: 'center',
+                                        mt: 2,
+                                        '&:hover': {
+                                            backgroundColor: 'var(--button-danger-hover)',
+                                        },
+                                    }}
+                                >
                                     Radera konto
                                 </SecondaryButton>
                             </Box>

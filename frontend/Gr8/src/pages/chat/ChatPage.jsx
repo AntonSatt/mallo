@@ -1,3 +1,7 @@
+import ConversationItem from "../../components/chat/conversationItem/ConversationItem.jsx";
+import ChatWindow from "../../components/chat/chatWindow/ChatWindow.jsx";
+import MessageInput from "../../components/chat/messageInput/MessageInput.jsx";
+import ConversationList from "../../components/chat/conversationList/ConversationList.jsx";
 import ChatService from "../../services/ChatService.jsx";
 import ChatSignalrServices from "../../services/ChatSignalrServices.jsx";
 import { useEffect, useState, useRef } from "react";
@@ -170,12 +174,10 @@ const ChatPage = () => {
             {conversations.length === 0 ? (
                 <p>Inga konversationer ännu.</p>
             ) : (
-                conversations.map((conversation) => (
-                    <div key={conversation.otherUserId} onClick={() => openConversation(conversation)}>
-                        <strong>{conversation.otherUserId}</strong>
-                        <p>{conversation.lastMessage}</p>
-                    </div>
-                ))
+                <ConversationList
+                    conversations = {conversations}
+                    openConversation = {openConversation}
+                />
             )}
 
             {selectedConversation && (
@@ -185,19 +187,14 @@ const ChatPage = () => {
                 </div>
             )}
 
-            <h3>Senaste meddelanden</h3>
-
-            {messages.map((message, index) => (
-                <div key={`${message.id}-${index}`}>
-                    <strong>{message.senderId}</strong>: {message.content}
-                </div>
-            ))}
+            <ChatWindow messages={messages} />
 
             {selectedConversation && (
-                <div style={{ marginTop: "1rem" }}>
-                    <input type="text" placeholder="Skriv ett meddelande" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} />
-                    <button onClick={sendMessage}>Skicka</button>
-                </div>
+                <MessageInput
+                    newMessage={newMessage}
+                    setNewMessage={setNewMessage}
+                    sendMessage={sendMessage}
+                />
             )}
         </div>
     )

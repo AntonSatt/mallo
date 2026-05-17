@@ -1,6 +1,6 @@
 import ChatService from "../../services/ChatService.jsx";
 import ChatSignalrServices from "../../services/ChatSignalrServices.jsx";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const ChatPage = () => {
     const [conversations, setConversations] = useState([]);
@@ -10,16 +10,24 @@ const ChatPage = () => {
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [newMessage, setNewMessage] = useState("");
     const [newConversationUserId, setNewConversationUserId] = useState("");
+    const selectedConversationRef = useRef(null);
 
+    // useEffect hook to initialize the chat connection and fetch conversations when the component mounts.
     useEffect(() => {
         const initializeChat = async () => {
             try {
                 await ChatSignalrServices.startConnection();
 
                 ChatSignalrServices.onReceiveMessage((message) => {
-                    console.log("Received message:", message);
 
                     setMessages((prevMessages) => {
+                        const currentConversation = message.senderId === selectedConversationRef.current?.otherUserId ||
+                            message.receiverId === selectedConversationRef.current?.otherUserId;
+
+                        if (!currentConversation) {
+                            return prevMessages;
+                        }
+
                         const alreadyExists = prevMessages.some((m) => m.id === message.id);
 
                         if (alreadyExists) {
@@ -29,24 +37,41 @@ const ChatPage = () => {
                         return [...prevMessages, message];
                     });
 
+                    // Update the conversation list when a new message arrives. If the conversation already exists, 
+                    // update its latest messageand move it to the top of the list.
+                    // If it does not exist, create a new conversation and place it first.
                     setConversations((prevConversation) => {
-                        const existingConversation = prevConversation.find((c) => c.otherUserId === message.senderId || c.otherUserId === message.receiverId);
+                        const existingConversation = prevConversation.find((conversation) =>
+                            conversation.otherUserId === message.senderId || conversation.otherUserId === message.receiverId
+                        );
 
                         if (existingConversation) {
-                            return prevConversation.map((conversation) => {
+                            const updatedConversation = {
+                                ...existingConversation,
+                                lastMessage: message.content,
+                                lastMessageAt: message.sendAt
+                            };
 
-                                if (conversation.otherUserId === message.senderId || conversation.otherUserId === message.receiverId) {
-                                    return { ...conversation, lastMessage: message.content };
-                                }
+                            const otherConversations = prevConversation.filter((conversation) =>
+                                conversation.otherUserId !== existingConversation.otherUserId
+                            );
 
-                                return conversation;
-                            });
+                            return [
+                                updatedConversation,
+                                ...otherConversations
+                            ];
                         }
 
-                        return [{
-                            otherUserId: message.senderId,
-                            lastMessage: message.content
-                        }, ...prevConversation];
+                        return [
+                            {
+                                otherUserId: message.senderId,
+                                activityId: message.activityId,
+                                lastMessage: message.content,
+                                lastMessageAt: message.sendAt,
+                                hasUnreadMessage: true
+                            },
+                            ...prevConversation
+                        ];
 
                     });
                 });
@@ -55,7 +80,6 @@ const ChatPage = () => {
 
                 const conversationsData = await ChatService.getConversations();
                 setConversations(conversationsData ?? []);
-                console.log("Conversations from backend:", conversationsData);
 
             } catch (error) {
                 console.error("Failed to initialize chat:", error);
@@ -67,6 +91,13 @@ const ChatPage = () => {
 
     }, []);
 
+    // useEffect hook to clean up the SignalR connection when the component unmounts.
+    useEffect(() => {
+        selectedConversationRef.current = selectedConversation;
+    }, [selectedConversation]);
+
+
+    // Function to open a conversation and fetch its chat history.
     const openConversation = async (conversation) => {
         setSelectedConversation(conversation);
 
@@ -74,6 +105,7 @@ const ChatPage = () => {
         setMessages(history ?? []);
     }
 
+    // Function to start a new conversation with a specified user ID.
     const startNewConversation = () => {
         if (!newConversationUserId.trim()) {
             return;
@@ -89,6 +121,7 @@ const ChatPage = () => {
         setNewConversationUserId("");
     };
 
+    // Function to send a new message in the currently selected conversation.
     const sendMessage = async () => {
         if (!selectedConversation || !newMessage.trim()) {
             return;

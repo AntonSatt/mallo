@@ -1,6 +1,6 @@
 import { TextField, styled } from "@mui/material";
 
-const InputField = styled(TextField)({
+const StyledInputField = styled(TextField)({
     "& .MuiOutlinedInput-root": {
         borderRadius: 20,
         backgroundColor: "#F5F5F5",
@@ -13,5 +13,16 @@ const InputField = styled(TextField)({
         },
     },
 });
+
+const InputField = ({ autoComplete = "off", inputProps, ...props }) => (
+    <StyledInputField
+        {...props}
+        autoComplete={autoComplete}
+        inputprops={{
+            ...inputProps,
+            autoComplete: inputProps?.autoComplete ?? autoComplete
+        }}
+    />
+);
 
 export default InputField;

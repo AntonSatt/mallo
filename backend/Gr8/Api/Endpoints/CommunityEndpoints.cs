@@ -175,7 +175,7 @@ namespace Gr8.Api.Endpoints
                     return Results.NotFound("Comment not found.");
                 }
 
-                if (comment.CreatedByUser != appUser.Id)
+                if (comment.AuthorInfo.Id != appUser.Id)
                 {
                     return Results.Forbid();
                 }

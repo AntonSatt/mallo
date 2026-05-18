@@ -6,7 +6,6 @@ namespace Gr8.Application.DTOs
     {
         public int Id { get; set; }
         public string Title { get; set; }
-        public string UserName { get; set; }
         public string Content { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
@@ -14,6 +13,7 @@ namespace Gr8.Application.DTOs
         public bool IsDeleted { get; set; }
         public CategoryDto Category { get; set; }
         public List<TagDto> Tags { get; set; }
-        public string CreatedByUser { get; set; }
+        public int CountOfComments { get; set; }
+        public AuthorDTO AuthorInfo { get; set; }
     }
 }

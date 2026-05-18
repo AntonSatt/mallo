@@ -1,0 +1,60 @@
+.notification-wrapper {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-text-inverse);
+    border-radius: 50px;
+    padding: 8px 16px;
+    width: 100%;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.search-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 12px;
+    display: block;
+}
+
+.search-input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 15px;
+    background: transparent;
+    color: #333;
+}
+
+.notification-box {
+    background-color: var(--color-primary-soft);
+    border-radius: 16px;
+    padding: 10px 0;
+    height: 600px;
+}
+
+.notification-header {
+    background-color: var(--color-text-inverse);
+    margin: 10px 15px;
+    border-radius: 20px;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    font-size: 25px;
+    gap: 15px;
+}
+
+.notification-card {
+    background-color: var(--color-text-inverse);
+    margin: 10px 20px;
+    border-radius: 16px;
+    height: 200px;
+}

@@ -46,13 +46,23 @@ namespace Gr8.Infrastructure.Persistence
                 new Tag { Name = "Ätstörning", Id = 18 },
                 new Tag { Name = "Suicidtankar", Id = 19 },
                 new Tag { Name = "Relation", Id = 20 }
-                );
+            );
 
             modelBuilder.Entity<Category>().HasData(
-                new Category { Name = "Djur", Id = 1 },
-                new Category { Name = "Generell", Id = 2 },
-                new Category { Name = "Relation", Id = 3 }
-                );
+                new Category { Name = "Relationer", Id = 1 },
+                new Category { Name = "Familj", Id = 2 },
+                new Category { Name = "Sexualitet", Id = 3 },
+                new Category { Name = "Psykisk hälsa", Id = 4 },
+                new Category { Name = "Fysisk hälsa", Id = 5 },
+                new Category { Name = "Samhälle", Id = 6 },
+                new Category { Name = "Barn & ungdom", Id = 7 },
+                new Category { Name = "Miljö", Id = 8 },
+                new Category { Name = "Volontärarbete", Id = 9 },
+                new Category { Name = "Djur", Id = 10 },
+                new Category { Name = "Utbildning", Id = 11 },
+                new Category { Name = "Generell", Id = 12 },
+                new Category { Name = "Övrigt", Id = 13 }
+            );
 
             // Map ApplicationUser to AspNetUsers table
             modelBuilder.Entity<ApplicationUser>().ToTable("AspNetUsers");
@@ -207,7 +217,7 @@ namespace Gr8.Infrastructure.Persistence
                 .HasForeignKey(b => b.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasIndex(b => new {b.UserId, b.PostId}).IsUnique();
+                entity.HasIndex(b => new { b.UserId, b.PostId }).IsUnique();
             });
 
             modelBuilder.Entity<ChatMessage>(entity => 

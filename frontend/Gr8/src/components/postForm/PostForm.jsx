@@ -125,6 +125,7 @@ const PostForm = ({ onPostCreated, onClose }) => {
               value={postData.categoryId}
               onChange={(e) => setPostData({ ...postData, categoryId: e.target.value })}
               label="Kategori"
+              MenuProps={MenuProps}
             >
               {categories.map(category => (
                 <MenuItem key={category.id} value={category.id}>
@@ -142,6 +143,7 @@ const PostForm = ({ onPostCreated, onClose }) => {
               value={postData.tags}
               onChange={(e) => setPostData({ ...postData, tags: e.target.value })}
               input={<OutlinedInput label="Taggar" />}
+              MenuProps={MenuProps}
               renderValue={(selected) =>
                 selected
                   .map(id => tags.find(t => t.id === id)?.name)

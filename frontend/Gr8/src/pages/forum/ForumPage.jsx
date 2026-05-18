@@ -5,12 +5,9 @@ import DeletePost from "../../components/deleteForm/DeletePost.jsx";
 import PostServices from "../../services/PostServices";
 import EditPostForm from "../../components/editPostForm/EditPostForm.jsx";
 import { useAuth } from "../../hooks/useAuth";
-import useViewport from "../../hooks/useViewport";
 import FilterPost from "../../components/filterPost/FilterPost.jsx";
 import PostCard from "../../components/postCard/PostCard.jsx";
-import ProfileBar from "../../components/layout/ProfileBar.jsx";
 import PostActionsDialog from "../../components/postActionsDialog/PostActionsDialog.jsx";
-import ProfileHeader from "../../components/layout/ProfileHeader";
 
 import {
     Box,
@@ -22,12 +19,10 @@ import {
 
 import { useEffect, useState, useMemo } from "react";
 
-const ForumPage = () => {
+const ForumPage = ({ openModal, setOpenModal }) => {
     const { currentUser } = useAuth();
-    const { isDesktop } = useViewport();
 
     const [expanded, setExpanded] = useState(null);
-    const [openPostModal, setPostModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
     const [openReportModal, setOpenReportModal] = useState(false);
 
@@ -54,14 +49,9 @@ const ForumPage = () => {
         setDeletePostId(null);
     };
 
-    // Opens the post creation modal
-    const handleClickOpen = () => {
-        setPostModalOpen(true);
-    };
-
     // Closes the post creation modal
     const handleClose = async () => {
-        setPostModalOpen(false);
+        setOpenModal(false);
     };
 
     // Toggles the expansion of the comment section for a post
@@ -215,9 +205,8 @@ const ForumPage = () => {
     return (
         <>
             <div className="forum-page">
-                <div className="forum-container">
 
-                    {!isDesktop && <ProfileBar showCreate onCreatePost={handleClickOpen} />}
+                <div className="forum-container">
 
                     <DeletePost
                         postId={deletePostId}
@@ -252,7 +241,7 @@ const ForumPage = () => {
                     />
 
                     <Dialog
-                        open={openPostModal}
+                        open={openModal}
                         onClose={handleClose}
                         fullWidth
                         maxWidth="sm"

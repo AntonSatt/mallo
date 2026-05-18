@@ -39,44 +39,44 @@ const ProfileBar = ({ showCreate = false, onCreatePost }) => {
         <ClickAwayListener onClickAway={closeMenu}>
             <Box className="profilebar-wrapper">
                 <Paper className={`profilebar-container ${showCreate ? "forum-profilebar" : ""}`}>
-                    {showCreate ? (
+                    {showCreate === "true" ? (
                         <>
                             <Box className="profilebar-top-row">
                                 <Avatar avatar={currentUser?.picture} />
-                                </Box>
+                            </Box>
 
-                                <Box className="profilebar-create">
-                                    <InputField
-                                        fullWidth
-                                        placeholder="Skapa..."
-                                        onClick={onCreatePost}
-                                        slotProps={{
-                                            input: {
-                                                readOnly: true,
-                                                startAdornment: (
-                                                    <InputAdornment position="start">
-                                                        <ControlPointIcon className="profilebar-create-icon" />
-                                                    </InputAdornment>
-                                                ),
-                                            },
-                                        }}
-                                    />
-                                </Box>
+                            <Box className="profilebar-create">
+                                <InputField
+                                    fullWidth
+                                    placeholder="Skapa..."
+                                    onClick={onCreatePost}
+                                    slotProps={{
+                                        input: {
+                                            readOnly: true,
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <ControlPointIcon className="profilebar-create-icon" />
+                                                </InputAdornment>
+                                            ),
+                                        },
+                                    }}
+                                />
+                            </Box>
 
-                                <Button type="button" className="profilebar-search-button" aria-label="Sök">
-                                    <img src={SearchHeartButton} alt="" className="profilebar-search-icon" />
-                                </Button>
+                            <Button type="button" className="profilebar-search-button" aria-label="Sök">
+                                <img src={SearchHeartButton} alt="" className="profilebar-search-icon" />
+                            </Button>
 
-                                <Box className="profilebar-right">
-                                    <HamburgerMenu
-                                        open={menuOpen}
-                                        onToggle={toggleMenu}
-                                    />
-                                </Box>
+                            <Box className="profilebar-right">
+                                <HamburgerMenu
+                                    open={menuOpen}
+                                    onToggle={toggleMenu}
+                                />
+                            </Box>
                         </>
                     ) : (
                         <>
-                            <Box className="profilebar-left"> 
+                            <Box className="profilebar-left">
                                 <Avatar avatar={currentUser?.picture} />
                                 <Typography className="profile-name">
                                     {currentUser?.preferred_username || currentUser?.email || "Användarnamn saknas"}

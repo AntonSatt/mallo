@@ -1,7 +1,6 @@
 .protected-route-layout {
     height: 100dvh;
     background-color: var(--color-primary-bg);
-    overflow: hidden;
 }
 
 .protected-route-nav {
@@ -15,7 +14,6 @@
     box-sizing: border-box;
     padding-bottom: var(--protected-nav-height);
     background-color: inherit;
-    overflow-y: auto;
 }
 
 @media (min-width: 1024px) {

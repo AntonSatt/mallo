@@ -12,6 +12,14 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             _applicationDbContext = applicationDbContext;
         }
 
+        public Task<int> GetAvatarIdByUserIdAsync(string userId)
+        {
+            return _applicationDbContext.Users
+                .Where(u => u.Id == userId)
+                .Select(u => u.Avatar)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<string?> GetUserNameByIdAsync(string userId)
         {
             var user = await _applicationDbContext.Users

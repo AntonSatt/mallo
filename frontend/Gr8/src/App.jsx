@@ -11,6 +11,7 @@ import ForumPage from './pages/forum/ForumPage'
 import LandingPage from './pages/landing/LandingPage'
 import ForgotPasswordPage from './pages/resetPassword/ForgotPasswordPage'
 import ResetPasswordPage from './pages/resetPassword/ResetPasswordPage'
+import "moment/dist/locale/sv";
 // import ChatTestPage from './pages/chat/ChatTestPage'
 import ChatPage from './pages/chat/ChatPage';
 

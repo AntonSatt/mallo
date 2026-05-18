@@ -1,6 +1,6 @@
 # gr8 Helm chart
 
-Deploys the Grupp GR8 stack (api + frontend + mssql) into the school k3s cluster, namespace `doe25-anton-satterkvist`. One Helm release per branch — release name == `gr8-${CI_COMMIT_REF_SLUG}`.
+Deploys the Grupp GR8 stack (api + frontend + mssql) into the school k3s cluster, namespace `doe25-group-8`. One Helm release per branch — release name == `gr8-${CI_COMMIT_REF_SLUG}`.
 
 The chart itself is namespace-agnostic — namespace is passed via `helm --namespace`, not baked into templates. Reusable for any namespace if the cluster's wildcard cert and ingress class match.
 
@@ -10,7 +10,7 @@ The chart itself is namespace-agnostic — namespace is passed via `helm --names
 helm lint ./
 
 helm template gr8-test ./ \
-  --namespace doe25-anton-satterkvist \
+  --namespace doe25-group-8 \
   --set image.tag=test \
   | kubectl apply --dry-run=client -f -
 ```
@@ -24,7 +24,7 @@ These two Secrets are created **out-of-band** (not by the chart, not by CI). Re-
 Create a GitLab project deploy token with `read_registry` scope, then:
 
 ```bash
-kubectl -n doe25-anton-satterkvist create secret docker-registry gitlab-registry \
+kubectl -n doe25-group-8 create secret docker-registry gitlab-registry \
   --docker-server=registry.git.chas-lab.dev \
   --docker-username='<deploy-token-username>' \
   --docker-password='<deploy-token-password>'
@@ -33,7 +33,7 @@ kubectl -n doe25-anton-satterkvist create secret docker-registry gitlab-registry
 ### 2. App secrets
 
 ```bash
-kubectl -n doe25-anton-satterkvist create secret generic gr8-secrets \
+kubectl -n doe25-group-8 create secret generic gr8-secrets \
   --from-literal=DB_PASSWORD='<strong password>' \
   --from-literal=Jwt__Key='<32+ char random>' \
   --from-literal=Email__SmtpUser='<smtp user>' \
@@ -48,7 +48,7 @@ The chart references this Secret via:
 
 ```bash
 helm upgrade --install gr8-${CI_COMMIT_REF_SLUG} ./ \
-  --namespace doe25-anton-satterkvist \
+  --namespace doe25-group-8 \
   --set image.tag=${CI_COMMIT_REF_SLUG} \
   --wait --timeout 5m --atomic
 ```
@@ -56,7 +56,7 @@ helm upgrade --install gr8-${CI_COMMIT_REF_SLUG} ./ \
 Manual rollback:
 
 ```bash
-helm rollback gr8-${CI_COMMIT_REF_SLUG} -n doe25-anton-satterkvist
+helm rollback gr8-${CI_COMMIT_REF_SLUG} -n doe25-group-8
 ```
 
 ## Cleanup (feature branches only)
@@ -64,18 +64,18 @@ helm rollback gr8-${CI_COMMIT_REF_SLUG} -n doe25-anton-satterkvist
 `helm uninstall` does not delete StatefulSet PVCs. Run both:
 
 ```bash
-helm uninstall gr8-${slug} -n doe25-anton-satterkvist
-kubectl -n doe25-anton-satterkvist delete pvc -l app.kubernetes.io/instance=gr8-${slug}
+helm uninstall gr8-${slug} -n doe25-group-8
+kubectl -n doe25-group-8 delete pvc -l app.kubernetes.io/instance=gr8-${slug}
 ```
 
 **Never** run this for `gr8-main` or `gr8-develop` — those PVCs hold persistent data.
 
 ## URLs
 
-- Frontend: `https://gr8-${slug}.labb.k3s.chas-lab.dev/`
-- API:      `https://gr8-${slug}.labb.k3s.chas-lab.dev/api`
+- Frontend: `https://gr8-${slug}.cc.k3s.chas-lab.dev/`
+- API:      `https://gr8-${slug}.cc.k3s.chas-lab.dev/api`
 
-TLS is handled at the cluster's Traefik via the wildcard `*.labb.k3s.chas-lab.dev` cert. The Ingress declares no `spec.tls` block.
+TLS is handled at the cluster's Traefik via the wildcard `*.cc.k3s.chas-lab.dev` cert. The Ingress declares no `spec.tls` block.
 
 ## Architecture notes
 

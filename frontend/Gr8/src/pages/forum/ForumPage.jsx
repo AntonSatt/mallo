@@ -19,11 +19,12 @@ import {
     DialogActions,
 } from "@mui/material";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 
 const ForumPage = () => {
     const { currentUser } = useAuth();
     const { isDesktop } = useViewport();
+    const scrollAreaRef = useRef(null);
 
     const [expanded, setExpanded] = useState(null);
     const [openPostModal, setPostModalOpen] = useState(false);
@@ -126,7 +127,7 @@ const ForumPage = () => {
                 return checkedCategories.includes(cat);
             });
         }
-        if (activeNavCategory !== "Alla" && activeNavCategory !== "Sparade") {
+        if (activeNavCategory !== "Alla" && activeNavCategory !== "Sparade" && activeNavCategory !== "Dina inlägg") {
             return posts.filter(p => {
                 const cat = p.category?.name || p.category;
                 return cat === activeNavCategory;
@@ -136,8 +137,11 @@ const ForumPage = () => {
             return posts.filter(p => {
                 return userBookmarks.some(b => b.postId === p.id);
             });
-
         }
+        if (activeNavCategory == "Dina inlägg") {
+            return posts.filter(p => p.authorInfo.id === currentUser?.sub);
+        }
+
         return posts;
     }, [posts, activeNavCategory, checkedCategories, userBookmarks]);
 
@@ -165,11 +169,11 @@ const ForumPage = () => {
                     id: post.id,
                     title: post.title,
                     content: post.content ? post.content : "Innehåll saknas",
-                    userName: post.userName,
                     createdAt: post.createdAt,
                     category: post.category ? post.category : "Ingen kategori",
-                    createdByUser: post.createdByUser,
-                    tags: post.tags ? post.tags : []
+                    tags: post.tags ? post.tags : [],
+                    countOfComments: post.countOfComments || 0,
+                    authorInfo: post.authorInfo || { avatarId: 1 },
                 }));
                 setPosts(allPosts);
             } catch (error) {
@@ -197,16 +201,44 @@ const ForumPage = () => {
         fetchBookmarks();
     }, []);
 
+    useEffect(() => {
+        if (!isDesktop) {
+            return;
+        }
+
+        const handleWheel = (event) => {
+            const scrollArea = scrollAreaRef.current;
+            if (!scrollArea || !event.deltaY) {
+                return;
+            }
+
+            const inDialog = event.target instanceof Element && !!event.target.closest(".MuiDialog-root");
+            if (inDialog) {
+                return;
+            }
+
+            const targetInScrollArea = event.target instanceof Node && scrollArea.contains(event.target);
+            if (targetInScrollArea) {
+                return;
+            }
+
+            scrollArea.scrollTop += event.deltaY;
+            event.preventDefault();
+        };
+
+        window.addEventListener("wheel", handleWheel, { passive: false });
+        return () => window.removeEventListener("wheel", handleWheel);
+    }, [isDesktop]);
+
     const handlePostCreated = (newPost) => {
         const formattedPost = {
             id: newPost.id,
             title: newPost.title,
             content: newPost.content,
-            userName: newPost.userName,
             createdAt: newPost.createdAt,
             category: newPost.category,
             tags: newPost.tags,
-            createdByUser: newPost.createdByUser,
+            authorInfo: newPost.authorInfo || { avatarId: 1 },
         };
         setPosts((prevPosts) => [formattedPost, ...prevPosts]);
     };
@@ -285,15 +317,16 @@ const ForumPage = () => {
                             handleMenuClose();
                         }}
                         isOwner={
-                            currentUser?.sub === posts.find(p => p.id === selectedPostId)?.createdByUser
+                            currentUser?.sub === posts.find(p => p.id === selectedPostId)?.authorInfo.id
                         }
                     />
 
                     <Box className="scrollbar"
+                        ref={scrollAreaRef}
                         sx={{
                             width: "100%",
 
-                            height: { xs: "auto", md: "calc(100vh - 30px)" },
+                            height: { xs: "auto", md: "auto" },
 
                             overflowY: { xs: "visible", md: "auto" },
                             overflowX: "hidden",

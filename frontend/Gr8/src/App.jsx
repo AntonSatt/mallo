@@ -11,9 +11,9 @@ import ForumPage from './pages/forum/ForumPage'
 import LandingPage from './pages/landing/LandingPage'
 import ForgotPasswordPage from './pages/resetPassword/ForgotPasswordPage'
 import ResetPasswordPage from './pages/resetPassword/ResetPasswordPage'
-import "moment/dist/locale/sv";
-// import ChatTestPage from './pages/chat/ChatTestPage'
 import ChatPage from './pages/chat/ChatPage';
+import ConversationPage from './pages/chat/ConversationPage';
+import "moment/dist/locale/sv";
 
 function App() {
   return (
@@ -28,6 +28,7 @@ function App() {
           <Route path='/settings' element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           <Route path='/forum' element={<ProtectedRoute><ForumPage /></ProtectedRoute>} />
           <Route path='/message' element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+          <Route path='/message/:userId' element={<ProtectedRoute><ConversationPage /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

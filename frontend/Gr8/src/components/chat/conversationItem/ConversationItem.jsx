@@ -1,8 +1,11 @@
-// component to display a single conversation between the user and another user.
+import {useNavigate} from "react-router-dom";
 
-const ConversationItem = ({ conversation, openConversation}) => {
+// component to display a single conversation between the user and another user.
+const ConversationItem = ({ conversation }) => {
+    const navigate = useNavigate();
+
     return (
-        <div onClick={() => openConversation(conversation)}>
+        <div onClick={() => navigate(`/message/${conversation.otherUserId}`)}>
             <strong>{conversation.otherUserId}</strong>
             <p>{conversation.lastMessage}</p>
         </div>

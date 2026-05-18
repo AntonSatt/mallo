@@ -318,10 +318,13 @@ const ForumPage = ({ openModal, setOpenModal }) => {
                         sx={{
                             width: "100%",
 
-                            height: { xs: "auto", md: "auto" },
+                            height: { xs: "auto", md: "100%" },
+                            maxHeight: { md: "100%" },
 
-                            overflowY: { xs: "visible", md: "auto" },
+                            overflowY: { xs: "visible", md: "scroll" },
                             overflowX: "hidden",
+                            scrollbarWidth: { md: "thin" },
+                            scrollbarColor: { md: "white transparent" },
 
                             '&::-webkit-scrollbar': { width: '6px', },
 

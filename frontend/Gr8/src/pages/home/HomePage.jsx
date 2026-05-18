@@ -29,9 +29,13 @@ const Homepage = ({ page }) => {
                     </aside>
 
                     <main className="main-content">
-                        <Stack spacing={2}>
+                        <Stack spacing={2} sx={{ height: "100%", minHeight: 0 }}>
                             <Navbar />
-                            {page === "forum" && <ForumPage openModal={isOpen} setOpenModal={setOpen} />}
+                            {page === "forum" && (
+                                <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
+                                    <ForumPage openModal={isOpen} setOpenModal={setOpen} />
+                                </Box>
+                            )}
                         </Stack>
                     </main>
 

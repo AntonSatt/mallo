@@ -68,6 +68,17 @@ const UserSettings = () => {
 
     const [tags, setTags] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
+    const ITEM_HEIGHT = 48;
+    const ITEM_PADDING_TOP = 8;
+    const MenuProps = {
+        slotProps: {
+            paper: {
+                style: {
+                    maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+                },
+            },
+        },
+    };
 
     const [errors, setErrors] = useState({});
 
@@ -253,7 +264,7 @@ const UserSettings = () => {
                     '&:before': { display: 'none' },
                     mt: 2,
                 }}>
-                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{color: 'var(--color-primary)'}} />}>
+                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />}>
                         <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <img src={Settings} alt="edit" style={{
                                 width: 20,
@@ -424,7 +435,7 @@ const UserSettings = () => {
                         </Box>
 
                         <Box item sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <SecondaryButton onClick={handleClickOpen} sx={{ borderRadius: 50, backgroundColor: '--color-bg-muted', width: '50%', alignItems: 'center', mt: 2 }}>
+                            <SecondaryButton onClick={handleClickOpen} sx={{ borderRadius: 50, backgroundColor: '--color-bg-muted', width: '50%', alignItems: 'center', mt: 2 }}>
                                 Radera konto
                             </SecondaryButton>
                         </Box>
@@ -441,7 +452,7 @@ const UserSettings = () => {
                     '&:before': { display: 'none' },
                     mt: 2,
                 }}>
-                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{color: 'var(--color-primary)'}} />}>
+                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />}>
                         <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <img src={Settings} alt="edit" style={{
                                 width: 20,
@@ -600,6 +611,7 @@ const UserSettings = () => {
                             value={selectedTags}
                             onChange={(e) => setSelectedTags(e.target.value)}
                             input={<OutlinedInput />}
+                            MenuProps={MenuProps}
                             renderValue={(selected) =>
                                 selected
                                     .map(id => tags.find(t => t.id === id)?.name)

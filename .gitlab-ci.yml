@@ -159,11 +159,11 @@ deploy review:
     - job: build backend
   environment:
     name: review/$CI_COMMIT_REF_SLUG
-    url: https://gr8-$CI_COMMIT_REF_SLUG.${HOST_BASE}
+    url: https://gr8-$CI_ENVIRONMENT_SLUG.${HOST_BASE}
     on_stop: stop_review
   script:
     - |
-      helm upgrade --install "gr8-$CI_COMMIT_REF_SLUG" ./devops/k8s/chart \
+      helm upgrade --install "gr8-$CI_ENVIRONMENT_SLUG" ./devops/k8s/chart \
         --namespace "$NAMESPACE" \
         -f ./devops/k8s/chart/values-feature.yaml \
         --set image.tag="$CI_COMMIT_REF_SLUG" \
@@ -205,7 +205,7 @@ deploy production:
   image: curlimages/curl:latest
   script:
     - |
-      URL="https://gr8-${CI_COMMIT_REF_SLUG}.${HOST_BASE}/api/openapi/v1.json"
+      URL="${CI_ENVIRONMENT_URL}/api/openapi/v1.json"
       echo "Polling $URL"
       for i in $(seq 1 30); do
         status=$(curl -o /dev/null -s -w "%{http_code}" --max-time 5 "$URL" || echo "000")
@@ -227,6 +227,9 @@ smoke-test develop:
   <<: *smoke-test
   needs:
     - job: deploy develop
+  environment:
+    name: develop
+    action: verify
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "develop" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
@@ -235,6 +238,9 @@ smoke-test review:
   <<: *smoke-test
   needs:
     - job: deploy review
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    action: verify
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "main"
     - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop"
@@ -243,6 +249,9 @@ smoke-test production:
   <<: *smoke-test
   needs:
     - job: deploy production
+  environment:
+    name: production
+    action: verify
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
@@ -269,8 +278,8 @@ stop_review:
     name: review/$CI_COMMIT_REF_SLUG
     action: stop
   script:
-    - helm uninstall "gr8-$CI_COMMIT_REF_SLUG" -n "$NAMESPACE" || true
-    - kubectl delete pvc -l app.kubernetes.io/instance="gr8-$CI_COMMIT_REF_SLUG" -n "$NAMESPACE" --ignore-not-found
+    - helm uninstall "gr8-$CI_ENVIRONMENT_SLUG" -n "$NAMESPACE" || true
+    - kubectl delete pvc -l app.kubernetes.io/instance="gr8-$CI_ENVIRONMENT_SLUG" -n "$NAMESPACE" --ignore-not-found
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "main"
       when: manual

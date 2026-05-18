@@ -5,6 +5,7 @@ import { Icon, IconButton, Stack, Typography, ClickAwayListener, Box, Button } f
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import PrimaryButton from '../../design/buttons/PrimaryButton';
+import "./ProfileHeader.css"
 
 const ProfileHeader = () => {
     const { currentUser, logout } = useAuth();
@@ -17,42 +18,25 @@ const ProfileHeader = () => {
         <ClickAwayListener onClickAway={closeMenu}>
             <Box className="profileheader-wrapper">
                 <Stack
-                    className='profileHeader-container'
-                    direction="row"
-                    alignItems="center"
-                    spacing={2}
-                    sx={{
-                        cursor: "pointer",
-                        "&:hover": { opacity: 0.8 },
-                        paddingLeft: "20px"
-                    }}
+                    className="profileHeader-container"
+                    spacing={1}
                 >
                     <Avatar
-                        avatar={currentUser?.picture}
                         className="header-avatar"
-                        style={{ width: '70px', height: '70px', borderRadius: '50%' }}
+                        avatar={currentUser?.picture}
                     />
                     <Typography
-                        sx={{
-                            fontSize: "1.8rem",
-                            paddingTop: "10px"
-                        }}
+                        className="header-username"
                     >
                         {currentUser?.preferred_username || name}
                     </Typography>
 
                     <IconButton
-                        size="small"
+                        className="header-arrow-button"
                         onClick={toggleMenu}
                         sx={{
                             color: "var(--color-primary)",
                             border: "1px solid var(--color-primary)",
-                            borderRadius: "50%",
-                            width: "20px",
-                            height: "20px",
-                            top: "22px",
-                            zIndex: "9999",
-                            pointerEvents: "auto"
                         }}
                     >
                         <ExpandMoreIcon
@@ -67,25 +51,14 @@ const ProfileHeader = () => {
                 {menuOpen && (
                     <Box
                         sx={{
-                            position: "fixed",
-                            top: "106px",
-                            left: "20px",
-                            width: "285px",
-                            backgroundColor: "var(--color-bg-surface)",
-                            borderRadius: "8px",
-                            border: "1px solid var(--color-border-light)",
-                            boxShadow: "0px 4px 10px rgba(0,0,0,0,1)",
-                            padding: "16px",
-                            zIndex: 10000
+                            // position: "fixed" Kolla vad folk tycker
                         }}
                     >
                         <Stack>
                             <PrimaryButton
+                                className="logout-button"
                                 onClick={logout}
                                 startIcon={<LogoutOutlinedIcon />}
-                                sx={{
-                                    color: "var(--color-bg-muted)",
-                                }}
                             >
                                 Logga ut
                             </PrimaryButton>

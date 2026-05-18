@@ -255,8 +255,8 @@ const UserSettings = () => {
                         expanded={expandedSection === "profile"}
                         onChange={handleAccordionChange("profile")}
                     >
-                        <AccordionSummary className="dropdown" expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />}>
-                            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <AccordionSummary className="dropdown" expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />} >
+                            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 0.5, py: 1 }}>
                                 <img src={Settings} alt="edit" style={{
                                     width: 20,
                                     height: 20,
@@ -456,7 +456,7 @@ const UserSettings = () => {
                         onChange={handleAccordionChange("password")}
                     >
                         <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />}>
-                            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 0.5, py: 1 }}>
                                 <img src={Settings} alt="edit" style={{
                                     width: 20,
                                     height: 20,
@@ -596,7 +596,7 @@ const UserSettings = () => {
                         onChange={handleAccordionChange("triggers")}
                     >
                         <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />} >
-                            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 0.5, py: 1 }}>
                                 <img src={Settings} alt="edit" style={{
                                     width: 20,
                                     height: 20,

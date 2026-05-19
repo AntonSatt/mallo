@@ -7,10 +7,12 @@ namespace Gr8.Application.Services
     public class ChatService : IChatService
     {
         private readonly IChatRepository _chatRepository;
+        private readonly IApplicationRepository _applicationRepository;
 
-        public ChatService(IChatRepository chatRepository) 
+        public ChatService(IChatRepository chatRepository, IApplicationRepository applicationRepository)
         {
             _chatRepository = chatRepository;
+            _applicationRepository = applicationRepository;
         }
 
         // Creates and saves a new chat message, then returns it as a response DTO.
@@ -62,23 +64,33 @@ namespace Gr8.Application.Services
         {
             var messages = await _chatRepository.GetUserConversationsAsync(userId);
 
-            var conversations = messages.GroupBy(m => m.SenderId == userId ? m.ReceiverId : m.SenderId)
-                .Select(group =>
+            var conversations = new List<ChatConversationDto>();
+
+            foreach (var group in messages.GroupBy(m => m.SenderId == userId ? m.ReceiverId : m.SenderId))
+            {
+                var latestMessage = group.OrderByDescending(m => m.SendAt).First();
+
+                //var otherUserId = group.Key;
+                var otherUserId = latestMessage.SenderId == userId ? latestMessage.ReceiverId : latestMessage.SenderId;
+
+                var avatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(otherUserId);
+
+                conversations.Add(new ChatConversationDto
                 {
-                    var latestMessage = group.OrderByDescending(m => m.SendAt).First();
+                    OtherUserId = otherUserId,
+                    ActivityId = latestMessage.ActivityId,
+                    LastMessage = latestMessage.Content,
+                    LastMessageAt = latestMessage.SendAt,
+                    HasUnreadMessage = group.Any(m => m.ReceiverId == userId && !m.IsRead),
+                    AvatarId = avatarId
+                });
+            }
 
-                    return new ChatConversationDto
-                    {
-                        OtherUserId = latestMessage.SenderId == userId ? latestMessage.ReceiverId : latestMessage.SenderId,
-                        ActivityId = latestMessage.ActivityId,
-                        LastMessage = latestMessage.Content,
-                        LastMessageAt = latestMessage.SendAt,
-                        HasUnreadMessage = group.Any(m => m.ReceiverId == userId && !m.IsRead)
-                    };
+            var sortedConversations = conversations
+                .OrderByDescending(c => c.LastMessageAt)
+                .ToList();
 
-                }).OrderByDescending(c => c.LastMessageAt).ToList();
-
-            return conversations;
+            return sortedConversations;
         }
 
         // Soft deletes a conversation for the current user without removing messages from the database.

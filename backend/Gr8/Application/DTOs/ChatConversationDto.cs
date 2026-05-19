@@ -12,5 +12,6 @@ namespace Gr8.Application.DTOs
         public string LastMessage { get; set; } = null!;
         public DateTime LastMessageAt { get; set; }
         public bool HasUnreadMessage { get; set; }
+        public int AvatarId { get; set; }
     }
 }

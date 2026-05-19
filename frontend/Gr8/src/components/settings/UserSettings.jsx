@@ -30,7 +30,6 @@ import ProfileBar from "../../components/layout/ProfileBar.jsx";
 import EditPencil from "../../assets/icons/editPencil.svg";
 import Settings from "../../assets/icons/settings.svg";
 import AvatarSlider from "../../components/avatar/avatarSlider.jsx";
-import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import SecondaryButton from "../../design/buttons/SecondaryButton";
 import PrimaryButton from "../../design/buttons/PrimaryButton.jsx";
 import Switch from '@mui/material/Switch';
@@ -313,15 +312,6 @@ const UserSettings = () => {
                                     },
                                     width: "80%"
                                 }}
-                                slotProps={{
-                                    input: {
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                            </InputAdornment>
-                                        ),
-                                    },
-                                }}
                             />
 
                             <Typography variant="body2" color="var(--color-text-main)" align="center">
@@ -346,16 +336,7 @@ const UserSettings = () => {
                                         borderRadius: 20,
                                     },
                                     width: "80%"
-                                }}
-                                slotProps={{
-                                    input: {
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                            </InputAdornment>
-                                        ),
-                                    },
-                                }}
+                                }}                                
                             />
 
                             <Typography variant="body2" color="var(--color-text-main)" align="center">
@@ -381,15 +362,6 @@ const UserSettings = () => {
                                     },
                                     width: "80%"
                                 }}
-                                slotProps={{
-                                    input: {
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                            </InputAdornment>
-                                        ),
-                                    },
-                                }}
                             />
                             <Typography variant="body2" color="var(--color-text-main)" align="center">
                                 Email
@@ -414,15 +386,6 @@ const UserSettings = () => {
                                         borderRadius: 20,
                                     },
                                     width: "80%"
-                                }}
-                                slotProps={{
-                                    input: {
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                            </InputAdornment>
-                                        ),
-                                    },
                                 }}
                             />
 
@@ -491,15 +454,6 @@ const UserSettings = () => {
                                     },
                                     width: "80%"
                                 }}
-                                slotProps={{
-                                    input: {
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                            </InputAdornment>
-                                        ),
-                                    },
-                                }}
                             />
 
                             <Typography variant="body2" color="var(--color-text-main)" align="center">
@@ -525,15 +479,6 @@ const UserSettings = () => {
                                         borderRadius: 20,
                                     },
                                     width: "80%"
-                                }}
-                                slotProps={{
-                                    input: {
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                            </InputAdornment>
-                                        ),
-                                    },
                                 }}
                             />
 
@@ -562,15 +507,6 @@ const UserSettings = () => {
                                         borderRadius: 20,
                                     },
                                     width: "80%"
-                                }}
-                                slotProps={{
-                                    input: {
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                            </InputAdornment>
-                                        ),
-                                    },
                                 }}
                             />
 

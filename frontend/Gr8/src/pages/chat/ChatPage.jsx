@@ -1,7 +1,9 @@
 import ConversationList from "../../components/chat/conversationList/ConversationList.jsx";
 import ChatService from "../../services/ChatService.jsx";
 import ChatSignalrServices from "../../services/ChatSignalrServices.jsx";
+import ProfileBar from "../../components/layout/ProfileBar.jsx";
 import { useEffect, useState } from "react";
+import { Box, Typography } from "@mui/material";
 
 const ChatPage = () => {
     const [conversations, setConversations] = useState([]);
@@ -15,7 +17,6 @@ const ChatPage = () => {
                 await ChatSignalrServices.startConnection();
 
                 ChatSignalrServices.onReceiveMessage((message) => {
-
 
                     setConversations((prevConversation) => {
                         const existingConversation = prevConversation.find((conversation) =>
@@ -76,34 +77,59 @@ const ChatPage = () => {
     };
 
     return (
-        <div style={{ padding: "2rem" }}>
-            <h2>Chat</h2>
+        <>
+            <ProfileBar />
 
-            {error && <p>{error}</p>}
+            <Box
+                sx={{
+                    minHeight: "100vh",
+                    backgroundColor: "var(--color-bg-main)",
+                    px: 2,
+                    py: 3,
+                }}
+            >
+                <Typography
+                    variant="h4"
+                    sx={{
+                        textAlign: "center",
+                        fontWeight: 700,
+                        color: "var(--color-text-main)",
+                        mb: 4,
+                    }}
+                >
+                    Chattar
+                </Typography>
 
-            <div style={{ marginTop: "1rem" }}>
-                <h3>Starta ny chat</h3>
+                {error && <p>{error}</p>}
 
-                <input
-                    type="text"
-                    placeholder="Skriv användarens ID"
-                    value={newConversationUserId}
-                    onChange={(e) => setNewConversationUserId(e.target.value)}
-                />
+                <Box sx={{ mb: 3 }}>
 
-                <button onClick={startNewConversation}>
-                    Starta chat
-                </button>
-            </div>
+                    <Typography
+                        sx={{
+                            mb: 1,
+                            fontWeight: 600,
+                            color: "var(--color-text-main)",
+                        }}
+                    >
+                        Starta ny chat
+                    </Typography>
 
-            <h3>Konversationer</h3>
+                    <input
+                        type="text"
+                        placeholder="Skriv användarens ID"
+                        value={newConversationUserId}
+                        onChange={(e) => setNewConversationUserId(e.target.value)}
+                    />
 
-            {conversations.length === 0 ? (
-                <p>Inga konversationer ännu.</p>
-            ) : (
+                    <button onClick={startNewConversation}>
+                        Starta chat
+                    </button>
+
+                </Box>
+
                 <ConversationList conversations={conversations} />
-            )}
-        </div>
+            </Box>
+        </>
     )
 };
 

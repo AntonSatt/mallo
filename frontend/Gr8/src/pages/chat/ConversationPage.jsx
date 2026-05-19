@@ -127,7 +127,7 @@ const ConversationPage = () => {
 
                     <Typography
                         sx={{ mt: 1, color: "var(--color-text-main)", fontWeight: 600, }}>
-                        {conversationInfo?.otherUserName || userId}
+                        {conversationInfo?.otherUserFullName}
                     </Typography>
                 </Box>
 

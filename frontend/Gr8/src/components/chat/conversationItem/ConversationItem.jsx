@@ -30,7 +30,7 @@ const ConversationItem = ({ conversation }) => {
                         color: "var(--color-text-main)",
                     }}
                 >
-                    {conversation.otherUserName || conversation.otherUserId}
+                    {conversation.otherUserFullName}
                 </Typography>
 
                 <Typography

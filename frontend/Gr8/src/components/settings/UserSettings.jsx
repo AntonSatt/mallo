@@ -20,6 +20,8 @@ import { useAuth } from "../../hooks/useAuth";
 import ArrowDropDownCircleOutlinedIcon from '@mui/icons-material/ArrowDropDownCircleOutlined';
 import InputField from "../../design/input/InputField";
 import Settings from "../../assets/icons/settings.svg";
+import Report from "../../assets/icons/report.svg";
+import Lock from "../../assets/icons/lock.svg";
 import AvatarSlider from "../../components/avatar/avatarSlider.jsx";
 import SecondaryButton from "../../design/buttons/SecondaryButton";
 import PrimaryButton from "../../design/buttons/PrimaryButton.jsx";
@@ -426,7 +428,7 @@ const UserSettings = () => {
                     >
                         <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />}>
                             <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 0.5, py: 1 }}>
-                                <img src={Settings} alt="edit" style={{
+                                <img src={Lock} alt="edit" style={{
                                     width: 20,
                                     height: 20,
                                     filter: 'invert(78%) sepia(50%) saturate(500%) hue-rotate(330deg)'
@@ -536,10 +538,10 @@ const UserSettings = () => {
                     >
                         <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />} >
                             <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 0.5, py: 1 }}>
-                                <img src={Settings} alt="edit" style={{
+                                <img src={Report} alt="edit" style={{
                                     width: 20,
                                     height: 20,
-                                    filter: 'invert(78%) sepia(50%) saturate(500%) hue-rotate(330deg)'
+                                    filter: 'saturate(500%)'
                                 }} />
                                 Triggers
                             </Typography>

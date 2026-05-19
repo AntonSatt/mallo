@@ -1,0 +1,57 @@
+.calendar-container {
+    background-color: #F8F9FA;
+    border-radius: 15px;
+    padding: 5px;
+    height: 300px;
+    overflow: hidden;
+}
+
+.sidebar-search-input .MuiOutlinedInput-root {
+    background-color: var(--color-text-inverse) !important;
+}
+
+.custom-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+}
+
+.nav-arrow {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--color-text-inverse);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.date-selection-container {
+    display: flex;
+    gap: 5px;
+}
+
+.select-pill {
+    background-color: var(--color-text-inverse);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 16px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    text-transform: capitalize;
+}
+
+.orange-corner {
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    border-style: solid;
+    border-width: 0 0 7px 7px;
+    border-color: transparent transparent var(--color-primary) transparent;
+}

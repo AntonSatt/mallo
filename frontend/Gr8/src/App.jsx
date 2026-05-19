@@ -2,8 +2,6 @@ import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/protectedRoute/ProtectedRoute'
-import Navbar from './components/layout/Navbar'
-import HomePage from './pages/home/HomePage'
 import LoginPage from './pages/login/LoginPage'
 import RegisterPage from './pages/register/RegisterPage'
 import Settings from './pages/settings/SettingsPage'
@@ -11,6 +9,7 @@ import ForumPage from './pages/forum/ForumPage'
 import LandingPage from './pages/landing/LandingPage'
 import ForgotPasswordPage from './pages/resetPassword/ForgotPasswordPage'
 import ResetPasswordPage from './pages/resetPassword/ResetPasswordPage'
+import ActivityPage from './pages/activity/ActivityPage.jsx'
 
 function App() {
   return (
@@ -24,6 +23,7 @@ function App() {
           <Route path='/reset-password' element={<ResetPasswordPage />} />
           <Route path='/settings' element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           <Route path='/forum' element={<ProtectedRoute><ForumPage /></ProtectedRoute>} />
+          <Route path='/maps' element={<ProtectedRoute><ActivityPage /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

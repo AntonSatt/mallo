@@ -72,8 +72,7 @@ const Step2 = ({ formData, handleChange, onNext, error }) => {
                 helperText={error.fullName}
                 sx={{
                     "& .MuiOutlinedInput-input": {
-                        textAlign: "center",
-                        paddingLeft: "40px",
+                        textAlign: "center"
                     },
                     "& .MuiOutlinedInput-root": {
                         height: 40,
@@ -95,8 +94,7 @@ const Step2 = ({ formData, handleChange, onNext, error }) => {
                 helperText={error.ssn}
                 sx={{
                     "& .MuiOutlinedInput-input": {
-                        textAlign: "center",
-                        paddingLeft: "40px",
+                        textAlign: "center"
                     },
                     "& .MuiOutlinedInput-root": {
                         height: 40,

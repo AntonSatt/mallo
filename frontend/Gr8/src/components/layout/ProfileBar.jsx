@@ -22,18 +22,28 @@ import Avatar from "../avatar/avatar";
 import InputField from '../../design/input/InputField.jsx';
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
 import SearchHeartButton from "../../assets/icons/searchHeartForum.svg";
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
 
 // this is the profile bar that appears at the top of the forum page. It shows the user's avatar and name, 
 // and has a hamburger menu on the right side. The hamburger menu contains options for viewing badges, 
 // activities, gifts, saved posts, and logging out. The profile bar also has an optional "create post" 
 // input that looks like a text field but works as a button to open the post creation dialog. This input is 
 // only shown when the showCreate prop is true.
-const ProfileBar = ({ showCreate = false, onCreatePost }) => {
+const ProfileBar = ({ showCreate = false, onCreatePost, onSearch }) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const { currentUser, logout } = useAuth();
 
     const toggleMenu = () => setMenuOpen((prev) => !prev);
     const closeMenu = () => setMenuOpen(false);
+
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchValue, setSearchValue] = useState("");
+
+    const handleSearchChange = (e) => {
+        setSearchValue(e.target.value);
+        onSearch?.(e.target.value);
+    };
 
     return (
         <ClickAwayListener onClickAway={closeMenu}>
@@ -43,40 +53,75 @@ const ProfileBar = ({ showCreate = false, onCreatePost }) => {
                         <>
                             <Box className="profilebar-top-row">
                                 <Avatar avatar={currentUser?.picture} />
-                                </Box>
+                            </Box>
 
-                                <Box className="profilebar-create">
-                                    <InputField
-                                        fullWidth
-                                        placeholder="Skapa..."
-                                        onClick={onCreatePost}
-                                        slotProps={{
-                                            input: {
-                                                readOnly: true,
-                                                startAdornment: (
-                                                    <InputAdornment position="start">
-                                                        <ControlPointIcon className="profilebar-create-icon" />
-                                                    </InputAdornment>
-                                                ),
-                                            },
-                                        }}
-                                    />
-                                </Box>
+                            <Box className="profilebar-create" sx={{ position: 'relative', flex: 1 }}>
+                                <InputField
+                                    fullWidth
+                                    placeholder="Skapa inlägg"
+                                    onClick={onCreatePost}
+                                    slotProps={{
+                                        input: {
+                                            readOnly: true,
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <ControlPointIcon className="profilebar-create-icon" />
+                                                </InputAdornment>
+                                            ),
+                                        },
+                                    }}
+                                />
 
-                                <Button type="button" className="profilebar-search-button" aria-label="Sök">
-                                    <img src={SearchHeartButton} alt="" className="profilebar-search-icon" />
-                                </Button>
+                                {searchOpen && (
+                                    <Box sx={{
+                                        position: 'absolute',
+                                        left: 0,
+                                        right: 0,
+                                        top: 0,
+                                        bottom: 0,
+                                        zIndex: 10,
+                                    }}>
+                                        <InputField
+                                            autoFocus
+                                            fullWidth
+                                            placeholder="Sök inlägg..."
+                                            value={searchValue}
+                                            onChange={handleSearchChange}
+                                            slotProps={{
+                                                input: {
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
+                                                            <IconButton onClick={() => {
+                                                                setSearchValue("");
+                                                                onSearch?.("");
+                                                                setSearchOpen(false);
+                                                            }}sx={{ mr: -2 }}>
+                                                                <CloseIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </InputAdornment>
+                                                    ),
+                                                },
+                                            }}
+                                        />
+                                    </Box>
+                                )}
+                            </Box>
 
-                                <Box className="profilebar-right">
-                                    <HamburgerMenu
-                                        open={menuOpen}
-                                        onToggle={toggleMenu}
-                                    />
-                                </Box>
+                            <Button type="button" className="profilebar-search-button" aria-label="Sök"
+                                onClick={() => setSearchOpen(true)}>
+                                <img src={SearchHeartButton} alt="" className="profilebar-search-icon" />
+                            </Button>
+
+                            <Box className="profilebar-right">
+                                <HamburgerMenu
+                                    open={menuOpen}
+                                    onToggle={toggleMenu}
+                                />
+                            </Box>
                         </>
                     ) : (
                         <>
-                            <Box className="profilebar-left"> 
+                            <Box className="profilebar-left">
                                 <Avatar avatar={currentUser?.picture} />
                                 <Typography className="profile-name">
                                     {currentUser?.preferred_username || currentUser?.email || "Användarnamn saknas"}

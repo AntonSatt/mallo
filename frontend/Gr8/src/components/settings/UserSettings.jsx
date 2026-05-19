@@ -303,8 +303,7 @@ const UserSettings = () => {
                                 helperText={errors.userName}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
@@ -328,8 +327,7 @@ const UserSettings = () => {
                                 helperText={errors.firstName}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
@@ -353,8 +351,7 @@ const UserSettings = () => {
                                 helperText={errors.lastName}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
@@ -378,8 +375,7 @@ const UserSettings = () => {
                                 helperText={errors.email}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
@@ -445,8 +441,7 @@ const UserSettings = () => {
                                 helperText={errors.currentPassword}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
@@ -471,8 +466,7 @@ const UserSettings = () => {
                                 helperText={errors.newPassword}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
@@ -499,8 +493,7 @@ const UserSettings = () => {
                                 inputProps={{ style: { textAlign: 'center' } }}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,

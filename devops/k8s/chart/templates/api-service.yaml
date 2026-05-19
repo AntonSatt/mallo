@@ -6,6 +6,12 @@ metadata:
   labels:
     {{- include "gr8.labels" . | nindent 4 }}
     app.kubernetes.io/component: {{ $component }}
+  annotations:
+    traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
+    traefik.ingress.kubernetes.io/service.sticky.cookie.name: "gr8_signalr_sticky"
+    traefik.ingress.kubernetes.io/service.sticky.cookie.httponly: "true"
+    traefik.ingress.kubernetes.io/service.sticky.cookie.samesite: "Lax"
+    traefik.ingress.kubernetes.io/service.sticky.cookie.secure: "true"
 spec:
   type: ClusterIP
   ports:

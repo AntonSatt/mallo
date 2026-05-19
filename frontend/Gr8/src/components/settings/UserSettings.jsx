@@ -30,7 +30,6 @@ import ProfileBar from "../../components/layout/ProfileBar.jsx";
 import EditPencil from "../../assets/icons/editPencil.svg";
 import Settings from "../../assets/icons/settings.svg";
 import AvatarSlider from "../../components/avatar/avatarSlider.jsx";
-import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import SecondaryButton from "../../design/buttons/SecondaryButton";
 import PrimaryButton from "../../design/buttons/PrimaryButton.jsx";
 import Switch from '@mui/material/Switch';
@@ -68,6 +67,17 @@ const UserSettings = () => {
 
     const [tags, setTags] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
+    const ITEM_HEIGHT = 48;
+    const ITEM_PADDING_TOP = 8;
+    const MenuProps = {
+        slotProps: {
+            paper: {
+                style: {
+                    maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+                },
+            },
+        },
+    };
 
     const [errors, setErrors] = useState({});
 
@@ -253,7 +263,7 @@ const UserSettings = () => {
                     '&:before': { display: 'none' },
                     mt: 2,
                 }}>
-                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{color: 'var(--color-primary)'}} />}>
+                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />}>
                         <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <img src={Settings} alt="edit" style={{
                                 width: 20,
@@ -293,23 +303,13 @@ const UserSettings = () => {
                                 helperText={errors.userName}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
                                         borderRadius: 20,
                                     },
                                     width: "80%"
-                                }}
-                                slotProps={{
-                                    input: {
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                            </InputAdornment>
-                                        ),
-                                    },
                                 }}
                             />
 
@@ -327,24 +327,14 @@ const UserSettings = () => {
                                 helperText={errors.firstName}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
                                         borderRadius: 20,
                                     },
                                     width: "80%"
-                                }}
-                                slotProps={{
-                                    input: {
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                            </InputAdornment>
-                                        ),
-                                    },
-                                }}
+                                }}                                
                             />
 
                             <Typography variant="body2" color="var(--color-text-main)" align="center">
@@ -361,23 +351,13 @@ const UserSettings = () => {
                                 helperText={errors.lastName}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
                                         borderRadius: 20,
                                     },
                                     width: "80%"
-                                }}
-                                slotProps={{
-                                    input: {
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                            </InputAdornment>
-                                        ),
-                                    },
                                 }}
                             />
                             <Typography variant="body2" color="var(--color-text-main)" align="center">
@@ -395,8 +375,7 @@ const UserSettings = () => {
                                 helperText={errors.email}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
@@ -404,27 +383,18 @@ const UserSettings = () => {
                                     },
                                     width: "80%"
                                 }}
-                                slotProps={{
-                                    input: {
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                            </InputAdornment>
-                                        ),
-                                    },
-                                }}
                             />
 
                         </Box>
 
-                        <Box item sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                             <PrimaryButton type="submit" sx={{ mt: 2, borderRadius: 50, width: '75%' }}>
                                 Spara profil
                             </PrimaryButton>
                         </Box>
 
-                        <Box item sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <SecondaryButton onClick={handleClickOpen} sx={{ borderRadius: 50, backgroundColor: '--color-bg-muted', width: '50%', alignItems: 'center', mt: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <SecondaryButton onClick={handleClickOpen} sx={{ borderRadius: 50, backgroundColor: '--color-bg-muted', width: '50%', alignItems: 'center', mt: 2 }}>
                                 Radera konto
                             </SecondaryButton>
                         </Box>
@@ -441,7 +411,7 @@ const UserSettings = () => {
                     '&:before': { display: 'none' },
                     mt: 2,
                 }}>
-                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{color: 'var(--color-primary)'}} />}>
+                    <AccordionSummary expandIcon={<ArrowDropDownCircleOutlinedIcon sx={{ color: 'var(--color-primary)' }} />}>
                         <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <img src={Settings} alt="edit" style={{
                                 width: 20,
@@ -471,23 +441,13 @@ const UserSettings = () => {
                                 helperText={errors.currentPassword}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
                                         borderRadius: 20,
                                     },
                                     width: "80%"
-                                }}
-                                slotProps={{
-                                    input: {
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                            </InputAdornment>
-                                        ),
-                                    },
                                 }}
                             />
 
@@ -506,23 +466,13 @@ const UserSettings = () => {
                                 helperText={errors.newPassword}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
                                         borderRadius: 20,
                                     },
                                     width: "80%"
-                                }}
-                                slotProps={{
-                                    input: {
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                            </InputAdornment>
-                                        ),
-                                    },
                                 }}
                             />
 
@@ -543,8 +493,7 @@ const UserSettings = () => {
                                 inputProps={{ style: { textAlign: 'center' } }}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
@@ -552,20 +501,11 @@ const UserSettings = () => {
                                     },
                                     width: "80%"
                                 }}
-                                slotProps={{
-                                    input: {
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                            </InputAdornment>
-                                        ),
-                                    },
-                                }}
                             />
 
                         </Box>
 
-                        <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Grid sx={{ display: 'flex', justifyContent: 'center' }}>
                             <PrimaryButton type="submit" sx={{ mt: 2, borderRadius: 50, width: '75%' }}>
                                 Spara lösenord
                             </PrimaryButton>
@@ -600,6 +540,7 @@ const UserSettings = () => {
                             value={selectedTags}
                             onChange={(e) => setSelectedTags(e.target.value)}
                             input={<OutlinedInput />}
+                            MenuProps={MenuProps}
                             renderValue={(selected) =>
                                 selected
                                     .map(id => tags.find(t => t.id === id)?.name)

@@ -83,8 +83,7 @@ const LoginForm = () => {
             helperText={error.userName}
             sx={{
               "& .MuiOutlinedInput-input": {
-                textAlign: "center",
-                paddingLeft: "40px"
+                textAlign: "center"
               },
               "& .MuiOutlinedInput-root": {
                 height: 40,
@@ -111,14 +110,12 @@ const LoginForm = () => {
             onChange={(e) => setPassword(e.target.value)}
             sx={{
               "& .MuiOutlinedInput-input": {
-                textAlign: "center",
-                paddingLeft: "40px",
+                textAlign: "center"
               },
               "& .MuiOutlinedInput-root": {
                 height: 40,
                 borderRadius: 20,
               },
-
             }}
           />
         </Grid>

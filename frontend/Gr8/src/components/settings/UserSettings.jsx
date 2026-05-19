@@ -303,8 +303,7 @@ const UserSettings = () => {
                                 helperText={errors.userName}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
@@ -328,8 +327,7 @@ const UserSettings = () => {
                                 helperText={errors.firstName}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
@@ -353,8 +351,7 @@ const UserSettings = () => {
                                 helperText={errors.lastName}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
@@ -378,8 +375,7 @@ const UserSettings = () => {
                                 helperText={errors.email}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
@@ -391,13 +387,13 @@ const UserSettings = () => {
 
                         </Box>
 
-                        <Box item sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                             <PrimaryButton type="submit" sx={{ mt: 2, borderRadius: 50, width: '75%' }}>
                                 Spara profil
                             </PrimaryButton>
                         </Box>
 
-                        <Box item sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                             <SecondaryButton onClick={handleClickOpen} sx={{ borderRadius: 50, backgroundColor: '--color-bg-muted', width: '50%', alignItems: 'center', mt: 2 }}>
                                 Radera konto
                             </SecondaryButton>
@@ -445,8 +441,7 @@ const UserSettings = () => {
                                 helperText={errors.currentPassword}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
@@ -471,8 +466,7 @@ const UserSettings = () => {
                                 helperText={errors.newPassword}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
@@ -499,8 +493,7 @@ const UserSettings = () => {
                                 inputProps={{ style: { textAlign: 'center' } }}
                                 sx={{
                                     "& .MuiOutlinedInput-input": {
-                                        textAlign: "center",
-                                        paddingLeft: "40px",
+                                        textAlign: "center"
                                     },
                                     "& .MuiOutlinedInput-root": {
                                         height: 40,
@@ -512,7 +505,7 @@ const UserSettings = () => {
 
                         </Box>
 
-                        <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Grid sx={{ display: 'flex', justifyContent: 'center' }}>
                             <PrimaryButton type="submit" sx={{ mt: 2, borderRadius: 50, width: '75%' }}>
                                 Spara lösenord
                             </PrimaryButton>

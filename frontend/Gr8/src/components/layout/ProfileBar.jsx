@@ -56,21 +56,25 @@ const ProfileBar = ({ showCreate = false, onCreatePost, onSearch }) => {
                             </Box>
 
                             <Box className="profilebar-create" sx={{ position: 'relative', flex: 1 }}>
-                                <InputField
+                                <Button
                                     fullWidth
-                                    placeholder="Skapa inlägg"
                                     onClick={onCreatePost}
-                                    slotProps={{
-                                        input: {
-                                            readOnly: true,
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <ControlPointIcon className="profilebar-create-icon" />
-                                                </InputAdornment>
-                                            ),
-                                        },
+                                    sx={{
+                                        height: 46,
+                                        borderRadius: '999px',
+                                        backgroundColor: 'var(--color-bg-muted)',
+                                        justifyContent: 'flex-start',
+                                        paddingLeft: '14px',
+                                        color: 'var(--color-text-main)',
+                                        textTransform: 'none',
+                                        '&:hover': {
+                                            backgroundColor: 'var(--color-bg-muted)',
+                                        }
                                     }}
-                                />
+                                    startIcon={<ControlPointIcon sx={{ color: 'var(--color-primary)', fontSize: '30px !important' }} />}
+                                >
+                                    Skapa inlägg
+                                </Button>
 
                                 {searchOpen && (
                                     <Box sx={{
@@ -95,7 +99,7 @@ const ProfileBar = ({ showCreate = false, onCreatePost, onSearch }) => {
                                                                 setSearchValue("");
                                                                 onSearch?.("");
                                                                 setSearchOpen(false);
-                                                            }}sx={{ mr: -2 }}>
+                                                            }} sx={{ mr: -2 }}>
                                                                 <CloseIcon fontSize="small" />
                                                             </IconButton>
                                                         </InputAdornment>

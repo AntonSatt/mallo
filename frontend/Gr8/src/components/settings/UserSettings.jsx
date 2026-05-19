@@ -79,6 +79,16 @@ const UserSettings = () => {
     const [showNewPassword] = useState(false);
     const [showConfirmPassword] = useState(false);
 
+    const normalizeTagIds = (tagIds) => {
+        if (!Array.isArray(tagIds)) {
+            return [];
+        }
+
+        return tagIds
+            .map((id) => Number(id))
+            .filter((id) => Number.isInteger(id) && id > 0);
+    };
+
     const handleProfileChange = (e) => {
         const key = e.target.id || e.target.name;
         setProfileData({ ...profileData, [key]: e.target.value });
@@ -112,6 +122,7 @@ const UserSettings = () => {
                     userName: data.userName || "",
                     email: data.email || ""
                 });
+                setSelectedTags(normalizeTagIds(data.tagIds));
             }
             catch (error) {
                 console.error("Kunde inte hämta användardata", error);
@@ -171,6 +182,16 @@ const UserSettings = () => {
             }
         }
 
+    };
+
+    const handleTagSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            await UserServices.updateUserTags(selectedTags);
+        } catch (error) {
+            console.error("Kunde inte uppdatera triggers", error);
+        }
     };
 
     const handlePasswordSubmit = async (e) => {
@@ -530,7 +551,7 @@ const UserSettings = () => {
                     </Accordion>
                 </form>
 
-                <form>
+                <form onSubmit={handleTagSubmit}>
                     <Accordion
                         className="dropdown"
                         expanded={expandedSection === "triggers"}
@@ -554,12 +575,12 @@ const UserSettings = () => {
                                 multiple
                                 fullWidth
                                 value={selectedTags}
-                                onChange={(e) => setSelectedTags(e.target.value)}
+                                onChange={(e) => setSelectedTags(normalizeTagIds(e.target.value))}
                                 input={<OutlinedInput />}
                                 MenuProps={MenuProps}
                                 renderValue={(selected) =>
                                     selected
-                                        .map(id => tags.find(t => t.id === id)?.name)
+                                        .map(id => tags.find(t => t.id === id)?.name ?? id)
                                         .join(", ")
                                 }
                             >
@@ -575,6 +596,12 @@ const UserSettings = () => {
                                     );
                                 })}
                             </Select>
+
+                            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                                <PrimaryButton type="submit" sx={{ borderRadius: 50, width: '75%' }}>
+                                    Spara triggers
+                                </PrimaryButton>
+                            </Box>
                         </AccordionDetails>
 
                     </Accordion>

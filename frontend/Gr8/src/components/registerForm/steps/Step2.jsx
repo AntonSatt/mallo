@@ -5,7 +5,6 @@ import SecondaryButton from "../../../design/buttons/SecondaryButton";
 import ageValidation from "../../../assets/images/ageValidation.png"
 import { useNavigate } from "react-router-dom";
 import InputField from "../../../design/input/InputField";
-import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import InputAdornment from "@mui/material/InputAdornment";
 import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
 import {

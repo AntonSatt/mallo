@@ -1,7 +1,7 @@
 .protected-route-layout {
     height: 100dvh;
     background-color: var(--color-primary-bg);
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 .protected-route-nav {

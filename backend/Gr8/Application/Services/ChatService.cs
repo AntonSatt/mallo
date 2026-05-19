@@ -74,10 +74,14 @@ namespace Gr8.Application.Services
                 var otherUserId = latestMessage.SenderId == userId ? latestMessage.ReceiverId : latestMessage.SenderId;
 
                 var avatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(otherUserId);
+                var fullName = await _applicationRepository.GetFullNameByIdAsync(otherUserId);
+                var userName = await _applicationRepository.GetUserNameByIdAsync(otherUserId);
 
                 conversations.Add(new ChatConversationDto
                 {
                     OtherUserId = otherUserId,
+                    OtherUserFullName = fullName ?? "Okänd användare",
+                    OtherUserName = userName ?? "Okänd användare",
                     ActivityId = latestMessage.ActivityId,
                     LastMessage = latestMessage.Content,
                     LastMessageAt = latestMessage.SendAt,

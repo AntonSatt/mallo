@@ -57,3 +57,5 @@ Thumbs.db
 .idea/
 *.iml
 .vscode/
+
+my-kubeconfig.yaml

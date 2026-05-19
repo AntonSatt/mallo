@@ -82,15 +82,6 @@ const Step2 = ({ formData, handleChange, onNext, error }) => {
                     },
 
                 }}
-                slotProps={{
-                    input: {
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                            </InputAdornment>
-                        ),
-                    },
-                }}
             />
 
             <Typography variant="body2" sx={{ mt: 2 }}>Personnummer</Typography>
@@ -113,15 +104,6 @@ const Step2 = ({ formData, handleChange, onNext, error }) => {
                         borderRadius: 20,
                     },
 
-                }}
-                slotProps={{
-                    input: {
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                            </InputAdornment>
-                        ),
-                    },
                 }}
             />
 

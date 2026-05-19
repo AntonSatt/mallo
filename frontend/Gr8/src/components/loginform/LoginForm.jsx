@@ -4,7 +4,6 @@ import { useAuth } from "../../hooks/useAuth";
 import { Grid, Typography, Box } from "@mui/material"
 import PrimaryButton from "../../design/buttons/PrimaryButton";
 import InputField from "../../design/input/InputField";
-import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import InputAdornment from "@mui/material/InputAdornment";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
@@ -92,15 +91,6 @@ const LoginForm = () => {
                 borderRadius: 20,
               },
             }}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                  </InputAdornment>
-                ),
-              },
-            }}
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
           />
@@ -129,15 +119,6 @@ const LoginForm = () => {
                 borderRadius: 20,
               },
 
-            }}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                  </InputAdornment>
-                ),
-              },
             }}
           />
         </Grid>

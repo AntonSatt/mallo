@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import {
     Dialog,
     DialogTitle,
     DialogActions,
     Button,
-    InputAdornment,
     Accordion,
     AccordionSummary,
     AccordionDetails,
@@ -22,7 +21,6 @@ import ArrowDropDownCircleOutlinedIcon from '@mui/icons-material/ArrowDropDownCi
 import InputField from "../../design/input/InputField";
 import Settings from "../../assets/icons/settings.svg";
 import AvatarSlider from "../../components/avatar/avatarSlider.jsx";
-import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import SecondaryButton from "../../design/buttons/SecondaryButton";
 import PrimaryButton from "../../design/buttons/PrimaryButton.jsx";
 import Switch from '@mui/material/Switch';
@@ -60,6 +58,17 @@ const UserSettings = () => {
 
     const [tags, setTags] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
+    const ITEM_HEIGHT = 48;
+    const ITEM_PADDING_TOP = 8;
+    const MenuProps = {
+        slotProps: {
+            paper: {
+                style: {
+                    maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+                },
+            },
+        },
+    };
 
     const [errors, setErrors] = useState({});
     const [expandedSection, setExpandedSection] = useState(false);
@@ -304,15 +313,6 @@ const UserSettings = () => {
                                         },
                                         width: "80%"
                                     }}
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                                </InputAdornment>
-                                            ),
-                                        },
-                                    }}
                                 />
 
                                 <Typography variant="body2" color="var(--color-text-main)" align="center">
@@ -337,15 +337,6 @@ const UserSettings = () => {
                                             borderRadius: 20,
                                         },
                                         width: "80%"
-                                    }}
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                                </InputAdornment>
-                                            ),
-                                        },
                                     }}
                                 />
 
@@ -372,15 +363,6 @@ const UserSettings = () => {
                                         },
                                         width: "80%"
                                     }}
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                                </InputAdornment>
-                                            ),
-                                        },
-                                    }}
                                 />
                                 <Typography variant="body2" color="var(--color-text-main)" align="center">
                                     Email
@@ -405,15 +387,6 @@ const UserSettings = () => {
                                             borderRadius: 20,
                                         },
                                         width: "80%"
-                                    }}
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                                </InputAdornment>
-                                            ),
-                                        },
                                     }}
                                 />
 
@@ -494,15 +467,6 @@ const UserSettings = () => {
                                         },
                                         width: "80%"
                                     }}
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                                </InputAdornment>
-                                            ),
-                                        },
-                                    }}
                                 />
 
                                 <Typography variant="body2" color="var(--color-text-main)" align="center">
@@ -528,15 +492,6 @@ const UserSettings = () => {
                                             borderRadius: 20,
                                         },
                                         width: "80%"
-                                    }}
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                                </InputAdornment>
-                                            ),
-                                        },
                                     }}
                                 />
 
@@ -565,15 +520,6 @@ const UserSettings = () => {
                                             borderRadius: 20,
                                         },
                                         width: "80%"
-                                    }}
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                                </InputAdornment>
-                                            ),
-                                        },
                                     }}
                                 />
 
@@ -615,13 +561,7 @@ const UserSettings = () => {
                                 value={selectedTags}
                                 onChange={(e) => setSelectedTags(e.target.value)}
                                 input={<OutlinedInput />}
-                                MenuProps={{
-                                    slotProps: {
-                                        paper: {
-                                            sx: { maxHeight: 240 },
-                                        },
-                                    },
-                                }}
+                                MenuProps={MenuProps}
                                 renderValue={(selected) =>
                                     selected
                                         .map(id => tags.find(t => t.id === id)?.name)

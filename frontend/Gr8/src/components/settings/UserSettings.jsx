@@ -305,7 +305,6 @@ const UserSettings = () => {
                                     sx={{
                                         "& .MuiOutlinedInput-input": {
                                             textAlign: "center",
-                                            paddingLeft: "40px",
                                         },
                                         "& .MuiOutlinedInput-root": {
                                             height: 40,
@@ -330,7 +329,6 @@ const UserSettings = () => {
                                     sx={{
                                         "& .MuiOutlinedInput-input": {
                                             textAlign: "center",
-                                            paddingLeft: "40px",
                                         },
                                         "& .MuiOutlinedInput-root": {
                                             height: 40,
@@ -355,7 +353,6 @@ const UserSettings = () => {
                                     sx={{
                                         "& .MuiOutlinedInput-input": {
                                             textAlign: "center",
-                                            paddingLeft: "40px",
                                         },
                                         "& .MuiOutlinedInput-root": {
                                             height: 40,
@@ -380,7 +377,6 @@ const UserSettings = () => {
                                     sx={{
                                         "& .MuiOutlinedInput-input": {
                                             textAlign: "center",
-                                            paddingLeft: "40px",
                                         },
                                         "& .MuiOutlinedInput-root": {
                                             height: 40,
@@ -459,7 +455,6 @@ const UserSettings = () => {
                                     sx={{
                                         "& .MuiOutlinedInput-input": {
                                             textAlign: "center",
-                                            paddingLeft: "40px",
                                         },
                                         "& .MuiOutlinedInput-root": {
                                             height: 40,
@@ -485,7 +480,6 @@ const UserSettings = () => {
                                     sx={{
                                         "& .MuiOutlinedInput-input": {
                                             textAlign: "center",
-                                            paddingLeft: "40px",
                                         },
                                         "& .MuiOutlinedInput-root": {
                                             height: 40,
@@ -513,7 +507,6 @@ const UserSettings = () => {
                                     sx={{
                                         "& .MuiOutlinedInput-input": {
                                             textAlign: "center",
-                                            paddingLeft: "40px",
                                         },
                                         "& .MuiOutlinedInput-root": {
                                             height: 40,

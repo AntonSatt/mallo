@@ -33,8 +33,7 @@ const Step3 = ({ formData, handleChange, onNext, error }) => {
                 helperText={error.email}
                 sx={{
                     "& .MuiOutlinedInput-input": {
-                        textAlign: "center",
-                        paddingLeft: "40px",
+                        textAlign: "center"
                     },
                     "& .MuiOutlinedInput-root": {
                         height: 40,
@@ -57,8 +56,7 @@ const Step3 = ({ formData, handleChange, onNext, error }) => {
                 type="password"
                 sx={{
                     "& .MuiOutlinedInput-input": {
-                        textAlign: "center",
-                        paddingLeft: "40px",
+                        textAlign: "center"
                     },
                     "& .MuiOutlinedInput-root": {
                         height: 40,
@@ -81,8 +79,7 @@ const Step3 = ({ formData, handleChange, onNext, error }) => {
                 type="password"
                 sx={{
                     "& .MuiOutlinedInput-input": {
-                        textAlign: "center",
-                        paddingLeft: "40px",
+                        textAlign: "center"
                     },
                     "& .MuiOutlinedInput-root": {
                         height: 40,

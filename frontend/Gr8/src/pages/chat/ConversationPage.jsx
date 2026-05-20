@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Box, Typography, IconButton, Paper } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
@@ -18,6 +18,9 @@ const ConversationPage = () => {
     const [newMessage, setNewMessage] = useState("");
     const [error, setError] = useState("");
     const [conversationInfo, setConversationInfo] = useState(null);
+    const [isTyping, setIsTyping] = useState(false);
+
+    const typingTimeoutRef = useRef(null);
 
     useEffect(() => {
 
@@ -41,32 +44,74 @@ const ConversationPage = () => {
         loadConversation();
     }, [userId]);
 
-    // Listen for incoming messages through SignalR and update the chat window if the message belongs to the current conversation.
+    // Set up SignalR connection and event handlers for receiving messages and typing notifications.
     useEffect(() => {
+        const setupSignalR = async () => {
+            try {
+                await ChatSignalrServices.startConnection();
 
-        ChatSignalrServices.onReceiveMessage((message) => {
+                ChatSignalrServices.onReceiveMessage((message) => {
+                    const currentConversation =
+                        message.senderId === userId || message.receiverId === userId;
 
-            const currentConversation =
-                message.senderId === userId || message.receiverId === userId;
+                    if (!currentConversation) {
+                        return;
+                    }
 
-            if (!currentConversation) {
-                return;
+                    setMessages((prevMessages) => {
+                        const alreadyExists = prevMessages.some(
+                            (m) => m.id === message.id
+                        );
+
+                        if (alreadyExists) {
+                            return prevMessages;
+                        }
+
+                        return [...prevMessages, message];
+                    });
+                });
+
+                // Listen for typing notifications from the other user and show "typing..."
+                ChatSignalrServices.onUserTyping((senderId) => {
+                    if (senderId !== userId) {
+                        return;
+                    }
+
+                    setIsTyping(true);
+
+                    clearTimeout(typingTimeoutRef.current);
+
+                    typingTimeoutRef.current = setTimeout(() => {
+                        setIsTyping(false);
+                    }, 5000);
+                });
+            } catch (error) {
+                console.error("Failed to setup SignalR", error);
+                setError("Could not connect to chat.");
             }
+        };
 
-            setMessages((prevMessages) => {
+        setupSignalR();
 
-                const alreadyExists = prevMessages.some((m) => m.id === message.id);
-
-                if (alreadyExists) {
-                    return prevMessages;
-                }
-
-                return [...prevMessages, message];
-            });
-        });
-
+        return () => {
+            clearTimeout(typingTimeoutRef.current);
+        };
     }, [userId]);
 
+    // Handle changes to the message input and send typing notifications to the other user.
+     const handleMessageChange = (value) => {
+        setNewMessage(value);
+
+        if (!value.trim()) {
+            return;
+        }
+
+        ChatSignalrServices.sendTyping(userId).catch((error) => {
+            console.error("Failed to send typing event", error);
+        });
+    };
+
+    // Send a new message to the other user through SignalR and clear the input field.
     const sendMessage = async () => {
 
         if (!newMessage.trim()) {
@@ -99,36 +144,50 @@ const ConversationPage = () => {
                     flexDirection: "column",
                     px: 1,
                     py: 2,
-                    boxSizing: "border-box",
+                    boxSizing: "border-box"
                 }}
             >
                 <Box
-                    sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-
-                    <IconButton onClick={() => navigate("/message")}>
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        position: "relative",
+                        px: 2,
+                        pt: 0.1,
+                        pb: 1
+                    }}
+                >
+                    <IconButton
+                        onClick={() => navigate("/message")}
+                        sx={{
+                            position: "absolute",
+                            left: 5
+                        }}
+                    >
                         <ArrowBackIosNewIcon />
                     </IconButton>
 
-                    <Typography
+                    <Box
                         sx={{
-                            fontWeight: 700,
-                            color: "var(--color-text-main)",
+                            width: "100%",
+                            textAlign: "center"
                         }}
                     >
-                        Tillbaka
-                    </Typography>
-                </Box>
+                        <Avatar
+                            className="post-avatar"
+                            avatar={conversationInfo?.avatarId}
+                        />
 
-                <Box sx={{ textAlign: "center", mb: 1 }}>
-                    <Avatar
-                        className="post-avatar"
-                        avatar={conversationInfo?.avatarId}
-                    />
-
-                    <Typography
-                        sx={{ mt: 1, color: "var(--color-text-main)", fontWeight: 600, }}>
-                        {conversationInfo?.otherUserFullName}
-                    </Typography>
+                        <Typography
+                            sx={{
+                                mt: 1,
+                                color: "var(--color-text-main)",
+                                fontWeight: 300
+                            }}
+                        >
+                            {conversationInfo?.otherUserFullName}
+                        </Typography>
+                    </Box>
                 </Box>
 
                 {error && (
@@ -148,10 +207,23 @@ const ConversationPage = () => {
                         px: 2,
                         py: 1,
                         mb: 2,
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
                     }}
                 >
                     <ChatWindow messages={messages} />
+                    {isTyping && (
+                        <Typography
+                            sx={{
+                                px: 0.2,
+                                pb: 0.5,
+                                fontSize: "0.80rem",
+                                opacity: 0.5,
+                                color: "var(--color-text-main)"
+                            }}
+                        >
+                            {conversationInfo?.otherUserFullName} skriver...
+                        </Typography>
+                    )}
                 </Paper>
 
                 <Box
@@ -163,7 +235,7 @@ const ConversationPage = () => {
 
                     <MessageInput
                         newMessage={newMessage}
-                        setNewMessage={setNewMessage}
+                        setNewMessage={handleMessageChange}
                         sendMessage={sendMessage}
                     />
                 </Box>

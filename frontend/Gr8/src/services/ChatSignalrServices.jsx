@@ -28,6 +28,7 @@ class ChatSignalrService {
         }
     }
     
+    // Listen for incoming messages through SignalR and update the chat window if the message belongs to the current conversation.
     onReceiveMessage(callback){
         if(!this.connection) return;
 
@@ -38,6 +39,19 @@ class ChatSignalrService {
         if(!this.connection) return;
 
         await this.connection.invoke("SendMessage", messageData);
+    }
+
+    // Listen for typing notifications from the other user and show "typing..."
+    onUserTyping(callback){
+        if(!this.connection) return;
+
+        this.connection.on("UserTyping", callback);
+    }
+
+    async sendTyping(receiverId){
+        if(!this.connection) return;
+
+        await this.connection.invoke("Typing", receiverId);
     }
 }
 

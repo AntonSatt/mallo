@@ -53,6 +53,12 @@ class ChatSignalrService {
 
         await this.connection.invoke("Typing", receiverId);
     }
+
+    async markConversationAsRead(otherUserId) {
+    if (!this.connection) return;
+
+    await this.connection.invoke("MarkConversationAsRead", otherUserId);
+}
 }
 
 export default new ChatSignalrService();

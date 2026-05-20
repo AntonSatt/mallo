@@ -1,10 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { Box, Paper, Typography } from "@mui/material";
 import Avatar from "../../avatar/avatar.jsx";
+import moment from "moment";
 
 // component to display a single conversation between the user and another user.
 const ConversationItem = ({ conversation }) => {
     const navigate = useNavigate();
+
+    const hasUnreadMessage = conversation.hasUnreadMessage;
 
     return (
         <Paper
@@ -36,16 +39,30 @@ const ConversationItem = ({ conversation }) => {
                 <Typography
                     sx={{
                         color: "var(--color-text-main)",
-                        opacity: 0.75,
+                        opacity: hasUnreadMessage ? 1 : 0.75,
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         fontSize: "0.9rem",
+                        fontWeight: hasUnreadMessage ? 700 : 400
                     }}
                 >
                     {conversation.lastMessage || "Ingen meddelandehistorik ännu"}
                 </Typography>
             </Box>
+
+            <Typography
+                sx={{
+                    fontSize: "0.7rem",
+                    opacity: 0.55,
+                    color: "var(--color-text-main)",
+                    flexShrink: 0,
+                    alignSelf: "center"
+                }}
+            >
+                {conversation.lastMessageAt ? moment(conversation.lastMessageAt).format("HH:mm") : ""}
+
+            </Typography>
         </Paper>
     );
 };

@@ -1,5 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { useAuth } from "../../../hooks/useAuth";
+import moment from "moment";
 
 //components to display the chat window with messages.
 const ChatWindow = ({ messages }) => {
@@ -24,10 +25,23 @@ const ChatWindow = ({ messages }) => {
                         key={`${message.id}-${index}`}
                         sx={{
                             display: "flex",
-                            justifyContent: isMine ? "flex-end" : "flex-start",
+                            flexDirection: "column",
+                            alignItems: isMine ? "flex-end" : "flex-start",
                             px: 0.1
                         }}
                     >
+                        <Typography
+                                sx={{
+                                    fontSize: "0.7rem",
+                                    opacity: 0.6,
+                                    mb: 0.5,
+                                    mr: 1,
+                                    textAlign: isMine ? "right" : "left",
+                                }}
+                                >
+                                {moment(message.sendAt).format("HH:mm")}
+                            </Typography>
+                        
                         <Box
                             sx={{
                                 maxWidth: "75%",
@@ -49,10 +63,14 @@ const ChatWindow = ({ messages }) => {
                             </Typography>
                         </Box>
                     </Box>
+                    
                 );
             })}
+            
         </Box>
+        
     );
+    
 };
 
 export default ChatWindow;

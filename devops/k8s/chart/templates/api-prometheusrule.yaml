@@ -13,9 +13,9 @@ spec:
       rules:
         - alert: Gr8ApiHighErrorRate
           expr: |
-            sum(rate(http_requests_received_total{namespace="doe25-group-8",status=~"5..",handler!="/metrics"}[5m]))
+            sum(rate(http_requests_received_total{namespace="doe25-group-8",code=~"5..",endpoint!="/metrics"}[5m]))
               /
-            clamp_min(sum(rate(http_requests_received_total{namespace="doe25-group-8",handler!="/metrics"}[5m])), 1)
+            clamp_min(sum(rate(http_requests_received_total{namespace="doe25-group-8",endpoint!="/metrics"}[5m])), 1)
               > 0.05
           for: 5m
           labels:
@@ -26,7 +26,7 @@ spec:
 
         - alert: Gr8ApiNoTraffic
           expr: |
-            sum(rate(http_requests_received_total{namespace="doe25-group-8",handler!="/metrics"}[10m])) == 0
+            sum(rate(http_requests_received_total{namespace="doe25-group-8",endpoint!="/metrics"}[10m])) == 0
           for: 15m
           labels:
             severity: info

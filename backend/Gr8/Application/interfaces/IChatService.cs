@@ -11,6 +11,8 @@ namespace Gr8.Application.Interfaces
 
         Task<List<ChatConversationDto>> GetUserConversationsAsync(string userId);
 
+        Task MarkMessagesAsReadAsync(string currentUserId, string otherUserId);
+
         Task DeleteConversationForUserAsync(string currentUserId, string otherUserId);
     }
 }

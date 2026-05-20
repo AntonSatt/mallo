@@ -73,6 +73,7 @@ namespace Gr8.Infrastructure.Hubs
             await _chatService.DeleteConversationForUserAsync(currentUserId, otherUserId);
         }
 
+        // Notifies the receiver that the sender is typing a message in real time.
         public async Task Typing(string receiverId) 
         {
             var senderId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -83,6 +84,19 @@ namespace Gr8.Infrastructure.Hubs
             }
 
             await Clients.User(receiverId).UserTyping(senderId);
+        }
+
+        // Marks all messages in a conversation as read for the current user.
+        public async Task MarkConversationAsRead(string otherUserId)
+        {
+            var currentUserId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                throw new HubException("User is not authenticated.");
+            }
+
+            await _chatService.MarkMessagesAsReadAsync(currentUserId, otherUserId);
         }
     }
 }

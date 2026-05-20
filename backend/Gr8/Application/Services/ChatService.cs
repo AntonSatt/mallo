@@ -116,5 +116,21 @@ namespace Gr8.Application.Services
 
             await _chatRepository.SaveChangesAsync();
         }
+
+        // Marks all messages from the other user as read for the current user.
+        public async Task MarkMessagesAsReadAsync(string currentUserId, string otherUserId)
+        {
+            var messages = await _chatRepository.GetChatHistoryAsync(currentUserId, otherUserId);
+
+            foreach (var message in messages)
+            {
+                if (message.ReceiverId == currentUserId)
+                {
+                    message.IsRead = true;
+                }
+            }
+
+            await _chatRepository.SaveChangesAsync();
+        }
     }
 }

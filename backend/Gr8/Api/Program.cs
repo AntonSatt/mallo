@@ -90,6 +90,8 @@ namespace Gr8
                 await SeedData.EnsureSeedDataAsync(app.Services);
             }
 
+            app.UseRouting();
+
             app.UseCors("ReactApplication");
 
             app.UseHttpsRedirection();

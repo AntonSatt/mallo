@@ -5,8 +5,6 @@ import ProfileBar from "../../components/layout/ProfileBar.jsx";
 const Settings = () => {
     return (
         <>
-            {/* <ProfileBar /> */}
-
             <UserSettings />
         </>
     )

@@ -73,9 +73,19 @@ namespace Gr8.Application.Services
             return postDto;
         }
 
-        public async Task<List<PostDto>> GetAllPostsAsync()
+        public async Task<List<PostDto>> GetAllPostsAsync(string userId)
         {
             var posts = await _communityRepository.GetAllPostsAsync();
+            var userTagIds = await _communityRepository.GetUserTagIdsAsync(userId);
+            var userTagIdSet = userTagIds.ToHashSet();
+
+            if (userTagIdSet.Count > 0)
+            {
+                posts = posts
+                    .Where(post => !post.Tags.Any(tag => userTagIdSet.Contains(tag.Id)))
+                    .ToList();
+            }
+
             var postDtoList = new List<PostDto>();
 
             foreach (var post in posts)

@@ -72,5 +72,17 @@ namespace Gr8.Infrastructure.Hubs
 
             await _chatService.DeleteConversationForUserAsync(currentUserId, otherUserId);
         }
+
+        public async Task Typing(string receiverId) 
+        {
+            var senderId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(senderId))
+            {
+                throw new HubException("User is not authenticated.");
+            }
+
+            await Clients.User(receiverId).UserTyping(senderId);
+        }
     }
 }

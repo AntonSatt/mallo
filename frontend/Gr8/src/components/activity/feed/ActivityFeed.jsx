@@ -28,7 +28,7 @@ const ActivityFeed = ({ activities, currentUserId, onCardAction }) => {
                                 activity={activity}
                                 distance={calculateDistanceText(activity.distanceMeters)}
                                 currentUserId={currentUserId}
-                                onCardAction={onCardAction}
+                                onCardAction={(action, data) => onCardAction(action, data)}
                             />
                         </Box>
                     ))

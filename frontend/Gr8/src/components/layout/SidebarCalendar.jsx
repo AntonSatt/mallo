@@ -53,7 +53,7 @@ const SidebarCalendar = ({ showCreate = false, onCreatePost }) => {
                     <Box className="profilebar-create">
                         <InputField className="create-post-input"
                             fullWidth
-                            placeholder="Skapa..."
+                            placeholder="Skapa inlägg..."
                             onClick={onCreatePost}
                             slotProps={{
                                 input: {

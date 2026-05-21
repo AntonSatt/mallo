@@ -68,6 +68,7 @@ namespace Gr8.Api.Endpoints
                     Url = form["url"],
                     Latitude = decimal.Parse(form["latitude"]!, CultureInfo.InvariantCulture),
                     Longitude = decimal.Parse(form["longitude"]!, CultureInfo.InvariantCulture),
+                    Adress = form["adressName"],
                     StartAt = DateTime.Parse(form["startAt"]!, CultureInfo.InvariantCulture),
                     EndAt = DateTime.Parse(form["endAt"]!, CultureInfo.InvariantCulture),
                     Image = imageBytes,

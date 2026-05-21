@@ -36,6 +36,7 @@ namespace Gr8.Application.Services
                     Url = activity.Url,
                     Latitude = activity.Latitude,
                     Longitude = activity.Longitude,
+                    Adress = activity.Adress,
                     StartAt = activity.StartAt,
                     EndAt = activity.EndAt,
                     IsEdited = activity.IsEdited,
@@ -73,6 +74,7 @@ namespace Gr8.Application.Services
                 Url = activity.Url,
                 Latitude = activity.Latitude,
                 Longitude = activity.Longitude,
+                Adress = activity.Adress,
                 StartAt = activity.StartAt,
                 EndAt = activity.EndAt,
                 IsEdited = activity.IsEdited,
@@ -100,6 +102,7 @@ namespace Gr8.Application.Services
                 Url = createDto.Url,
                 Latitude = createDto.Latitude,
                 Longitude = createDto.Longitude,
+                Adress = createDto.Adress,
                 StartAt = createDto.StartAt,
                 EndAt = createDto.EndAt,
                 IsDeleted = false,
@@ -119,6 +122,7 @@ namespace Gr8.Application.Services
                 Url = activity.Url,
                 Latitude = activity.Latitude,
                 Longitude = activity.Longitude,
+                Adress = activity.Adress,
                 StartAt = activity.StartAt,
                 EndAt = activity.EndAt,
                 IsEdited = activity.IsEdited,
@@ -156,6 +160,7 @@ namespace Gr8.Application.Services
             existing.Url = updateDto.Url;
             existing.Latitude = updateDto.Latitude;
             existing.Longitude = updateDto.Longitude;
+            existing.Adress = updateDto.Adress;
             existing.StartAt = updateDto.StartAt;
             existing.EndAt = updateDto.EndAt;
             existing.IsEdited = true;
@@ -173,6 +178,7 @@ namespace Gr8.Application.Services
                 Url = existing.Url,
                 Latitude = existing.Latitude,
                 Longitude = existing.Longitude,
+                Adress = existing.Adress,
                 StartAt = existing.StartAt,
                 EndAt = existing.EndAt,
                 IsEdited = existing.IsEdited,

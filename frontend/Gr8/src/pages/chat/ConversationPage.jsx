@@ -144,17 +144,14 @@ const ConversationPage = () => {
     return (
         <Box
             sx={{
-                height: "calc(100dvh - var(--protected-nav-height))",
+                height: "calc(100dvh - var(--protected-nav-height) - 4px)",
                 backgroundColor: "var(--color-bg-main)",
                 display: "flex",
                 flexDirection: "column",
-                overflow: "hidden"
+                overflow: "hidden",
+                pb: "calc(8px + var(--protected-nav-height))",
             }}
         >
-            <Box sx={{ flexShrink: 0 }}>
-                <ProfileBar />
-            </Box>
-
             <Box
                 sx={{
                     flexShrink: 0,

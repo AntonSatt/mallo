@@ -101,10 +101,6 @@ const ChatPage = () => {
                 overflow: "hidden"
             }}
         >
-            <Box sx={{ flexShrink: 0 }}>
-                <ProfileBar />
-            </Box>
-
             <Box
                 sx={{
                     flex: 1,

@@ -18,16 +18,6 @@ namespace Gr8.Infrastructure.Services
             _configuration = configuration;
             _token = _configuration["Mapbox:AccessToken"] ?? "";
         }
-
-    /*    public async Task<MapBoxLocationDto> SearchLocationAsync()
-        {
-
-        }
-
-        public async Task<MapBoxPin> PinLocationAsync()
-        {
-
-        }*/
     }
 }
  

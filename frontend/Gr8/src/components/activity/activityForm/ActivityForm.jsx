@@ -181,9 +181,6 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
                                             alt="Vald bild"
                                             sx={{ width: 48, height: 48, borderRadius: 1, objectFit: "cover", border: "1px solid var(--color-border)" }}
                                         />
-                                        {/* <Typography variant="caption" noWrap sx={{ flex: 1, maxWidth: 100 }}>
-                                            {selectedImage.name}
-                                        </Typography> */}
                                         <IconButton size="small" onClick={handleRemoveImage}>
                                             <CloseIcon fontSize="small" />
                                         </IconButton>

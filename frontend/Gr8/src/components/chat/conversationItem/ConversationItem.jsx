@@ -48,7 +48,7 @@ const ConversationItem = ({ conversation, deleteConversation }) => {
                     }}
                     sx={{
                         position: "absolute",
-                        top: 55,
+                        top: 65,
                         left: 0,
                         zIndex: 20,
                         backgroundColor: "#f53e3e",

@@ -69,7 +69,7 @@ const SidebarNotification = ({ onSearch }) => { //TODO: Add search functionality
                         </div>
                     </Box>
 
-                    <Typography className="visa-alla-btn">Visa alla</Typography>
+                    <Typography className="show-all-btn">Visa alla</Typography>
                 </Box>
 
                 <Box className="notification-card content-card">

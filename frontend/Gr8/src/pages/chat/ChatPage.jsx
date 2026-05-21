@@ -77,65 +77,71 @@ const ChatPage = () => {
     };
 
     return (
-        <>
-            <Box
-                sx={{ height: "calc(100dvh - var(--protected-nav-height))" }}
-            >
+        <Box
+            sx={{
+                height: "calc(100dvh - var(--protected-nav-height))",
+                backgroundColor: "var(--color-bg-main)",
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden"
+            }}
+        >
+            <Box sx={{ flexShrink: 0 }}>
                 <ProfileBar />
-
-                <Box
-                    sx={{
-                        backgroundColor: "var(--color-bg-main)",
-                        px: 2,
-                        py: 3,
-                        pb: "calc(24px + var(--protected-nav-height))"
-                    }}
-                >
-                    <Typography
-                        variant="h4"
-                        sx={{
-                            textAlign: "center",
-                            fontWeight: 700,
-                            color: "var(--color-text-main)",
-                            mb: 4,
-                        }}
-                    >
-                        Chattar
-                    </Typography>
-
-                    {error && <p>{error}</p>}
-
-                    <Box sx={{ mb: 3 }}>
-
-                        <Typography
-                            sx={{
-                                mb: 1,
-                                fontWeight: 600,
-                                color: "var(--color-text-main)",
-                            }}
-                        >
-                            Starta ny chat
-                        </Typography>
-
-                        <input
-                            type="text"
-                            placeholder="Skriv användarens ID"
-                            value={newConversationUserId}
-                            onChange={(e) => setNewConversationUserId(e.target.value)}
-                        />
-
-                        <button onClick={startNewConversation}>
-                            Starta chat
-                        </button>
-
-                    </Box>
-
-                    <ConversationList conversations={conversations} />
-                </Box>
             </Box>
 
-        </>
-    )
+            <Box
+                sx={{
+                    flex: 1,
+                    minHeight: 0,
+                    overflowY: "auto",
+                    backgroundColor: "var(--color-bg-main)",
+                    px: 2,
+                    py: 3,
+                    pb: "calc(24px + var(--protected-nav-height))"
+                }}
+            >
+                <Typography
+                    variant="h4"
+                    sx={{
+                        textAlign: "center",
+                        fontWeight: 700,
+                        color: "var(--color-text-main)",
+                        mb: 4,
+                    }}
+                >
+                    Chattar
+                </Typography>
+
+                {error && <p>{error}</p>}
+
+                <Box sx={{ mb: 3 }}>
+                    <Typography
+                        sx={{
+                            mb: 1,
+                            fontWeight: 600,
+                            color: "var(--color-text-main)",
+                        }}
+                    >
+                        Starta ny chat
+                    </Typography>
+
+                    <input
+                        type="text"
+                        placeholder="Skriv användarens ID"
+                        value={newConversationUserId}
+                        onChange={(e) => setNewConversationUserId(e.target.value)}
+                    />
+
+                    <button onClick={startNewConversation}>
+                        Starta chat
+                    </button>
+                </Box>
+
+                <ConversationList conversations={conversations} />
+            </Box>
+        </Box>
+    );
 };
 
 export default ChatPage;

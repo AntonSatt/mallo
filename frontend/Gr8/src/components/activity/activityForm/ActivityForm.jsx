@@ -31,7 +31,7 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
         Url: "",
         latitude: "",
         longitude: "",
-        addressName: "",
+        adressName: "",
         startAt: dayjs(),
         endAt: dayjs(),
     });
@@ -61,14 +61,21 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
                 ...prev,
                 latitude: locationData.latitude,
                 longitude: locationData.longitude,
-                addressName: locationData.addressName
+                adressName: locationData.adressName
             }));
         }
+
         setView("form");
     };
 
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
+
+        if (!formData.adressName) {
+            alert("Du måste välja en plats innan du publicerar.");
+            return;
+        }
+
         setLoading(true);
         try {
             const data = new FormData();
@@ -77,6 +84,7 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
             data.append("url", formData.Url);
             data.append("latitude", formData.latitude);
             data.append("longitude", formData.longitude);
+            data.append("adressName", formData.adressName);
             data.append("startAt", formData.startAt.toISOString());
             data.append("endAt", formData.endAt.toISOString());
 
@@ -85,18 +93,15 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
                 data.append("imageMimeType", selectedImage.type);
             }
 
-            // Send to backend
             const response = await ActivityServices.create(data);
 
-            // If the backend returns the created activity, pass it to onSuccess. Otherwise, pass the formData as a fallback.
             if (onSuccess && response?.data) {
                 onSuccess(response.data);
             } else if (onSuccess) {
-                // Fallback 
                 onSuccess(formData);
             }
 
-            setView("form"); // Reset view to form for next time it's opened
+            setView("form");
         } catch (error) {
             console.error("Kunde inte skapa aktivitet:", error);
         } finally {
@@ -203,7 +208,7 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
                                         }}
                                     />
                                     }
-                                    label={formData.addressName || "Välj plats"}
+                                    label={formData.adressName || "Välj plats"}
                                     onClick={() => setView("search")}
                                 >
                                     Välj plats

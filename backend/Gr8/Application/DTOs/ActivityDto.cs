@@ -13,6 +13,7 @@ namespace Gr8.Application.DTOs
         public string FullName { get; set; } = null!;
         public decimal Latitude { get; set; }
         public decimal Longitude { get; set; }
+        public string Adress { get; set; }
         public DateTime StartAt { get; set; }
         public DateTime EndAt { get; set; }
         public bool IsEdited { get; set; }

@@ -25,6 +25,7 @@ const ActivityPage = () => {
     const currentUserId = currentUser?.sub;
 
     const [editActivity, setEditActivity] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
     const [activities, setActivities] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -108,76 +109,57 @@ const ActivityPage = () => {
 
     // Apply filters to activities
     const filteredActivities = activities
-        .map(activity => {
-            // Calculate distance if we have user coordinates and activity has location data
-            if (userCoords) {
-                const from = [userCoords.lng, userCoords.lat];
-                const to = [activity.longitude, activity.latitude];
-                const distanceInMeters = distance(from, to, { units: 'meters' });
-                return { ...activity, distanceMeters: distanceInMeters };
-            }
-            return activity;
-        })
-        .filter(activity => {
-            // Nearby filter
-            if (activeFilters.nearby) {
-                if (!userCoords) return false; // If we don't have user location, we can't show nearby activities
-                if (activity.distanceMeters > 7000) return false;
-            }
+    .map(activity => {
+        if (userCoords) {
+            const from = [userCoords.lng, userCoords.lat];
+            const to = [activity.longitude, activity.latitude];
+            const distanceInMeters = distance(from, to, { units: 'meters' });
+            return { ...activity, distanceMeters: distanceInMeters };
+        }
+        return activity;
+    })
+    .filter(activity => {
+        // Search filter
+        if (searchQuery.trim()) {
+            const q = searchQuery.toLowerCase();
+            if (
+                !activity.title?.toLowerCase().includes(q) &&
+                !activity.description?.toLowerCase().includes(q)
+            ) return false;
+        }
 
-            // Your activities filter
-            if (activeFilters.yourActivities) {
-                if (!currentUserId) return false;
+        // Nearby filter
+        if (activeFilters.nearby) {
+            if (!userCoords) return false;
+            if (activity.distanceMeters > 7000) return false;
+        }
 
-                if (activity.userId !== currentUserId) {
-                    return false;
-                }
-            }
+        // Your activities filter
+        if (activeFilters.yourActivities) {
+            if (!currentUserId) return false;
+            if (activity.userId !== currentUserId) return false;
+        }
 
-            // Time filter - only show upcoming activities
-            if (activeFilters.time) {
-                const now = new Date();
-                const activityEnd = new Date(activity.endAt);
-                if (activityEnd < now) {
-                    return false;
-                }
-            }
+        // Time filter
+        if (activeFilters.time) {
+            const now = new Date();
+            const activityEnd = new Date(activity.endAt);
+            if (activityEnd < now) return false;
+        }
 
-            // TODO: Saved activities filter
-
-            return true;
-        })
-        .sort((a, b) => {
-            // If time filter is active, sort by start time (earliest first)
-            if (activeFilters.time) {
-                const timeA = new Date(a.startAt).getTime();
-                const timeB = new Date(b.startAt).getTime();
-                return timeA - timeB; // earliest first
-            }
-
-            // Sort: closest first if we have distance data, otherwise no sorting
-            if (a.distanceMeters && b.distanceMeters) {
-                return a.distanceMeters - b.distanceMeters;
-            }
-            return 0;
-        });
-
-    // Loader while fetching data
-    if (loading) {
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
-                <CircularProgress sx={{ color: 'var(--color-primary)' }} />
-            </Box>
-        );
-    }
-
-    if (error) {
-        return (
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-                <Typography color="error">{error}</Typography>
-            </Box>
-        );
-    }
+        return true;
+    })
+    .sort((a, b) => {
+        if (activeFilters.time) {
+            const timeA = new Date(a.startAt).getTime();
+            const timeB = new Date(b.startAt).getTime();
+            return timeA - timeB;
+        }
+        if (a.distanceMeters && b.distanceMeters) {
+            return a.distanceMeters - b.distanceMeters;
+        }
+        return 0;
+    });
 
     return (
 
@@ -224,6 +206,8 @@ const ActivityPage = () => {
                     <InputField
                         fullWidth
                         placeholder="Sök aktiviteter..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         sx={{
                             "& .MuiOutlinedInput-input": { textAlign: "center" },
                             "& .MuiOutlinedInput-root": {

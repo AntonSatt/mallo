@@ -13,9 +13,6 @@ const ProtectedRoute = ({ children }) => {
 
   return (
     <div className="protected-route-layout">
-      <div className="protected-route-nav">
-        <Navbar />
-      </div>
       <div className="protected-route-content">
         {children}
       </div>

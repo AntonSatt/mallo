@@ -25,7 +25,7 @@ function App() {
           <Route path='/forgot-password' element={<ForgotPasswordPage />} />
           <Route path='/reset-password' element={<ResetPasswordPage />} />
           <Route path='/settings' element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-          <Route path='/forum' element={<ProtectedRoute><ForumPage /></ProtectedRoute>} />
+          <Route path='/forum' element={<ProtectedRoute><HomePage page="forum" /></ProtectedRoute>} />
           <Route path='/message' element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
           <Route path='/message/:userId' element={<ProtectedRoute><ConversationPage /></ProtectedRoute>} />
           <Route path='/maps' element={<ProtectedRoute><ActivityPage /></ProtectedRoute>} />

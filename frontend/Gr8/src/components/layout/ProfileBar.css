@@ -1,7 +1,7 @@
 .profilebar-wrapper {
   position: relative;
   width: 100%;
-  max-width: 800px;
+  max-width: var(--content-width-mobile);
   margin: 0 auto 8px;
 }
 
@@ -97,6 +97,7 @@
 .profilebar-create-icon {
   color: var(--color-primary) !important;
   font-size: 30px !important;
+  cursor: pointer;
 }
 
 /* The HeartSearch-button starts here*/

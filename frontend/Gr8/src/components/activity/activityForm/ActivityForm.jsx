@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Dialog, Box, Typography, Paper, Stack, CircularProgress } from "@mui/material";
+import { useState, useRef } from "react";
+import { Dialog, Box, Typography, Paper, Stack, CircularProgress, IconButton } from "@mui/material";
 import LinkIcon from '@mui/icons-material/Link';
 import SecondaryButton from "../../../design/buttons/SecondaryButton.jsx";
 import ActivityServices from "../../../services/ActivityService.jsx";
@@ -12,6 +12,8 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/sv';
 import CalendarPicker from "../calender/CalenderPicker.jsx";
 import TimePicker from "../time/TimePicker.jsx";
+import InputField from "../../../design/input/InputField.jsx";
+import CloseIcon from '@mui/icons-material/Close';
 
 dayjs.locale('sv');
 
@@ -26,12 +28,31 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
     const [formData, setFormData] = useState({
         title: "",
         description: "",
+        Url: "",
         latitude: "",
         longitude: "",
         addressName: "",
         startAt: dayjs(),
         endAt: dayjs(),
     });
+
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const fileInputRef = useRef(null);
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setSelectedImage(file);
+        setImagePreview(URL.createObjectURL(file));
+    };
+
+    const handleRemoveImage = () => {
+        setSelectedImage(null);
+        setImagePreview(null);
+        fileInputRef.current.value = "";
+    };
 
     // Function for recive location in SearchAddress
     const handleLocationSelect = (locationData) => {
@@ -50,8 +71,24 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
         if (e) e.preventDefault();
         setLoading(true);
         try {
+            const data = new FormData();
+            data.append("title", formData.title);
+            data.append("description", formData.description);
+            data.append("url", formData.Url);
+            data.append("latitude", formData.latitude);
+            data.append("longitude", formData.longitude);
+            data.append("startAt", formData.startAt.toISOString());
+            data.append("endAt", formData.endAt.toISOString());
+
+            if (selectedImage) {
+                data.append("image", selectedImage);
+                data.append("imageMimeType", selectedImage.type);
+            }
+
+            await ActivityServices.create(data);
+
             // Send to backend
-            const response = await ActivityServices.create(formData);
+            const response = await ActivityServices.create(data);
 
             // If the backend returns the created activity, pass it to onSuccess. Otherwise, pass the formData as a fallback.
             if (onSuccess && response?.data) {
@@ -113,21 +150,55 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 style={{ width: '100%', border: 'none', outline: 'none', resize: 'none', fontSize: '1rem' }}
                             />
+                            <Box sx={{ mt: 2, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, alignItems: 'center' }}>
+                                <InputField startIcon={<LinkIcon sx={{ color: "var(--color-primary)" }} />}
+                                    value={formData.Url || ""}
+                                    onChange={(e) => setFormData({ ...formData, Url: e.target.value })}
+                                    placeholder="Skriv länkadress">
+                                </InputField>
 
-                            <Box sx={{ mt: 3, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-                                <SecondaryButton startIcon=
-                                    {<ImageOutlinedIcon
-                                        sx={{
-                                            color: "var(--color-primary)",
-                                            width: "30px",
-                                            height: "22px"
-                                        }}
-                                    />
-                                    } label="Välj foto"
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    ref={fileInputRef}
+                                    style={{ display: "none" }}
+                                    onChange={handleImageChange}
+                                />
+
+                                <SecondaryButton
+                                    startIcon={
+                                        <ImageOutlinedIcon sx={{ color: "var(--color-primary)", width: "30px", height: "22px" }} />
+                                    }
+                                    label="Välj foto"
+                                    onClick={() => fileInputRef.current.click()}
                                 >
                                     Välj foto
                                 </SecondaryButton>
 
+                                {imagePreview ? (
+                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                        <Box
+                                            component="img"
+                                            src={imagePreview}
+                                            alt="Vald bild"
+                                            sx={{ width: 48, height: 48, borderRadius: 1, objectFit: "cover", border: "1px solid var(--color-border)" }}
+                                        />
+                                        {/* <Typography variant="caption" noWrap sx={{ flex: 1, maxWidth: 100 }}>
+                                            {selectedImage.name}
+                                        </Typography> */}
+                                        <IconButton size="small" onClick={handleRemoveImage}>
+                                            <CloseIcon fontSize="small" />
+                                        </IconButton>
+                                    </Box>
+                                ) : (
+                                    <Typography variant="caption" color="text.secondary">
+                                        Ingen bild vald
+                                    </Typography>
+                                )}
+
+                            </Box>
+
+                            <Box sx={{ mt: 2, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
                                 <SecondaryButton startIcon=
                                     {<FmdGoodOutlinedIcon
                                         sx={{
@@ -141,15 +212,6 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
                                     onClick={() => setView("search")}
                                 >
                                     Välj plats
-                                </SecondaryButton>
-
-                                <SecondaryButton startIcon=
-                                    {<LinkIcon
-                                        sx={{ color: "var(--color-primary)" }}
-                                    />
-                                    } label="Bifoga länk"
-                                >
-                                    Bifoga länk
                                 </SecondaryButton>
 
                                 <SecondaryButton startIcon=

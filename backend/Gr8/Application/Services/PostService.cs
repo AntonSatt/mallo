@@ -46,8 +46,12 @@ namespace Gr8.Application.Services
                 UpdatedAt = post.UpdatedAt,
                 IsEdited = post.IsEdited,
                 IsDeleted = post.IsDeleted,
-                CreatedByUser = post.UserId,
-                Tags = post.Tags.Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList()
+                Tags = post.Tags.Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList(),
+                AuthorInfo = new AuthorDTO
+                {
+                    Id = post.UserId,
+                    AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(post.UserId)
+                }
             };
 
             if (category != null)
@@ -63,19 +67,31 @@ namespace Gr8.Application.Services
 
             if (userName != null)
             {
-                postDto.UserName = userName;
+                postDto.AuthorInfo.UserName = userName;
             }
 
             return postDto;
         }
 
-        public async Task<List<PostDto>> GetAllPostsAsync()
+        public async Task<List<PostDto>> GetAllPostsAsync(string userId)
         {
             var posts = await _communityRepository.GetAllPostsAsync();
+            var userTagIds = await _communityRepository.GetUserTagIdsAsync(userId);
+            var userTagIdSet = userTagIds.ToHashSet();
+
+            if (userTagIdSet.Count > 0)
+            {
+                posts = posts
+                    .Where(post => !post.Tags.Any(tag => userTagIdSet.Contains(tag.Id)))
+                    .ToList();
+            }
+
             var postDtoList = new List<PostDto>();
 
             foreach (var post in posts)
             {
+                var commentsOnPostCount = await _communityRepository.CountCommentsByPostIdAsync(post.Id);
+
                 var postDto = new PostDto
                 {
                     Id = post.Id,
@@ -85,26 +101,31 @@ namespace Gr8.Application.Services
                     UpdatedAt = post.UpdatedAt,
                     IsDeleted = post.IsDeleted,
                     IsEdited = post.IsEdited,
-                    CreatedByUser = post.UserId,
                     Category = new CategoryDto
                     {
                         Name = post.Category.Name,
                         Id = post.Category.Id
                     },
-                    Tags = post.Tags.Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList()
+                    Tags = post.Tags.Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList(),
+                    CountOfComments = commentsOnPostCount,
+                    AuthorInfo = new AuthorDTO
+                    {
+                        Id = post.UserId,
+                        AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(post.UserId)
+                    }
                 };
 
                 var userName = await _applicationRepository.GetUserNameByIdAsync(post.UserId);
 
                 if (userName != null)
                 {
-                    postDto.UserName = userName;
+                    postDto.AuthorInfo.UserName = userName;
                 }
 
                 postDtoList.Add(postDto);
             }
 
-            return postDtoList;
+            return postDtoList.OrderByDescending(p => p.CreatedAt).ToList();
         }
 
         public async Task<PostDto> GetPostByIdAsync(int postId, string userId)
@@ -120,10 +141,22 @@ namespace Gr8.Application.Services
                 IsDeleted = post.IsDeleted,
                 IsEdited = post.IsEdited,
                 UpdatedAt = post.UpdatedAt,
-                CreatedByUser = post.UserId,
                 Id = post.Id,
-                Tags = post.Tags.Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList()
+                Tags = post.Tags.Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList(),
+                AuthorInfo = new AuthorDTO
+                {
+                    Id = post.UserId,
+                    AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(post.UserId)
+                }
             };
+
+            var userName = await _applicationRepository.GetUserNameByIdAsync(post.UserId);
+
+            if (userName != null)
+            {
+                postDto.AuthorInfo.UserName = userName;
+            }
+
             return postDto;
         }
 
@@ -170,16 +203,20 @@ namespace Gr8.Application.Services
                     UpdatedAt = oldPost.UpdatedAt,
                     IsEdited = oldPost.IsEdited,
                     IsDeleted = oldPost.IsDeleted,
-                    CreatedByUser = oldPost.UserId,
                     Tags = oldPost.Tags.Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList(),
-                    Category = new CategoryDto { Id = oldPost.CategoryId, Name = oldPost.Category.Name }
+                    Category = new CategoryDto { Id = oldPost.CategoryId, Name = oldPost.Category.Name },
+                    AuthorInfo = new AuthorDTO
+                    {
+                        Id = oldPost.UserId,
+                        AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(oldPost.UserId)
+                    }
                 };
 
                 var userName = await _applicationRepository.GetUserNameByIdAsync(oldPost.UserId);
 
                 if (userName != null)
                 {
-                    postDto.UserName = userName;
+                    postDto.AuthorInfo.UserName = userName;
                 }
 
                 return postDto;

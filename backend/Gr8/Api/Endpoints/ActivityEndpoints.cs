@@ -6,6 +6,7 @@ using Gr8.Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Security.Claims;
 
 namespace Gr8.Api.Endpoints
@@ -42,27 +43,43 @@ namespace Gr8.Api.Endpoints
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPost("/map/activities", async (ClaimsPrincipal user, UserManager<ApplicationUser> userManager, [FromServices] IActivityService activityService, [FromBody] CreateActivityDto createDto) =>
+            app.MapPost("/map/activities", async (HttpRequest request, ClaimsPrincipal user, UserManager<ApplicationUser> userManager, [FromServices] IActivityService activityService) =>
             {
                 var appUser = await userManager.GetUserAsync(user);
+                if (appUser == null) return Results.Unauthorized();
 
-                if (appUser == null)
+                var form = await request.ReadFormAsync();
+
+                byte[]? imageBytes = null;
+                string? mimeType = null;
+
+                if (form.Files["image"] is IFormFile file)
                 {
-                    return Results.Unauthorized();
+                    using var ms = new MemoryStream();
+                    await file.CopyToAsync(ms);
+                    imageBytes = ms.ToArray();
+                    mimeType = form["imageMimeType"];
                 }
+
+                var createDto = new CreateActivityDto
+                {
+                    Title = form["title"]!,
+                    Description = form["description"]!,
+                    Url = form["url"],
+                    Latitude = decimal.Parse(form["latitude"]!, CultureInfo.InvariantCulture),
+                    Longitude = decimal.Parse(form["longitude"]!, CultureInfo.InvariantCulture),
+                    StartAt = DateTime.Parse(form["startAt"]!, CultureInfo.InvariantCulture),
+                    EndAt = DateTime.Parse(form["endAt"]!, CultureInfo.InvariantCulture),
+                    Image = imageBytes,
+                    ImageMimeType = mimeType
+                };
 
                 var context = new ValidationContext(createDto);
                 var results = new List<ValidationResult>();
-
                 bool isValid = Validator.TryValidateObject(createDto, context, results, true);
-
-                if (!isValid)
-                {
-                    return Results.BadRequest(results);
-                }
+                if (!isValid) return Results.BadRequest(results);
 
                 var response = await activityService.CreateActivityAsync(createDto, appUser.Id);
-
                 return Results.Ok(response);
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);

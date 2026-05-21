@@ -33,12 +33,15 @@ namespace Gr8.Application.Services
                     Id = activity.Id,
                     Title = activity.Title,
                     Description = activity.Description,
+                    Url = activity.Url,
                     Latitude = activity.Latitude,
                     Longitude = activity.Longitude,
                     StartAt = activity.StartAt,
                     EndAt = activity.EndAt,
                     IsEdited = activity.IsEdited,
-                    UserId = activity.UserId
+                    UserId = activity.UserId,
+                    Image = activity.Image,
+                    ImageMimeType = activity.ImageMimeType
                 };
 
                 var fullName = await _applicationRepository.GetFullNameByIdAsync(activity.UserId);
@@ -67,12 +70,15 @@ namespace Gr8.Application.Services
                 Id = activity.Id,
                 Title = activity.Title,
                 Description = activity.Description,
+                Url = activity.Url,
                 Latitude = activity.Latitude,
                 Longitude = activity.Longitude,
                 StartAt = activity.StartAt,
                 EndAt = activity.EndAt,
                 IsEdited = activity.IsEdited,
-                UserId = activity.UserId
+                UserId = activity.UserId,
+                Image = activity.Image,
+                ImageMimeType = activity.ImageMimeType
             };
 
             var userName = await _applicationRepository.GetFullNameByIdAsync(activityDto.UserId);
@@ -91,12 +97,15 @@ namespace Gr8.Application.Services
             {
                 Title = createDto.Title,
                 Description = createDto.Description,
+                Url = createDto.Url,
                 Latitude = createDto.Latitude,
                 Longitude = createDto.Longitude,
                 StartAt = createDto.StartAt,
                 EndAt = createDto.EndAt,
                 IsDeleted = false,
-                IsEdited = false
+                IsEdited = false,
+                Image = createDto.Image,
+                ImageMimeType = createDto.ImageMimeType
             };
 
             await _communityRepository.AddActivityAsync(activity);
@@ -107,12 +116,15 @@ namespace Gr8.Application.Services
                 Id = activity.Id,
                 Title = activity.Title,
                 Description = activity.Description,
+                Url = activity.Url,
                 Latitude = activity.Latitude,
                 Longitude = activity.Longitude,
                 StartAt = activity.StartAt,
                 EndAt = activity.EndAt,
                 IsEdited = activity.IsEdited,
-                UserId = activity.UserId
+                UserId = activity.UserId,
+                Image = activity.Image,
+                ImageMimeType = activity.ImageMimeType
             };
 
             var userName = await _applicationRepository.GetFullNameByIdAsync(activityDto.UserId);
@@ -141,11 +153,14 @@ namespace Gr8.Application.Services
 
             existing.Title = updateDto.Title;
             existing.Description = updateDto.Description;
+            existing.Url = updateDto.Url;
             existing.Latitude = updateDto.Latitude;
             existing.Longitude = updateDto.Longitude;
             existing.StartAt = updateDto.StartAt;
             existing.EndAt = updateDto.EndAt;
             existing.IsEdited = true;
+            existing.Image = updateDto.Image;
+            existing.ImageMimeType = updateDto.ImageMimeType;
 
             await _communityRepository.UpdateActivityAsync(existing);
             await _communityRepository.SaveChangesAsync();
@@ -155,12 +170,15 @@ namespace Gr8.Application.Services
                 Id = existing.Id,
                 Title = existing.Title,
                 Description = existing.Description,
+                Url = existing.Url,
                 Latitude = existing.Latitude,
                 Longitude = existing.Longitude,
                 StartAt = existing.StartAt,
                 EndAt = existing.EndAt,
                 IsEdited = existing.IsEdited,
-                UserId = existing.UserId
+                UserId = existing.UserId,
+                Image = existing.Image,
+                ImageMimeType = existing.ImageMimeType
             };
 
             var userName = await _applicationRepository.GetFullNameByIdAsync(activityDto.UserId);

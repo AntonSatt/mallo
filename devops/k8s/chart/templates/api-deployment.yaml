@@ -55,14 +55,19 @@ spec:
                 optional: false
           resources:
             {{- toYaml .Values.api.resources | nindent 12 }}
+          # API waits for DB to come up (which on a fresh PVC includes MSSQL schema upgrade ~3-4 min)
+          # then runs EF migrations on top. 600s is enough for the worst case (cold deploy).
+          startupProbe:
+            tcpSocket:
+              port: {{ .Values.api.port }}
+            periodSeconds: 10
+            failureThreshold: 60
           livenessProbe:
             tcpSocket:
               port: {{ .Values.api.port }}
-            initialDelaySeconds: 30
             periodSeconds: 30
             failureThreshold: 3
           readinessProbe:
             tcpSocket:
               port: {{ .Values.api.port }}
-            initialDelaySeconds: 10
             periodSeconds: 10

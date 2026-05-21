@@ -11,11 +11,10 @@ namespace Gr8.Application.DTOs
         [Required(ErrorMessage = "Content is required")]
         [MaxLength(8000)]
         public string Content { get; set; } 
-        public string UserName { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsEdited { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public string CreatedByUser { get; set; }
+        public AuthorDTO AuthorInfo { get; set; }
     }
 }

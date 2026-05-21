@@ -8,8 +8,8 @@ const SettingsButtonStyles = ({
     padding: '12px 16px',
     minWidth: 90,
     color: 'inherit',
-    backgroundColor: '#FFF0D4',
     gap: 1,
     '&:hover': { backgroundColor: '#ffe4b5' }
+
 });
 export default SettingsButtonStyles;

@@ -139,25 +139,20 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 style={{ width: '100%', border: 'none', outline: 'none', resize: 'none', fontSize: '1rem' }}
                             />
-
-                            <Box sx={{ mt: 2, display: 'grid', gap: 2 }}>
-
+                            <Box sx={{ mt: 2, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, alignItems: 'center' }}>
                                 <InputField startIcon={<LinkIcon sx={{ color: "var(--color-primary)" }} />}
                                     value={formData.Url || ""}
                                     onChange={(e) => setFormData({ ...formData, Url: e.target.value })}
                                     placeholder="Skriv länkadress">
                                 </InputField>
-                            </Box>
 
-                            <input
-                                type="file"
-                                accept="image/*"
-                                ref={fileInputRef}
-                                style={{ display: "none" }}
-                                onChange={handleImageChange}
-                            />
-
-                            <Box sx={{ mt: 2, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, alignItems: 'center' }}>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    ref={fileInputRef}
+                                    style={{ display: "none" }}
+                                    onChange={handleImageChange}
+                                />
 
                                 <SecondaryButton
                                     startIcon={
@@ -177,9 +172,9 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
                                             alt="Vald bild"
                                             sx={{ width: 48, height: 48, borderRadius: 1, objectFit: "cover", border: "1px solid var(--color-border)" }}
                                         />
-                                        <Typography variant="caption" noWrap sx={{ flex: 1, maxWidth: 100 }}>
+                                        {/* <Typography variant="caption" noWrap sx={{ flex: 1, maxWidth: 100 }}>
                                             {selectedImage.name}
-                                        </Typography>
+                                        </Typography> */}
                                         <IconButton size="small" onClick={handleRemoveImage}>
                                             <CloseIcon fontSize="small" />
                                         </IconButton>

@@ -49,7 +49,7 @@ const ProfileBar = ({ showCreate = false, onCreatePost, onSearch }) => {
         <ClickAwayListener onClickAway={closeMenu}>
             <Box className="profilebar-wrapper">
                 <Paper className={`profilebar-container ${showCreate ? "forum-profilebar" : ""}`}>
-                    {showCreate ? (
+                    {showCreate === "true" ? (
                         <>
                             <Box className="profilebar-top-row">
                                 <Avatar avatar={currentUser?.picture} />

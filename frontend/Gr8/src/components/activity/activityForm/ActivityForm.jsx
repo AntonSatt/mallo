@@ -85,8 +85,6 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
                 data.append("imageMimeType", selectedImage.type);
             }
 
-            await ActivityServices.create(data);
-
             // Send to backend
             const response = await ActivityServices.create(data);
 

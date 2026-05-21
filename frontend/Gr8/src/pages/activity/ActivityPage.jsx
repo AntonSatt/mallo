@@ -48,19 +48,54 @@ const ActivityPage = () => {
         setToast(prev => ({ ...prev, open: false }));
     };
 
-    const handleOpenForm = () => setIsFormOpen(true);
-    const handleSuccess = () => setIsFormOpen(false);
+    const handleOpenForm = () => {
+        setIsFormOpen(true);
+        setEditActivity(null);
+    };
+
+    const handleCloseForm = () => {
+        setIsFormOpen(false);
+        setEditActivity(null);
+    };
+
+    // Handles both create and edit Activity
+    const handleFormSuccess = (savedActivity) => {
+        setIsFormOpen(false);
+
+        setActivities(prevActivities => {
+            const exists = prevActivities.some(act => act.id === savedActivity.id);
+
+            if (exists) {
+                return prevActivities.map(act => act.id === savedActivity.id ? savedActivity : act);
+            } else {
+                return [savedActivity, ...prevActivities];
+            }
+        });
+
+        if (editActivity) {
+            setToast({
+                open: true,
+                message: "Aktiviteten har redigerats!",
+                severity: "success"
+            });
+        }
+
+        setEditActivity(null);
+    };
 
     const handleChange = (event, newAlignment) => {
         setAlignment(newAlignment);
     };
 
-    const handleActivityCreated = (newActivity) => {
-        setActivities(prevActivities => [newActivity, ...prevActivities]);
-    };
+    // Function to handle actions from the activity cards (edit, delete, etc)
+    const handleCardAction = (actionOrMessage, severity = "success", deletedId = null) => {
+        if (actionOrMessage === "edit" && severity && typeof severity === "object") {
+            const activityToEdit = severity;
+            setEditActivity(activityToEdit);
+            setIsFormOpen(true);
+            return;
+        }
 
-    // Function to handle updates and deletions from the activity cards
-    const handleCardAction = (message, severity = "success", deletedId = null) => {
         if (deletedId) {
             setActivities(prev => prev.filter(act => act.id !== deletedId));
         }
@@ -68,7 +103,7 @@ const ActivityPage = () => {
         // Confirm popup
         setToast({
             open: true,
-            message: message,
+            message: actionOrMessage,
             severity: severity
         });
     };
@@ -415,11 +450,9 @@ const ActivityPage = () => {
 
             <ActivityForm
                 open={isFormOpen}
-                handleClose={() => setIsFormOpen(false)}
-                onSuccess={(newActivity) => {
-                    setIsFormOpen(false);
-                    handleActivityCreated(newActivity);
-                }}
+                handleClose={handleCloseForm}
+                activityToEdit={editActivity}
+                onSuccess={handleFormSuccess}
             />
 
             < Snackbar

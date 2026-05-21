@@ -51,7 +51,7 @@ const ProfileHeader = () => {
                 {menuOpen && (
                     <Box
                         sx={{
-                            // position: "fixed" Kolla vad folk tycker
+                            position: "fixed" 
                         }}
                     >
                         <Stack>

@@ -1,39 +1,54 @@
 .sidebar-calendar-container {
+    align-items: center;
     background-color: var(--color-primary-soft);    
-    margin-top: 30px;
     padding: 15px;
     border-radius: 15px;
     width: 100%;
     box-sizing: border-box;
+    flex: 1; 
+    box-sizing: border-box;
+    border: 1px solid var(--color-border-light);
+
 }
 
 .activity-container {
     background-color: var(--color-text-inverse);
-    padding: 8px;
     border-radius: 20px;
+    padding: 8px 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     width: 100%;           
-    max-width: 450px;      
+    max-width: 500px;      
     box-sizing: border-box; 
     overflow: hidden;    
 }
 
 .activity-title {
-    font-size: 1.2rem !important;
-    font-weight: 700 !important;
-    margin-bottom: 20px !important;
-    display: block;
+    padding: 5px 20px;
+    font-size: 1.3rem !important;
 }
 
 .calendar-container{
-    background-color: #F8F9FA;
     border-radius: 15px;
+    padding: 10px;
     width: 100%;
     display: block;
+    background-color: #f9f9f8;
 }
 
-.sidebar-search-input .MuiOutlinedInput-root {
+.sidebar-calendar-container .create-post-input .MuiInputBase-root {
+    justify-content: center;
+}
+
+.sidebar-calendar-container .create-post-input input {
+    width: 58px; 
+}
+
+.create-post-input .MuiOutlinedInput-root {
     background-color: var(--color-text-inverse) !important;
+}
+
+.calendar{
+    width: 100% !important;
 }
 
 .custom-calendar-header {
@@ -53,7 +68,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .date-selection-container {
@@ -61,15 +76,12 @@
     gap: 8px;
 }
 
-.select-pill {
+.select-date {
     background-color: var(--color-text-inverse);
     padding: 6px 14px;
     border-radius: 8px;
     font-weight: 800;
-    font-size: 16px;
     position: relative;
-    display: flex;
-    align-items: center;
     text-transform: capitalize;
 }
 
@@ -79,5 +91,21 @@
     right: 3px;
     border-style: solid;
     border-width: 0 0 7px 7px;
-    border-color: transparent transparent var(--color-primary) transparent;
+    border-color: var(--color-primary) transparent;
+}
+
+.button-wrapper{
+    margin-top: 20px;
+    gap: 12px;
+    padding: 0px 10px 10px 10px;
+}
+
+.button-choice{
+    flex: 1;
+    background-color: var(--color-primary-soft) !important;
+    gap: 5px;
+}
+
+.button-title{
+    color: var(--color-text-main);
 }

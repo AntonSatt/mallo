@@ -6,7 +6,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import 'dayjs/locale/sv';
 import dayjs from 'dayjs';
 import PrimaryButton from '../../design/buttons/PrimaryButton';
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import InputField from '../../design/input/InputField.jsx';
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
@@ -27,12 +27,12 @@ const CustomCalendarHeader = (props) => {
             </button>
 
             <Box className="date-selection-container">
-                <div className="select-pill">
+                <div className="select-date">
                     {dayjs(currentMonth).format('MMMM')}
                     <span className="orange-corner"></span>
                 </div>
 
-                <div className="select-pill">
+                <div className="select-date">
                     {dayjs(currentMonth).format('YYYY')}
                     <span className="orange-corner"></span>
                 </div>
@@ -51,7 +51,7 @@ const SidebarCalendar = ({ showCreate = false, onCreatePost }) => {
             <Stack spacing={2}>
                 {showCreate === "true" &&
                     <Box className="profilebar-create">
-                        <InputField className="sidebar-search-input"
+                        <InputField className="create-post-input"
                             fullWidth
                             placeholder="Skapa..."
                             onClick={onCreatePost}
@@ -73,6 +73,7 @@ const SidebarCalendar = ({ showCreate = false, onCreatePost }) => {
                     <Typography className="activity-title">
                         Dina aktiviteter
                     </Typography>
+
                     <Box className="calendar-container">
                         <LocalizationProvider
                             dateAdapter={AdapterDayjs}
@@ -86,51 +87,13 @@ const SidebarCalendar = ({ showCreate = false, onCreatePost }) => {
                                     calendarHeader: CustomCalendarHeader,
                                 }}
 
-                                sx={{
-                                    width: '100% !important',
-                                    minWidth: '0px !important',
-                                    maxWidth: '100% !important',
-                                    height: 'auto !important',
-                                    overflow: 'hidden',
-
-                                    '& .MuiDateCalendar-viewTransitionContainer': {
-                                        width: '100% !important',
-                                        minWidth: '0px !important',
-                                    },
-
-                                    '& .MuiPickersDay-root': {
-                                        width: '30px !important',
-                                        height: '30px !important',
-                                        fontSize: '0.8rem !important',
-                                        margin: '0px !important',
-                                    },
-
-                                    '& .MuiDayCalendar-weekDayLabel': {
-                                        width: '30px !important',
-                                        margin: '0px !important',
-                                    },
-
-                                    '& .MuiDayCalendar-weekContainer': {
-                                        width: '100% !important',
-                                        justifyContent: 'center !important',
-                                        margin: '2px 0 !important',
-                                    },
-
-                                    '& .MuiPickersCalendarHeader-root': {
-                                        paddingLeft: '4px !important',
-                                        paddingRight: '4px !important',
-                                        width: '100% !important',
-                                        boxSizing: 'border-box',
-                                    }
-                                }}
-
                                 slotProps={{
                                     day: {
                                         sx: {
                                             className: "calendar-day",
-                                            borderRadius: "8px",
                                             backgroundColor: "var(--color-text-inverse)",
-                                            boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
+                                            borderRadius: "8px",
+                                            boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
                                             fontWeight: 600,
 
                                             "&.Mui-selected": {
@@ -141,30 +104,36 @@ const SidebarCalendar = ({ showCreate = false, onCreatePost }) => {
                                     }
                                 }}
                             />
+
                         </LocalizationProvider>
                     </Box>
-                </Box>
-                <Stack
-                    direction="row"
-                    spacing={2}
-                    justifyContent="center"
-                >
-                    <PrimaryButton
-                        sx={{
-                            gap: '8px', 
-                        }}
+                    <Stack className="button-wrapper"
+                        direction="row"
+                        justifyContent="center"
                     >
-                        <LocationOnOutlinedIcon /> Hitta
-                    </PrimaryButton>
+                        <PrimaryButton className="button-choice">
+                            <LocationOnOutlinedIcon
+                                sx={{
+                                    color: "var(--color-primary) !important"
+                                }}
+                            />
+                            <Typography className="button-title">
+                                Hitta
+                            </Typography>
+                        </PrimaryButton>
 
-                    <PrimaryButton
-                          sx={{
-                            gap: '8px', 
-                        }}
-                    >
-                        <FavoriteIcon /> Favoriter
-                    </PrimaryButton>
-                </Stack>
+                        <PrimaryButton className="button-choice">
+                            <BookmarkBorderIcon
+                                sx={{
+                                    color: "var(--color-primary) !important",
+                                }}
+                            />
+                            <Typography className="button-title">
+                                Favoriter
+                            </Typography>
+                        </PrimaryButton>
+                    </Stack>
+                </Box>
             </Stack>
         </Box>
     )

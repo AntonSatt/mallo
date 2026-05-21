@@ -24,12 +24,12 @@ const Homepage = ({ page }) => {
                     <aside className="sidebar-left">
                         <Stack spacing={2}>
                             <ProfileHeader />
-                            <SidebarCalendar />
+                            <SidebarCalendar showCreate="true" onCreatePost={handleClickOpen}/>
                         </Stack>
                     </aside>
 
                     <main className="main-content">
-                        <Stack spacing={2} sx={{ height: "100%", minHeight: 0 }}>
+                        <Stack spacing={"21px"} sx={{ height: "100%", minHeight: 0 }}>
                             <Navbar />
                             {page === "forum" && (
                                 <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>

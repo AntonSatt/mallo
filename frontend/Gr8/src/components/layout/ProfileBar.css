@@ -97,6 +97,7 @@
 .profilebar-create-icon {
   color: var(--color-primary) !important;
   font-size: 30px !important;
+  cursor: pointer;
 }
 
 /* The HeartSearch-button starts here*/

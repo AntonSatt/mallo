@@ -35,14 +35,18 @@ namespace Gr8.Application.Services
                     IsEdited = comment.IsEdited,
                     CreatedAt = comment.CreatedAt,
                     UpdatedAt = comment.UpdatedAt,
-                    CreatedByUser = comment.UserId,
+                    AuthorInfo = new AuthorDTO
+                    {
+                        Id = comment.UserId,
+                        AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(comment.UserId)
+                    }
                 };
 
                 var userName = await _applicationRepository.GetUserNameByIdAsync(comment.UserId);
 
                 if (userName != null)
                 {
-                    commentDto.UserName = userName;
+                    commentDto.AuthorInfo.UserName = userName;
                 }
 
                 commentsDtoList.Add(commentDto);
@@ -78,12 +82,16 @@ namespace Gr8.Application.Services
                 UpdatedAt = comment.UpdatedAt,
                 IsDeleted = comment.IsDeleted,
                 IsEdited = comment.IsEdited,
-                CreatedByUser = comment.UserId
+                AuthorInfo = new AuthorDTO
+                {
+                    Id = comment.UserId,
+                    AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(comment.UserId)
+                }
             };
 
             if (userName != null)
             {
-                resultDto.UserName = userName;
+                resultDto.AuthorInfo.UserName = userName;
             }
 
             return resultDto;
@@ -125,12 +133,18 @@ namespace Gr8.Application.Services
                 IsEdited = comment.IsEdited,
                 CreatedAt = comment.CreatedAt,
                 UpdatedAt = comment.UpdatedAt,
-                CreatedByUser = comment.UserId
+                AuthorInfo = new AuthorDTO
+                {
+                    Id = comment.UserId,
+                    AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(comment.UserId)
+                }
             };
 
             var userName = await _applicationRepository.GetUserNameByIdAsync(comment.UserId);
             if (userName != null)
-                commentDto.UserName = userName;
+            {
+                commentDto.AuthorInfo.UserName = userName;
+            }
 
             return commentDto;
         }

@@ -10,6 +10,7 @@ import LandingPage from './pages/landing/LandingPage'
 import ForgotPasswordPage from './pages/resetPassword/ForgotPasswordPage'
 import ResetPasswordPage from './pages/resetPassword/ResetPasswordPage'
 import ActivityPage from './pages/activity/ActivityPage.jsx'
+import "moment/dist/locale/sv";
 
 function App() {
   return (

@@ -78,57 +78,62 @@ const ChatPage = () => {
 
     return (
         <>
-            <ProfileBar />
-
             <Box
-                sx={{
-                    minHeight: "100vh",
-                    backgroundColor: "var(--color-bg-main)",
-                    px: 2,
-                    py: 3,
-                }}
+                sx={{ height: "calc(100dvh - var(--protected-nav-height))" }}
             >
-                <Typography
-                    variant="h4"
+                <ProfileBar />
+
+                <Box
                     sx={{
-                        textAlign: "center",
-                        fontWeight: 700,
-                        color: "var(--color-text-main)",
-                        mb: 4,
+                        backgroundColor: "var(--color-bg-main)",
+                        px: 2,
+                        py: 3,
+                        pb: "calc(24px + var(--protected-nav-height))"
                     }}
                 >
-                    Chattar
-                </Typography>
-
-                {error && <p>{error}</p>}
-
-                <Box sx={{ mb: 3 }}>
-
                     <Typography
+                        variant="h4"
                         sx={{
-                            mb: 1,
-                            fontWeight: 600,
+                            textAlign: "center",
+                            fontWeight: 700,
                             color: "var(--color-text-main)",
+                            mb: 4,
                         }}
                     >
-                        Starta ny chat
+                        Chattar
                     </Typography>
 
-                    <input
-                        type="text"
-                        placeholder="Skriv användarens ID"
-                        value={newConversationUserId}
-                        onChange={(e) => setNewConversationUserId(e.target.value)}
-                    />
+                    {error && <p>{error}</p>}
 
-                    <button onClick={startNewConversation}>
-                        Starta chat
-                    </button>
+                    <Box sx={{ mb: 3 }}>
 
+                        <Typography
+                            sx={{
+                                mb: 1,
+                                fontWeight: 600,
+                                color: "var(--color-text-main)",
+                            }}
+                        >
+                            Starta ny chat
+                        </Typography>
+
+                        <input
+                            type="text"
+                            placeholder="Skriv användarens ID"
+                            value={newConversationUserId}
+                            onChange={(e) => setNewConversationUserId(e.target.value)}
+                        />
+
+                        <button onClick={startNewConversation}>
+                            Starta chat
+                        </button>
+
+                    </Box>
+
+                    <ConversationList conversations={conversations} />
                 </Box>
-
-                <ConversationList conversations={conversations} />
             </Box>
+
         </>
     )
 };

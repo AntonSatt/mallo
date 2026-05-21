@@ -21,6 +21,7 @@ const ConversationPage = () => {
     const [isTyping, setIsTyping] = useState(false);
 
     const typingTimeoutRef = useRef(null);
+    const messageEndRef = useRef(null);
 
     useEffect(() => {
 
@@ -35,6 +36,9 @@ const ConversationPage = () => {
 
                 const history = await ChatService.getChatHistory(userId);
                 setMessages(history ?? []);
+
+                await ChatSignalrServices.markConversationAsRead(userId);
+                
             } catch (error) {
                 console.error("Failed to load conversation", error);
                 setError("Could not load conversation.");
@@ -98,8 +102,12 @@ const ConversationPage = () => {
         };
     }, [userId]);
 
+    useEffect(() => {
+        messageEndRef.current?.scrollIntoView();
+    }, [messages]);
+
     // Handle changes to the message input and send typing notifications to the other user.
-     const handleMessageChange = (value) => {
+    const handleMessageChange = (value) => {
         setNewMessage(value);
 
         if (!value.trim()) {
@@ -134,113 +142,119 @@ const ConversationPage = () => {
     };
 
     return (
-        <div>
-            <ProfileBar />
+        <Box
+            sx={{
+                height: "calc(100dvh - var(--protected-nav-height))",
+                backgroundColor: "var(--color-bg-main)",
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden"
+            }}
+        >
+            <Box sx={{ flexShrink: 0 }}>
+                <ProfileBar />
+            </Box>
+
             <Box
                 sx={{
-                    height: "100vh",
-                    backgroundColor: "var(--color-bg-main)",
+                    flexShrink: 0,
                     display: "flex",
-                    flexDirection: "column",
-                    px: 1,
-                    py: 2,
-                    boxSizing: "border-box"
+                    alignItems: "center",
+                    position: "relative",
+                    px: 2,
+                    pt: 0,
+                    pb: 1
                 }}
             >
-                <Box
+                <IconButton
+                    onClick={() => navigate("/message")}
                     sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        position: "relative",
-                        px: 2,
-                        pt: 0.1,
-                        pb: 1
+                        position: "absolute",
+                        left: 5
                     }}
                 >
-                    <IconButton
-                        onClick={() => navigate("/message")}
+                    <ArrowBackIosNewIcon />
+                </IconButton>
+
+                <Box
+                    sx={{
+                        width: "100%",
+                        textAlign: "center"
+                    }}
+                >
+                    <Avatar
+                        className="post-avatar"
+                        avatar={conversationInfo?.avatarId}
+                    />
+
+                    <Typography
                         sx={{
-                            position: "absolute",
-                            left: 5
+                            mt: 0.5,
+                            color: "var(--color-text-main)",
+                            fontWeight: 300
                         }}
                     >
-                        <ArrowBackIosNewIcon />
-                    </IconButton>
-
-                    <Box
-                        sx={{
-                            width: "100%",
-                            textAlign: "center"
-                        }}
-                    >
-                        <Avatar
-                            className="post-avatar"
-                            avatar={conversationInfo?.avatarId}
-                        />
-
-                        <Typography
-                            sx={{
-                                mt: 1,
-                                color: "var(--color-text-main)",
-                                fontWeight: 300
-                            }}
-                        >
-                            {conversationInfo?.otherUserFullName}
-                        </Typography>
-                    </Box>
+                        {conversationInfo?.otherUserFullName}
+                    </Typography>
                 </Box>
+            </Box>
 
-                {error && (
-                    <Typography sx={{ color: "red", mb: 1 }}>
-                        {error}
+            {error && (
+                <Typography sx={{ color: "red", px: 2, mb: 1, flexShrink: 0 }}>
+                    {error}
+                </Typography>
+            )}
+
+            <Paper
+                elevation={0}
+                sx={{
+                    flex: 1,
+                    minHeight: 0,
+                    overflowY: "auto",
+                    backgroundColor: "var(--color-bg-surface)",
+                    borderRadius: 4,
+                    px: 2,
+                    py: 1,
+                    mx: 1,
+                    mb: 1,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
+                }}
+            >
+                <ChatWindow messages={messages} />
+
+                {isTyping && (
+                    <Typography
+                        sx={{
+                            px: 0.2,
+                            pb: 0.5,
+                            fontSize: "0.80rem",
+                            opacity: 0.5,
+                            color: "var(--color-text-main)"
+                        }}
+                    >
+                        {conversationInfo?.otherUserFullName} skriver...
                     </Typography>
                 )}
 
-                <Paper
-                    elevation={0}
-                    sx={{
-                        flex: 1,
-                        minHeight: 0,
-                        overflowY: "auto",
-                        backgroundColor: "var(--color-bg-surface)",
-                        borderRadius: 4,
-                        px: 2,
-                        py: 1,
-                        mb: 2,
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
-                    }}
-                >
-                    <ChatWindow messages={messages} />
-                    {isTyping && (
-                        <Typography
-                            sx={{
-                                px: 0.2,
-                                pb: 0.5,
-                                fontSize: "0.80rem",
-                                opacity: 0.5,
-                                color: "var(--color-text-main)"
-                            }}
-                        >
-                            {conversationInfo?.otherUserFullName} skriver...
-                        </Typography>
-                    )}
-                </Paper>
+                <div ref={messageEndRef} />
+            </Paper>
 
-                <Box
-                    sx={{
-                        pt: 1,
-                        flexShrink: 0,
-                        backgroundColor: "var(--color-bg-main)"
-                    }}>
-
-                    <MessageInput
-                        newMessage={newMessage}
-                        setNewMessage={handleMessageChange}
-                        sendMessage={sendMessage}
-                    />
-                </Box>
+            <Box
+                sx={{
+                    flexShrink: 0,
+                    px: 1,
+                    pt: 0.5,
+                    pb: 1,
+                    backgroundColor: "var(--color-bg-main)"
+                }}
+            >
+                <MessageInput
+                    newMessage={newMessage}
+                    setNewMessage={handleMessageChange}
+                    sendMessage={sendMessage}
+                />
             </Box>
-        </div>
+        </Box>
     );
 };
 

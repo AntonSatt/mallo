@@ -4,6 +4,7 @@ using Gr8.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gr8.Infrastructure.Migrations.CommunityDb
 {
     [DbContext(typeof(CommunityDbContext))]
-    partial class CommunityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260507085253_AddActivityTable")]
+    partial class AddActivityTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,12 +40,6 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                     b.Property<DateTime>("EndAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<byte[]>("Image")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("ImageMimeType")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -64,10 +61,6 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -84,31 +77,6 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                             t.HasCheckConstraint("CK_Activity_EndAfterStart", "[EndAt] >= [StartAt]");
                         });
-                });
-
-            modelBuilder.Entity("Gr8.Domain.Entities.Bookmark", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("PostId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PostId");
-
-                    b.HasIndex("UserId", "PostId")
-                        .IsUnique();
-
-                    b.ToTable("Bookmarks");
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Category", b =>
@@ -131,67 +99,17 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                         new
                         {
                             Id = 1,
-                            Name = "Relationer"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Familj"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Sexualitet"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Psykisk hälsa"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "Fysisk hälsa"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Name = "Samhälle"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Name = "Barn & ungdom"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Name = "Miljö"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Name = "Volontärarbete"
-                        },
-                        new
-                        {
-                            Id = 10,
                             Name = "Djur"
                         },
                         new
                         {
-                            Id = 11,
-                            Name = "Utbildning"
-                        },
-                        new
-                        {
-                            Id = 12,
+                            Id = 2,
                             Name = "Generell"
                         },
                         new
                         {
-                            Id = 13,
-                            Name = "Övrigt"
+                            Id = 3,
+                            Name = "Relation"
                         });
                 });
 
@@ -574,21 +492,6 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                     b.ToTable("PostTags", (string)null);
                 });
 
-            modelBuilder.Entity("UserTags", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("TagId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "TagId");
-
-                    b.HasIndex("TagId");
-
-                    b.ToTable("UserTags", (string)null);
-                });
-
             modelBuilder.Entity("Gr8.Domain.Entities.Activity", b =>
                 {
                     b.HasOne("Gr8.Infrastructure.Identity.ApplicationUser", null)
@@ -596,23 +499,6 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Gr8.Domain.Entities.Bookmark", b =>
-                {
-                    b.HasOne("Gr8.Domain.Entities.Post", "Post")
-                        .WithMany("Bookmarks")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Gr8.Infrastructure.Identity.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Post");
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Comment", b =>
@@ -722,21 +608,6 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("UserTags", b =>
-                {
-                    b.HasOne("Gr8.Domain.Entities.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Gr8.Infrastructure.Identity.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Gr8.Domain.Entities.Category", b =>
                 {
                     b.Navigation("Posts");
@@ -751,8 +622,6 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
             modelBuilder.Entity("Gr8.Domain.Entities.Post", b =>
                 {
-                    b.Navigation("Bookmarks");
-
                     b.Navigation("Comments");
 
                     b.Navigation("Hugs");

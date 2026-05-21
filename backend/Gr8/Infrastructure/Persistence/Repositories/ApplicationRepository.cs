@@ -27,5 +27,18 @@ namespace Gr8.Infrastructure.Persistence.Repositories
 
             return user?.UserName;
         }
+
+        public async Task<string?> GetFullNameByIdAsync(string userId)
+        {
+            var user = await _applicationDbContext.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            return $"{user.FirstName} {user.LastName}";
+        }
     }
 }

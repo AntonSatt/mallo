@@ -30,5 +30,10 @@ namespace Gr8.Application.Interfaces
         Task<List<int>> GetUserTagIdsAsync(string userId);
         Task<List<int>> GetExistingTagIdsAsync(List<int> tagIds);
         Task ReplaceUserTagIdsAsync(string userId, List<int> tagIds);
+        Task<List<Activity>> GetAllActivitiesAsync();
+        Task<Activity?> GetActivityByIdAsync(int id);
+        Task AddActivityAsync(Activity activity);
+        Task UpdateActivityAsync(Activity activity);
+        Task DeleteActivityAsync(Activity activity);
     }
 }

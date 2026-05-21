@@ -189,7 +189,7 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction }) => {
                         gap: 0.5
                     }}>
                         <LocationOnOutlinedIcon sx={{ fontSize: "20px", mb: 0.5, color: "var(--color-primary)" }} />
-                        {activity.addressName || "Ingen plats angiven"}
+                        {activity.adress || "Ingen plats angiven"}
                     </Typography>
 
 

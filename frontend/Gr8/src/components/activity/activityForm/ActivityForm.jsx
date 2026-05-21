@@ -100,11 +100,18 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                 adressName: locationData.adressName
             }));
         }
+
         setView("form");
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
+
+        if (!formData.adressName) {
+            alert("Du måste välja en plats innan du publicerar.");
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -268,7 +275,7 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                                         }}
                                     />
                                     }
-                                    label={formData.addressName || "Välj plats"}
+                                    label={formData.adressName || "Välj plats"}
                                     onClick={() => setView("search")}
                                 >
                                     Välj plats

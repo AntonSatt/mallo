@@ -8,6 +8,8 @@ import { useState } from "react";
 import { Stack, Box } from "@mui/material";
 import Navbar from "../../components/layout/Navbar.jsx";
 import ForumPage from "../forum/ForumPage.jsx";
+import ChatPage from '../chat/ChatPage';
+import ConversationPage from '../chat/ConversationPage';
 
 const Homepage = ({ page }) => {
     const { isDesktop } = useViewport();
@@ -30,11 +32,21 @@ const Homepage = ({ page }) => {
                     </aside>
 
                     <main className="main-content">
-                        <Stack spacing={"21px"} sx={{ height: "100%", minHeight: 0 }}>
+                        <Stack spacing={"21px"} sx={{ height: "100%", minHeight: 0, minWidth: "var(--content-width-desktop)" }}>
                             <Navbar />
                             {page === "forum" && (
                                 <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
                                     <ForumPage openModal={isOpen} setOpenModal={setOpen} searchQuery={searchQuery} />
+                                </Box>
+                            )}
+                            {page === "message" && (
+                                <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
+                                    <ChatPage />
+                                </Box>
+                            )}
+                            {page === "conversation" && (
+                                <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
+                                    <ConversationPage />
                                 </Box>
                             )}
                         </Stack>
@@ -48,8 +60,11 @@ const Homepage = ({ page }) => {
                 <div className="mobile-layout">
                     {page === "forum" && <ProfileBar showCreate="true" onCreatePost={handleClickOpen} onSearch={setSearchQuery} />}
                     {page === "message" && <ProfileBar showCreate="false" />}
+                    {page === "conversation" && <ProfileBar showCreate="false" />}
                     <Navbar />
                     {page === "forum" && <ForumPage openModal={isOpen} setOpenModal={setOpen} searchQuery={searchQuery} />}
+                    {page === "message" && <ChatPage />}
+                    {page === "conversation" && <ConversationPage />}
                 </div>
             )}
         </div>

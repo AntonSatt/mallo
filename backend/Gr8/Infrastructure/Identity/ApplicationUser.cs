@@ -17,5 +17,7 @@ namespace Gr8.Infrastructure.Identity
         public string SocialNumber { get; set; }
         [Range(1, 9)]
         public int Avatar { get; set; }
+
+        public ICollection<Tag> Tags { get; set; } = new List<Tag>();
     }
 }

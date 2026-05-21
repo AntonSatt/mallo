@@ -28,6 +28,8 @@ namespace Gr8.Infrastructure.Identity
 
             modelBuilder.Entity<ApplicationUser>(entity =>
             {
+                entity.Ignore(u => u.Tags);
+
                 entity.Property(u => u.Avatar)
                     .HasDefaultValue(1);
 

@@ -42,7 +42,13 @@ const UserServices = {
             userName: userData.userName,
             firstName: userData.firstName,
             lastName: userData.lastName,
-            email: userData.email,
+            email: userData.email
+        });
+        return response.data;
+    },
+    updateUserTags: async (tagIds) => {
+        const response = await ApiClient.patch("/users/me/tags", {
+            tagIds: tagIds ?? []
         });
         return response.data;
     },

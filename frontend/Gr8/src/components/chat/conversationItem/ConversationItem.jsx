@@ -1,4 +1,6 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { PersonRemoveAlt1Outlined } from "@mui/icons-material";
 import { Box, Paper, Typography } from "@mui/material";
 import Avatar from "../../avatar/avatar.jsx";
 import moment from "moment";
@@ -6,6 +8,8 @@ import moment from "moment";
 // component to display a single conversation between the user and another user.
 const ConversationItem = ({ conversation }) => {
     const navigate = useNavigate();
+
+    const [showDelete, setShowDelete] = useState(false);
 
     const hasUnreadMessage = conversation.hasUnreadMessage;
 
@@ -24,7 +28,42 @@ const ConversationItem = ({ conversation }) => {
                 boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
             }}
         >
-            <Avatar className="post-avatar" avatar={conversation.avatarId} />
+            <Box
+                onClick={(event) => {
+                    event.stopPropagation();
+                    setShowDelete((prev) => !prev);
+                }}
+                sx={{
+                    position: "relative",
+                    flexShrink: 0,
+                }}
+            >
+                <Avatar className="post-avatar" avatar={conversation.avatarId} />
+
+                {showDelete && (
+                    <Box
+                        sx={{
+                            position: "absolute",
+                            top: 55,
+                            left: 0,
+                            zIndex: 20,
+                            backgroundColor: "#f53e3e",
+                            color: "#fff",
+                            borderRadius: 999,
+                            px: 2,
+                            py: 1,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.18)",
+                            whiteSpace: "nowrap",
+                        }}
+                    >
+                        <PersonRemoveAlt1Outlined fontSize="small" />
+                        Radera konversation
+                    </Box>
+                )}
+            </Box>
 
             <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography

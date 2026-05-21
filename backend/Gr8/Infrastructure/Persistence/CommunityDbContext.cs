@@ -73,6 +73,29 @@ namespace Gr8.Infrastructure.Persistence
                 .WithMany(t => t.Posts)
                 .UsingEntity(j => j.ToTable("PostTags"));
 
+            modelBuilder.Entity<ApplicationUser>()
+                .HasMany(u => u.Tags)
+                .WithMany()
+                .UsingEntity(
+                    "UserTags",
+                    right => right
+                        .HasOne(typeof(Tag))
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .HasPrincipalKey(nameof(Tag.Id))
+                        .OnDelete(DeleteBehavior.Cascade),
+                    left => left
+                        .HasOne(typeof(ApplicationUser))
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasPrincipalKey(nameof(ApplicationUser.Id))
+                        .OnDelete(DeleteBehavior.Cascade),
+                    join =>
+                    {
+                        join.HasKey("UserId", "TagId");
+                        join.ToTable("UserTags");
+                    });
+
             // Configure one-to-many relationship between Category and Post
             modelBuilder.Entity<Post>()
                 .HasOne(p => p.Category)

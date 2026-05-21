@@ -2,8 +2,6 @@ import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/protectedRoute/ProtectedRoute'
-import Navbar from './components/layout/Navbar'
-import HomePage from './pages/home/HomePage'
 import LoginPage from './pages/login/LoginPage'
 import RegisterPage from './pages/register/RegisterPage'
 import Settings from './pages/settings/SettingsPage'
@@ -13,6 +11,7 @@ import ForgotPasswordPage from './pages/resetPassword/ForgotPasswordPage'
 import ResetPasswordPage from './pages/resetPassword/ResetPasswordPage'
 import ChatPage from './pages/chat/ChatPage';
 import ConversationPage from './pages/chat/ConversationPage';
+import ActivityPage from './pages/activity/ActivityPage.jsx'
 import "moment/dist/locale/sv";
 
 function App() {
@@ -29,6 +28,7 @@ function App() {
           <Route path='/forum' element={<ProtectedRoute><ForumPage /></ProtectedRoute>} />
           <Route path='/message' element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
           <Route path='/message/:userId' element={<ProtectedRoute><ConversationPage /></ProtectedRoute>} />
+          <Route path='/maps' element={<ProtectedRoute><ActivityPage /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

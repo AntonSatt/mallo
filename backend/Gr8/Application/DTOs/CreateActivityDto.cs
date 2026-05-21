@@ -8,12 +8,16 @@ namespace Gr8.Application.DTOs
         public string Title { get; set; } = null!;
         [Required(ErrorMessage = "Description is required")]
         public string Description { get; set; } = null!;
+        public string Url { get; set; }
         [Required]
         public decimal Latitude { get; set; }
         [Required]
         public decimal Longitude { get; set; }
         public DateTime StartAt { get; set; }
         public DateTime EndAt { get; set; }
+
+        public byte[]? Image { get; set; }
+        public string? ImageMimeType { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

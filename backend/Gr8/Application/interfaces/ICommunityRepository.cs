@@ -27,6 +27,10 @@ namespace Gr8.Application.Interfaces
         Task AddBookmarkAsync(Bookmark bookmark);
         void RemoveBookmark(Bookmark bookmark);
         Task<int> CountCommentsByPostIdAsync(int postId);
+        Task<List<int>> GetUserTagIdsAsync(string userId);
+        Task<List<int>> GetExistingTagIdsAsync(List<int> tagIds);
+        Task ReplaceUserTagIdsAsync(string userId, List<int> tagIds);
+        Task<int> CountCommentsByPostIdAsync(int postId);
         Task<List<Activity>> GetAllActivitiesAsync();
         Task<Activity?> GetActivityByIdAsync(int id);
         Task AddActivityAsync(Activity activity);

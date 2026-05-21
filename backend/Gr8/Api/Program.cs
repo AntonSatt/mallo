@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
+using Gr8.Application.Interfaces;
+using Gr8.Infrastructure.Services;
 
 namespace Gr8
 {
@@ -78,6 +80,12 @@ namespace Gr8
                 //    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                 //    policy.RequireRole("Admin");
                 //});
+            });
+
+            // Add HttpClient dependency injection for MapBoxService with baseurl settings
+            builder.Services.AddHttpClient<IMapBoxService, MapBoxService>(client =>
+            {
+                client.BaseAddress = new Uri(builder.Configuration.GetSection("Mapbox:BaseUrl").Get<string>() ?? "https://api.mapbox.com/");
             });
 
             var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()

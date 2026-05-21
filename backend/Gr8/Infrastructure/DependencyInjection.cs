@@ -38,6 +38,7 @@ namespace Gr8.Infrastructure
             services.AddScoped<IActivityService, ActivityService>();
             services.AddScoped<IChatRepository, ChatRepository>();
             services.AddScoped<IChatService, ChatService>();
+            services.AddScoped<IUserTagService, UserTagService>();
 
             // Configure ASP.NET Core Identity to use the ApplicationUser and ApplicationRole classes, and to use Entity Framework Core for storage
             services.AddIdentity<ApplicationUser, ApplicationRole>()

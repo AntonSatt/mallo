@@ -37,6 +37,12 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                     b.Property<DateTime>("EndAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("ImageMimeType")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -55,6 +61,10 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -611,6 +621,21 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                     b.ToTable("PostTags", (string)null);
                 });
 
+            modelBuilder.Entity("UserTags", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("UserTags", (string)null);
+                });
+
             modelBuilder.Entity("Gr8.Domain.Entities.Activity", b =>
                 {
                     b.HasOne("Gr8.Infrastructure.Identity.ApplicationUser", null)
@@ -762,6 +787,21 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                     b.HasOne("Gr8.Domain.Entities.Tag", null)
                         .WithMany()
                         .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("UserTags", b =>
+                {
+                    b.HasOne("Gr8.Domain.Entities.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Gr8.Infrastructure.Identity.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

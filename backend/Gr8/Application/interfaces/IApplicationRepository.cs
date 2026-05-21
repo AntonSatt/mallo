@@ -5,7 +5,6 @@ namespace Gr8.Application.Interfaces
     {
         Task<int> GetAvatarIdByUserIdAsync(string userId);
         Task<string?> GetFullNameByIdAsync(string userId);
-        Task<int> GetAvatarIdByUserIdAsync(string userId);
         Task<string?> GetUserNameByIdAsync(string userId);
     }
 }

@@ -202,14 +202,6 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             await _communityDbContext.SaveChangesAsync();
         }
 
-        public Task<int> CountCommentsByPostIdAsync(int postId)
-        {
-            return _communityDbContext.Comments
-                .Where(c => c.PostId == postId)
-                .Where(c => !c.IsDeleted)
-                .CountAsync();
-        }
-
         public async Task<List<Activity>> GetAllActivitiesAsync()
         {
             return await _communityDbContext.Activities

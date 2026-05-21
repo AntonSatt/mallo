@@ -29,7 +29,7 @@ spec:
       containers:
         - name: frontend
           image: registry.chas-lab.dev/chas-challenge-2026/grupp-8/project/frontend:develop
-          imagePullpolicy: Always
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 80
@@ -45,12 +45,12 @@ spec:
             httpGet:
               path: /
               port: 80
-            initialDeplaySeconds: 10
+            initialDelaySeconds: 10
             periodSeconds: 30
             failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /
               port: 80
-            initialDeplaySeconds: 5
+            initialDelaySeconds: 5
             periodSeconds: 10

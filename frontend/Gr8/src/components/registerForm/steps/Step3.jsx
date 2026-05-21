@@ -5,7 +5,6 @@ import SecondaryButton from "../../../design/buttons/SecondaryButton";
 import notificationBell from "../../../assets/icons/notificationBell.svg"
 import { useNavigate } from "react-router-dom";
 import InputField from "../../../design/input/InputField";
-import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import InputAdornment from "@mui/material/InputAdornment";
 import ControlPointOutlinedIcon from '@mui/icons-material/ControlPointOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -34,23 +33,13 @@ const Step3 = ({ formData, handleChange, onNext, error }) => {
                 helperText={error.email}
                 sx={{
                     "& .MuiOutlinedInput-input": {
-                        textAlign: "center",
-                        paddingLeft: "40px",
+                        textAlign: "center"
                     },
                     "& .MuiOutlinedInput-root": {
                         height: 40,
                         borderRadius: 20,
                     },
 
-                }}
-                slotProps={{
-                    input: {
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                            </InputAdornment>
-                        ),
-                    },
                 }}
             />
 
@@ -67,23 +56,13 @@ const Step3 = ({ formData, handleChange, onNext, error }) => {
                 type="password"
                 sx={{
                     "& .MuiOutlinedInput-input": {
-                        textAlign: "center",
-                        paddingLeft: "40px",
+                        textAlign: "center"
                     },
                     "& .MuiOutlinedInput-root": {
                         height: 40,
                         borderRadius: 20,
                     },
 
-                }}
-                slotProps={{
-                    input: {
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                            </InputAdornment>
-                        ),
-                    },
                 }}
             />
 
@@ -100,21 +79,11 @@ const Step3 = ({ formData, handleChange, onNext, error }) => {
                 type="password"
                 sx={{
                     "& .MuiOutlinedInput-input": {
-                        textAlign: "center",
-                        paddingLeft: "40px",
+                        textAlign: "center"
                     },
                     "& .MuiOutlinedInput-root": {
                         height: 40,
                         borderRadius: 20,
-                    },
-                }}
-                slotProps={{
-                    input: {
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                            </InputAdornment>
-                        ),
                     },
                 }}
             />

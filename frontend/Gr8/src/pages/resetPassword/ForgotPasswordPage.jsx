@@ -4,7 +4,6 @@ import { Grid, Typography } from "@mui/material";
 import PrimaryButton from "../../design/buttons/PrimaryButton";
 import InputField from "../../design/input/InputField";
 import InputAdornment from "@mui/material/InputAdornment";
-import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import PasswordServices from "../../services/PasswordServices";
 import Header from "../../components/header/Header";
 import holdingHands2 from "../../assets/images/holdingHands2.png";
@@ -53,15 +52,6 @@ const ForgotPasswordPage = () => {
                             sx={{
                                 "& .MuiOutlinedInput-input": { textAlign: "center", paddingLeft: "40px" },
                                 "& .MuiOutlinedInput-root": { height: 40, borderRadius: 20 },
-                            }}
-                            slotProps={{
-                                input: {
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                                        </InputAdornment>
-                                    ),
-                                },
                             }}
                         />
                     </Grid>

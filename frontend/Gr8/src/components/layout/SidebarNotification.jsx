@@ -5,15 +5,21 @@ import NotificationRing from "../../assets/icons/notificationRing.svg";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import "./SidebarNotification.css";
 
-const SidebarNotification = () => {
+const SidebarNotification = ({ onSearch }) => { //TODO: Add search functionality
     const [postAlignment, setPostAlignment] = useState("all");
     const [activityAlignment, setActivityAlignment] = useState("all");
 
-    const handleChange = (event, newAligment) => {
-    if (newAligment) {
-        setActivityAlignment(newAligment);
-    }
-};
+    const handleActivityChange = (event, newAligment) => {
+        if (newAligment) {
+            setActivityAlignment(newAligment);
+        }
+    };
+
+    const handlePostChange = (event, newAlignment) => {
+        if (newAlignment) {
+            setPostAlignment(newAlignment);
+        }
+    };
 
     return (
         <Stack className="notification-wrapper">
@@ -40,15 +46,15 @@ const SidebarNotification = () => {
                     </Box>
                     <MoreHorizIcon sx={{ color: "#ccc", cursor: "pointer" }} />
                 </Box>
-                
+
                 <Box className="notification-card content-card">
                     <Box className="card-header-row">
                         <Typography className="card-title">Inlägg</Typography>
-                        
+
                         <ToggleButtonGroup
                             value={postAlignment}
                             exclusive
-                            onChange={handleChange}
+                            onChange={handlePostChange}
                             className="card-toggle-group"
                         >
                             <ToggleButton value="all" className="card-toggle-btn">Alla</ToggleButton>
@@ -62,18 +68,18 @@ const SidebarNotification = () => {
                             <p>En ny kommentar på <span className="highlight">Min hund är rädd för...</span></p>
                         </div>
                     </Box>
-                    
+
                     <Typography className="visa-alla-btn">Visa alla</Typography>
                 </Box>
 
                 <Box className="notification-card content-card">
                     <Box className="card-header-row">
                         <Typography className="card-title">Aktiviteter</Typography>
-                        
+
                         <ToggleButtonGroup
                             value={activityAlignment}
                             exclusive
-                            onChange={handleChange}
+                            onChange={handleActivityChange}
                             className="card-toggle-group"
                         >
                             <ToggleButton value="all" className="card-toggle-btn">Alla</ToggleButton>

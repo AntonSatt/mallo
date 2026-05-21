@@ -20,7 +20,7 @@ import {
 
 import { useEffect, useState, useMemo, useRef } from "react";
 
-const ForumPage = ({ openModal, setOpenModal }) => {
+const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
     const { currentUser } = useAuth();
     const { isDesktop } = useViewport();
     const scrollAreaRef = useRef(null);
@@ -114,29 +114,39 @@ const ForumPage = ({ openModal, setOpenModal }) => {
     };
 
     const filteredPosts = useMemo(() => {
-        if (checkedCategories.length > 0) {
-            return posts.filter(p => {
-                const cat = p.category?.name || p.category;
-                return checkedCategories.includes(cat);
-            });
-        }
-        if (activeNavCategory !== "Alla" && activeNavCategory !== "Sparade" && activeNavCategory !== "Dina inlägg") {
-            return posts.filter(p => {
-                const cat = p.category?.name || p.category;
-                return cat === activeNavCategory;
-            });
-        }
-        if (activeNavCategory == "Sparade") {
-            return posts.filter(p => {
-                return userBookmarks.some(b => b.postId === p.id);
-            });
-        }
-        if (activeNavCategory == "Dina inlägg") {
-            return posts.filter(p => p.authorInfo.id === currentUser?.sub);
-        }
+    let result = posts;
 
-        return posts;
-    }, [posts, activeNavCategory, checkedCategories, userBookmarks]);
+    if (searchQuery.trim()) {
+        result = result.filter(p =>
+            p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.content.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }
+
+    if (checkedCategories.length > 0) {
+        return result.filter(p => {
+            const cat = p.category?.name || p.category;
+            return checkedCategories.includes(cat);
+        });
+    }
+
+    if (activeNavCategory !== "Alla" && activeNavCategory !== "Sparade" && activeNavCategory !== "Dina inlägg") {
+        return result.filter(p => {
+            const cat = p.category?.name || p.category;
+            return cat === activeNavCategory;
+        });
+    }
+
+    if (activeNavCategory === "Sparade") {
+        return result.filter(p => userBookmarks.some(b => b.postId === p.id));
+    }
+
+    if (activeNavCategory === "Dina inlägg") {
+        return result.filter(p => p.authorInfo.id === currentUser?.sub);
+    }
+
+    return result;
+}, [posts, activeNavCategory, checkedCategories, userBookmarks, searchQuery, currentUser?.sub]);
 
     useEffect(() => {
         const fetchCategories = async () => {

@@ -12,6 +12,7 @@ import ForumPage from "../forum/ForumPage.jsx";
 const Homepage = ({ page }) => {
     const { isDesktop } = useViewport();
     const [isOpen, setOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -33,22 +34,22 @@ const Homepage = ({ page }) => {
                             <Navbar />
                             {page === "forum" && (
                                 <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
-                                    <ForumPage openModal={isOpen} setOpenModal={setOpen} />
+                                    <ForumPage openModal={isOpen} setOpenModal={setOpen} searchQuery={searchQuery} />
                                 </Box>
                             )}
                         </Stack>
                     </main>
 
                     <aside className="sidebar-right">
-                        <SidebarNotification />
+                        <SidebarNotification onSearch={setSearchQuery} />
                     </aside>
                 </div>
             ) : (
                 <div className="mobile-layout">
-                    {page === "forum" && <ProfileBar showCreate="true" onCreatePost={handleClickOpen} />}
+                    {page === "forum" && <ProfileBar showCreate="true" onCreatePost={handleClickOpen} onSearch={setSearchQuery} />}
                     {page === "message" && <ProfileBar showCreate="false" />}
                     <Navbar />
-                    {page === "forum" && <ForumPage openModal={isOpen} setOpenModal={setOpen} />}
+                    {page === "forum" && <ForumPage openModal={isOpen} setOpenModal={setOpen} searchQuery={searchQuery} />}
                 </div>
             )}
         </div>

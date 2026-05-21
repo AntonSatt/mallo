@@ -67,6 +67,21 @@ const ChatPage = () => {
 
     }, []);
 
+    const deleteConversation = async (otherUserId) => {
+    try {
+        await ChatSignalrServices.deleteConversation(otherUserId);
+
+        setConversations((prevConversations) =>
+            prevConversations.filter(
+                (conversation) => conversation.otherUserId !== otherUserId
+            )
+        );
+    } catch (error) {
+        console.error("Failed to delete conversation", error);
+        setError("Could not delete conversation.");
+    }
+};
+
     // Function to start a new conversation with a specified user ID.
     const startNewConversation = () => {
         if (!newConversationUserId.trim()) {
@@ -138,7 +153,10 @@ const ChatPage = () => {
                     </button>
                 </Box>
 
-                <ConversationList conversations={conversations} />
+                <ConversationList 
+                conversations={conversations} 
+                deleteConversation={deleteConversation}
+                />
             </Box>
         </Box>
     );

@@ -58,7 +58,13 @@ class ChatSignalrService {
     if (!this.connection) return;
 
     await this.connection.invoke("MarkConversationAsRead", otherUserId);
-}
+    }
+
+    async deleteConversation(otherUserId) {
+        if(!this.connection) return;
+
+        await this.connection.invoke("DeleteConversation", otherUserId);
+    }
 }
 
 export default new ChatSignalrService();

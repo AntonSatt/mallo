@@ -1,7 +1,7 @@
 import ConversationItem from "../conversationItem/ConversationItem.jsx";
 
 //components to display a list of conversations.
-const ConversationList = ({ conversations }) => {
+const ConversationList = ({ conversations, deleteConversation }) => {
 
     if (conversations.length === 0) {
         return <p>Inga konversationer ännu.</p>
@@ -13,6 +13,7 @@ const ConversationList = ({ conversations }) => {
             <ConversationItem
                 key={conversation.otherUserId}
                 conversation={conversation}
+                deleteConversation={deleteConversation}
             />
             ))}
         </>

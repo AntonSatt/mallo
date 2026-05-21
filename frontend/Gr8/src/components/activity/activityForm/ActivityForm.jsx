@@ -33,7 +33,7 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
         Url: "",
         latitude: "",
         longitude: "",
-        addressName: "",
+        adressName: "",
         startAt: dayjs(),
         endAt: dayjs(),
     });
@@ -66,7 +66,7 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                     Url: activityToEdit.url || "",
                     latitude: activityToEdit.latitude || "",
                     longitude: activityToEdit.longitude || "",
-                    addressName: activityToEdit.addressName || "",
+                    adressName: activityToEdit.adressName || "",
                     startAt: dayjs(activityToEdit.startAt),
                     endAt: dayjs(activityToEdit.endAt),
                 });
@@ -79,7 +79,7 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                     Url: "",
                     latitude: "",
                     longitude: "",
-                    addressName: "",
+                    adressName: "",
                     startAt: dayjs(),
                     endAt: dayjs(),
                 });
@@ -97,7 +97,7 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                 ...prev,
                 latitude: locationData.latitude,
                 longitude: locationData.longitude,
-                addressName: locationData.addressName
+                adressName: locationData.adressName
             }));
         }
         setView("form");
@@ -117,9 +117,10 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                     description: formData.description,
                     latitude: Number(formData.latitude),
                     longitude: Number(formData.longitude),
+                    adressName: formData.adressName,
                     startAt: dayjs(formData.startAt).toISOString(),
                     endAt: dayjs(formData.endAt).toISOString(),
-                    url: activityToEdit.url
+                    url: formData.Url
                 };
 
                 response = await ActivityServices.update(activityToEdit.id, updatePayload);
@@ -130,6 +131,8 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                 data.append("description", formData.description);
                 data.append("latitude", Number(formData.latitude));
                 data.append("longitude", Number(formData.longitude));
+                data.append("adressName", formData.adressName);
+                data.append("url", formData.Url);
                 data.append("startAt", dayjs(formData.startAt).toISOString());
                 data.append("endAt", dayjs(formData.endAt).toISOString());
 

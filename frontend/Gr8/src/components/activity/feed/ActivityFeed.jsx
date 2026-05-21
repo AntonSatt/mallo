@@ -1,96 +1,40 @@
-import { useState, useEffect } from "react";
-import { Box, CircularProgress, Typography, Stack } from "@mui/material";
-import ActivityServices from "../../../services/ActivityService.jsx";
+import { Box, Typography, Stack } from "@mui/material";
 import ActivityCard from "./ActivityCard.jsx";
-import distance from "@turf/distance";
-import { point } from "@turf/helpers";
 
-const ActivityFeed = () => {
-    const [activities, setActivities] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [userLocation, setUserLocation] = useState(null);
+// Component for rendering the list of activity cards in the feed
+const ActivityFeed = ({ activities, currentUserId, onCardAction }) => {
 
-    // Get user's current location on component mount
-    useEffect(() => {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                setUserLocation({
-                    lng: position.coords.longitude,
-                    lat: position.coords.latitude
-                });
-            },
-            (err) => console.error("Kunde inte hämta position", err)
-        )
-    })
+    const calculateDistanceText = (distanceMeters) => {
+        if (!distanceMeters) return null;
 
-    // Fetch activities from backend on component mount
-    useEffect(() => {
-        const fetchActivities = async () => {
-            try {
-                setLoading(true);
-                const data = await ActivityServices.getAll();
-                setActivities(data);
-            } catch (err) {
-                console.error("Error fetching activities:", err);
-                setError("Kunde inte hämta aktiviteter. Försök igen senare.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchActivities();
-    }, []);
-
-    const calculateDistance = (actLat, actLng) => {
-        if (!userLocation) return null;
-
-        // Turf [longitude, latitude]
-        const from = point([userLocation.lng, userLocation.lat]);
-        const to = point([actLng, actLat]);
-        const options = { units: 'meters' };
-
-        const d = distance(from, to, options);
-
-        // If it's over 1 km, show in km with one decimal, otherwise in meters
-        if (d > 1000) {
-            return (d / 1000).toFixed(1) + " km";
+        //If it's over 1 km, show in km with one decimal, otherwise in meters
+        if (distanceMeters > 1000) {
+            return (distanceMeters / 1000).toFixed(1) + " km";
         }
-
-        return Math.round(d) + " m";
+        return Math.round(distanceMeters) + " m";
     };
-    if (loading) return <CircularProgress />;
-
-    if (loading) {
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 10 }}>
-                <CircularProgress sx={{ color: 'var(--color-primary)' }} />
-            </Box>
-        );
-    }
-
-    if (error) {
-        return (
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-                <Typography color="error">{error}</Typography>
-            </Box>
-        );
-    }
 
     return (
         <Box sx={{ px: 2, pb: 4 }}>
             <Stack spacing={2}>
                 {activities.length > 0 ? (
                     activities.map((activity) => (
-                        <ActivityCard
-                            key={activity.id}
-                            activity={activity}
-                            distance={calculateDistance(activity.latitude, activity.longitude)}
-                        />
+                        /* 
+                            Every box gets an unique ID based on the activity ID, 
+                            which allows us to scroll to it when clicking the marker on the map
+                        */
+                        <Box key={activity.id} id={`activity-card-${activity.id}`}>
+                            <ActivityCard
+                                activity={activity}
+                                distance={calculateDistanceText(activity.distanceMeters)}
+                                currentUserId={currentUserId}
+                                onCardAction={onCardAction}
+                            />
+                        </Box>
                     ))
                 ) : (
                     <Typography sx={{ textAlign: 'center', mt: 4, opacity: 0.6 }}>
-                        Inga aktiviteter hittades i närheten.
+                        Inga aktiviteter hittades som matchar dina filter.
                     </Typography>
                 )}
             </Stack>

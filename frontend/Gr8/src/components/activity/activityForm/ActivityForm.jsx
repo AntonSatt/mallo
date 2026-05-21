@@ -50,11 +50,20 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
         if (e) e.preventDefault();
         setLoading(true);
         try {
-            await ActivityServices.create(formData);
-            onSuccess();
-            setView("form");
+            // Send to backend
+            const response = await ActivityServices.create(formData);
+
+            // If the backend returns the created activity, pass it to onSuccess. Otherwise, pass the formData as a fallback.
+            if (onSuccess && response?.data) {
+                onSuccess(response.data);
+            } else if (onSuccess) {
+                // Fallback 
+                onSuccess(formData);
+            }
+
+            setView("form"); // Reset view to form for next time it's opened
         } catch (error) {
-            console.error("Kunde inte publicera:", error);
+            console.error("Kunde inte skapa aktivitet:", error);
         } finally {
             setLoading(false);
         }
@@ -178,7 +187,7 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
                 value={calendarMode === 'start' ? formData.startAt : formData.endAt}
                 onChange={(newDate) => {
                     if (calendarMode === 'start') {
-                        setFormData({ ...formData, startAt: newDate });
+                        setFormData({ ...formData, startAt: newDate, endAt: newDate });
                     } else {
                         setFormData({ ...formData, endAt: newDate });
                     }

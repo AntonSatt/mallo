@@ -18,6 +18,14 @@ const ActivityServices = {
         const response = await ApiClient.get(`/map/activities/${id}`);
         return response.data;
     },
+    delete: async (activityId) => {
+        const response = await ApiClient.delete(`/map/activities/${activityId}`);
+        return response.data;
+    },
+    update: async (id, updateDto) => {
+        const response = await ApiClient.put(`/map/activities/${id}`, updateDto);
+        return response.data;
+    }
 };
 
 export default ActivityServices;

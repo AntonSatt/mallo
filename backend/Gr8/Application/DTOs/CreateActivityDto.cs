@@ -13,6 +13,7 @@ namespace Gr8.Application.DTOs
         public decimal Latitude { get; set; }
         [Required]
         public decimal Longitude { get; set; }
+        public string Adress { get; set; } = null!;
         public DateTime StartAt { get; set; }
         public DateTime EndAt { get; set; }
 

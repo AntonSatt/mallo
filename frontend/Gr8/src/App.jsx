@@ -7,6 +7,7 @@ import RegisterPage from './pages/register/RegisterPage'
 import Settings from './pages/settings/SettingsPage'
 import ForumPage from './pages/forum/ForumPage'
 import LandingPage from './pages/landing/LandingPage'
+import HomePage from './pages/home/HomePage'
 import ForgotPasswordPage from './pages/resetPassword/ForgotPasswordPage'
 import ResetPasswordPage from './pages/resetPassword/ResetPasswordPage'
 import ChatPage from './pages/chat/ChatPage';

@@ -33,6 +33,7 @@ import PostServices from "../../services/PostServices";
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import SettingsButtonStyles from "../../design/buttons/SettingsButton.jsx";
+import SettingsSuccessDialog from "./SettingsSuccessDialog.jsx";
 
 // User Settings Page: Provides an interface for users to update their profile information, change their password, and delete their account. 
 // Utilizes accordions for organized sections and handles form validation and API interactions for user data management.
@@ -74,6 +75,8 @@ const UserSettings = () => {
 
     const [errors, setErrors] = useState({});
     const [expandedSection, setExpandedSection] = useState(false);
+    const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+    const [successDialogVariant, setSuccessDialogVariant] = useState("profile");
 
     const [showCurrentPassword] = useState(false);
     const [showNewPassword] = useState(false);
@@ -107,6 +110,15 @@ const UserSettings = () => {
 
     const handleClose = () => {
         setOpen(false);
+    };
+
+    const openSuccessDialog = (variant) => {
+        setSuccessDialogVariant(variant);
+        setSuccessDialogOpen(true);
+    };
+
+    const closeSuccessDialog = () => {
+        setSuccessDialogOpen(false);
     };
 
     useEffect(() => {
@@ -170,6 +182,7 @@ const UserSettings = () => {
         try {
             await UserServices.updateUser(profileData);
             refreshCurrentUser();
+            openSuccessDialog("profile");
         }
         catch (error) {
             if (error.response && error.response.status === 409) {
@@ -190,6 +203,7 @@ const UserSettings = () => {
 
         try {
             await UserServices.updateUserTags(selectedTags);
+            openSuccessDialog("triggers");
         } catch (error) {
             console.error("Kunde inte uppdatera triggers", error);
         }
@@ -206,6 +220,7 @@ const UserSettings = () => {
         try {
             await UserServices.updatePassword(passwordData);
             setPasswordData({ currentPassword: "", newPassword: "", confirmNewPassword: "" });
+            openSuccessDialog("password");
         }
         catch (e) {
             const serverErrors = e.response.data;
@@ -615,6 +630,12 @@ const UserSettings = () => {
                         <Button variant="contained" color="error" onClick={handleDelete} id="deleteUser">Ja, ta bort konto</Button>
                     </DialogActions>
                 </Dialog>
+
+                <SettingsSuccessDialog
+                    open={successDialogOpen}
+                    onClose={closeSuccessDialog}
+                    variant={successDialogVariant}
+                />
             </Box>
         </>
     );

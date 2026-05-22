@@ -28,7 +28,7 @@ const ActivityFeed = ({ activities, currentUserId, onCardAction, onBookmarkToggl
                                 activity={activity}
                                 distance={calculateDistanceText(activity.distanceMeters)}
                                 currentUserId={currentUserId}
-                                onCardAction={onCardAction}
+                                onCardAction={(action, data) => onCardAction(action, data)}
                                 onBookmarkToggle={onBookmarkToggle}
                             />
                         </Box>

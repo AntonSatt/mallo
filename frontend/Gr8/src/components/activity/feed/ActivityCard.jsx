@@ -49,7 +49,6 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
         setIsDialogOpen(true);
     };
 
-    // Close menu
     const handleDialogClose = (e) => {
         if (e) e.stopPropagation();
         setIsDialogOpen(false);
@@ -58,25 +57,7 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
     const handleEdit = async (e) => {
         handleDialogClose(e);
         setError("");
-        setLoading(true);
-
-        try {
-            await ActivityServices.update(activity.id);
-            onCardAction("Aktiviteten har redigerats!", "success", activity.id);
-
-        } catch (error) {
-            if (error.response?.status === 403) {
-                setError("Du får inte ta redigera denna aktivitet.");
-            }
-            else if (error.response?.status === 404) {
-                setError("Aktiviteten hittades inte.");
-            }
-            else {
-                setError("Aktiviteten kunde inte redigeras. Försök igen.");
-            }
-        } finally {
-            setLoading(false);
-        }
+        onCardAction("edit", activity);
     };
 
     const handleDelete = async (e) => {

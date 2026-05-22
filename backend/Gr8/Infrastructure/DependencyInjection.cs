@@ -36,6 +36,8 @@ namespace Gr8.Infrastructure
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped <IBookmarkService,BookmarkService>();
             services.AddScoped<IActivityService, ActivityService>();
+            services.AddScoped<IChatRepository, ChatRepository>();
+            services.AddScoped<IChatService, ChatService>();
             services.AddScoped<IUserTagService, UserTagService>();
             services.AddScoped<IActivityBookmarkService, ActivityBookmarkService>();
 

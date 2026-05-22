@@ -14,8 +14,6 @@ namespace Gr8.Infrastructure.Persistence
         public DbSet<Hug> Hugs => Set<Hug>();
         public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
         public DbSet<Activity> Activities => Set<Activity>();
-        public DbSet<ActivityBookmark> ActivityBookmarks => Set<ActivityBookmark>();
-        public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
 
         public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
         {
@@ -242,38 +240,6 @@ namespace Gr8.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasIndex(b => new { b.UserId, b.PostId }).IsUnique();
-            });
-
-            modelBuilder.Entity<ChatMessage>(entity => 
-            {
-                entity.HasKey(cm => cm.Id);
-
-                entity.Property(cm => cm.Content)
-                .IsRequired()
-                .HasMaxLength(4000);
-
-                entity.Property(cm => cm.SendAt)
-                .IsRequired();
-
-                entity.HasOne(cm => cm.Activity)
-                .WithMany()
-                .HasForeignKey(cm => cm.ActivityId)
-                .OnDelete(DeleteBehavior.SetNull); //The chat can continue when the activity deletes. 
-
-                entity.HasOne<ApplicationUser>()
-                .WithMany()
-                .HasForeignKey(cm => cm.SenderId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne<ApplicationUser>()
-                .WithMany()
-                .HasForeignKey(cm => cm.ReceiverId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
-
-                //Ensures fast loading of chat history by indexing the relationship between sender and receiver.
-                entity.HasIndex(cm => new { cm.SenderId, cm.ReceiverId });
             });
         }
     }

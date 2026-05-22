@@ -49,6 +49,12 @@ const ActivityPage = () => {
         setToast(prev => ({ ...prev, open: false }));
     };
 
+    const handleBookmarkToggle = (activityId, isBookmarked) => {
+        setActivities(prev => prev.map(a =>
+            a.id === activityId ? { ...a, isBookmarked } : a
+        ));
+    };
+
     const handleOpenForm = () => {
         setIsFormOpen(true);
         setEditActivity(null);
@@ -114,8 +120,18 @@ const ActivityPage = () => {
         const fetchActivities = async () => {
             try {
                 setLoading(true);
-                const data = await ActivityServices.getAll();
-                setActivities(data || []);
+                const [activitiesData, bookmarksData] = await Promise.all([
+                    ActivityServices.getAll(),
+                    ActivityServices.getBookmarks()
+                ]);
+
+                const bookmarkedIds = new Set(bookmarksData.map(b => b.actvityId));
+                const activitiesWithBookmarks = (activitiesData || []).map(a => ({
+                    ...a,
+                    isBookmarked: bookmarkedIds.has(a.id)
+                }));
+
+                setActivities(activitiesWithBookmarks);
             } catch (err) {
                 console.error("Error fetching activities:", err);
                 setError("Kunde inte hämta aktiviteter. Försök igen senare.");
@@ -144,57 +160,57 @@ const ActivityPage = () => {
 
     // Apply filters to activities
     const filteredActivities = activities
-    .map(activity => {
-        if (userCoords) {
-            const from = [userCoords.lng, userCoords.lat];
-            const to = [activity.longitude, activity.latitude];
-            const distanceInMeters = distance(from, to, { units: 'meters' });
-            return { ...activity, distanceMeters: distanceInMeters };
-        }
-        return activity;
-    })
-    .filter(activity => {
-        // Search filter
-        if (searchQuery.trim()) {
-            const q = searchQuery.toLowerCase();
-            if (
-                !activity.title?.toLowerCase().includes(q) &&
-                !activity.description?.toLowerCase().includes(q)
-            ) return false;
-        }
+        .map(activity => {
+            if (userCoords) {
+                const from = [userCoords.lng, userCoords.lat];
+                const to = [activity.longitude, activity.latitude];
+                const distanceInMeters = distance(from, to, { units: 'meters' });
+                return { ...activity, distanceMeters: distanceInMeters };
+            }
+            return activity;
+        })
+        .filter(activity => {
+            // Search filter
+            if (searchQuery.trim()) {
+                const q = searchQuery.toLowerCase();
+                if (
+                    !activity.title?.toLowerCase().includes(q) &&
+                    !activity.description?.toLowerCase().includes(q)
+                ) return false;
+            }
 
-        // Nearby filter
-        if (activeFilters.nearby) {
-            if (!userCoords) return false;
-            if (activity.distanceMeters > 7000) return false;
-        }
+            // Nearby filter
+            if (activeFilters.nearby) {
+                if (!userCoords) return false;
+                if (activity.distanceMeters > 7000) return false;
+            }
 
-        // Your activities filter
-        if (activeFilters.yourActivities) {
-            if (!currentUserId) return false;
-            if (activity.userId !== currentUserId) return false;
-        }
+            // Your activities filter
+            if (activeFilters.yourActivities) {
+                if (!currentUserId) return false;
+                if (activity.userId !== currentUserId) return false;
+            }
 
-        // Time filter
-        if (activeFilters.time) {
-            const now = new Date();
-            const activityEnd = new Date(activity.endAt);
-            if (activityEnd < now) return false;
-        }
+            // Time filter
+            if (activeFilters.time) {
+                const now = new Date();
+                const activityEnd = new Date(activity.endAt);
+                if (activityEnd < now) return false;
+            }
 
-        return true;
-    })
-    .sort((a, b) => {
-        if (activeFilters.time) {
-            const timeA = new Date(a.startAt).getTime();
-            const timeB = new Date(b.startAt).getTime();
-            return timeA - timeB;
-        }
-        if (a.distanceMeters && b.distanceMeters) {
-            return a.distanceMeters - b.distanceMeters;
-        }
-        return 0;
-    });
+            return true;
+        })
+        .sort((a, b) => {
+            if (activeFilters.time) {
+                const timeA = new Date(a.startAt).getTime();
+                const timeB = new Date(b.startAt).getTime();
+                return timeA - timeB;
+            }
+            if (a.distanceMeters && b.distanceMeters) {
+                return a.distanceMeters - b.distanceMeters;
+            }
+            return 0;
+        });
 
     return (
 
@@ -422,6 +438,7 @@ const ActivityPage = () => {
                     userCoords={userCoords}
                     onCardAction={handleCardAction}
                     currentUserId={currentUserId}
+                    onBookmarkToggle={handleBookmarkToggle}
                 />
             </Box>
 

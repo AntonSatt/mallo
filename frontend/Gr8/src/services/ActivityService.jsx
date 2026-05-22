@@ -25,7 +25,15 @@ const ActivityServices = {
     update: async (id, updateDto) => {
         const response = await ApiClient.put(`/map/activities/${id}`, updateDto);
         return response.data;
-    }
+    },
+    toggleBookmark: async (activityId) => {
+        const response = await ApiClient.post(`/map/activities/${activityId}/bookmark`);
+        return response.data;
+    },
+    getBookmarks: async () => {
+        const response = await ApiClient.get(`/map/activities/bookmarks`);
+        return response.data;
+    },
 };
 
 export default ActivityServices;

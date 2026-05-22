@@ -1,69 +1,46 @@
-import {useState} from "react";
-import PostServices from "../../services/PostServices"
-import {IconButton, Snackbar, Alert } from "@mui/material"
+import { useState } from "react";
+import { IconButton, Snackbar, Alert } from "@mui/material";
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 
-const BookmarkButton = ({postId, userBookmarks, currentUser, setUserBookmarks}) => {
-    const [bookmarked, setBookmarked] = useState(userBookmarks?.find(b => b.postId === postId && b.userId === currentUser.sub));
+const BookmarkButton = ({ isBookmarked: initialBookmarked, onToggle, savedText = "Du har sparat!" }) => {
+    const [bookmarked, setBookmarked] = useState(initialBookmarked ?? false);
     const [open, setOpen] = useState(false);
 
     const handleBookmark = async () => {
-       try{
-            if(!currentUser?.sub) {
-                console.log("User Id is missing")
-                return; 
-        }
-
-        const result = await PostServices.bookmarkPost(postId, currentUser.sub)
-        if (result.bookmarked) {
-            setUserBookmarks(prev => [...prev, { postId: postId, userId: currentUser.sub }])
-        }
-        else {
-            setUserBookmarks(prev => prev.filter(b => !(b.postId === postId && b.userId === currentUser.sub)));
-        }
-
-        setBookmarked(!bookmarked);
-
-        if(!bookmarked){
-            setOpen(true);
-        }
-
-    } 
-        catch(error){
-            console.error("Error with bookmark: ", error)
+        try {
+            const result = await onToggle();
+            setBookmarked(result);
+            if (result) setOpen(true);
+        } catch (error) {
+            console.error("Error with bookmark: ", error);
         }
     };
 
-    return(
+    return (
         <>
-            <IconButton 
-                sx={{color: "var(--color-primary)"}}
+            <IconButton
+                sx={{ color: "var(--color-primary)" }}
                 aria-label="bookmark"
                 onClick={handleBookmark}
-                color={bookmarked ? "primary" : "default"}
-                >
-                {bookmarked ? <BookmarkIcon/> : <BookmarkBorderIcon/>}
-            </IconButton>   
+            >
+                {bookmarked ? <BookmarkIcon /> : <BookmarkBorderIcon />}
+            </IconButton>
 
-            <Snackbar
-                open={open}
-                autoHideDuration={2500}
-                onClose={() => setOpen(false)}
-                >
-                <Alert 
-                 sx={{
-                    backgroundColor: "white",
-                    "& .MuiAlert-icon":{color: "var(--color-primary)"},
-                    border: "1px solid var(--color-border-light)"
-                 }}
+            <Snackbar open={open} autoHideDuration={2500} onClose={() => setOpen(false)}>
+                <Alert
+                    sx={{
+                        backgroundColor: "white",
+                        "& .MuiAlert-icon": { color: "var(--color-primary)" },
+                        border: "1px solid var(--color-border-light)"
+                    }}
                     severity="success"
-                    >
-                        Du har sparat inlägget
+                >
+                    {savedText}
                 </Alert>
-            </Snackbar>         
+            </Snackbar>
         </>
-    )
+    );
 };
 
 export default BookmarkButton;

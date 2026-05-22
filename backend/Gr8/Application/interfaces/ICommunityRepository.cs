@@ -35,5 +35,9 @@ namespace Gr8.Application.Interfaces
         Task AddActivityAsync(Activity activity);
         Task UpdateActivityAsync(Activity activity);
         Task DeleteActivityAsync(Activity activity);
+        Task<ActivityBookmark?> GetActivityBookmarkAsync(int activityId, string userId);
+        void RemoveActivityBookmark(ActivityBookmark bookmark);
+        Task AddActivityBookmarkAsync(ActivityBookmark bookmark);
+        Task<List<ActivityBookmark>> GetAllActivityBookmarksByUserIdAsync(string userId);
     }
 }

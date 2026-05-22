@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Dialog, Box, Typography, Paper, Stack, CircularProgress, IconButton } from "@mui/material";
 import LinkIcon from '@mui/icons-material/Link';
 import SecondaryButton from "../../../design/buttons/SecondaryButton.jsx";
@@ -17,12 +17,14 @@ import CloseIcon from '@mui/icons-material/Close';
 
 dayjs.locale('sv');
 
-const ActivityForm = ({ open, handleClose, onSuccess }) => {
+const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
     const [loading, setLoading] = useState(false);
     const [view, setView] = useState("form");
     const [calendarOpen, setCalendarOpen] = useState(false);
     const [timeConfigOpen, setTimeConfigOpen] = useState(false);
     const [calendarMode, setCalendarMode] = useState('start');
+    const [error, setError] = useState("");
+    const isEditMode = !!activityToEdit;
 
     // Backend data
     const [formData, setFormData] = useState({
@@ -31,7 +33,7 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
         Url: "",
         latitude: "",
         longitude: "",
-        addressName: "",
+        adressName: "",
         startAt: dayjs(),
         endAt: dayjs(),
     });
@@ -54,6 +56,40 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
         fileInputRef.current.value = "";
     };
 
+    // Edit or create
+    useEffect(() => {
+        if (open) {
+            if (activityToEdit) {
+                setFormData({
+                    title: activityToEdit.title || "",
+                    description: activityToEdit.description || "",
+                    Url: activityToEdit.url || "",
+                    latitude: activityToEdit.latitude || "",
+                    longitude: activityToEdit.longitude || "",
+                    adressName: activityToEdit.adressName || "",
+                    startAt: dayjs(activityToEdit.startAt),
+                    endAt: dayjs(activityToEdit.endAt),
+                });
+                setImagePreview(activityToEdit.imageUrl || null);
+            } else {
+                // Reset form for new activity
+                setFormData({
+                    title: "",
+                    description: "",
+                    Url: "",
+                    latitude: "",
+                    longitude: "",
+                    adressName: "",
+                    startAt: dayjs(),
+                    endAt: dayjs(),
+                });
+                setSelectedImage(null);
+                setImagePreview(null);
+            }
+            setView("form");
+        }
+    }, [activityToEdit, open]);
+
     // Function for recive location in SearchAddress
     const handleLocationSelect = (locationData) => {
         if (locationData) {
@@ -61,44 +97,80 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
                 ...prev,
                 latitude: locationData.latitude,
                 longitude: locationData.longitude,
-                addressName: locationData.addressName
+                adressName: locationData.adressName
             }));
         }
+
         setView("form");
     };
 
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
+
+        if (!formData.adressName) {
+            alert("Du måste välja en plats innan du publicerar.");
+            return;
+        }
+
         setLoading(true);
+
         try {
-            const data = new FormData();
-            data.append("title", formData.title);
-            data.append("description", formData.description);
-            data.append("url", formData.Url);
-            data.append("latitude", formData.latitude);
-            data.append("longitude", formData.longitude);
-            data.append("startAt", formData.startAt.toISOString());
-            data.append("endAt", formData.endAt.toISOString());
+            let response;
 
-            if (selectedImage) {
-                data.append("image", selectedImage);
-                data.append("imageMimeType", selectedImage.type);
+            if (isEditMode) {
+                // Payload for edit
+                const updatePayload = {
+                    title: formData.title,
+                    description: formData.description,
+                    latitude: Number(formData.latitude),
+                    longitude: Number(formData.longitude),
+                    adressName: formData.adressName,
+                    startAt: dayjs(formData.startAt).toISOString(),
+                    endAt: dayjs(formData.endAt).toISOString(),
+                    url: formData.Url
+                };
+
+                response = await ActivityServices.update(activityToEdit.id, updatePayload);
+            } else {
+                // Create new activity
+                const data = new FormData();
+                data.append("title", formData.title);
+                data.append("description", formData.description);
+                data.append("latitude", Number(formData.latitude));
+                data.append("longitude", Number(formData.longitude));
+                data.append("adressName", formData.adressName);
+                data.append("url", formData.Url);
+                data.append("startAt", dayjs(formData.startAt).toISOString());
+                data.append("endAt", dayjs(formData.endAt).toISOString());
+
+                if (selectedImage) {
+                    data.append("image", selectedImage);
+                    data.append("imageMimetype", selectedImage.type);
+                }
+
+                response = await ActivityServices.create(data);
             }
 
-            // Send to backend
-            const response = await ActivityServices.create(data);
-
-            // If the backend returns the created activity, pass it to onSuccess. Otherwise, pass the formData as a fallback.
-            if (onSuccess && response?.data) {
-                onSuccess(response.data);
-            } else if (onSuccess) {
-                // Fallback 
-                onSuccess(formData);
+            if (onSuccess) {
+                onSuccess(response);
             }
 
-            setView("form"); // Reset view to form for next time it's opened
+            // Reset view to form for next time it's opened
+            if (typeof setView === "function") {
+                setView("form");
+            }
+
         } catch (error) {
-            console.error("Kunde inte skapa aktivitet:", error);
+            console.error("Kunde inte spara aktivitet:", error);
+            if (error.response?.status === 403) {
+                setError("Du får inte redigera denna aktivitet.");
+            }
+            else if (error.response?.status === 404) {
+                setError("Aktiviteten hittades inte.");
+            }
+            else {
+                setError("Aktiviteten kunde inte redigeras. Försök igen.");
+            }
         } finally {
             setLoading(false);
         }
@@ -203,7 +275,7 @@ const ActivityForm = ({ open, handleClose, onSuccess }) => {
                                         }}
                                     />
                                     }
-                                    label={formData.addressName || "Välj plats"}
+                                    label={formData.adressName || "Välj plats"}
                                     onClick={() => setView("search")}
                                 >
                                     Välj plats

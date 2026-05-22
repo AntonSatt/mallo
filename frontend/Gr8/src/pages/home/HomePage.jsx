@@ -9,6 +9,7 @@ import { Stack, Box } from "@mui/material";
 import Navbar from "../../components/layout/Navbar.jsx";
 import ForumPage from "../forum/ForumPage.jsx";
 import ChatPage from '../chat/ChatPage';
+import Settings from "../settings/SettingsPage.jsx";
 import ConversationPage from '../chat/ConversationPage';
 import ActivityPage from "../activity/ActivityPage.jsx";
 
@@ -33,7 +34,7 @@ const Homepage = ({ page }) => {
                     </aside>
 
                     <main className="main-content">
-                        <Stack spacing={"21px"} sx={{ height: "100%", minHeight: 0, minWidth: "var(--content-width-desktop)" }}>
+                        <Stack spacing={"34px"} sx={{ height: "100%", minHeight: 0, minWidth: "var(--content-width-desktop)" }}>
                             <Navbar />
                             {page === "forum" && (
                                 <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
@@ -55,6 +56,11 @@ const Homepage = ({ page }) => {
                                     <ActivityPage />
                                 </Box>
                             )}
+                            {page === "settings" && (
+                                <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
+                                    <Settings />
+                                </Box>
+                            )}
                         </Stack>
                     </main>
 
@@ -67,10 +73,12 @@ const Homepage = ({ page }) => {
                     {page === "forum" && <ProfileBar showCreate="true" onCreatePost={handleClickOpen} onSearch={setSearchQuery} />}
                     {page === "message" && <ProfileBar showCreate="false" />}
                     {page === "conversation" && <ProfileBar showCreate="false" />}
+                    {page === "settings" && <ProfileBar showCreate="false" />}
                     <Navbar />
                     {page === "forum" && <ForumPage openModal={isOpen} setOpenModal={setOpen} searchQuery={searchQuery} />}
                     {page === "message" && <ChatPage />}
                     {page === "conversation" && <ConversationPage />}
+                    {page === "settings" && <Settings />}
                 </div>
             )}
         </div>

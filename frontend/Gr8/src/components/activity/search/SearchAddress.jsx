@@ -49,7 +49,7 @@ const SearchAddress = ({ onSelect, onBack }) => {
 
     // Move map view and update/create the marker
     const updateMap = (lng, lat, placeName) => {
-        setTempData({ latitude: lat, longitude: lng, addressName: placeName });
+        setTempData({ latitude: lat, longitude: lng, adressName: placeName });
 
         if (mapInstance) {
             mapInstance.flyTo({ center: [lng, lat], zoom: 14, essential: true });
@@ -83,7 +83,7 @@ const SearchAddress = ({ onSelect, onBack }) => {
                 setTempData({
                     latitude: lat,
                     longitude: lng,
-                    addressName: placeName
+                    adressName: placeName
                 });
 
                 mapInstance.flyTo({
@@ -195,7 +195,9 @@ const SearchAddress = ({ onSelect, onBack }) => {
                                 Tillbaka
                             </SecondaryButton>
                             <PrimaryButton
-                                fullWidth onClick={() => onSelect(tempData)} >
+                                fullWidth
+                                disabled={!tempData}
+                                onClick={() => onSelect(tempData)} >
                                 Spara plats
                             </PrimaryButton>
                         </Stack>

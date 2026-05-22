@@ -6,7 +6,7 @@ import Step2 from "./steps/Step2";
 import Step3 from "./steps/Step3";
 import RegisterErrorDialog from "./RegisterErrorDialog.jsx";
 
-// Main container for the multi-step registration process. 
+// Main container for the multi-step registration process.
 // Manages form state, handles step-specific validation, and executes the final registration call.
 const RegisterForm = ({ step, setStep }) => {
   const [formData, setFormData] = useState({
@@ -23,6 +23,25 @@ const RegisterForm = ({ step, setStep }) => {
   const [registerErrorOpen, setRegisterErrorOpen] = useState(false);
   const [registerErrorMessage, setRegisterErrorMessage] = useState("Något gick fel vid registreringen. Försök igen.");
   const { register } = useAuth();
+  const userNameRegex = /^[\p{L}\p{N}]+$/u;
+
+  const getUserNameError = (value, { requireValue = false } = {}) => {
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) {
+      return requireValue ? "Användarnamn måste vara ifyllt." : "";
+    }
+
+    if (/\s/.test(value)) {
+      return "Användarnamn får inte innehålla mellanslag.";
+    }
+
+    if (!userNameRegex.test(trimmedValue)) {
+      return "Användarnamn får endast innehålla bokstäver och siffror.";
+    }
+
+    return "";
+  };
 
   const getRegistrationErrorMessage = (err) => {
     const serverData = err?.response?.data;
@@ -57,6 +76,14 @@ const RegisterForm = ({ step, setStep }) => {
       [field]: value
     });
 
+    if (field === "userName") {
+      setError((prev) => ({
+        ...prev,
+        userName: getUserNameError(value)
+      }));
+      return;
+    }
+
     if (error[field]) {
       setError({ ...error, [field]: "" });
     }
@@ -65,7 +92,8 @@ const RegisterForm = ({ step, setStep }) => {
   // Step validations functions - returns or sets error if invalid, otherwise returns true and clears error.
   const validateStep1 = () => {
     let newError = {};
-    if (!formData.userName.trim()) newError.userName = "Användarnamn måste vara ifyllt.";
+    const userNameError = getUserNameError(formData.userName, { requireValue: true });
+    if (userNameError) newError.userName = userNameError;
 
     setError(newError);
     return Object.keys(newError).length === 0;
@@ -122,8 +150,8 @@ const RegisterForm = ({ step, setStep }) => {
     return Object.keys(newError).length === 0;
   };
 
-  // Final submit function - calls register from useAuth, if successful moves to 
-  // step 4 (success screen) otherwise sets error message.
+  // Final submit function - calls register from useAuth, if successful moves to
+  // step 4 (success screen) otherwise shows error dialog.
   const handleSubmit = async () => {
     try {
       setError({});
@@ -132,7 +160,7 @@ const RegisterForm = ({ step, setStep }) => {
       const lastName = nameParts.slice(1).join(" ");
 
       const dataToSubmit = {
-        userName: formData.userName,
+        userName: formData.userName.trim(),
         firstName: firstName,
         lastName: lastName || " ",
         ssn: formData.ssn,
@@ -142,7 +170,7 @@ const RegisterForm = ({ step, setStep }) => {
       };
 
       await register(dataToSubmit);
-      setStep(4); // success screen 
+      setStep(4); // success screen
 
     } catch (err) {
       setRegisterErrorMessage(getRegistrationErrorMessage(err));
@@ -152,7 +180,6 @@ const RegisterForm = ({ step, setStep }) => {
 
   return (
     <section>
-
       {step === 1 && (
         <Step1
           formData={formData}
@@ -164,7 +191,6 @@ const RegisterForm = ({ step, setStep }) => {
           }}
         />
       )}
-
 
       {step === 2 && (
         <Step2
@@ -197,7 +223,6 @@ const RegisterForm = ({ step, setStep }) => {
         onClose={() => setRegisterErrorOpen(false)}
         message={registerErrorMessage}
       />
-
     </section>
   );
 };

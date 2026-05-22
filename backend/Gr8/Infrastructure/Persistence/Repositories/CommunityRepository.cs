@@ -1,4 +1,5 @@
-﻿using Gr8.Application.Interfaces;
+﻿using Gr8.Application.DTOs;
+using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
 using Gr8.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -115,6 +116,20 @@ namespace Gr8.Infrastructure.Persistence.Repositories
         public async Task AddHugAsync(Hug hug)
         {
             await _communityDbContext.Hugs.AddAsync(hug);
+        }
+
+        public async Task<List<Hug>> GetAllPostHugsByUserIdAsync(string userId, int postId)
+        {
+            return await _communityDbContext.Hugs
+                .Where(h => h.UserId == userId && h.PostId == postId)
+                .ToListAsync();
+        }
+
+        public async Task<List<Hug>> GetAllCommentHugsByUserIdAsync(string userId, int commentId)
+        {
+            return await _communityDbContext.Hugs
+                .Where(h => h.UserId == userId && h.CommentId == commentId)
+                .ToListAsync();
         }
 
         public void RemoveHug(Hug hug)

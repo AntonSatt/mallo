@@ -25,7 +25,15 @@ import PostServices from "../../services/PostServices";
 //this file contains the PostCard component, which is used to display a post in the feed. 
 // It takes in the post data as props and displays the post's title, content, author, category, tags, 
 // and actions (hug, save, comment). It also has a collapsible section for comments.
-const PostCard = ({ post, expanded, onExpand, onMenuOpen, userBookmarks, currentUser, setUserBookmarks }) => {
+const PostCard = ({
+    post,
+    expanded,
+    onExpand,
+    onMenuOpen,
+    userBookmarks,
+    currentUser,
+    setUserBookmarks,
+    userPostHugs }) => {
     const categoryName = post.category?.name || post.category || "Ingen kategori";
     const [showFullContent, setShowFullContent] = useState(false);
 
@@ -80,7 +88,11 @@ const PostCard = ({ post, expanded, onExpand, onMenuOpen, userBookmarks, current
 
                 <CardActions className="post-actions">
 
-                    <HugButton type="post" id={post.id} />
+                    <HugButton
+                        type="post"
+                        id={post.id}
+                        userPostHugs={userPostHugs}
+                    />
 
                     <BookmarkButton
                         isBookmarked={!!userBookmarks?.find(b => b.postId === post.id && b.userId === currentUser.sub)}

@@ -22,10 +22,24 @@ spec:
       terminationGracePeriodSeconds: 30
       securityContext:
         fsGroup: 10001
+      # Spread MSSQL pods across nodes. Without this the scheduler piles every
+      # release's database onto one node, so each new deploy's DB fights the
+      # others for CPU/RAM/disk and cold-start time becomes a coin flip.
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: gr8
+                    app.kubernetes.io/component: db
+                topologyKey: kubernetes.io/hostname
       containers:
         - name: mssql
           image: {{ .Values.db.image | quote }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          # Stable MSSQL tag — don't re-pull the ~1.5 GB image on every deploy.
+          imagePullPolicy: IfNotPresent
           ports:
             - name: mssql
               containerPort: {{ .Values.db.port }}

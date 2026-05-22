@@ -1,8 +1,6 @@
-﻿using Gr8.Application.Interfaces;
+﻿using Gr8.Application.DTOs;
+using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Gr8.Application.Services
 {
@@ -10,7 +8,7 @@ namespace Gr8.Application.Services
     {
         private readonly ICommunityRepository _communityRepository;
 
-        public HugService(ICommunityRepository communityRepository) 
+        public HugService(ICommunityRepository communityRepository)
         {
             _communityRepository = communityRepository;
         }
@@ -18,20 +16,20 @@ namespace Gr8.Application.Services
         {
             var existingHug = await _communityRepository.GetPostHugAsync(postId, userId);
 
-            if (existingHug != null) 
+            if (existingHug != null)
             {
                 _communityRepository.RemoveHug(existingHug);
                 await _communityRepository.SaveChangesAsync();
                 return false;
             }
 
-            var hug = new Hug 
+            var hug = new Hug
             {
                 UserId = userId,
                 PostId = postId,
                 CommentId = null
             };
-            
+
             await _communityRepository.AddHugAsync(hug);
             await _communityRepository.SaveChangesAsync();
             return true;
@@ -40,14 +38,14 @@ namespace Gr8.Application.Services
         {
             var existingHug = await _communityRepository.GetCommentHugAsync(commentId, userId);
 
-            if (existingHug != null) 
+            if (existingHug != null)
             {
                 _communityRepository.RemoveHug(existingHug);
                 await _communityRepository.SaveChangesAsync();
                 return false;
             }
 
-            var hug = new Hug 
+            var hug = new Hug
             {
                 UserId = userId,
                 CommentId = commentId,
@@ -57,6 +55,29 @@ namespace Gr8.Application.Services
             await _communityRepository.AddHugAsync(hug);
             await _communityRepository.SaveChangesAsync();
             return true;
+        }
+        public async Task<List<HugDto>> GetAllPostHugsByUserIdAsync(string userId, int postId)
+        {
+            var hugs = await _communityRepository.GetAllPostHugsByUserIdAsync(userId, postId);
+
+            return hugs.Select(h => new HugDto
+            {
+                UserId = h.UserId,
+                PostId = h.PostId,
+                CommentId = h.CommentId
+            }).ToList();
+        }
+
+        public async Task<List<HugDto>> GetAllCommentHugsByUserIdAsync(string userId, int commentId)
+        {
+            var hugs = await _communityRepository.GetAllCommentHugsByUserIdAsync(userId, commentId);
+
+            return hugs.Select(h => new HugDto
+            {
+                UserId = h.UserId,
+                PostId = h.PostId,
+                CommentId = h.CommentId
+            }).ToList();
         }
     }
 }

@@ -10,9 +10,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: gr8
-      app.kubernetes.io/instance: {{ .Release.Name }}
-      app.kubernetes.io/component: {{ $component }}
+      app: {{ include "gr8.fullname" (dict "Release" .Release "component" $component) }}
   endpoints:
     - port: http
       path: /metrics

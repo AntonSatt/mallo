@@ -41,7 +41,6 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
     const [userBookmarks, setUserBookmarks] = useState([]);
     const [userPostHugs, setUserPostHugs] = useState([]);
 
-
     const handleOpenEditPost = (post) => setEditPost(post);
     const handleCloseEditPost = () => setEditPost(null);
 

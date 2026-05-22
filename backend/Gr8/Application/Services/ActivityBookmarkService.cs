@@ -44,8 +44,8 @@ namespace Gr8.Application.Services
             };
 
             await _communityRepository.AddActivityBookmarkAsync(bookmark);
-            await _communityRepository.SaveChangesAsync();
-            return true;        
+            var result = await _communityRepository.SaveChangesAsync();
+            return result > 0;        
         }
     }
 }

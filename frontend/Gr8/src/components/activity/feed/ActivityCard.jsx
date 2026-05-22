@@ -89,7 +89,6 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
         // TODO: report logic & add in ActivityServices
     };
 
-
     return (
         <Paper elevation={2}
             onClick={handleExpand}

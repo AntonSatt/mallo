@@ -237,7 +237,6 @@ namespace Gr8.Infrastructure.Persistence.Repositories
         {
             return _communityDbContext.ActivityBookmarks
                 .FirstOrDefaultAsync(ab => ab.ActivityId == activityId && ab.UserId == userId);
-
         }
 
         public void RemoveActivityBookmark(ActivityBookmark bookmark)

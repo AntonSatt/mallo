@@ -162,15 +162,7 @@ namespace Gr8.Api.Endpoints
                 var isBookmarked = await activityBookmarkService.ToggleActivityBookmarkAsync(activityId, appUser.Id);
                 return Results.Ok(new { isBookmarked });
 
-            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
-
-            app.MapDelete("/map/activities/{activityId}/bookmark", async (int activityId, ClaimsPrincipal user, UserManager<ApplicationUser> userManager, [FromServices] IActivityBookmarkService activityBookmarkService) =>
-            {
-                var appUser = await userManager.GetUserAsync(user);
-                if (appUser == null) return Results.Unauthorized();
-                var isBookmarked = await activityBookmarkService.ToggleActivityBookmarkAsync(activityId, appUser.Id);
-                return Results.Ok(new { isBookmarked });
-            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);        
         }
     }
 }

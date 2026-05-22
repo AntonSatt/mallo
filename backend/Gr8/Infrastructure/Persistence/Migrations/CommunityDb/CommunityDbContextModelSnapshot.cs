@@ -90,28 +90,6 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                         });
                 });
 
-            modelBuilder.Entity("Gr8.Domain.Entities.ActivityBookmark", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ActivityId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ActivityId");
-
-                    b.ToTable("ActivityBookmarks");
-                });
-
             modelBuilder.Entity("Gr8.Domain.Entities.Bookmark", b =>
                 {
                     b.Property<int>("Id")
@@ -669,17 +647,6 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Gr8.Domain.Entities.ActivityBookmark", b =>
-                {
-                    b.HasOne("Gr8.Domain.Entities.Activity", "Activity")
-                        .WithMany()
-                        .HasForeignKey("ActivityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Activity");
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Bookmark", b =>

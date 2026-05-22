@@ -247,28 +247,5 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             _communityDbContext.Activities.Update(activity);
             await Task.CompletedTask;
         }
-
-        public Task<ActivityBookmark?> GetActivityBookmarkAsync(int activityId, string userId)
-        {
-            return _communityDbContext.ActivityBookmarks
-                .FirstOrDefaultAsync(ab => ab.ActivityId == activityId && ab.UserId == userId);
-        }
-
-        public void RemoveActivityBookmark(ActivityBookmark bookmark)
-        {
-            _communityDbContext.ActivityBookmarks.Remove(bookmark);
-        }
-
-        public async Task AddActivityBookmarkAsync(ActivityBookmark bookmark)
-        {
-            await _communityDbContext.ActivityBookmarks.AddAsync(bookmark);
-        }
-
-        public Task<List<ActivityBookmark>> GetAllActivityBookmarksByUserIdAsync(string userId)
-        {
-            return _communityDbContext.ActivityBookmarks
-                .Where(ab => ab.UserId == userId)
-                .ToListAsync();
-        }
     }
 }

@@ -15,10 +15,6 @@ include:
 # - When no MR is open, run the branch pipeline (so pre-MR feature pushes still
 #   get a review env deployed).
 workflow:
-  # Auto-cancel an older pipeline's interruptible jobs when a new commit lands,
-  # so rapid pushes don't stack up full pipelines.
-  auto_cancel:
-    on_new_commit: interruptible
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
@@ -33,7 +29,6 @@ variables:
 # Only develop can be merged into main
 check-merge-source:
   stage: test
-  interruptible: true
   script:
     - |
       if [ "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" == "main" ] && [ "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" != "develop" ]; then
@@ -49,9 +44,7 @@ check-merge-source:
 # ---------------------------------------------------------------------------
 frontend-test:
   stage: test
-  interruptible: true
-  # Placeholder job (only echoes). Restore image to node:20 when real Vitest/Jest tests are added.
-  image: alpine:3.21
+  image: node:20
   script:
     - cd frontend/Gr8
     - echo "WARNING - No test scripts found in frontend package.json"
@@ -66,9 +59,7 @@ frontend-test:
 # ---------------------------------------------------------------------------
 backend-test:
   stage: test
-  interruptible: true
-  # Placeholder job (only echoes). Restore image to the .NET SDK when real xUnit/NUnit tests are added.
-  image: alpine:3.21
+  image: mcr.microsoft.com/dotnet/sdk:8.0
   script:
     - cd backend/Gr8
     - echo "WARNING - No test projects found in backend."
@@ -85,7 +76,6 @@ backend-test:
 .build-image: &build-image
   stage: build
   image: docker:29
-  interruptible: true
   services:
     - docker:29-dind
   before_script:
@@ -145,7 +135,6 @@ build backend:
 # Develop deploy: persistent shared dev environment
 deploy develop:
   <<: *deploy-k3s
-  resource_group: develop
   needs:
     - job: build frontend
     - job: build backend
@@ -165,7 +154,6 @@ deploy develop:
 # Review deploy: ephemeral per-branch releases for feature branches
 deploy review:
   <<: *deploy-k3s
-  resource_group: review/$CI_COMMIT_REF_SLUG
   needs:
     - job: build frontend
     - job: build backend
@@ -187,7 +175,6 @@ deploy review:
 # Production deploy: only on main, manual approval gate
 deploy production:
   <<: *deploy-k3s
-  resource_group: production
   needs:
     - job: build frontend
     - job: build backend
@@ -216,7 +203,6 @@ deploy production:
 .smoke-test: &smoke-test
   stage: smoke-test
   image: curlimages/curl:latest
-  interruptible: true
   script:
     - |
       URL="${CI_ENVIRONMENT_URL}/api/openapi/v1.json"

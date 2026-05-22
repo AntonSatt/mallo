@@ -20,7 +20,6 @@ import {
 } from "@mui/material";
 import BookmarkButton from "../../components/bookmarkButton/BookmarkButton.jsx";
 import Avatar from "../avatar/avatar.jsx";
-import PostServices from "../../services/PostServices";
 
 //this file contains the PostCard component, which is used to display a post in the feed. 
 // It takes in the post data as props and displays the post's title, content, author, category, tags, 
@@ -94,19 +93,8 @@ const PostCard = ({
                         userPostHugs={userPostHugs}
                     />
 
-                    <BookmarkButton
-                        isBookmarked={!!userBookmarks?.find(b => b.postId === post.id && b.userId === currentUser.sub)}
-                        onToggle={async () => {
-                            const result = await PostServices.bookmarkPost(post.id, currentUser.sub);
-                            if (result.bookmarked) {
-                                setUserBookmarks(prev => [...prev, { postId: post.id, userId: currentUser.sub }]);
-                            } else {
-                                setUserBookmarks(prev => prev.filter(b => !(b.postId === post.id && b.userId === currentUser.sub)));
-                            }
-                            return result.bookmarked;
-                        }}
-                        savedText="Du har sparat inlägget"
-                    />
+                    <BookmarkButton postId={post.id} userBookmarks={userBookmarks} currentUser={currentUser} setUserBookmarks={setUserBookmarks} />
+
 
                     <IconButton onClick={onExpand}
                         aria-expanded={expanded}

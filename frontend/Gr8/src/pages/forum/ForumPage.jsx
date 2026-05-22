@@ -40,6 +40,7 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
     const [checkedCategories, setCheckedCategories] = useState([]);
     const [categories, setCategories] = useState([]);
     const [userBookmarks, setUserBookmarks] = useState([]);
+    const [userPostHugs, setUserPostHugs] = useState([]);
 
     const handleOpenEditPost = (post) => setEditPost(post);
     const handleCloseEditPost = () => setEditPost(null);
@@ -115,39 +116,39 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
     };
 
     const filteredPosts = useMemo(() => {
-    let result = posts;
+        let result = posts;
 
-    if (searchQuery.trim()) {
-        result = result.filter(p =>
-            p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.content.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-    }
+        if (searchQuery.trim()) {
+            result = result.filter(p =>
+                p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                p.content.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
 
-    if (checkedCategories.length > 0) {
-        return result.filter(p => {
-            const cat = p.category?.name || p.category;
-            return checkedCategories.includes(cat);
-        });
-    }
+        if (checkedCategories.length > 0) {
+            return result.filter(p => {
+                const cat = p.category?.name || p.category;
+                return checkedCategories.includes(cat);
+            });
+        }
 
-    if (activeNavCategory !== "Alla" && activeNavCategory !== "Sparade" && activeNavCategory !== "Dina inlägg") {
-        return result.filter(p => {
-            const cat = p.category?.name || p.category;
-            return cat === activeNavCategory;
-        });
-    }
+        if (activeNavCategory !== "Alla" && activeNavCategory !== "Sparade" && activeNavCategory !== "Dina inlägg") {
+            return result.filter(p => {
+                const cat = p.category?.name || p.category;
+                return cat === activeNavCategory;
+            });
+        }
 
-    if (activeNavCategory === "Sparade") {
-        return result.filter(p => userBookmarks.some(b => b.postId === p.id));
-    }
+        if (activeNavCategory === "Sparade") {
+            return result.filter(p => userBookmarks.some(b => b.postId === p.id));
+        }
 
-    if (activeNavCategory === "Dina inlägg") {
-        return result.filter(p => p.authorInfo.id === currentUser?.sub);
-    }
+        if (activeNavCategory === "Dina inlägg") {
+            return result.filter(p => p.authorInfo.id === currentUser?.sub);
+        }
 
-    return result;
-}, [posts, activeNavCategory, checkedCategories, userBookmarks, searchQuery, currentUser?.sub]);
+        return result;
+    }, [posts, activeNavCategory, checkedCategories, userBookmarks, searchQuery, currentUser?.sub]);
 
     const emptyStateMessage = useMemo(() => {
         if (filteredPosts.length > 0) {
@@ -232,6 +233,29 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
         };
         fetchBookmarks();
     }, []);
+
+    useEffect(() => {
+        const fetchPostHugs = async () => {
+            try {
+                if (posts.length === 0) {
+                    return;
+                }
+
+                const hugsResult = await Promise.all(
+                    posts.map(post => PostServices.getPostHugs(post.id))
+                );
+
+                const allHugs = hugsResult.flat().filter(Boolean);
+
+                setUserPostHugs(allHugs);
+            }
+            catch (error) {
+                console.error("Error fetching post hugs:", error);
+            }
+        };
+
+        fetchPostHugs();
+    }, [posts]);
 
     useEffect(() => {
         if (!isDesktop) {
@@ -390,6 +414,8 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
                                         userBookmarks={userBookmarks}
                                         currentUser={currentUser}
                                         setUserBookmarks={setUserBookmarks}
+                                        userPostHugs={userPostHugs}
+                                        setUserPostHugs={setUserPostHugs}
                                     />
                                 ))
                             ) : (

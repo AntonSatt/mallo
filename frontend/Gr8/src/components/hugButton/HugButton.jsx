@@ -16,7 +16,11 @@ import {
 } from "@mui/material";
 
 //this component is used for both posts and comments, it takes in the type and id of the post/comment to know which one to hug.
-const HugButton = ({ type, id }) => {
+const HugButton = ({
+    type,
+    id,
+    userPostHugs,
+    userCommentHugs }) => {
     const { currentUser } = useAuth();
     const { isDesktop } = useViewport();
     const [hugged, setHugged] = useState(false);
@@ -24,6 +28,13 @@ const HugButton = ({ type, id }) => {
 
     //this function is called when the user clicks the hug button, it sends a request to the backend to 
     // hug the post/comment and updates the state accordingly.
+    const alreadyHugged =
+        type === "post"
+            ? Array.isArray(userPostHugs) && userPostHugs.some(hug => hug.postId === id)
+            : Array.isArray(userCommentHugs) && userCommentHugs.some(hug => hug.commentId === id);
+
+    const isHugged = hugged || alreadyHugged;
+
     const handleHug = async () => {
         try {
             if (!currentUser?.sub) {
@@ -62,7 +73,7 @@ const HugButton = ({ type, id }) => {
     return (
         <>
             <IconButton aria-label="hug" onClick={handleHug} className="hug-button">
-                <img src={hugged ? Hugged : Hug} alt="" className="hug-icon"></img>
+                <img src={isHugged ? Hugged : Hug} alt="" className="hug-icon" />
             </IconButton>
 
             <Dialog open={open} onClose={() => setOpen(false)} className="hug-dialog"

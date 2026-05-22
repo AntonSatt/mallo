@@ -10,6 +10,7 @@ import Navbar from "../../components/layout/Navbar.jsx";
 import ForumPage from "../forum/ForumPage.jsx";
 import ChatPage from '../chat/ChatPage';
 import ConversationPage from '../chat/ConversationPage';
+import ActivityPage from "../activity/ActivityPage.jsx";
 
 const Homepage = ({ page }) => {
     const { isDesktop } = useViewport();
@@ -47,6 +48,11 @@ const Homepage = ({ page }) => {
                             {page === "conversation" && (
                                 <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
                                     <ConversationPage />
+                                </Box>
+                            )}
+                            {page== "maps" && (
+                                <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
+                                    <ActivityPage />
                                 </Box>
                             )}
                         </Stack>

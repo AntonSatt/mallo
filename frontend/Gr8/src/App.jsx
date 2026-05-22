@@ -28,7 +28,7 @@ function App() {
           <Route path='/forum' element={<ProtectedRoute><HomePage page="forum" /></ProtectedRoute>} />
           <Route path='/message' element={<ProtectedRoute><HomePage page="message" /></ProtectedRoute>} />
           <Route path='/message/:userId' element={<ProtectedRoute><HomePage page="conversation" /></ProtectedRoute>} />
-          <Route path='/maps' element={<ProtectedRoute><ActivityPage /></ProtectedRoute>} />
+          <Route path='/maps' element={<ProtectedRoute><HomePage page="maps" /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

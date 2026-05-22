@@ -6,6 +6,8 @@
         {
             CommunityEndpoints.MapCommunityEndpoints(app);
             IdentityEndpoints.MapIdentityEndpoints(app);
+            ActivityEndpoints.MapActivityEndpoints(app);
+            ChatEndpoints.MapChatEndpoints(app);
         }
     }
 }

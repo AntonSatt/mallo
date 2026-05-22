@@ -1,14 +1,17 @@
 using Gr8.Api.Endpoints;
 using Gr8.Application.Common.Constants;
 using Gr8.Infrastructure;
-using Gr8.Infrastructure.Persistence;
-using Scalar.AspNetCore;
+using Gr8.Infrastructure.Hubs;
 using Gr8.Infrastructure.Identity;
+using Gr8.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 using System.Text;
 using Prometheus;
+using Gr8.Application.Interfaces;
+using Gr8.Infrastructure.Services;
 
 namespace Gr8
 {
@@ -39,6 +42,29 @@ namespace Gr8
                         IssuerSigningKey = new SymmetricSecurityKey(
                             Encoding.UTF8.GetBytes(jwtSettings.Key))
                     };
+
+                    // Allows SignalR connections to authenticate using JWT tokens from the query string.
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"].FirstOrDefault();
+
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                accessToken.StartsWith("Bearer "))
+                            {
+                                accessToken = accessToken["Bearer ".Length..].Trim();
+                            }
+
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                context.HttpContext.Request.Path.StartsWithSegments("/chat"))
+                            {
+                                context.Token = accessToken;
+                            }
+
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             builder.Services.AddAuthorization(options =>
@@ -57,6 +83,12 @@ namespace Gr8
                 //});
             });
 
+            // Add HttpClient dependency injection for MapBoxService with baseurl settings
+            builder.Services.AddHttpClient<IMapBoxService, MapBoxService>(client =>
+            {
+                client.BaseAddress = new Uri(builder.Configuration.GetSection("Mapbox:BaseUrl").Get<string>() ?? "https://api.mapbox.com/");
+            });
+
             var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
                               ?? new[] { "http://localhost:5173" };
 
@@ -66,13 +98,16 @@ namespace Gr8
                 {
                     policy.WithOrigins(corsOrigins)
                         .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        .AllowAnyMethod()
+                        .AllowCredentials(); // authentication via JWT/websocket.
                 });
             });
 
             builder.Services.AddOpenApi();
 
             builder.Services.AddInfrastructure(builder.Configuration);
+
+            builder.Services.AddSignalR();
 
             var app = builder.Build();
 
@@ -104,6 +139,8 @@ namespace Gr8
             app.MapMetrics();
 
             app.MapEndpoints();
+
+            app.MapHub<ChatHub>("/chat/hub");
 
             app.Run();
         }

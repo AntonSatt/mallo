@@ -1,0 +1,110 @@
+.sidebar-calendar-container {
+    align-items: center;
+    background-color: var(--color-primary-soft);    
+    padding: 15px;
+    border-radius: 15px;
+    width: 100%;
+    box-sizing: border-box;
+    flex: 1; 
+    box-sizing: border-box;
+    border: 1px solid var(--color-border-light);
+}
+
+.activity-container {
+    background-color: var(--color-text-inverse);
+    border-radius: 20px;
+    padding: 8px 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    width: 100%;           
+    max-width: 500px;      
+    box-sizing: border-box; 
+    overflow: hidden;    
+}
+
+.activity-title {
+    padding: 5px 20px;
+    font-size: 1.3rem !important;
+}
+
+.calendar-container{
+    border-radius: 15px;
+    padding: 10px;
+    width: 100%;
+    display: block;
+    background-color: #f9f9f8;
+}
+
+.sidebar-calendar-container .create-post-input .MuiInputBase-root {
+    justify-content: center;
+}
+
+.sidebar-calendar-container .create-post-input input {
+    width: 120px; 
+}
+
+.create-post-input .MuiOutlinedInput-root {
+    background-color: var(--color-text-inverse) !important;
+}
+
+.calendar{
+    width: 100% !important;
+}
+
+.custom-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+}
+
+.nav-arrow {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--color-text-inverse);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.date-selection-container {
+    display: flex;
+    gap: 8px;
+}
+
+.select-date {
+    background-color: var(--color-text-inverse);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 800;
+    position: relative;
+    text-transform: capitalize;
+}
+
+.orange-corner {
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    border-style: solid;
+    border-width: 0 0 7px 7px;
+    border-color: var(--color-primary) transparent;
+}
+
+.button-wrapper{
+    margin-top: 20px;
+    gap: 12px;
+    padding: 0px 10px 10px 10px;
+}
+
+.button-choice{
+    flex: 1;
+    background-color: var(--color-primary-soft) !important;
+    gap: 5px;
+}
+
+.button-title{
+    color: var(--color-text-main);
+}

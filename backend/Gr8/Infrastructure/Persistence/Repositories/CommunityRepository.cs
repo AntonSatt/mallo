@@ -1,11 +1,7 @@
 ﻿using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
+using Gr8.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.ComponentModel.Design;
-using System.Text;
 
 namespace Gr8.Infrastructure.Persistence.Repositories
 {
@@ -154,6 +150,110 @@ namespace Gr8.Infrastructure.Persistence.Repositories
                 .Where(c => c.PostId == postId)
                 .Where(c => !c.IsDeleted)
                 .CountAsync();
+        }
+
+        public async Task<List<int>> GetUserTagIdsAsync(string userId)
+        {
+            return await _communityDbContext.Set<ApplicationUser>()
+                .Where(u => u.Id == userId)
+                .SelectMany(u => u.Tags.Select(t => t.Id))
+                .OrderBy(id => id)
+                .ToListAsync();
+        }
+
+        public async Task<List<int>> GetExistingTagIdsAsync(List<int> tagIds)
+        {
+            if (tagIds.Count == 0)
+            {
+                return new List<int>();
+            }
+
+            return await _communityDbContext.Tags
+                .Where(t => tagIds.Contains(t.Id))
+                .Select(t => t.Id)
+                .ToListAsync();
+        }
+
+        public async Task ReplaceUserTagIdsAsync(string userId, List<int> tagIds)
+        {
+            var user = await _communityDbContext.Set<ApplicationUser>()
+                .Include(u => u.Tags)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return;
+            }
+
+            user.Tags.Clear();
+
+            if (tagIds.Count > 0)
+            {
+                var tags = await _communityDbContext.Tags
+                    .Where(t => tagIds.Contains(t.Id))
+                    .ToListAsync();
+
+                foreach (var tag in tags)
+                {
+                    user.Tags.Add(tag);
+                }
+            }
+
+            await _communityDbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<Activity>> GetAllActivitiesAsync()
+        {
+            return await _communityDbContext.Activities
+                .Where(a => !a.IsDeleted)
+                .ToListAsync();
+        }
+
+        public async Task<Activity?> GetActivityByIdAsync(int id)
+        {
+            return await _communityDbContext.Activities
+                .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
+        }
+
+        public async Task AddActivityAsync(Activity activity)
+        {
+            await _communityDbContext.Activities.AddAsync(activity);
+        }
+
+        public async Task UpdateActivityAsync(Activity activity)
+        {
+            _communityDbContext.Activities.Update(activity);
+            await Task.CompletedTask;
+        }
+
+        public async Task DeleteActivityAsync(Activity activity)
+        {
+            activity.IsDeleted = true;
+            _communityDbContext.Activities.Update(activity);
+            await Task.CompletedTask;
+        }
+
+        public Task<ActivityBookmark?> GetActivityBookmarkAsync(int activityId, string userId)
+        {
+            return _communityDbContext.ActivityBookmarks
+                .FirstOrDefaultAsync(ab => ab.ActivityId == activityId && ab.UserId == userId);
+        }
+
+        public void RemoveActivityBookmark(ActivityBookmark bookmark)
+        {
+            _communityDbContext.ActivityBookmarks.Remove(bookmark);
+        }
+
+        public async Task AddActivityBookmarkAsync(ActivityBookmark bookmark)
+        {
+            await _communityDbContext.ActivityBookmarks.AddAsync(bookmark);
+        }
+
+        public Task<List<ActivityBookmark>> GetAllActivityBookmarksByUserIdAsync(string userId)
+        {
+            return _communityDbContext.ActivityBookmarks
+                .Where(ab => ab.UserId == userId)
+                .ToListAsync();
         }
     }
 }

@@ -79,7 +79,7 @@ const Step3 = ({ formData, handleChange, onNext, error }) => {
                 type="password"
                 sx={{
                     "& .MuiOutlinedInput-input": {
-                        textAlign: "center"
+                        textAlign: "center",
                     },
                     "& .MuiOutlinedInput-root": {
                         height: 40,

@@ -13,9 +13,16 @@ namespace Gr8.Api.Endpoints
     {
         public static void MapCommunityEndpoints(WebApplication app)
         {
-            app.MapGet("/forum/posts", async ([FromServices] IPostService postService) =>
+            app.MapGet("/forum/posts", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IPostService postService) =>
             {
-                var posts = await postService.GetAllPostsAsync();
+                var appUser = await userManager.GetUserAsync(user);
+
+                if (appUser == null)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var posts = await postService.GetAllPostsAsync(appUser.Id);
 
                 if (posts.Count == 0)
                 {

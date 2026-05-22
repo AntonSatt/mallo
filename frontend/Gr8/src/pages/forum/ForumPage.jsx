@@ -8,7 +8,6 @@ import { useAuth } from "../../hooks/useAuth";
 import useViewport from "../../hooks/useViewport";
 import FilterPost from "../../components/filterPost/FilterPost.jsx";
 import PostCard from "../../components/postCard/PostCard.jsx";
-import ProfileBar from "../../components/layout/ProfileBar.jsx";
 import PostActionsDialog from "../../components/postActionsDialog/PostActionsDialog.jsx";
 
 import {
@@ -21,13 +20,12 @@ import {
 
 import { useEffect, useState, useMemo, useRef } from "react";
 
-const ForumPage = () => {
+const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
     const { currentUser } = useAuth();
     const { isDesktop } = useViewport();
     const scrollAreaRef = useRef(null);
 
     const [expanded, setExpanded] = useState(null);
-    const [openPostModal, setPostModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
     const [openReportModal, setOpenReportModal] = useState(false);
 
@@ -38,7 +36,6 @@ const ForumPage = () => {
 
     const [activeNavCategory, setActiveNavCategory] = useState("Alla");
     const [filterAnchorEl, setFilterAnchorEl] = useState(null);
-    const [searchQuery, setSearchQuery] = useState("");
     const [checkedCategories, setCheckedCategories] = useState([]);
     const [categories, setCategories] = useState([]);
     const [userBookmarks, setUserBookmarks] = useState([]);
@@ -55,14 +52,9 @@ const ForumPage = () => {
         setDeletePostId(null);
     };
 
-    // Opens the post creation modal
-    const handleClickOpen = () => {
-        setPostModalOpen(true);
-    };
-
     // Closes the post creation modal
     const handleClose = async () => {
-        setPostModalOpen(false);
+        setOpenModal(false);
     };
 
     // Toggles the expansion of the comment section for a post
@@ -154,7 +146,7 @@ const ForumPage = () => {
     }
 
     return result;
-}, [posts, activeNavCategory, checkedCategories, userBookmarks, searchQuery]);
+}, [posts, activeNavCategory, checkedCategories, userBookmarks, searchQuery, currentUser?.sub]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -257,9 +249,8 @@ const ForumPage = () => {
     return (
         <>
             <div className="forum-page">
-                <div className="forum-container">
 
-                    {!isDesktop && <ProfileBar showCreate onCreatePost={handleClickOpen} onSearch={setSearchQuery} />}
+                <div className="forum-container">
 
                     <DeletePost
                         postId={deletePostId}
@@ -294,7 +285,7 @@ const ForumPage = () => {
                     />
 
                     <Dialog
-                        open={openPostModal}
+                        open={openModal}
                         onClose={handleClose}
                         fullWidth
                         maxWidth="sm"
@@ -337,10 +328,13 @@ const ForumPage = () => {
                         sx={{
                             width: "100%",
 
-                            height: { xs: "auto", md: "auto" },
+                            height: { xs: "auto", md: "100%" },
+                            maxHeight: { md: "100%" },
 
-                            overflowY: { xs: "visible", md: "auto" },
+                            overflowY: { xs: "visible", md: "scroll" },
                             overflowX: "hidden",
+                            scrollbarWidth: { md: "thin" },
+                            scrollbarColor: { md: "white transparent" },
 
                             '&::-webkit-scrollbar': { width: '6px', },
 

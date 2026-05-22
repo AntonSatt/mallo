@@ -21,24 +21,11 @@
 
 /*---------- MEDIA QUERIES --------*/
 @media (min-width: 1024px) {
-    /* Desktop styles can be added here if needed. */
-    .protected-route-layout:has(.forum-page) {
-        height: 100dvh;
-        min-height: 100dvh;
-        overflow: hidden;
-    }
-
-    .protected-route-layout:has(.forum-page) .protected-route-content {
-        height: calc(100dvh - var(--protected-nav-height) - 2px);
-        min-height: 0;
-        overflow: hidden;
-    }
-
     .forum-page {
         height: 100%;
         min-height: 0;
         overflow: hidden;
-        padding: 13px 0 0;
+        padding: 0;
         box-sizing: border-box;
     }
 

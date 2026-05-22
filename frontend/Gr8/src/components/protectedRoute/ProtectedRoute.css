@@ -1,7 +1,7 @@
 .protected-route-layout {
     height: 100dvh;
+    min-height: 100dvh;
     background-color: var(--color-primary-bg);
-    overflow: hidden;
 }
 
 .protected-route-nav {
@@ -13,32 +13,32 @@
 .protected-route-content {
     min-height: 0;
     box-sizing: border-box;
-    padding-bottom: var(--protected-nav-height);
+    padding-bottom: 0;
     background-color: inherit;
-    overflow-y: auto;
-}
-
-.protected-route-layout:has(.forum-page) {
-    height: auto;
-    min-height: 100dvh;
-    overflow-x: hidden;
-    overflow-y: visible;
-}
-
-.protected-route-layout:has(.forum-page) .protected-route-content {
-    overflow: visible;
 }
 
 @media (min-width: 1024px) {
     .protected-route-layout {
         height: auto;
-        min-height: 100dvh;
         overflow: visible;
     }
 
     .protected-route-content {
-        min-height: calc(100dvh - var(--protected-nav-height) - 2px);
+        min-height: 0;
         padding-bottom: 0;
         overflow: visible;
+    }
+
+    .protected-route-layout:has(.forum-page) {
+        height: 100dvh;
+        min-height: 100dvh;
+        overflow: hidden;
+    }
+
+    .protected-route-layout:has(.forum-page) .protected-route-content {
+        height: 100%;
+        min-height: 0;
+        padding-bottom: 0;
+        overflow: hidden;
     }
 }

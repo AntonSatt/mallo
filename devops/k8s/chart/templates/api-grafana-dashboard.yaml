@@ -1,0 +1,147 @@
+{{- $component := "api" -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "gr8.fullname" (dict "Release" .Release "component" $component) }}-dashboard
+  labels:
+    {{- include "gr8.labels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ $component }}
+    grafana_dashboard: "1"
+data:
+  gr8-api-dashboard.json: |
+    {
+      "title": "{{ .Release.Name }} API",
+      "uid": "{{ .Release.Name }}-api",
+      "schemaVersion": 39,
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "refresh": "30s",
+      "tags": ["chas-academy", "gr8", "api"],
+      "templating": {
+        "list": [
+          {
+            "name": "namespace",
+            "type": "query",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
+            "query": "label_values(http_requests_received_total, namespace)",
+            "current": {
+              "text": "doe25-group-8",
+              "value": "doe25-group-8"
+            },
+            "refresh": 1,
+            "includeAll": false
+          }
+        ]
+      },
+      "panels": [
+        {
+          "id": 1,
+          "type": "timeseries",
+          "title": "Request rate by endpoint",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 0
+          },
+          "targets": [
+            {
+              "expr": "sum by (endpoint) (rate(http_requests_received_total{namespace=\"$namespace\",endpoint!=\"/metrics\"}[1m]))",
+              "legendFormat": "{{ "{{" }}endpoint{{ "}}" }}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps"
+            }
+          }
+        },
+        {
+          "id": 2,
+          "type": "timeseries",
+          "title": "5xx error rate",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 0
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(http_requests_received_total{namespace=\"$namespace\",code=~\"5..\",endpoint!=\"/metrics\"}[5m])) / clamp_min(sum(rate(http_requests_received_total{namespace=\"$namespace\",endpoint!=\"/metrics\"}[5m])), 1)",
+              "legendFormat": "5xx ratio",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percentunit",
+              "min": 0
+            }
+          }
+        },
+        {
+          "id": 3,
+          "type": "timeseries",
+          "title": "Latency p95 by endpoint",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 8
+          },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, sum by (endpoint, le) (rate(http_request_duration_seconds_bucket{namespace=\"$namespace\",endpoint!=\"/metrics\"}[5m])))",
+              "legendFormat": "{{ "{{" }}endpoint{{ "}}" }}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s"
+            }
+          }
+        },
+        {
+          "id": 4,
+          "type": "stat",
+          "title": "Requests last 5m by code",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 8
+          },
+          "targets": [
+            {
+              "expr": "sum by (code) (increase(http_requests_received_total{namespace=\"$namespace\",endpoint!=\"/metrics\"}[5m]))",
+              "legendFormat": "{{ "{{" }}code{{ "}}" }}",
+              "refId": "A"
+            }
+          ]
+        }
+      ]
+    }

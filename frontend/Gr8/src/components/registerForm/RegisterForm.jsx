@@ -4,6 +4,7 @@ import { useAuth } from "../../hooks/useAuth";
 import Step1 from "./steps/Step1";
 import Step2 from "./steps/Step2";
 import Step3 from "./steps/Step3";
+import RegisterErrorDialog from "./RegisterErrorDialog.jsx";
 
 // Main container for the multi-step registration process. 
 // Manages form state, handles step-specific validation, and executes the final registration call.
@@ -18,8 +19,33 @@ const RegisterForm = ({ step, setStep }) => {
     avatar: 0
   });
 
-  const [error, setError] = useState("");
+  const [error, setError] = useState({});
+  const [registerErrorOpen, setRegisterErrorOpen] = useState(false);
+  const [registerErrorMessage, setRegisterErrorMessage] = useState("Något gick fel vid registreringen. Försök igen.");
   const { register } = useAuth();
+
+  const getRegistrationErrorMessage = (err) => {
+    const serverData = err?.response?.data;
+
+    if (typeof serverData === "string" && serverData.trim()) {
+      return serverData;
+    }
+
+    if (Array.isArray(serverData) && serverData.length > 0) {
+      const first = serverData[0];
+      if (typeof first === "string" && first.trim()) {
+        return first;
+      }
+      if (typeof first?.description === "string" && first.description.trim()) {
+        return first.description;
+      }
+      if (typeof first?.errorMessage === "string" && first.errorMessage.trim()) {
+        return first.errorMessage;
+      }
+    }
+
+    return "Något gick fel vid registreringen. Försök igen.";
+  };
 
   // Updates form state and manages field-specific error clearing
   const handleChange = (e) => {
@@ -119,7 +145,8 @@ const RegisterForm = ({ step, setStep }) => {
       setStep(4); // success screen 
 
     } catch (err) {
-      setError(err?.message || "Registrering misslyckades.");
+      setRegisterErrorMessage(getRegistrationErrorMessage(err));
+      setRegisterErrorOpen(true);
     }
   };
 
@@ -164,6 +191,12 @@ const RegisterForm = ({ step, setStep }) => {
           onBack={() => setStep(2)}
         />
       )}
+
+      <RegisterErrorDialog
+        open={registerErrorOpen}
+        onClose={() => setRegisterErrorOpen(false)}
+        message={registerErrorMessage}
+      />
 
     </section>
   );

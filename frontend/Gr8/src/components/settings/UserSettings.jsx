@@ -39,7 +39,7 @@ import SettingsButtonStyles from "../../design/buttons/SettingsButton.jsx";
 
 const UserSettings = () => {
 
-    const { logout } = useAuth();
+    const { logout, refreshCurrentUser } = useAuth();
     const { deleteAccount } = useAuth();
     const [profileData, setProfileData] = useState({
         avatar: null,
@@ -169,6 +169,7 @@ const UserSettings = () => {
 
         try {
             await UserServices.updateUser(profileData);
+            refreshCurrentUser();
         }
         catch (error) {
             if (error.response && error.response.status === 409) {

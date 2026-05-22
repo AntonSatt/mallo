@@ -143,6 +143,34 @@ namespace Gr8.Api.Endpoints
                 }
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapGet("/map/activities/bookmarks", async (ClaimsPrincipal user, UserManager<ApplicationUser> userManager, [FromServices] IActivityBookmarkService activityBookmarkService) =>
+            {
+                var appUser = await userManager.GetUserAsync(user);
+                if (appUser == null) return Results.Unauthorized();
+
+                var bookmarks = await activityBookmarkService.GetAllActivityBookmarksByUserIdAsync(appUser.Id);
+                return Results.Ok(bookmarks);
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPost("/map/activities/{activityId}/bookmark", async (int activityId, ClaimsPrincipal user, UserManager<ApplicationUser> userManager, [FromServices] IActivityBookmarkService activityBookmarkService) =>
+            {
+                var appUser = await userManager.GetUserAsync(user);
+                if (appUser == null) return Results.Unauthorized();
+
+                var isBookmarked = await activityBookmarkService.ToggleActivityBookmarkAsync(activityId, appUser.Id);
+                return Results.Ok(new { isBookmarked });
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapDelete("/map/activities/{activityId}/bookmark", async (int activityId, ClaimsPrincipal user, UserManager<ApplicationUser> userManager, [FromServices] IActivityBookmarkService activityBookmarkService) =>
+            {
+                var appUser = await userManager.GetUserAsync(user);
+                if (appUser == null) return Results.Unauthorized();
+                var isBookmarked = await activityBookmarkService.ToggleActivityBookmarkAsync(activityId, appUser.Id);
+                return Results.Ok(new { isBookmarked });
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
         }
     }
 }

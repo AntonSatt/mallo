@@ -14,6 +14,7 @@ namespace Gr8.Infrastructure.Persistence
         public DbSet<Hug> Hugs => Set<Hug>();
         public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
         public DbSet<Activity> Activities => Set<Activity>();
+        public DbSet<ActivityBookmark> ActivityBookmarks => Set<ActivityBookmark>();
 
         public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
         {

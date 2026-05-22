@@ -37,6 +37,7 @@ namespace Gr8.Infrastructure
             services.AddScoped <IBookmarkService,BookmarkService>();
             services.AddScoped<IActivityService, ActivityService>();
             services.AddScoped<IUserTagService, UserTagService>();
+            services.AddScoped<IActivityBookmarkService, ActivityBookmarkService>();
 
             // Configure ASP.NET Core Identity to use the ApplicationUser and ApplicationRole classes, and to use Entity Framework Core for storage
             services.AddIdentity<ApplicationUser, ApplicationRole>()

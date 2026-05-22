@@ -1,5 +1,6 @@
 import { Box, ClickAwayListener, Dialog, DialogContent, Typography } from "@mui/material";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
+import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded";
 import PrimaryButton from "../../design/buttons/PrimaryButton.jsx";
 
 const successMessages = {
@@ -8,8 +9,17 @@ const successMessages = {
     triggers: "Dina triggers har sparats.",
 };
 
-const SettingsSuccessDialog = ({ open, onClose, variant = "profile" }) => {
-    const message = successMessages[variant] ?? successMessages.profile;
+const errorMessages = {
+    profile: "Kunde inte spara dina profilinställningar.",
+    password: "Kunde inte uppdatera ditt lösenord.",
+    triggers: "Kunde inte spara dina triggers.",
+};
+
+const SettingsSuccessDialog = ({ open, onClose, section = "profile", outcome = "success" }) => {
+    const isSuccess = outcome === "success";
+    const message = isSuccess
+        ? (successMessages[section] ?? successMessages.profile)
+        : (errorMessages[section] ?? errorMessages.profile);
 
     const handleDialogClose = () => {
         onClose();
@@ -47,13 +57,17 @@ const SettingsSuccessDialog = ({ open, onClose, variant = "profile" }) => {
                             width: 64,
                             height: 64,
                             borderRadius: "50%",
-                            backgroundColor: "var(--color-primary-soft)",
+                            backgroundColor: isSuccess ? "var(--color-primary-soft)" : "var(--button-danger-bg)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                         }}
                     >
-                        <CheckCircleRoundedIcon sx={{ color: "var(--color-primary)", fontSize: 36 }} />
+                        {isSuccess ? (
+                            <CheckCircleRoundedIcon sx={{ color: "var(--color-primary)", fontSize: 36 }} />
+                        ) : (
+                            <ErrorOutlineRoundedIcon sx={{ color: "var(--color-text-inverse)", fontSize: 36 }} />
+                        )}
                     </Box>
 
                     <Typography

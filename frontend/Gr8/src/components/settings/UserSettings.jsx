@@ -75,8 +75,9 @@ const UserSettings = () => {
 
     const [errors, setErrors] = useState({});
     const [expandedSection, setExpandedSection] = useState(false);
-    const [successDialogOpen, setSuccessDialogOpen] = useState(false);
-    const [successDialogVariant, setSuccessDialogVariant] = useState("profile");
+    const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+    const [statusDialogSection, setStatusDialogSection] = useState("profile");
+    const [statusDialogOutcome, setStatusDialogOutcome] = useState("success");
 
     const [showCurrentPassword] = useState(false);
     const [showNewPassword] = useState(false);
@@ -112,13 +113,14 @@ const UserSettings = () => {
         setOpen(false);
     };
 
-    const openSuccessDialog = (variant) => {
-        setSuccessDialogVariant(variant);
-        setSuccessDialogOpen(true);
+    const openStatusDialog = (section, outcome) => {
+        setStatusDialogSection(section);
+        setStatusDialogOutcome(outcome);
+        setStatusDialogOpen(true);
     };
 
-    const closeSuccessDialog = () => {
-        setSuccessDialogOpen(false);
+    const closeStatusDialog = () => {
+        setStatusDialogOpen(false);
     };
 
     useEffect(() => {
@@ -182,7 +184,7 @@ const UserSettings = () => {
         try {
             await UserServices.updateUser(profileData);
             refreshCurrentUser();
-            openSuccessDialog("profile");
+            openStatusDialog("profile", "success");
         }
         catch (error) {
             if (error.response && error.response.status === 409) {
@@ -194,6 +196,7 @@ const UserSettings = () => {
             else {
                 setErrors({ general: "Kunde inte spara inställningarna. Försök igen senare." })
             }
+            openStatusDialog("profile", "error");
         }
 
     };
@@ -203,9 +206,10 @@ const UserSettings = () => {
 
         try {
             await UserServices.updateUserTags(selectedTags);
-            openSuccessDialog("triggers");
+            openStatusDialog("triggers", "success");
         } catch (error) {
             console.error("Kunde inte uppdatera triggers", error);
+            openStatusDialog("triggers", "error");
         }
     };
 
@@ -220,10 +224,10 @@ const UserSettings = () => {
         try {
             await UserServices.updatePassword(passwordData);
             setPasswordData({ currentPassword: "", newPassword: "", confirmNewPassword: "" });
-            openSuccessDialog("password");
+            openStatusDialog("password", "success");
         }
         catch (e) {
-            const serverErrors = e.response.data;
+            const serverErrors = Array.isArray(e?.response?.data) ? e.response.data : [];
             let newErrors = {};
             let hasPasswordError = false;
 
@@ -243,7 +247,12 @@ const UserSettings = () => {
                 newErrors.confirmNewPassword = allRequirements;
             }
 
+            if (Object.keys(newErrors).length === 0) {
+                newErrors = { general: "Kunde inte uppdatera lösenordet. Försök igen senare." };
+            }
+
             setErrors(newErrors);
+            openStatusDialog("password", "error");
         }
     };
 
@@ -632,9 +641,10 @@ const UserSettings = () => {
                 </Dialog>
 
                 <SettingsSuccessDialog
-                    open={successDialogOpen}
-                    onClose={closeSuccessDialog}
-                    variant={successDialogVariant}
+                    open={statusDialogOpen}
+                    onClose={closeStatusDialog}
+                    section={statusDialogSection}
+                    outcome={statusDialogOutcome}
                 />
             </Box>
         </>

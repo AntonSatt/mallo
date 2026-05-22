@@ -9,6 +9,22 @@
     margin: 0 auto;
 }
 
+.forum-empty-state-panel {
+    background-color: var(--color-bg-surface);
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.08);
+    margin: 8px 0;
+    padding: 0 12px 12px 12px;
+}
+
+.forum-empty-state {
+    color: var(--color-text-main) !important;
+    opacity: 0.6;
+    font-style: italic;
+    padding: 18px 10px;
+    text-align: center;
+}
+
 /* targeting MUI wrapper */
 .create-post .MuiInputAdornment-root {
     margin-right: 8px;

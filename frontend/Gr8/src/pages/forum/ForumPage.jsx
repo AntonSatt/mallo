@@ -16,6 +16,7 @@ import {
     Dialog,
     DialogTitle,
     DialogActions,
+    Typography,
 } from "@mui/material";
 
 import { useEffect, useState, useMemo, useRef } from "react";
@@ -147,6 +148,34 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
 
     return result;
 }, [posts, activeNavCategory, checkedCategories, userBookmarks, searchQuery, currentUser?.sub]);
+
+    const emptyStateMessage = useMemo(() => {
+        if (filteredPosts.length > 0) {
+            return "";
+        }
+
+        if (searchQuery.trim()) {
+            return "Inga inlägg matchade din sökning.";
+        }
+
+        if (activeNavCategory === "Sparade") {
+            return "Du har inga sparade inlägg ännu.";
+        }
+
+        if (activeNavCategory === "Dina inlägg") {
+            return "Du har inte skapat några inlägg ännu.";
+        }
+
+        if (checkedCategories.length > 0) {
+            return "Det finns inga inlägg i de valda kategorierna just nu.";
+        }
+
+        if (activeNavCategory !== "Alla") {
+            return `Det finns inga inlägg i kategorin ${activeNavCategory} ännu.`;
+        }
+
+        return "Det finns inga inlägg att visa just nu.";
+    }, [filteredPosts.length, searchQuery, activeNavCategory, checkedCategories.length]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -350,18 +379,26 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
                             {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
                     each post. The PostCard component is responsible for displaying the post content, as well as handling the 
                     expand/collapse of the comment section and the menu actions for reporting, editing, and deleting posts. */}
-                            {filteredPosts.map((post) => (
-                                <PostCard
-                                    key={post.id}
-                                    post={post}
-                                    expanded={expanded === post.id}
-                                    onExpand={() => handleExpandClick(post.id)}
-                                    onMenuOpen={(event) => handleMenuOpen(event, post.id)}
-                                    userBookmarks={userBookmarks}
-                                    currentUser={currentUser}
-                                    setUserBookmarks={setUserBookmarks}
-                                />
-                            ))}
+                            {filteredPosts.length > 0 ? (
+                                filteredPosts.map((post) => (
+                                    <PostCard
+                                        key={post.id}
+                                        post={post}
+                                        expanded={expanded === post.id}
+                                        onExpand={() => handleExpandClick(post.id)}
+                                        onMenuOpen={(event) => handleMenuOpen(event, post.id)}
+                                        userBookmarks={userBookmarks}
+                                        currentUser={currentUser}
+                                        setUserBookmarks={setUserBookmarks}
+                                    />
+                                ))
+                            ) : (
+                                <Box className="forum-empty-state-panel">
+                                    <Typography className="forum-empty-state">
+                                        {emptyStateMessage}
+                                    </Typography>
+                                </Box>
+                            )}
                         </Box>
                     </Box>
                 </div>

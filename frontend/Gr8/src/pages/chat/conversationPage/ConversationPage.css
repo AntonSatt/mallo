@@ -25,6 +25,7 @@
         width: var(--content-width-desktop);
         max-width: var(--content-width-desktop);
         height: 100%;
+        max-height: 100%;
         margin: 0 auto;
         background-color: var(--button-secondary-bg);
         border-radius: 10px;
@@ -32,5 +33,11 @@
         box-sizing: border-box;
         overflow: hidden;
         border: 1px solid var(--color-border-light);
+    }
+
+    .conversation-content {
+        height: 100%;
+        max-height: 100%;
+        min-height: 0;
     }
 }

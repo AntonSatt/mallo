@@ -146,15 +146,15 @@ const ConversationPage = () => {
 
     return (
         <div className="conversation-page">
-            <div clasName="conversation-container">
-                <Box
+            <div className="conversation-container">
+                <Box className="conversation-content"
                     sx={{
                         height: "calc(100dvh - var(--protected-nav-height) - 4px)",
                         backgroundColor: "var(--color-bg-main)",
                         display: "flex",
                         flexDirection: "column",
                         overflow: "hidden",
-                        pb: "calc(8px + var(--protected-nav-height))",
+                        pb: isDesktop ? 1 : "calc(8px + var(--protected-nav-height))",
                     }}
                 >
                     <Box

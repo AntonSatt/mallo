@@ -55,13 +55,13 @@
         overflow: hidden;
     }
 
-    .protected-route-layout:has(.chonversation-page) {
+    .protected-route-layout:has(.conversation-page) {
         height: 100dvh;
         min-height: 100dvh;
         overflow: hidden;
     }
 
-    .protected-route-layout:has(.chonversation-page) .protected-route-content {
+    .protected-route-layout:has(.conversation-page) .protected-route-content {
         height: 100%;
         min-height: 0;
         padding-bottom: 0;

@@ -33,4 +33,24 @@
         overflow: hidden;
         border: 1px solid var(--color-border-light);
     }
+
+    .forum-container .scrollbar {
+        flex: 1;
+        min-height: 0;
+        scrollbar-width: thin;
+        scrollbar-color: #fff transparent;
+    }
+
+    .chat-container .scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-container .scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .chat-container .scrollbar::-webkit-scrollbar-thumb {
+        background-color: #fff;
+        border-radius: 10px;
+    }
 }

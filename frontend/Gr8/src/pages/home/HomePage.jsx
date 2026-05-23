@@ -8,7 +8,7 @@ import { useState } from "react";
 import { Stack, Box } from "@mui/material";
 import Navbar from "../../components/layout/Navbar.jsx";
 import ForumPage from "../forum/ForumPage.jsx";
-import ChatPage from '../chat/ChatPage';
+import ChatPage from '../chat/chatPage/ChatPage';
 import Settings from "../settings/SettingsPage.jsx";
 import ConversationPage from '../chat/ConversationPage';
 

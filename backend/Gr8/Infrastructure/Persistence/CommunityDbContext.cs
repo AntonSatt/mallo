@@ -15,6 +15,7 @@ namespace Gr8.Infrastructure.Persistence
         public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
         public DbSet<Activity> Activities => Set<Activity>();
         public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
+        public DbSet<PostNotification> PostNotifications => Set<PostNotification>();
 
         public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
         {
@@ -243,7 +244,7 @@ namespace Gr8.Infrastructure.Persistence
                 entity.HasIndex(b => new { b.UserId, b.PostId }).IsUnique();
             });
 
-            modelBuilder.Entity<ChatMessage>(entity => 
+            modelBuilder.Entity<ChatMessage>(entity =>
             {
                 entity.HasKey(cm => cm.Id);
 
@@ -273,6 +274,23 @@ namespace Gr8.Infrastructure.Persistence
 
                 //Ensures fast loading of chat history by indexing the relationship between sender and receiver.
                 entity.HasIndex(cm => new { cm.SenderId, cm.ReceiverId });
+            });
+
+            modelBuilder.Entity<PostNotification>(entity =>
+            {
+                entity.HasKey(pn => pn.Id);
+
+                entity.Property(pn => pn.Content)
+                .IsRequired()
+                .HasMaxLength(500);
+                
+                entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(pn => pn.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(pn => pn.UserId);
             });
         }
     }

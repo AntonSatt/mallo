@@ -1,0 +1,36 @@
+.conversation-page {
+    min-height: auto;
+    background-color: var(--color-bg-main);
+    padding: 5px 3px;
+}
+
+.conversation-container {
+    max-width: var(--content-width-mobile);
+    margin: 0 auto;
+}
+
+/* ---------- DESKTOP ---------- */
+@media (min-width: 1024px) {
+    .conversation-page {
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .conversation-container {
+        display: flex;
+        flex-direction: column;
+        width: var(--content-width-desktop);
+        max-width: var(--content-width-desktop);
+        height: 100%;
+        margin: 0 auto;
+        background-color: var(--button-secondary-bg);
+        border-radius: 10px;
+        padding: 16px;
+        box-sizing: border-box;
+        overflow: hidden;
+        border: 1px solid var(--color-border-light);
+    }
+}

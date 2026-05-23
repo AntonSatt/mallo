@@ -54,4 +54,17 @@
         padding-bottom: 0;
         overflow: hidden;
     }
+
+    .protected-route-layout:has(.chonversation-page) {
+        height: 100dvh;
+        min-height: 100dvh;
+        overflow: hidden;
+    }
+
+    .protected-route-layout:has(.chonversation-page) .protected-route-content {
+        height: 100%;
+        min-height: 0;
+        padding-bottom: 0;
+        overflow: hidden;
+    }
 }

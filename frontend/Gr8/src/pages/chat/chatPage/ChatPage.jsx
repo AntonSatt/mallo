@@ -99,11 +99,13 @@ const ChatPage = () => {
             <div className="chat-container">
                 <Box
                     sx={{
-                        height: isDesktop ? "100%" : "calc(100dvh - var(--protected-nav-height))",
+                        flex: 1,
+                        minHeight: 0,
+                        overflowY: "auto",
                         backgroundColor: "var(--color-bg-main)",
-                        display: "flex",
-                        flexDirection: "column",
-                        overflow: "hidden"
+                        px: 2,
+                        py: 3,
+                        pb: isDesktop ? 0 : "calc(24px + var(--protected-nav-height))"
                     }}
                 >
                     <Box
@@ -114,7 +116,7 @@ const ChatPage = () => {
                             backgroundColor: "var(--color-bg-main)",
                             px: 2,
                             py: 3,
-                            pb: "calc(24px + var(--protected-nav-height))"
+                            pb: isDesktop ? 0 : "calc(24px + var(--protected-nav-height))"
                         }}
                     >
                         <Typography

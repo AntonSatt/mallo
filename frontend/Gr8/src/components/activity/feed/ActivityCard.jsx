@@ -235,7 +235,6 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                         >
                         </SecondaryButton>
 
-                        // Chat button
                         <SecondaryButton
                             onClick={(e) => {
                                 e.stopPropagation();

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ActivityServices from "../../../services/ActivityService.jsx";
 import { Paper, Box, Typography, IconButton, Collapse, Dialog } from "@mui/material";
 import BookmarkIcon from '@mui/icons-material/Bookmark';
@@ -23,6 +24,8 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const navigate = useNavigate();
 
     const isOwner = currentUserId === activity.userId;
     const dateText = dayjs(activity.startAt).format('D MMMM');
@@ -232,7 +235,13 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                         >
                         </SecondaryButton>
 
+                        // Chat button
                         <SecondaryButton
+                            onClick={(e) => {
+                                e.stopPropagation();
+
+                                navigate(`/message/${activity.userId}`);
+                            }}
                             sx={{
                                 borderRadius: "50%", height: "40px", width: "40px", minWidth: "unset",
                                 p: 0,

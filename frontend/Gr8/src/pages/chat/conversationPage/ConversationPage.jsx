@@ -166,8 +166,8 @@ const ConversationPage = () => {
                             alignItems: "center",
                             position: "relative",
                             px: 2,
-                            pt: 0,
-                            pb: 1
+                            pt: isDesktop ? 2 : 0,
+                            pb: isDesktop ? 2 : 1
                         }}
                     >
                         <IconButton
@@ -183,9 +183,15 @@ const ConversationPage = () => {
                         <Box
                             sx={{
                                 width: "100%",
-                                textAlign: "center"
+                                textAlign: isDesktop ? "left" : "center",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                flexDirection: isDesktop ? "row" : "column",
+                                gap: isDesktop ? 2 : 0,
                             }}
                         >
+
                             <Avatar
                                 className="post-avatar"
                                 avatar={conversationInfo?.avatarId}
@@ -193,11 +199,13 @@ const ConversationPage = () => {
 
                             <Typography
                                 sx={{
-                                    mt: 0.5,
+                                    mt: isDesktop ? 0 : 0.5,
                                     color: "var(--color-text-main)",
-                                    fontWeight: 300
-                                }}
-                            >
+                                    fontWeight: isDesktop ? 400 : 300,
+                                    fontSize: isDesktop ? "1.5rem" : "1rem",
+                                }} 
+                                >
+
                                 {conversationInfo?.otherUserFullName}
                             </Typography>
                         </Box>

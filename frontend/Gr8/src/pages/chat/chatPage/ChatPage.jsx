@@ -8,7 +8,7 @@ import { useEffect, useState, useRef } from "react";
 import { Box, Typography } from "@mui/material";
 
 const ChatPage = () => {
-    const { isDesktop, isTablet } = useViewport();
+    const { isDesktop } = useViewport();
     const scrollAreaRef = useRef(null);
 
     const [conversations, setConversations] = useState([]);

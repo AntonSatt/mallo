@@ -30,6 +30,7 @@ namespace Gr8.Infrastructure.Hubs
             await base.OnConnectedAsync();
         }
 
+        // Triggers automatic when a user disconnects from the signalR hub.
         public override async Task OnDisconnectedAsync(Exception? exception) 
         {
             var userId = Context.UserIdentifier;

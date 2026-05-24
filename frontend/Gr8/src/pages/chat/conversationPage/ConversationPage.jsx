@@ -7,7 +7,6 @@ import ChatService from "../../../services/ChatService.jsx";
 import ChatSignalrServices from "../../../services/ChatSignalrServices.jsx";
 import ChatWindow from "../../../components/chat/chatWindow/ChatWindow.jsx";
 import MessageInput from "../../../components/chat/messageInput/MessageInput.jsx";
-import ProfileBar from "../../../components/layout/ProfileBar.jsx";
 import Avatar from "../../../components/avatar/avatar.jsx";
 import useViewport from "../../../hooks/useViewport.js";
 

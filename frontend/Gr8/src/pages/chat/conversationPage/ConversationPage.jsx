@@ -2,6 +2,7 @@ import './ConversationPage.css';
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Box, Typography, IconButton, Paper } from "@mui/material";
+import { useOnlineUsers } from "../../../contexts/OnlineUsersContext.jsx";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ChatService from "../../../services/ChatService.jsx";
 import ChatSignalrServices from "../../../services/ChatSignalrServices.jsx";
@@ -12,6 +13,7 @@ import useViewport from "../../../hooks/useViewport.js";
 
 const ConversationPage = () => {
 
+    const { isUserOnline } = useOnlineUsers();
     const { userId } = useParams();
     const navigate = useNavigate();
     const { isDesktop } = useViewport();
@@ -176,6 +178,8 @@ const ConversationPage = () => {
         }
     };
 
+    const isOnline = isUserOnline(conversationInfo?.otherUserId);
+
     return (
         <div className="conversation-page">
             <div className="conversation-container">
@@ -223,11 +227,31 @@ const ConversationPage = () => {
                                 gap: isDesktop ? 2 : 0,
                             }}
                         >
+                            <Box
+                                sx={{
+                                    position: "relative",
+                                    width: "fit-content",
+                                    flexShrink: 0,
+                                }}
+                            >
+                                <Avatar
+                                    className="post-avatar"
+                                    avatar={conversationInfo?.avatarId}
+                                />
 
-                            <Avatar
-                                className="post-avatar"
-                                avatar={conversationInfo?.avatarId}
-                            />
+                                <Box
+                                    sx={{
+                                        position: "absolute",
+                                        top: isDesktop ? -5 : -2,
+                                        right: isDesktop ? -5 : -5,
+                                        width: isDesktop ? 14 : 12,
+                                        height: isDesktop ? 14 : 12,
+                                        borderRadius: "50%",
+                                        backgroundColor: isOnline ? "#22C55E" : "#D9D9D9",
+                                        border: "2px solid var(--color-bg-main)",
+                                    }}
+                                />
+                            </Box>
 
                             <Typography
                                 sx={{
@@ -235,9 +259,8 @@ const ConversationPage = () => {
                                     color: "var(--color-text-main)",
                                     fontWeight: isDesktop ? 400 : 300,
                                     fontSize: isDesktop ? "1.5rem" : "1rem",
-                                }} 
-                                >
-
+                                }}
+                            >
                                 {conversationInfo?.otherUserFullName}
                             </Typography>
                         </Box>

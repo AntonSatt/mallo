@@ -32,7 +32,8 @@ const ChatPage = () => {
                             const updatedConversation = {
                                 ...existingConversation,
                                 lastMessage: message.content,
-                                lastMessageAt: message.sendAt
+                                lastMessageAt: message.sendAt,
+                                hasUnreadMessage: true
                             };
 
                             const otherConversations = prevConversation.filter((conversation) =>

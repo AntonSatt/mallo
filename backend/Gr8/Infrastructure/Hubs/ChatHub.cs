@@ -17,6 +17,31 @@ namespace Gr8.Infrastructure.Hubs
             _chatService = chatService;
         }
 
+        // Triggers automatic when a user connects to the signalR hub.
+        public override async Task OnConnectedAsync() 
+        {
+            var userId = Context.UserIdentifier;
+
+            if (!string.IsNullOrEmpty(userId)) 
+            {
+                await Clients.All.UserOnline(userId);
+            }
+
+            await base.OnConnectedAsync();
+        }
+
+        public override async Task OnDisconnectedAsync(Exception? exception) 
+        {
+            var userId = Context.UserIdentifier;
+
+            if(!string.IsNullOrEmpty(userId)) 
+            {
+                await Clients.All.UserOffline(userId);
+            }
+
+            await base.OnDisconnectedAsync(exception);
+        }
+
         // Sends a chat message and broadcasts it to the receiver in real time.
         public async Task SendMessage(SendChatMessageDto dto) 
         {

@@ -54,6 +54,18 @@ class ChatSignalrService {
         await this.connection.invoke("Typing", receiverId);
     }
 
+    onUserOnline(callback){
+        if(!this.connected) return;
+
+        this.connection.on("UserOnline", callback);
+    }
+
+    onUserOffline(callback){
+        if(!this.connected) return;
+
+        this.connection.on("UserOffline", callback);
+    }
+
     async markConversationAsRead(otherUserId) {
     if (!this.connection) return;
 

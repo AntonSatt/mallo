@@ -72,6 +72,7 @@ const ChatPage = () => {
 
     }, []);
 
+    // Global scroll handler to allow scrolling the chat window when the mouse is outside of it on desktop.
     useEffect(() => {
         if (!isDesktop) {
             return;

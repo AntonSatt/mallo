@@ -25,6 +25,7 @@ const ConversationPage = () => {
 
     const typingTimeoutRef = useRef(null);
     const messageEndRef = useRef(null);
+    const chatScrollRef = useRef(null);
 
     useEffect(() => {
 
@@ -108,6 +109,36 @@ const ConversationPage = () => {
     useEffect(() => {
         messageEndRef.current?.scrollIntoView();
     }, [messages]);
+
+    // Global scroll handler to allow scrolling the chat window when the mouse is outside of it on desktop.
+    useEffect(() => {
+        if (!isDesktop) {
+            return;
+        }
+
+        const handleWheel = (event) => {
+            const chatScroll = chatScrollRef.current;
+
+            if (!chatScroll || !event.deltaY) {
+                return;
+            }
+
+            const targetInChatScroll =
+                event.target instanceof Node &&
+                chatScroll.contains(event.target);
+
+            if (targetInChatScroll) {
+                return;
+            }
+
+            chatScroll.scrollTop += event.deltaY;
+            event.preventDefault();
+        };
+
+        window.addEventListener("wheel", handleWheel, { passive: false });
+
+        return () => window.removeEventListener("wheel", handleWheel);
+    }, [isDesktop]);
 
     // Handle changes to the message input and send typing notifications to the other user.
     const handleMessageChange = (value) => {
@@ -218,6 +249,7 @@ const ConversationPage = () => {
                     )}
 
                     <Paper
+                        ref={chatScrollRef}
                         elevation={0}
                         sx={{
                             flex: 1,

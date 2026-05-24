@@ -1,6 +1,7 @@
 import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
+import { OnlineUsersProviders } from './contexts/OnlineUsersContext'
 import ProtectedRoute from './components/protectedRoute/ProtectedRoute'
 import LoginPage from './pages/login/LoginPage'
 import RegisterPage from './pages/register/RegisterPage'
@@ -17,6 +18,7 @@ import "moment/dist/locale/sv";
 function App() {
   return (
     <AuthProvider>
+      <OnlineUsersProviders>
       <Router>
         <Routes>
           <Route path='/' element={<LandingPage />} />
@@ -31,6 +33,7 @@ function App() {
           <Route path='/maps' element={<ProtectedRoute><ActivityPage /></ProtectedRoute>} />
         </Routes>
       </Router>
+      </OnlineUsersProviders>
     </AuthProvider>
   )
 }

@@ -1,10 +1,10 @@
+import './ChatPage.css';
+import { useEffect, useState, useRef } from "react";
+import { Box, Typography } from "@mui/material";
 import ConversationList from "../../../components/chat/conversationList/ConversationList.jsx";
 import ChatService from "../../../services/ChatService.jsx";
 import ChatSignalrServices from "../../../services/ChatSignalrServices.jsx";
 import useViewport from "../../../hooks/useViewport.js";
-import './ChatPage.css';
-import { useEffect, useState, useRef } from "react";
-import { Box, Typography } from "@mui/material";
 
 const ChatPage = () => {
     const { isDesktop } = useViewport();
@@ -63,7 +63,7 @@ const ChatPage = () => {
 
             } catch (error) {
                 console.error("Failed to initialize chat:", error);
-                setError(error.message || "Could not load chat.");
+                setError(error.message || "Kunde inte ladda chatten. Försök igen senare.");
             }
         };
 
@@ -112,7 +112,7 @@ const ChatPage = () => {
             );
         } catch (error) {
             console.error("Failed to delete conversation", error);
-            setError("Could not delete conversation.");
+            setError("Kunde inte radera konversationen. Försök igen senare.");
         }
     };
 

@@ -26,6 +26,7 @@ const ConversationPage = () => {
     const messageEndRef = useRef(null);
     const chatScrollRef = useRef(null);
 
+    // Load the conversation info and chat history when the component mounts or when the userId changes.
     useEffect(() => {
 
         const loadConversation = async () => {
@@ -44,7 +45,7 @@ const ConversationPage = () => {
 
             } catch (error) {
                 console.error("Failed to load conversation", error);
-                setError("Could not load conversation.");
+                setError("Kunde inte ladda konversationen. Försök igen senare.");
             }
         };
 
@@ -94,7 +95,7 @@ const ConversationPage = () => {
                 });
             } catch (error) {
                 console.error("Failed to setup SignalR", error);
-                setError("Could not connect to chat.");
+                setError("Kunde inte ansluta till chatten. Försök igen senare.");
             }
         };
 
@@ -105,6 +106,7 @@ const ConversationPage = () => {
         };
     }, [userId]);
 
+    // Scroll to the bottom of the chat window whenever new messages are received.
     useEffect(() => {
         messageEndRef.current?.scrollIntoView();
     }, [messages]);
@@ -170,7 +172,7 @@ const ConversationPage = () => {
 
         } catch (error) {
             console.error("Failed to send message", error);
-            setError("Could not send message.");
+            setError("Kunde inte skicka meddelandet. Försök igen senare.");
         }
     };
 

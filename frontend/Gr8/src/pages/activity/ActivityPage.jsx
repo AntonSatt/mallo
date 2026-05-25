@@ -19,7 +19,6 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import { Box, InputAdornment, Button, CircularProgress, Snackbar, Alert } from "@mui/material";
 import distance from "@turf/distance";
 
-
 const ActivityPage = () => {
     const { currentUser } = useAuth();
     const currentUserId = currentUser?.sub;
@@ -164,9 +163,9 @@ const ActivityPage = () => {
     // Apply filters to activities
     const filteredActivities = activities
         .map(activity => {
-            if (userCoords && activity.longitude && activity.latitude) {
+            if (userCoords) {
                 const from = [userCoords.lng, userCoords.lat];
-                const to = [Number(activity.longitude), Number(activity.latitude)];
+                const to = [activity.longitude, activity.latitude];
                 const distanceInMeters = distance(from, to, { units: 'meters' });
                 return { ...activity, distanceMeters: distanceInMeters };
             }
@@ -176,15 +175,16 @@ const ActivityPage = () => {
             // Search filter
             if (searchQuery.trim()) {
                 const q = searchQuery.toLowerCase();
-                const titleMatch = activity.title?.toLowerCase().includes(q);
-                const descMatch = activity.description?.toLowerCase().includes(q);
-                if (!titleMatch && !descMatch) return false;
+                if (
+                    !activity.title?.toLowerCase().includes(q) &&
+                    !activity.description?.toLowerCase().includes(q)
+                ) return false;
             }
 
             // Nearby filter
             if (activeFilters.nearby) {
                 if (!userCoords) return false;
-                if (!activity.distanceMeters || activity.distanceMeters > 7000) return false;
+                if (activity.distanceMeters > 7000) return false;
             }
 
             // Your activities filter
@@ -193,14 +193,8 @@ const ActivityPage = () => {
                 if (activity.userId !== currentUserId) return false;
             }
 
-            // Saved activities filter
-            if (activeFilters.savedActivities) {
-                if (!activity.isBookmarked) return false;
-            }
-
             // Time filter
             if (activeFilters.time) {
-                if (!activity.endAt) return false;
                 const now = new Date();
                 const activityEnd = new Date(activity.endAt);
                 if (activityEnd < now) return false;
@@ -210,8 +204,8 @@ const ActivityPage = () => {
         })
         .sort((a, b) => {
             if (activeFilters.time) {
-                const timeA = a.startAt ? new Date(a.startAt).getTime() : 0;
-                const timeB = b.startAt ? new Date(b.startAt).getTime() : 0;
+                const timeA = new Date(a.startAt).getTime();
+                const timeB = new Date(b.startAt).getTime();
                 return timeA - timeB;
             }
             if (a.distanceMeters && b.distanceMeters) {
@@ -238,8 +232,16 @@ const ActivityPage = () => {
 
             {/* Map - default map view with short list */}
             {alignment === 'map' && (
-                <Box className="activity-map-wrapper" sx={{ position: 'relative', zIndex: 1, height: "45vh", overflow: 'hidden', borderRadius: { xs: 0, md: "15px" } }}>
-                    <MapComponent activities={filteredActivities} userCoords={userCoords} mode="view" onMapInstance={""} />
+                <Box className="activity-map-wrapper"
+                    sx={{ position: 'relative', zIndex: 1, height: "50vh", overflow: 'hidden', borderRadius: { xs: 0, md: "15px" } }}>
+                    <MapComponent activities={filteredActivities}
+                        userCoords={userCoords}
+                        mode="view"
+                        onSelectActivity={setSelectedActivity}
+                        selectedActivity={selectedActivity}
+                        feedScrollRef={feedScrollRef}
+                        onMapInstance={(map) => { mapInstanceRef.current = map; }}
+                    />
                 </Box>
             )}
 
@@ -334,6 +336,8 @@ const ActivityPage = () => {
                         startIcon={<TodayOutlinedIcon sx={{ color: "white", marginLeft: 1.5, fontSize: "25px !important" }} />}
                     >
                     </PrimaryButton>
+
+
                 </Box>
             </Box>
 
@@ -431,20 +435,24 @@ const ActivityPage = () => {
             </Box>
 
             {/* List view - whole screen */}
-            <Box className="activity-feed-wrapper" sx={{
-                flex: 1,
-                bgcolor: 'white',
-                overflowY: 'auto',
-                pb: 10,
-                height: alignment === 'map' ? '25vh' : 'auto',
-                minHeight: alignment === 'map' ? '25vh' : 'auto',
-            }}>
+            <Box className="activity-feed-wrapper"
+                ref={feedScrollRef}
+                sx={{
+                    flex: 1,
+                    bgcolor: 'white',
+                    overflowY: 'auto',
+                    pb: 10,
+                    height: alignment === 'map' ? '25vh' : 'auto',
+                    minHeight: alignment === 'map' ? '25vh' : 'auto',
+                    scrollMarginTop: "20px"
+                }}>
                 <ActivityFeed
                     activities={filteredActivities}
                     userCoords={userCoords}
                     onCardAction={handleCardAction}
                     currentUserId={currentUserId}
                     onBookmarkToggle={handleBookmarkToggle}
+                    onSelectActivity={setSelectedActivity}
                 />
             </Box>
 

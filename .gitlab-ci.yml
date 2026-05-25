@@ -158,6 +158,12 @@ deploy develop:
     # same cluster. Image tags already match (:develop), no image rewrite.
     - sed -i 's|gr8-plain|gr8-develop|g' devops/k8s/manifests/*.yaml
     - kubectl apply -f devops/k8s/manifests/
+    # kubectl apply is a no-op when the manifest spec is byte-identical to the
+    # live resource (e.g. when only the image *contents* changed under the same
+    # :develop tag). Force a rollout so the api+frontend pods actually pull the
+    # new image. DB StatefulSet is excluded — restarting MSSQL costs ~3-4 min
+    # of schema upgrade and the DB image rarely changes.
+    - kubectl -n "$NAMESPACE" rollout restart deployment -l app.kubernetes.io/instance=gr8-develop
     - |
       helm upgrade --install gr8-develop-extras ./devops/k8s/chart \
         --namespace "$NAMESPACE" \
@@ -181,6 +187,7 @@ deploy production:
     # and image tags ":develop" → ":latest" since main builds the :latest tag.
     - sed -i 's|gr8-plain|gr8-main|g; s|backend:develop|backend:latest|g; s|frontend:develop|frontend:latest|g' devops/k8s/manifests/*.yaml
     - kubectl apply -f devops/k8s/manifests/
+    - kubectl -n "$NAMESPACE" rollout restart deployment -l app.kubernetes.io/instance=gr8-main
     - |
       helm upgrade --install gr8-main-extras ./devops/k8s/chart \
         --namespace "$NAMESPACE" \

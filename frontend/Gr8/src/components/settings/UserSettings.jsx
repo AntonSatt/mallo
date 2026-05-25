@@ -92,6 +92,7 @@ const UserSettings = () => {
     const [showConfirmPassword] = useState(false);
 
     const [locationEnabled, setLocationEnabled] = useState(false);
+    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
     const normalizeTagIds = (tagIds) => {
         if (!Array.isArray(tagIds)) {
@@ -664,7 +665,7 @@ const UserSettings = () => {
 
                 <form>
                     <Accordion className="dropdown" expanded={false}>
-                        <AccordionSummary>
+                        <AccordionSummary className="switch-row-summary">
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', px: 0.5, py: 1 }}>
                                 <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                     <LocationOnOutlinedIcon sx={{ color: 'var(--color-primary)', width: 20, height: 20 }} />
@@ -684,7 +685,7 @@ const UserSettings = () => {
 
                 <form>
                     <Accordion className="dropdown" expanded={false}>
-                        <AccordionSummary>
+                        <AccordionSummary className="switch-row-summary">
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', px: 0.5, py: 1 }}>
                                 <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                     <CircleNotificationsIcon sx={{ color: 'var(--color-primary)', width: 20, height: 20 }} />
@@ -692,8 +693,8 @@ const UserSettings = () => {
                                 </Typography>
                                 <Switch
                                     className="settingsSwitch"
-                                    checked={locationEnabled}
-                                    onChange={(e) => setLocationEnabled(e.target.checked)}
+                                    checked={notificationsEnabled}
+                                    onChange={(e) => setNotificationsEnabled(e.target.checked)}
                                     size="small"
                                     onClick={(e) => e.stopPropagation()}
                                 />

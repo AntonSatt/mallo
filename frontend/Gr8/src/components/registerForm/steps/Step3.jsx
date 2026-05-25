@@ -9,11 +9,13 @@ import InputAdornment from "@mui/material/InputAdornment";
 import ControlPointOutlinedIcon from '@mui/icons-material/ControlPointOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
+import { Accordion } from "../TermsAccordion";
 
 // Step 3 of registration: Finalizes account creation by collecting email, password, 
 // and handling user consent for terms, privacy policy, and notifications.
 const Step3 = ({ formData, handleChange, onNext, error }) => {
 
+    const [open, setOpen] = useState(null);
     const navigate = useNavigate();
     const [allowNotifications, setAllowNotifications] = useState(false);
     const [approveTerms, setApproveTerms] = useState(false);
@@ -105,11 +107,20 @@ const Step3 = ({ formData, handleChange, onNext, error }) => {
                 )}
 
                 <Typography variant="caption" sx={{ mt: 1, mb: 0.5 }}>
-                    Jag godkänner {" "}
-                    <span style={{ color: "var(--color-primary)" }}>användarvillkoren</span>{" "}
-                    och
-                    {" "}
-                    <span style={{ color: "var(--color-primary)" }}> integritetspolicyn</span>{" "}
+                    Jag godkänner{" "}
+                    <span
+                        style={{ color: "var(--color-primary)", cursor: "pointer", textDecoration: "underline" }}
+                        onClick={(e) => { e.stopPropagation(); setOpen("användarvillkor"); }}
+                    >
+                        användarvillkoren
+                    </span>{" "}
+                    och{" "}
+                    <span
+                        style={{ color: "var(--color-primary)", cursor: "pointer", textDecoration: "underline" }}
+                        onClick={(e) => { e.stopPropagation(); setOpen("integritetspolicy"); }}
+                    >
+                        integritetspolicyn
+                    </span>
                 </Typography>
             </Box>
 
@@ -153,6 +164,7 @@ const Step3 = ({ formData, handleChange, onNext, error }) => {
                 </PrimaryButton>
 
             </Box>
+            {open && <Accordion id={open} onClose={() => setOpen(null)} />}
         </Box>
     );
 };

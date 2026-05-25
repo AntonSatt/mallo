@@ -34,6 +34,8 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import SettingsButtonStyles from "../../design/buttons/SettingsButton.jsx";
 import SettingsSuccessDialog from "./SettingsSuccessDialog.jsx";
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
 
 // User Settings Page: Provides an interface for users to update their profile information, change their password, and delete their account. 
 // Utilizes accordions for organized sections and handles form validation and API interactions for user data management.
@@ -82,6 +84,8 @@ const UserSettings = () => {
     const [showCurrentPassword] = useState(false);
     const [showNewPassword] = useState(false);
     const [showConfirmPassword] = useState(false);
+
+    const [locationEnabled, setLocationEnabled] = useState(false);
 
     const normalizeTagIds = (tagIds) => {
         if (!Array.isArray(tagIds)) {
@@ -629,6 +633,46 @@ const UserSettings = () => {
                             </Box>
                         </AccordionDetails>
 
+                    </Accordion>
+                </form>
+
+                <form>
+                    <Accordion className="dropdown" expanded={false}>
+                        <AccordionSummary>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', px: 0.5, py: 1 }}>
+                                <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <LocationOnOutlinedIcon sx={{ color: 'var(--color-primary)', width: 20, height: 20 }} />
+                                    Platstjänster
+                                </Typography>
+                                <Switch
+                                    className="settingsSwitch"
+                                    checked={locationEnabled}
+                                    onChange={(e) => setLocationEnabled(e.target.checked)}
+                                    size="small"
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+                            </Box>
+                        </AccordionSummary>
+                    </Accordion>
+                </form>
+
+                <form>
+                    <Accordion className="dropdown" expanded={false}>
+                        <AccordionSummary>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', px: 0.5, py: 1 }}>
+                                <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <CircleNotificationsIcon sx={{ color: 'var(--color-primary)', width: 20, height: 20 }} />
+                                    Notifikationer
+                                </Typography>
+                                <Switch
+                                    className="settingsSwitch"
+                                    checked={locationEnabled}
+                                    onChange={(e) => setLocationEnabled(e.target.checked)}
+                                    size="small"
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+                            </Box>
+                        </AccordionSummary>
                     </Accordion>
                 </form>
 

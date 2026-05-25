@@ -1,4 +1,4 @@
-import { Box, ClickAwayListener, Dialog, DialogContent, Typography } from "@mui/material";
+﻿import { Box, ClickAwayListener, Dialog, DialogContent, Typography } from "@mui/material";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded";
 import PrimaryButton from "../../design/buttons/PrimaryButton.jsx";
@@ -7,12 +7,14 @@ const successMessages = {
     profile: "Dina profilinställningar har sparats.",
     password: "Ditt lösenord har uppdaterats.",
     triggers: "Dina triggers har sparats.",
+    anonymity: "Din anonymitetsinställning har uppdaterats.",
 };
 
 const errorMessages = {
     profile: "Kunde inte spara dina profilinställningar.",
     password: "Kunde inte uppdatera ditt lösenord.",
     triggers: "Kunde inte spara dina triggers.",
+    anonymity: "Kunde inte uppdatera din anonymitetsinställning.",
 };
 
 const SettingsSuccessDialog = ({ open, onClose, section = "profile", outcome = "success" }) => {

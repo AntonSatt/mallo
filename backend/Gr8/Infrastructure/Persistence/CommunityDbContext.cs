@@ -67,6 +67,7 @@ namespace Gr8.Infrastructure.Persistence
 
             // Map ApplicationUser to AspNetUsers table
             modelBuilder.Entity<ApplicationUser>().ToTable("AspNetUsers");
+            modelBuilder.Entity<ApplicationUser>().Ignore(u => u.IsAnonymousPosting);
 
             // Configure many-to-many relationship between Post and Tag
             modelBuilder.Entity<Post>()

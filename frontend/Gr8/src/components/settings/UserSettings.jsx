@@ -150,6 +150,7 @@ const UserSettings = () => {
                     userName: data.userName || "",
                     email: data.email || ""
                 });
+                setIsAnonymousPublishing(data.isAnonymousPosting ?? true);
                 setSelectedTags(normalizeTagIds(data.tagIds));
             }
             catch (error) {
@@ -273,6 +274,20 @@ const UserSettings = () => {
     const handleDelete = async () => {
         await deleteAccount();
         setOpen(false);
+    };
+
+    const handleAnonymityToggle = async (nextValue) => {
+        const previousValue = isAnonymousPublishing;
+        setIsAnonymousPublishing(nextValue);
+
+        try {
+            await UserServices.updateAnonymity(nextValue);
+            openStatusDialog("anonymity", "success");
+        } catch (error) {
+            setIsAnonymousPublishing(previousValue);
+            console.error("Kunde inte uppdatera anonymitetsinställningen", error);
+            openStatusDialog("anonymity", "error");
+        }
     };
 
     const handleAccordionChange = (section) => (_, isExpanded) => {
@@ -657,7 +672,7 @@ const UserSettings = () => {
                                 <Switch
                                     className="settingsSwitch"
                                     checked={isAnonymousPublishing}
-                                    onChange={(e) => setIsAnonymousPublishing(e.target.checked)}
+                                    onChange={(e) => handleAnonymityToggle(e.target.checked)}
                                     size="small"
                                     onClick={(e) => e.stopPropagation()}
                                 />

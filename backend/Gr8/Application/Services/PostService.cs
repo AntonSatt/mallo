@@ -20,11 +20,13 @@ namespace Gr8.Application.Services
         public async Task<PostDto?> CreateAsync(CreatePostDto createPostDto, string userId)
         {
             var tags = await _communityRepository.GetTagsByIdAsync(createPostDto.TagIds);
+            var authorDisplayName = await _applicationRepository.GetAuthorDisplayNameForNewContentAsync(userId);
 
             var post = new Post(userId, createPostDto.CategoryId, tags)
             {
                 Content = createPostDto.Content,
                 Title = createPostDto.Title,
+                AuthorDisplayName = authorDisplayName
             };
 
             await _communityRepository.AddPostAsync(post);
@@ -63,12 +65,7 @@ namespace Gr8.Application.Services
                 };
             }
 
-            var userName = await _applicationRepository.GetUserNameByIdAsync(post.UserId);
-
-            if (userName != null)
-            {
-                postDto.AuthorInfo.UserName = userName;
-            }
+            postDto.AuthorInfo.UserName = await ResolveAuthorNameAsync(post.UserId, post.AuthorDisplayName);
 
             return postDto;
         }
@@ -115,12 +112,7 @@ namespace Gr8.Application.Services
                     }
                 };
 
-                var userName = await _applicationRepository.GetUserNameByIdAsync(post.UserId);
-
-                if (userName != null)
-                {
-                    postDto.AuthorInfo.UserName = userName;
-                }
+                postDto.AuthorInfo.UserName = await ResolveAuthorNameAsync(post.UserId, post.AuthorDisplayName);
 
                 postDtoList.Add(postDto);
             }
@@ -150,12 +142,7 @@ namespace Gr8.Application.Services
                 }
             };
 
-            var userName = await _applicationRepository.GetUserNameByIdAsync(post.UserId);
-
-            if (userName != null)
-            {
-                postDto.AuthorInfo.UserName = userName;
-            }
+            postDto.AuthorInfo.UserName = await ResolveAuthorNameAsync(post.UserId, post.AuthorDisplayName);
 
             return postDto;
         }
@@ -212,12 +199,7 @@ namespace Gr8.Application.Services
                     }
                 };
 
-                var userName = await _applicationRepository.GetUserNameByIdAsync(oldPost.UserId);
-
-                if (userName != null)
-                {
-                    postDto.AuthorInfo.UserName = userName;
-                }
+                postDto.AuthorInfo.UserName = await ResolveAuthorNameAsync(oldPost.UserId, oldPost.AuthorDisplayName);
 
                 return postDto;
             }
@@ -248,6 +230,16 @@ namespace Gr8.Application.Services
             var result = await _communityRepository.SaveChangesAsync();
 
             return result > 0;
+        }
+
+        private async Task<string?> ResolveAuthorNameAsync(string userId, string? authorDisplayName)
+        {
+            if (!string.IsNullOrWhiteSpace(authorDisplayName))
+            {
+                return authorDisplayName;
+            }
+
+            return await _applicationRepository.GetUserNameByIdAsync(userId);
         }
     }
 }

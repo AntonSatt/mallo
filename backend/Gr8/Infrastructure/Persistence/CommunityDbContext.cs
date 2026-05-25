@@ -1,9 +1,6 @@
 ﻿using Gr8.Domain.Entities;
 using Gr8.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Gr8.Infrastructure.Persistence
 {
@@ -16,6 +13,9 @@ namespace Gr8.Infrastructure.Persistence
         public DbSet<Report> Reports => Set<Report>();
         public DbSet<Hug> Hugs => Set<Hug>();
         public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
+        public DbSet<Activity> Activities => Set<Activity>();
+        public DbSet<ActivityBookmark> ActivityBookmarks => Set<ActivityBookmark>();
+        public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
 
         public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
         {
@@ -73,6 +73,29 @@ namespace Gr8.Infrastructure.Persistence
                 .HasMany(p => p.Tags)
                 .WithMany(t => t.Posts)
                 .UsingEntity(j => j.ToTable("PostTags"));
+
+            modelBuilder.Entity<ApplicationUser>()
+                .HasMany(u => u.Tags)
+                .WithMany()
+                .UsingEntity(
+                    "UserTags",
+                    right => right
+                        .HasOne(typeof(Tag))
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .HasPrincipalKey(nameof(Tag.Id))
+                        .OnDelete(DeleteBehavior.Cascade),
+                    left => left
+                        .HasOne(typeof(ApplicationUser))
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasPrincipalKey(nameof(ApplicationUser.Id))
+                        .OnDelete(DeleteBehavior.Cascade),
+                    join =>
+                    {
+                        join.HasKey("UserId", "TagId");
+                        join.ToTable("UserTags");
+                    });
 
             // Configure one-to-many relationship between Category and Post
             modelBuilder.Entity<Post>()
@@ -166,6 +189,44 @@ namespace Gr8.Infrastructure.Persistence
                 entity.HasIndex(h => new { h.UserId, h.CommentId }).IsUnique();
             });
 
+            modelBuilder.Entity<Activity>(entity =>
+            {
+                entity.HasKey(a => a.Id);
+
+                entity.Property(a => a.Title)
+                .IsRequired();
+
+                entity.Property(a => a.Description)
+                .IsRequired();
+
+                entity.Property(a => a.Latitude)
+                .HasPrecision(18, 6)
+                .IsRequired();
+
+                entity.Property(a => a.Longitude)
+                .HasPrecision(18, 6)
+                .IsRequired();
+
+                entity.ToTable(t => t.HasCheckConstraint("CK_Activity_Dates_NotDefault", "[StartAt] > '2000-01-01' AND [EndAt] > '2000-01-01'"));
+
+                entity.ToTable(t => t.HasCheckConstraint("CK_Activity_EndAfterStart", "[EndAt] >= [StartAt]"));
+
+                entity.Property(a => a.StartAt)
+                .IsRequired();
+
+                entity.Property(a => a.EndAt)
+                .IsRequired();
+
+
+
+                entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(a => new { a.Latitude, a.Longitude });
+            });
+
             modelBuilder.Entity<Bookmark>(entity =>
             {
                 entity.HasKey(b => b.Id);
@@ -181,6 +242,38 @@ namespace Gr8.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasIndex(b => new { b.UserId, b.PostId }).IsUnique();
+            });
+
+            modelBuilder.Entity<ChatMessage>(entity => 
+            {
+                entity.HasKey(cm => cm.Id);
+
+                entity.Property(cm => cm.Content)
+                .IsRequired()
+                .HasMaxLength(4000);
+
+                entity.Property(cm => cm.SendAt)
+                .IsRequired();
+
+                entity.HasOne(cm => cm.Activity)
+                .WithMany()
+                .HasForeignKey(cm => cm.ActivityId)
+                .OnDelete(DeleteBehavior.SetNull); //The chat can continue when the activity deletes. 
+
+                entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(cm => cm.SenderId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(cm => cm.ReceiverId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+                //Ensures fast loading of chat history by indexing the relationship between sender and receiver.
+                entity.HasIndex(cm => new { cm.SenderId, cm.ReceiverId });
             });
         }
     }

@@ -5,7 +5,6 @@ import useViewport from "../../hooks/useViewport.js";
 import {
     Stack,
     Chip,
-    Badge,
     IconButton,
     Menu,
     MenuItem,
@@ -61,11 +60,9 @@ const CategoryFilter = ({
                     }
                 }}
             >
-                <Badge badgeContent={checkedCategories.length} color="error">
-                    <IconButton onClick={onFilterIconClick} size="small" className="filter-button" aria-label="Filtrera inlägg">
-                        <img src={FilterIcon} alt="" className="filter-icon-img" />
-                    </IconButton>
-                </Badge>
+                <IconButton onClick={onFilterIconClick} size="small" className="filter-button" aria-label="Filtrera inlägg">
+                    <img src={FilterIcon} alt="" className="filter-icon-img" />
+                </IconButton>
 
                 <Chip
                     label="Alla"

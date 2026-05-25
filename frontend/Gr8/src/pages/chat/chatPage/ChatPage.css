@@ -1,0 +1,56 @@
+.chat-page {
+    min-height: auto;
+    background-color: var(--color-bg-main);
+    padding: 5px 3px;
+}
+
+.chat-container {
+    max-width: var(--content-width-mobile);
+    margin: 0 auto;
+}
+
+/* ---------- DESKTOP ---------- */
+@media (min-width: 1024px) {
+    .chat-page {
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        width: var(--content-width-desktop);
+        max-width: var(--content-width-desktop);
+        height: 100%;
+        margin: 0 auto;
+        background-color: var(--button-secondary-bg);
+        border-radius: 10px;
+        padding: 16px;
+        box-sizing: border-box;
+        overflow: hidden;
+        border: 1px solid var(--color-border-light);
+    }
+
+    .forum-container .scrollbar {
+        flex: 1;
+        min-height: 0;
+        scrollbar-width: thin;
+        scrollbar-color: #fff transparent;
+    }
+
+    .chat-container .scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-container .scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .chat-container .scrollbar::-webkit-scrollbar-thumb {
+        background-color: #fff;
+        border-radius: 10px;
+    }
+}

@@ -1,0 +1,17 @@
+{{- $component := "api" -}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "gr8.fullname" (dict "Release" .Release "component" $component) }}
+  labels:
+    {{- include "gr8.labels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ $component }}
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "gr8.fullname" (dict "Release" .Release "component" $component) }}
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s

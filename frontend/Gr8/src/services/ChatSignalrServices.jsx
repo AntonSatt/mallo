@@ -8,13 +8,9 @@ class ChatSignalrService {
         this.connection = null;
     }
 
-    async startConnection() {
-        if (this.connection?.state === signalR.HubConnectionState.Connected) {
-            return;
-        }
-
-        if (this.connection?.state === signalR.HubConnectionState.Connecting) {
-            return;
+    createConnection() {
+        if (this.connection) {
+            return this.connection;
         }
 
         const token = localStorage.getItem("token");
@@ -25,22 +21,42 @@ class ChatSignalrService {
             .withAutomaticReconnect()
             .build();
 
-        await this.connection.start();
+        return this.connection;
+    }
+    async startConnection() {
+        const connection = this.createConnection();
+
+        if (connection.state === signalR.HubConnectionState.Connected) {
+            return connection;
+        }
+
+        if (connection.state === signalR.HubConnectionState.Connecting) {
+            return connection;
+        }
+
+        await connection.start();
 
         console.log("SignalR connected");
+
+        return connection;
     }
 
     async stopConnection() {
-        if (this.connection) {
-            await this.connection.stop();
+        if (!this.connection) {
+            return;
         }
+
+        await this.connection.stop();
+        this.connection = null;
+
+        console.log("signalR disconnected")
     }
 
     // Listen for incoming messages through SignalR and update the chat window if the message belongs to the current conversation.
     onReceiveMessage(callback) {
-        if (!this.connection) return;
+        const connection = this.createConnection();
 
-        this.connection.on("ReceiveMessage", callback);
+        connection.on("ReceiveMessage", callback);
     }
 
     async sendMessage(messageData) {
@@ -51,9 +67,9 @@ class ChatSignalrService {
 
     // Listen for typing notifications from the other user and show "typing..."
     onUserTyping(callback) {
-        if (!this.connection) return;
+        const connection = this.createConnection();
 
-        this.connection.on("UserTyping", callback);
+        connection.on("UserTyping", callback);
     }
 
     async sendTyping(receiverId) {
@@ -63,27 +79,27 @@ class ChatSignalrService {
     }
 
     onUserOnline(callback) {
-        if (!this.connected) return;
+        const connection = this.createConnection();
 
-        this.connection.on("UserOnline", callback);
+        connection.on("UserOnline", callback);
     }
 
     onUserOffline(callback) {
-        if (!this.connected) return;
+        const connection = this.createConnection();
 
-        this.connection.on("UserOffline", callback);
+        connection.on("UserOffline", callback);
     }
 
-    onOnlineUsers(callback){
-        if(!this.connection) return;
+    onOnlineUsers(callback) {
+        const connection = this.createConnection();
 
-        this.connection.on("OnlineUsers", callback);
+        connection.on("OnlineUsers", callback);
     }
 
     async markConversationAsRead(otherUserId) {
-        if (!this.connection) return;
+        await this.startConnection();
 
-        await this.connection.invoke("MarkConversationAsRead", otherUserId);
+        return this.connection.invoke("MarkConversationAsRead", otherUserId);
     }
 
     async deleteConversation(otherUserId) {

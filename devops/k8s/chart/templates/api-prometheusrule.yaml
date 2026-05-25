@@ -1,0 +1,35 @@
+{{- $component := "api" -}}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "gr8.fullname" (dict "Release" .Release "component" $component) }}
+  labels:
+    {{- include "gr8.labels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ $component }}
+    release: monitoring
+spec:
+  groups:
+    - name: {{ include "gr8.fullname" (dict "Release" .Release "component" $component) }}.rules
+      rules:
+        - alert: Gr8ApiHighErrorRate
+          expr: |
+            sum(rate(http_requests_received_total{namespace="doe25-group-8",code=~"5..",endpoint!="/metrics"}[5m]))
+              /
+            clamp_min(sum(rate(http_requests_received_total{namespace="doe25-group-8",endpoint!="/metrics"}[5m])), 1)
+              > 0.05
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "GR8 API 5xx rate above 5% for 5 minutes"
+            description: "More than 5% of API requests are returning 5xx errors during the last 5 minutes."
+
+        - alert: Gr8ApiNoTraffic
+          expr: |
+            sum(rate(http_requests_received_total{namespace="doe25-group-8",endpoint!="/metrics"}[10m])) == 0
+          for: 15m
+          labels:
+            severity: info
+          annotations:
+            summary: "GR8 API has received no traffic for 15 minutes"
+            description: "The API has received no measured HTTP traffic during the last 15 minutes."

@@ -28,10 +28,15 @@ const CommentServices = {
     const response = await ApiClient.put(`/forum/posts/${postId}/comments/${commentId}`, data);
     return response.data;
   },
+  
   hugComment: async (commentId, userId) => {
     const response = await ApiClient.post(`/forum/comments/${commentId}/hug`, {
       userId
     });
+    return response.data;
+  },
+  getCommentHugs: async (commentId) => {
+    const response = await ApiClient.get(`/forum/comments/${commentId}/hugs`)
     return response.data;
   }
 };

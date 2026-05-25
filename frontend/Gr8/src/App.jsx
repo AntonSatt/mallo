@@ -10,7 +10,7 @@ import LandingPage from './pages/landing/LandingPage'
 import HomePage from './pages/home/HomePage'
 import ForgotPasswordPage from './pages/resetPassword/ForgotPasswordPage'
 import ResetPasswordPage from './pages/resetPassword/ResetPasswordPage'
-import ConversationPage from './pages/chat/ConversationPage';
+import ConversationPage from './pages/chat/conversationPage/ConversationPage';
 import ActivityPage from './pages/activity/ActivityPage.jsx'
 import "moment/dist/locale/sv";
 

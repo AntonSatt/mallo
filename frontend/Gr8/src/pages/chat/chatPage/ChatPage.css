@@ -1,43 +1,17 @@
-.forum-page {
-    min-height: 100vh;
+.chat-page {
+    min-height: auto;
     background-color: var(--color-bg-main);
     padding: 5px 3px;
 }
 
-.forum-container {
-    max-width: 430px;
+.chat-container {
+    max-width: var(--content-width-mobile);
     margin: 0 auto;
 }
 
-.forum-empty-state-panel {
-    background-color: var(--color-bg-surface);
-    border-radius: 0 0 16px 16px;
-    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.08);
-    margin: 8px 0;
-    padding: 0 12px 12px 12px;
-}
-
-.forum-empty-state {
-    color: var(--color-text-main) !important;
-    opacity: 0.6;
-    font-style: italic;
-    padding: 18px 10px;
-    text-align: center;
-}
-
-/* targeting MUI wrapper */
-.create-post .MuiInputAdornment-root {
-    margin-right: 8px;
-}
-
-.create-post-icon {
-    color: var(--color-primary);
-    font-size: 28px;
-}
-
-/*---------- MEDIA QUERIES --------*/
+/* ---------- DESKTOP ---------- */
 @media (min-width: 1024px) {
-    .forum-page {
+    .chat-page {
         height: 100%;
         min-height: 0;
         overflow: hidden;
@@ -45,7 +19,7 @@
         box-sizing: border-box;
     }
 
-    .forum-container {
+    .chat-container {
         display: flex;
         flex-direction: column;
         width: var(--content-width-desktop);
@@ -63,5 +37,20 @@
     .forum-container .scrollbar {
         flex: 1;
         min-height: 0;
+        scrollbar-width: thin;
+        scrollbar-color: #fff transparent;
+    }
+
+    .chat-container .scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-container .scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .chat-container .scrollbar::-webkit-scrollbar-thumb {
+        background-color: #fff;
+        border-radius: 10px;
     }
 }

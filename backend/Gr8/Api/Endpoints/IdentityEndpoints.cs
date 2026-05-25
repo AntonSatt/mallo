@@ -148,7 +148,7 @@ namespace Gr8.Api.Endpoints
             })
              .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPut("/users/me", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) =>
+            app.MapPut("/users/me", async (UserManager<ApplicationUser> userManager, IJwtTokenGenerator jwtGenerator, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) =>
                 {
                     var appUser = await userManager.GetUserAsync(user);
 
@@ -167,7 +167,8 @@ namespace Gr8.Api.Endpoints
 
                     if (changedProfil.Succeeded)
                     {
-                        return Results.Ok("User updated successfully");
+                        var token = jwtGenerator.GenerateToken(appUser.Id, appUser.Email!, appUser.UserName!, appUser.Avatar);
+                        return Results.Ok(new { Message = "User updated successfully", Token = token });
                     }
 
                     var isDuplicate = changedProfil.Errors.Any(e => e.Code.Contains("DuplicateUserName") || e.Code.Contains("DuplicateEmail"));

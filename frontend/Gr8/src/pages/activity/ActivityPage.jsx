@@ -52,6 +52,12 @@ const ActivityPage = () => {
         setToast(prev => ({ ...prev, open: false }));
     };
 
+    const handleBookmarkToggle = (activityId, isBookmarked) => {
+        setActivities(prev => prev.map(a =>
+            a.id === activityId ? { ...a, isBookmarked } : a
+        ));
+    };
+
     const handleOpenForm = () => {
         setIsFormOpen(true);
         setEditActivity(null);
@@ -117,8 +123,18 @@ const ActivityPage = () => {
         const fetchActivities = async () => {
             try {
                 setLoading(true);
-                const data = await ActivityServices.getAll();
-                setActivities(data || []);
+                const [activitiesData, bookmarksData] = await Promise.all([
+                    ActivityServices.getAll(),
+                    ActivityServices.getBookmarks()
+                ]);
+
+                const bookmarkedIds = new Set(bookmarksData.map(b => b.actvityId));
+                const activitiesWithBookmarks = (activitiesData || []).map(a => ({
+                    ...a,
+                    isBookmarked: bookmarkedIds.has(a.id)
+                }));
+
+                setActivities(activitiesWithBookmarks);
             } catch (err) {
                 console.error("Error fetching activities:", err);
                 setError("Kunde inte hämta aktiviteter. Försök igen senare.");
@@ -438,6 +454,7 @@ const ActivityPage = () => {
                     userCoords={userCoords}
                     onCardAction={handleCardAction}
                     currentUserId={currentUserId}
+                    onBookmarkToggle={handleBookmarkToggle}
                     onSelectActivity={setSelectedActivity}
                 />
             </Box>

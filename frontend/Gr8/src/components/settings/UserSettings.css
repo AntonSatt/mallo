@@ -66,6 +66,17 @@
     opacity: 1 !important;
 }
 
+.switch-row-summary.MuiButtonBase-root,
+.switch-row-summary .MuiAccordionSummary-content,
+.switch-row-summary .MuiAccordionSummary-content * {
+    cursor: default !important;
+}
+
+.switch-row-summary .settingsSwitch,
+.switch-row-summary .settingsSwitch * {
+    cursor: pointer !important;
+}
+
 .dropdown {
     background-color: var(--color-bg-surface);
     border-radius: 20px !important;

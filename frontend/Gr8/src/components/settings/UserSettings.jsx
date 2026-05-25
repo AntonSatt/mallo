@@ -645,7 +645,7 @@ const UserSettings = () => {
 
                 <form>
                     <Accordion className="dropdown" expanded={false}>
-                        <AccordionSummary>
+                        <AccordionSummary className="switch-row-summary">
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', px: 0.5, py: 1 }}>
                                 <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                     <img src={Avatar} alt="edit" style={{

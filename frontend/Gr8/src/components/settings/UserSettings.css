@@ -32,6 +32,35 @@
     padding: 0 8px;
 }
 
+.settingsSwitch .MuiSwitch-track {
+    background-color: var(--color-primary-soft) !important;
+    opacity: 1 !important;
+    border-radius: 13px !important;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.settingsSwitch .MuiSwitch-thumb {
+    background-color: var(--color-primary) !important;
+    width: 20px !important;
+    height: 20px !important;
+    box-shadow: none !important;
+}
+
+.settingsSwitch.MuiSwitch-root {
+    width: 46px;
+    height: 26px;
+    padding: 0;
+}
+
+.settingsSwitch .MuiSwitch-switchBase {
+    padding: 3px !important;
+}
+
+.settingsSwitch .MuiSwitch-switchBase.Mui-checked {
+    transform: translateX(20px) !important;
+    color: var(--color-primary) !important;
+}
+
 .dropdown {
     background-color: var(--color-bg-surface);
     border-radius: 20px !important;

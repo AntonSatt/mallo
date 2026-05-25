@@ -15,7 +15,8 @@ import {
     MenuItem,
     OutlinedInput,
     ListItemText,
-    ClickAwayListener
+    ClickAwayListener,
+    Switch
 } from "@mui/material";
 import UserServices from "../../services/UserServices";
 import { useAuth } from "../../hooks/useAuth";
@@ -31,6 +32,7 @@ import "./UserSettings.css";
 import LogoutIcon from '@mui/icons-material/Logout';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import Headset from "../../assets/icons/headset.svg"
+import Avatar from "../../assets/icons/avatar.svg"
 import PostServices from "../../services/PostServices";
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
@@ -298,9 +300,9 @@ const UserSettings = () => {
                     >
                         Kontakta oss
                         <img src={Headset} alt="edit" style={{
-                                    width: 20,
-                                    height: 20,
-                                }} />
+                            width: 20,
+                            height: 20,
+                        }} />
                         {/* <HeadsetMicOutlinedIcon sx={{ color: 'var(--color-primary)' }} /> */}
                     </Button>
 
@@ -640,6 +642,29 @@ const UserSettings = () => {
                     </Accordion>
                 </form>
 
+                <form>
+                    <Accordion className="dropdown" expanded={false}>
+                        <AccordionSummary>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', px: 0.5, py: 1 }}>
+                                <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <img src={Avatar} alt="edit" style={{
+                                        width: 20,
+                                        height: 20,
+                                    }} />
+                                    Notifikationer
+                                </Typography>
+                                <Switch
+                                    className="settingsSwitch"
+                                    checked={true}
+                                    // onChange={(e) => setLocationEnabled(e.target.checked)}
+                                    size="small"
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+                            </Box>
+                        </AccordionSummary>
+                    </Accordion>
+                </form>
+
                 <Dialog open={open} onClose={handleClose}>
                     <DialogTitle>Är du säker på att du vill ta bort ditt konto?</DialogTitle>
                     <DialogActions>
@@ -698,11 +723,11 @@ const UserSettings = () => {
                                     maxWidth: 280,
                                 }}
                             >
-                                Kontakta gärna oss per mejl om du har några frågor eller om du vill prata med oss om vår app. 
+                                Kontakta gärna oss per mejl om du har några frågor eller om du vill prata med oss om vår app.
                                 <Typography variant="body2" sx={{ color: "var(--button-secondary-text)", fontWeight: 700 }}>
                                     Vi ser fram emot att höra från dig!
                                 </Typography>
-                                 <Typography variant="h5" sx={{ color: "var(--button-primary-bg)", fontWeight: 700, mt: 1 }}>
+                                <Typography variant="h5" sx={{ color: "var(--button-primary-bg)", fontWeight: 700, mt: 1 }}>
                                     info@mallo.se
                                 </Typography>
                             </Typography>

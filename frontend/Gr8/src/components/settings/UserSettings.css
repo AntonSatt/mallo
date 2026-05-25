@@ -110,7 +110,7 @@
         height: auto;
         margin: 0 auto;
         background-color: var(--button-secondary-bg);
-        border-radius: 10px;
+        border-radius: 16px;
         padding: 16px;
         box-sizing: border-box;
         overflow: hidden;

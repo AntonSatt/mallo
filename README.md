@@ -19,6 +19,10 @@ _A Swedish-language community platform where members share posts, find local act
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-k3s-326CE5?logo=kubernetes&logoColor=white)
 ![SignalR](https://img.shields.io/badge/SignalR-WebSocket-512BD4)
 
+<br />
+
+### → [Try it live at gr8-main.cc.k3s.chas-lab.dev](https://gr8-main.cc.k3s.chas-lab.dev/) ←
+
 </div>
 
 ---
@@ -201,16 +205,15 @@ Everything ships to the school's **Kubernetes** cluster — a [k3s](https://k3s.
 
 `gr8-plain` is the placeholder name baked into the manifests; CI rewrites it (`sed -i 's|gr8-plain|gr8-<env>|g'`) to produce the per-environment release name. Production additionally rewrites image tags (`backend:develop` → `backend:latest`).
 
+<div align="center">
+<img src="docs/media/kubectl-pods.png" alt="kubectl get pods showing api, db, and frontend pods running" width="600" />
+</div>
+
 ### CI/CD pipeline
 
-```mermaid
-flowchart LR
-    push[git push] --> test[test]
-    test --> sd[secret-detection]
-    sd --> build[build<br/>frontend + backend images]
-    build --> deploy[deploy<br/>kubectl apply + rollout restart]
-    deploy --> smoke[smoke-test<br/>poll /api/openapi/v1.json for 5 min]
-```
+<div align="center">
+<img src="docs/media/ci-pipeline.png" alt="GitLab pipeline: test → build → deploy → smoke-test" width="900" />
+</div>
 
 | Stage | Highlights |
 |---|---|

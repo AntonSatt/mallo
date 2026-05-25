@@ -62,6 +62,7 @@ const UserSettings = () => {
     });
     const [open, setOpen] = useState(false);
     const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
+    const [isAnonymousPublishing, setIsAnonymousPublishing] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
 
     const [tags, setTags] = useState([]);
@@ -651,12 +652,12 @@ const UserSettings = () => {
                                         width: 20,
                                         height: 20,
                                     }} />
-                                    Notifikationer
+                                    Publicera anonymt
                                 </Typography>
                                 <Switch
                                     className="settingsSwitch"
-                                    checked={true}
-                                    // onChange={(e) => setLocationEnabled(e.target.checked)}
+                                    checked={isAnonymousPublishing}
+                                    onChange={(e) => setIsAnonymousPublishing(e.target.checked)}
                                     size="small"
                                     onClick={(e) => e.stopPropagation()}
                                 />

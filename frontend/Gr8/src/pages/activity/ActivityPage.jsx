@@ -72,12 +72,18 @@ const ActivityPage = () => {
         setIsFormOpen(false);
 
         setActivities(prevActivities => {
-            const exists = prevActivities.some(act => act.id === savedActivity.id);
+            const formattedSavedActivity = {
+                ...savedActivity,
+                imageUrl: savedActivity.image ? `data:${savedActivity.imageMimeType || 'image/jpeg'};base64,${savedActivity.image}` : null,
+                adress: savedActivity.adress ? savedActivity.adress.split(',')[0].trim() : savedActivity.adress
+            };
+
+            const exists = prevActivities.some(act => act.id === formattedSavedActivity.id);
 
             if (exists) {
-                return prevActivities.map(act => act.id === savedActivity.id ? savedActivity : act);
+                return prevActivities.map(act => act.id === formattedSavedActivity.id ? formattedSavedActivity : act);
             } else {
-                return [savedActivity, ...prevActivities];
+                return [formattedSavedActivity, ...prevActivities];
             }
         });
 
@@ -130,7 +136,9 @@ const ActivityPage = () => {
                 const bookmarkedIds = new Set(bookmarksData.map(b => b.actvityId));
                 const activitiesWithBookmarks = (activitiesData || []).map(a => ({
                     ...a,
-                    isBookmarked: bookmarkedIds.has(a.id)
+                    isBookmarked: bookmarkedIds.has(a.id),
+                    imageUrl: a.image ? `data:${a.imageMimeType || 'image/jpeg'};base64,${a.image}` : null,
+                    adress: a.adress ? a.adress.split(',')[0].trim() : a.adress
                 }));
 
                 setActivities(activitiesWithBookmarks);
@@ -223,7 +231,7 @@ const ActivityPage = () => {
             width: { xs: '100vw', md: '490px' },
             height: { xs: '100vh', md: 'auto' },
             overflow: { xs: 'hidden', md: 'visible' },
-            margin: { xs: 0, md: '40px auto' },
+            margin: { xs: 0, md: 0 },
             backgroundColor: { xs: 'transparent', md: 'var(--button-secondary-bg)' },
             borderRadius: { xs: 0, md: '20px' },
             padding: { xs: 0, md: '16px' },
@@ -233,7 +241,7 @@ const ActivityPage = () => {
             {/* Map - default map view with short list */}
             {alignment === 'map' && (
                 <Box className="activity-map-wrapper"
-                    sx={{ position: 'relative', zIndex: 1, height: "50vh", overflow: 'hidden', borderRadius: { xs: 0, md: "15px" } }}>
+                    sx={{ position: 'relative', zIndex: 1, height: { xs: '40vh', md: '55vh' }, overflow: 'hidden', borderRadius: { xs: 0, md: "15px" } }}>
                     <MapComponent activities={filteredActivities}
                         userCoords={userCoords}
                         mode="view"

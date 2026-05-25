@@ -33,13 +33,14 @@ import PostServices from "../../services/PostServices";
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import SettingsButtonStyles from "../../design/buttons/SettingsButton.jsx";
+import SettingsSuccessDialog from "./SettingsSuccessDialog.jsx";
 
 // User Settings Page: Provides an interface for users to update their profile information, change their password, and delete their account. 
 // Utilizes accordions for organized sections and handles form validation and API interactions for user data management.
 
 const UserSettings = () => {
 
-    const { logout } = useAuth();
+    const { logout, refreshCurrentUser } = useAuth();
     const { deleteAccount } = useAuth();
     const [profileData, setProfileData] = useState({
         avatar: null,
@@ -74,6 +75,9 @@ const UserSettings = () => {
 
     const [errors, setErrors] = useState({});
     const [expandedSection, setExpandedSection] = useState(false);
+    const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+    const [statusDialogSection, setStatusDialogSection] = useState("profile");
+    const [statusDialogOutcome, setStatusDialogOutcome] = useState("success");
 
     const [showCurrentPassword] = useState(false);
     const [showNewPassword] = useState(false);
@@ -107,6 +111,16 @@ const UserSettings = () => {
 
     const handleClose = () => {
         setOpen(false);
+    };
+
+    const openStatusDialog = (section, outcome) => {
+        setStatusDialogSection(section);
+        setStatusDialogOutcome(outcome);
+        setStatusDialogOpen(true);
+    };
+
+    const closeStatusDialog = () => {
+        setStatusDialogOpen(false);
     };
 
     useEffect(() => {
@@ -169,6 +183,8 @@ const UserSettings = () => {
 
         try {
             await UserServices.updateUser(profileData);
+            refreshCurrentUser();
+            openStatusDialog("profile", "success");
         }
         catch (error) {
             if (error.response && error.response.status === 409) {
@@ -180,6 +196,7 @@ const UserSettings = () => {
             else {
                 setErrors({ general: "Kunde inte spara inställningarna. Försök igen senare." })
             }
+            openStatusDialog("profile", "error");
         }
 
     };
@@ -189,8 +206,10 @@ const UserSettings = () => {
 
         try {
             await UserServices.updateUserTags(selectedTags);
+            openStatusDialog("triggers", "success");
         } catch (error) {
             console.error("Kunde inte uppdatera triggers", error);
+            openStatusDialog("triggers", "error");
         }
     };
 
@@ -205,9 +224,10 @@ const UserSettings = () => {
         try {
             await UserServices.updatePassword(passwordData);
             setPasswordData({ currentPassword: "", newPassword: "", confirmNewPassword: "" });
+            openStatusDialog("password", "success");
         }
         catch (e) {
-            const serverErrors = e.response.data;
+            const serverErrors = Array.isArray(e?.response?.data) ? e.response.data : [];
             let newErrors = {};
             let hasPasswordError = false;
 
@@ -227,7 +247,12 @@ const UserSettings = () => {
                 newErrors.confirmNewPassword = allRequirements;
             }
 
+            if (Object.keys(newErrors).length === 0) {
+                newErrors = { general: "Kunde inte uppdatera lösenordet. Försök igen senare." };
+            }
+
             setErrors(newErrors);
+            openStatusDialog("password", "error");
         }
     };
 
@@ -614,6 +639,13 @@ const UserSettings = () => {
                         <Button variant="contained" color="error" onClick={handleDelete} id="deleteUser">Ja, ta bort konto</Button>
                     </DialogActions>
                 </Dialog>
+
+                <SettingsSuccessDialog
+                    open={statusDialogOpen}
+                    onClose={closeStatusDialog}
+                    section={statusDialogSection}
+                    outcome={statusDialogOutcome}
+                />
             </Box>
         </>
     );

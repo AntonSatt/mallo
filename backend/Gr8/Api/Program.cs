@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
+using Prometheus;
 using Gr8.Application.Interfaces;
 using Gr8.Infrastructure.Services;
 
@@ -124,12 +125,18 @@ namespace Gr8
                 await SeedData.EnsureSeedDataAsync(app.Services);
             }
 
+            app.UseRouting();
+
             app.UseCors("ReactApplication");
 
             app.UseHttpsRedirection();
 
+            app.UseHttpMetrics();
+
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.MapMetrics();
 
             app.MapEndpoints();
 

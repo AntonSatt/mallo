@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ActivityServices from "../../../services/ActivityService.jsx";
 import { Paper, Box, Typography, IconButton, Collapse, Dialog } from "@mui/material";
 import BookmarkIcon from '@mui/icons-material/Bookmark';
@@ -14,13 +15,17 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import ReportOutlinedIcon from '@mui/icons-material/ReportOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import CloseIcon from "../../../assets/icons/closeIcon.svg";
+import BookmarkButton from "../../bookmarkButton/BookmarkButton.jsx";
 
-const ActivityCard = ({ activity, distance, currentUserId, onCardAction }) => {
+
+const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookmarkToggle }) => {
     const [expanded, setExpanded] = useState(false);
-    const [isBookmarked, setIsBookmarked] = useState(false);
+    const [isBookmarked, setIsBookmarked] = useState(activity.isBookmarked ?? false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const navigate = useNavigate();
 
     const isOwner = currentUserId === activity.userId;
     const dateText = dayjs(activity.startAt).format('D MMMM');
@@ -30,9 +35,15 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction }) => {
         setExpanded(!expanded);
     };
 
-    const handleBookmarkedClick = (e) => {
-        e.stopPropagation(); // Stops the click from propagating to the card's onClick, so it won't toggle the expansion
-        setIsBookmarked(!isBookmarked);
+    const handleBookmarkedClick = async (e) => {
+        e.stopPropagation();
+        try {
+            const response = await ActivityServices.toggleBookmark(activity.id);
+            setIsBookmarked(response.data.isBookmarked);
+            onBookmarkToggle(activity.id, response.data.isBookmarked);
+        } catch (error) {
+            setError("Kunde inte bokmärka aktiviteten. Försök igen.");
+        }
     };
 
     // Open 3 dots menu
@@ -108,17 +119,15 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction }) => {
                 }}>
                     {activity.title}
                 </Typography>
-                <IconButton
-                    size="small"
-                    onClick={handleBookmarkedClick}
-                    sx={{ color: 'var(--color-primary)', mr: 2, mt: 0.5 }}
-                >
-                    {isBookmarked ? (
-                        <BookmarkIcon /> // Filled bookmark
-                    ) : (
-                        <BookmarkBorderOutlinedIcon />   // Outlined bookmark
-                    )}
-                </IconButton>
+                <BookmarkButton
+                    isBookmarked={activity.isBookmarked}
+                    onToggle={async () => {
+                        const result = await ActivityServices.toggleBookmark(activity.id);
+                        onBookmarkToggle(activity.id, result.isBookmarked);
+                        return result.isBookmarked;
+                    }}
+                    savedText="Du har sparat aktiviteten"
+                />
             </Box>
 
             {/* Bottom part - white info*/}
@@ -227,6 +236,11 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction }) => {
                         </SecondaryButton>
 
                         <SecondaryButton
+                            onClick={(e) => {
+                                e.stopPropagation();
+
+                                navigate(`/message/${activity.userId}`);
+                            }}
                             sx={{
                                 borderRadius: "50%", height: "40px", width: "40px", minWidth: "unset",
                                 p: 0,

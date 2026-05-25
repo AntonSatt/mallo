@@ -6,6 +6,7 @@ metadata:
   labels:
     {{- include "gr8.labels" . | nindent 4 }}
     app.kubernetes.io/component: {{ $component }}
+    app: {{ include "gr8.fullname" (dict "Release" .Release "component" $component) }}
   annotations:
     traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
     traefik.ingress.kubernetes.io/service.sticky.cookie.name: "gr8_signalr_sticky"

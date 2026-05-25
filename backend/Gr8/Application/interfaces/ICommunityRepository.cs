@@ -1,4 +1,5 @@
-﻿using Gr8.Domain.Entities;
+﻿using Gr8.Application.DTOs;
+using Gr8.Domain.Entities;
 
 namespace Gr8.Application.Interfaces
 {
@@ -19,6 +20,8 @@ namespace Gr8.Application.Interfaces
         Task UpdatePostAsync(Post oldPost);
         Task<Post> GetPostByIdAsync(int id);
         Task<Hug?> GetPostHugAsync(int postId, string UserId);
+        Task<List<Hug>> GetAllPostHugsByUserIdAsync(string userId, int postId);
+        Task<List<Hug>> GetAllCommentHugsByUserIdAsync(string userId, int commentId);
         Task<Hug?> GetCommentHugAsync(int commentId, string UserId);
         Task AddHugAsync(Hug hug);
         void RemoveHug(Hug hug);
@@ -35,5 +38,9 @@ namespace Gr8.Application.Interfaces
         Task AddActivityAsync(Activity activity);
         Task UpdateActivityAsync(Activity activity);
         Task DeleteActivityAsync(Activity activity);
+        Task<ActivityBookmark?> GetActivityBookmarkAsync(int activityId, string userId);
+        void RemoveActivityBookmark(ActivityBookmark bookmark);
+        Task AddActivityBookmarkAsync(ActivityBookmark bookmark);
+        Task<List<ActivityBookmark>> GetAllActivityBookmarksByUserIdAsync(string userId);
     }
 }

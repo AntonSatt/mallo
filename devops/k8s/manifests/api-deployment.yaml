@@ -48,6 +48,9 @@ spec:
               value: "Server=gr8-plain-db;Database=CommunityDB;User Id=sa;Password=$(DB_PASSWORD);TrustServerCertificate=true"
             - name: ASPNETCORE_ENVIRONMENT
               value: "Development"
+            # Polling watcher — node inotify cap can crash pod at boot.
+            - name: DOTNET_USE_POLLING_FILE_WATCHER
+              value: "true"
             - name: Cors__AllowedOrigins__0
               value: "https://gr8-plain.cc.k3s.chas-lab.dev"
             - name: Cors__AllowedOrigins__1

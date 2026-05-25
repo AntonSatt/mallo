@@ -11,6 +11,7 @@ import ForumPage from "../forum/ForumPage.jsx";
 import ChatPage from '../chat/chatPage/ChatPage';
 import Settings from "../settings/SettingsPage.jsx";
 import ConversationPage from '../chat/conversationPage/ConversationPage';
+import ActivityPage from "../activity/ActivityPage.jsx";
 
 const Homepage = ({ page }) => {
     const { isDesktop } = useViewport();
@@ -55,6 +56,11 @@ const Homepage = ({ page }) => {
                                     <Settings />
                                 </Box>
                             )}
+                            {page === "maps" && (
+                                <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
+                                    <ActivityPage />
+                                </Box>
+                            )}
                         </Stack>
                     </main>
 
@@ -68,11 +74,13 @@ const Homepage = ({ page }) => {
                     {page === "message" && <ProfileBar showCreate="false" />}
                     {page === "conversation" && <ProfileBar showCreate="false" />}
                     {page === "settings" && <ProfileBar showCreate="false" />}
+                    {page === "maps" && <ProfileBar showCreate="false" />}
                     <Navbar />
                     {page === "forum" && <ForumPage openModal={isOpen} setOpenModal={setOpen} searchQuery={searchQuery} />}
                     {page === "message" && <ChatPage />}
                     {page === "conversation" && <ConversationPage />}
                     {page === "settings" && <Settings />}
+                    {page === "maps" && <ActivityPage />}
                 </div>
             )}
         </div>

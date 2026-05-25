@@ -424,7 +424,6 @@ const UserSettings = () => {
                             width: 20,
                             height: 20,
                         }} />
-                        {/* <HeadsetMicOutlinedIcon sx={{ color: 'var(--color-primary)' }} /> */}
                     </Button>
 
                     <Button

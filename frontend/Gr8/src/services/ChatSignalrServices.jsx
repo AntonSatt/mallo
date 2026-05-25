@@ -9,13 +9,21 @@ class ChatSignalrService {
     }
 
     async startConnection() {
+        if (this.connection?.state === signalR.HubConnectionState.Connected) {
+            return;
+        }
+
+        if (this.connection?.state === signalR.HubConnectionState.Connecting) {
+            return;
+        }
+
         const token = localStorage.getItem("token");
 
         this.connection = new signalR.HubConnectionBuilder().withUrl(`${import.meta.env.VITE_API_BASE_URL}/chat/hub`, {
-            accessTokenFactory: () => token
-        })
-        .withAutomaticReconnect()
-        .build();
+                accessTokenFactory: () => token
+            })
+            .withAutomaticReconnect()
+            .build();
 
         await this.connection.start();
 
@@ -23,57 +31,63 @@ class ChatSignalrService {
     }
 
     async stopConnection() {
-        if(this.connection){
+        if (this.connection) {
             await this.connection.stop();
         }
     }
-    
+
     // Listen for incoming messages through SignalR and update the chat window if the message belongs to the current conversation.
-    onReceiveMessage(callback){
-        if(!this.connection) return;
+    onReceiveMessage(callback) {
+        if (!this.connection) return;
 
         this.connection.on("ReceiveMessage", callback);
     }
 
-    async sendMessage(messageData){
-        if(!this.connection) return;
+    async sendMessage(messageData) {
+        if (!this.connection) return;
 
         await this.connection.invoke("SendMessage", messageData);
     }
 
     // Listen for typing notifications from the other user and show "typing..."
-    onUserTyping(callback){
-        if(!this.connection) return;
+    onUserTyping(callback) {
+        if (!this.connection) return;
 
         this.connection.on("UserTyping", callback);
     }
 
-    async sendTyping(receiverId){
-        if(!this.connection) return;
+    async sendTyping(receiverId) {
+        if (!this.connection) return;
 
         await this.connection.invoke("Typing", receiverId);
     }
 
-    onUserOnline(callback){
-        if(!this.connected) return;
+    onUserOnline(callback) {
+        if (!this.connected) return;
 
         this.connection.on("UserOnline", callback);
     }
 
-    onUserOffline(callback){
-        if(!this.connected) return;
+    onUserOffline(callback) {
+        if (!this.connected) return;
 
         this.connection.on("UserOffline", callback);
     }
 
-    async markConversationAsRead(otherUserId) {
-    if (!this.connection) return;
+    onOnlineUsers(callback){
+        if(!this.connection) return;
 
-    await this.connection.invoke("MarkConversationAsRead", otherUserId);
+        this.connection.on("OnlineUsers", callback);
+    }
+
+    async markConversationAsRead(otherUserId) {
+        if (!this.connection) return;
+
+        await this.connection.invoke("MarkConversationAsRead", otherUserId);
     }
 
     async deleteConversation(otherUserId) {
-        if(!this.connection) return;
+        if (!this.connection) return;
 
         await this.connection.invoke("DeleteConversation", otherUserId);
     }

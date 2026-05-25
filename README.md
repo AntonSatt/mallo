@@ -295,7 +295,7 @@ For Rider / Visual Studio: open [`backend/Gr8/Gr8.slnx`](backend/Gr8/Gr8.slnx).
 
 ---
 
-## Team (Grupp GR8)
+## Team GR8
 
 | Member | Role |
 |---|---|

@@ -290,15 +290,15 @@ For Rider / Visual Studio: open [`backend/Gr8/Gr8.slnx`](backend/Gr8/Gr8.slnx).
 
 | Member | Role |
 |---|---|
-| Sebastian | .NET Fullstack |
-| Elina | .NET Fullstack |
 | Daniel | .NET Fullstack |
+| Elina | .NET Fullstack |
 | Jonna | .NET Fullstack |
-| Jennifer | UX |
-| Reza | DevOps |
+| Sebastian | .NET Fullstack |
 | Victoria | .NET Fullstack |
 | Chipego | Frontend |
+| Jennifer | UX |
 | Anton | DevOps |
+| Reza | DevOps |
 
 Branch naming follows the team's Jira project (`UT8`) when a ticket exists — e.g. `feature/UT8-367_style_card_image_url` — and descriptive names (`feature/fix-api-inotify-crash`) for ticketless work.
 

@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gr8-plain
+  labels:
+    app.kubernetes.io/name: gr8
+    app.kubernetes.io/instance: gr8-plain
+    app.kubernetes.io/part-of: gr8
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    # Middleware ref format is <namespace>-<name>@kubernetescrd. Namespace is
+    # hardcoded here (doe25-group-8) since plain manifests have no .Release.Namespace.
+    traefik.ingress.kubernetes.io/router.middlewares: "doe25-group-8-gr8-plain-api-strip-prefix@kubernetescrd"
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: gr8-plain.cc.k3s.chas-lab.dev
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: gr8-plain-api
+                port:
+                  number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gr8-plain-frontend
+                port:
+                  number: 80

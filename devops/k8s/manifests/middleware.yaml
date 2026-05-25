@@ -1,0 +1,12 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: gr8-plain-api-strip-prefix
+  labels:
+    app.kubernetes.io/name: gr8
+    app.kubernetes.io/instance: gr8-plain
+    app.kubernetes.io/part-of: gr8
+spec:
+  stripPrefix:
+    prefixes:
+      - /api

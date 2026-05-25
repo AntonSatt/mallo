@@ -1,5 +1,5 @@
 import { useAuth } from "../../hooks/useAuth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ActivityServices from "../../services/ActivityService.jsx";
 import ActivityForm from "../../components/activity/activityForm/ActivityForm.jsx";
 import ActivityFilter from "../../components/activity/feed/ActivityFilter.jsx";
@@ -254,8 +254,16 @@ const ActivityPage = () => {
 
             {/* Map - default map view with short list */}
             {alignment === 'map' && (
-                <Box className="activity-map-wrapper" sx={{ position: 'relative', zIndex: 1, height: "45vh", overflow: 'hidden', borderRadius: { xs: 0, md: "15px" } }}>
-                    <MapComponent activities={filteredActivities} userCoords={userCoords} mode="view" onMapInstance={""} />
+                <Box className="activity-map-wrapper"
+                    sx={{ position: 'relative', zIndex: 1, height: "50vh", overflow: 'hidden', borderRadius: { xs: 0, md: "15px" } }}>
+                    <MapComponent activities={filteredActivities}
+                        userCoords={userCoords}
+                        mode="view"
+                        onSelectActivity={setSelectedActivity}
+                        selectedActivity={selectedActivity}
+                        feedScrollRef={feedScrollRef}
+                        onMapInstance={(map) => { mapInstanceRef.current = map; }}
+                    />
                 </Box>
             )}
 
@@ -449,20 +457,24 @@ const ActivityPage = () => {
             </Box>
 
             {/* List view - whole screen */}
-            <Box className="activity-feed-wrapper" sx={{
-                flex: 1,
-                bgcolor: 'white',
-                overflowY: 'auto',
-                pb: 10,
-                height: alignment === 'map' ? '25vh' : 'auto',
-                minHeight: alignment === 'map' ? '25vh' : 'auto',
-            }}>
+            <Box className="activity-feed-wrapper"
+                ref={feedScrollRef}
+                sx={{
+                    flex: 1,
+                    bgcolor: 'white',
+                    overflowY: 'auto',
+                    pb: 10,
+                    height: alignment === 'map' ? '25vh' : 'auto',
+                    minHeight: alignment === 'map' ? '25vh' : 'auto',
+                    scrollMarginTop: "20px"
+                }}>
                 <ActivityFeed
                     activities={filteredActivities}
                     userCoords={userCoords}
                     onCardAction={handleCardAction}
                     currentUserId={currentUserId}
                     onBookmarkToggle={handleBookmarkToggle}
+                    onSelectActivity={setSelectedActivity}
                 />
             </Box>
 

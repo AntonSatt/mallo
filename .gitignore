@@ -59,3 +59,7 @@ Thumbs.db
 .vscode/
 
 my-kubeconfig.yaml
+
+# ---- Helm ----
+# Vendored subcharts; CI runs `helm dependency update` to regenerate them.
+devops/k8s/chart/charts/

@@ -42,7 +42,7 @@
 .notification-box {
     display: flex;
     background-color: var(--color-primary-soft);
-    border-radius: 15px;
+    border-radius: 16px;
     padding: 15px 0;
     flex: 1; 
     overflow-y: auto;

@@ -1,11 +1,10 @@
 import './App.css'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/protectedRoute/ProtectedRoute'
+import { useAuth } from './hooks/useAuth'
 import LoginPage from './pages/login/LoginPage'
 import RegisterPage from './pages/register/RegisterPage'
-import Settings from './pages/settings/SettingsPage'
-import ForumPage from './pages/forum/ForumPage'
 import LandingPage from './pages/landing/LandingPage'
 import HomePage from './pages/home/HomePage'
 import ForgotPasswordPage from './pages/resetPassword/ForgotPasswordPage'
@@ -14,12 +13,22 @@ import ConversationPage from './pages/chat/conversationPage/ConversationPage';
 import ActivityPage from './pages/activity/ActivityPage.jsx'
 import "moment/dist/locale/sv";
 
+function RootRoute() {
+  const { isAuthenticated } = useAuth();
+
+  if (isAuthenticated) {
+    return <Navigate to="/forum" replace />;
+  }
+
+  return <LandingPage />;
+}
+
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path='/' element={<LandingPage />} />
+          <Route path='/' element={<RootRoute />} />
           <Route path='/login' element={<LoginPage />} />
           <Route path='/register' element={<RegisterPage />} />
           <Route path='/forgot-password' element={<ForgotPasswordPage />} />

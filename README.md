@@ -29,11 +29,11 @@ _A Swedish-language community platform where members share posts, find local act
 
 ## What is Mallo?
 
-Mallo is a Swedish-language web community. Members create posts, react with "hugs", comment, save favourites, and discover real-world activities pinned to a map of Sweden. A built-in real-time chat lets members reach out to each other one-to-one.
+Mallo is a Swedish-language web community. Members write posts, react with "hugs", comment, save favourites, and find real-world activities pinned to a map of Sweden. A built-in chat lets them message each other directly.
 
-The product is built as a fullstack web app — **React 19** in the browser, a **.NET 10** API on the server, **MS SQL Server 2022** for persistence, **SignalR** for realtime, **Mapbox** for geography. Everything is containerised and deployed to the school's **Kubernetes** cluster by GitLab CI.
+Under the hood: **React 19** in the browser, a **.NET 10** API, **MS SQL Server 2022**, **SignalR** for realtime, **Mapbox** for the maps. Everything runs in containers on the school's **Kubernetes** cluster, deployed by GitLab CI.
 
-This repository is **Grupp GR8**'s submission for **Chas Challenge 2026** at [Chas Academy](https://chasacademy.se).
+We built this as Grupp GR8's submission for **Chas Challenge 2026** at [Chas Academy](https://chasacademy.se).
 
 ---
 
@@ -50,7 +50,7 @@ This repository is **Grupp GR8**'s submission for **Chas Challenge 2026** at [Ch
 </tr>
 </table>
 
-<sub>Mobile views — Mallo is built mobile-first.</sub>
+<sub>Mobile views. Mallo is built mobile-first.</sub>
 
 </div>
 
@@ -107,13 +107,13 @@ flowchart LR
     PR --> GR
 ```
 
-**Why this shape:** the SPA and API are deployed and scaled independently. The API stays stateless (auth via JWT, no in-memory sessions); SignalR connections are pinned with a sticky-session cookie at the ingress so realtime chat survives multi-replica scale-out. MS SQL holds the durable application data as a `StatefulSet` with a Longhorn PVC; Redis (sub-chart) has its own smaller PVC for cache state.
+The SPA and API deploy separately so they can scale on their own. The API doesn't keep sessions in memory (auth is just a JWT), so we could run more than one replica if we ever need to. SignalR connections get pinned to a single pod via a sticky cookie at the ingress, which keeps chat from dropping when that happens. MSSQL is the only thing with durable state worth worrying about: StatefulSet, Longhorn PVC. Redis (sub-chart) has a small PVC too, but it's just cache.
 
 ---
 
-## Backend — .NET 10 / Clean Architecture
+## Backend (.NET 10, Clean Architecture)
 
-The backend is a four-project .NET solution following the classic **Clean Architecture** layering:
+Four .NET projects in the classic Clean Architecture layering:
 
 ```
 backend/Gr8/
@@ -136,16 +136,16 @@ backend/Gr8/
 | Metrics | `prometheus-net` exposed on `/metrics` |
 | Persistence | Two `DbContext`s: `ApplicationDbContext` (Identity, 7 migrations) and `CommunityDbContext` (domain, 21 migrations). Categories (13) and tags (20) seeded via EF `HasData` in `CommunityDbContext`. |
 
-### Notable design choices
+### A few notes
 
-- **Two DbContexts** keep the auth / Identity tables separate from the domain tables — easier to reason about migrations and to evolve each independently.
-- **Repository pattern** (`ICommunityRepository`, `IApplicationRepository`, `IChatRepository`) sits between services and EF so the Application layer is testable without a database.
-- **Endpoint grouping** instead of MVC controllers — minimal-API style, one file per bounded context (`Identity`, `Community`, `Activity`, `Chat`).
-- **Automatic migrations on startup** in dev; the smoke test (see [CI/CD](#cicd-pipeline)) waits long enough to cover a cold-start schema upgrade against a freshly-rolled MSSQL pod.
+- **Two DbContexts.** We keep Identity tables separate from the domain tables so the auth schema and the app schema can evolve independently without their migrations stepping on each other.
+- **Repository pattern** (`ICommunityRepository`, `IApplicationRepository`, `IChatRepository`) sits between the services and EF, so the Application layer can be tested without a real database.
+- **No MVC controllers.** We use minimal-API endpoints grouped one file per area: `Identity`, `Community`, `Activity`, `Chat`.
+- **Migrations run on startup.** The CI smoke test (see [CI/CD](#cicd-pipeline)) waits long enough to cover a cold MSSQL pod re-applying the schema after a deploy.
 
 ---
 
-## Frontend — React 19 / Vite
+## Frontend (React 19, Vite)
 
 ```
 frontend/Gr8/src/
@@ -168,21 +168,23 @@ frontend/Gr8/src/
 | Realtime | `@microsoft/signalr` |
 | HTTP | axios wrapper with JWT bearer interceptor |
 | Dates | `dayjs` + `moment` (`sv` locale) |
-| Language | Swedish (no i18n layer — strings live in components) |
+| Language | Swedish (no i18n layer; strings live in the components) |
 | Push notifications | Firebase Cloud Messaging service worker |
 
-The production build is served by nginx with an SPA fallback (`try_files $uri $uri/ /index.html`) — see [`frontend/Gr8/nginx.conf`](frontend/Gr8/nginx.conf).
+The production build is served by nginx with an SPA fallback (`try_files $uri $uri/ /index.html`). Full config in [`frontend/Gr8/nginx.conf`](frontend/Gr8/nginx.conf).
 
 ---
 
 ## Deploy & infrastructure
 
-Everything ships to the school's **Kubernetes** cluster — a [k3s](https://k3s.io/) distribution, CNCF-certified, same APIs as upstream — at `*.cc.k3s.chas-lab.dev`, namespace `doe25-group-8`. The deploy shape is a deliberate hybrid:
+Everything ships to the school's **Kubernetes** cluster (a [k3s](https://k3s.io/) distribution: same APIs as upstream, just a smaller install) at `*.cc.k3s.chas-lab.dev`, namespace `doe25-group-8`.
+
+We split the deploy in two:
 
 | Component | Deployed as | Why |
 |---|---|---|
-| Frontend, API, MSSQL | Plain k8s YAML in [`devops/k8s/manifests/`](devops/k8s/manifests/) | Simple, transparent — every reviewer can read a `Deployment` without learning Helm templating. |
-| Redis + observability glue | Helm chart in [`devops/k8s/chart/`](devops/k8s/chart/) | Redis is a versioned upstream dependency (Bitnami). Observability (ServiceMonitor, PrometheusRule, Grafana dashboard ConfigMap) benefits from Helm's templating for release naming. |
+| Frontend, API, MSSQL | Plain k8s YAML in [`devops/k8s/manifests/`](devops/k8s/manifests/) | Anyone can read a `Deployment` without learning Helm templating first. |
+| Redis + observability glue | Helm chart in [`devops/k8s/chart/`](devops/k8s/chart/) | Redis is a versioned upstream dependency (Bitnami sub-chart). The observability pieces (`ServiceMonitor`, `PrometheusRule`, Grafana dashboard ConfigMap) benefit from Helm's templating for release naming. |
 
 ### Branches → environments
 
@@ -190,9 +192,9 @@ Everything ships to the school's **Kubernetes** cluster — a [k3s](https://k3s.
 |---|---|---|---|
 | `main` | `:latest` | `https://gr8-main.cc.k3s.chas-lab.dev/` | **Manual approval gate in CI.** Persistent DB. |
 | `develop` | `:develop` | `https://gr8-develop.cc.k3s.chas-lab.dev/` | Auto-deploy on push. Persistent DB. |
-| `feature/<slug>` | `:<slug>` | _Not auto-deployed_ | Images are built so anyone can pull them; deploy locally or merge to develop to see them live. |
+| `feature/<slug>` | `:<slug>` | _Not auto-deployed_ | The images get built so anyone can pull them, but they don't auto-deploy. To see a feature branch live, deploy it locally or merge into develop. |
 
-`gr8-plain` is the placeholder name baked into the manifests; CI rewrites it (`sed -i 's|gr8-plain|gr8-<env>|g'`) to produce the per-environment release name. Production additionally rewrites image tags (`backend:develop` → `backend:latest`).
+The manifests bake in `gr8-plain` as a placeholder name. At deploy time, CI rewrites it (`sed -i 's|gr8-plain|gr8-<env>|g'`) to the per-environment release name. Production also rewrites image tags from `:develop` to `:latest`.
 
 <div align="center">
 <img src="docs/media/kubectl-pods.png" alt="kubectl get pods showing api, db, and frontend pods running" width="600" />
@@ -210,25 +212,25 @@ Everything ships to the school's **Kubernetes** cluster — a [k3s](https://k3s.
 | **secret-detection** | GitLab's built-in template, runs on every pipeline. |
 | **build** | Docker buildx with registry cache. Images pushed to `registry.chas-lab.dev/.../backend:<tag>` and `.../frontend:<tag>`. |
 | **deploy** | Applies the rewritten manifests, then `kubectl rollout restart` on the API + frontend deployments to force a pull even when the tag is unchanged. `helm upgrade --install` for Redis + observability. |
-| **smoke-test** | Polls `${ENV_URL}/api/openapi/v1.json` every 5s for 5 minutes. Any non-5xx is success; only gateway errors and connection failures count as down. Window is sized to cover an MSSQL cold start + EF schema upgrade (3–4 min). |
+| **smoke-test** | Polls `${ENV_URL}/api/openapi/v1.json` every 5s for 5 minutes. Any HTTP response counts as success. Only gateway errors (502/503/504) and connection failures count as down. 5 minutes is enough to cover MSSQL cold-starting and EF re-applying the schema, which takes around 3–4 min after a fresh pod. |
 
-Workflow rules guarantee exactly one pipeline per commit: when an MR is open, only the MR pipeline runs (so deploy + smoke-test become part of the merge gate); otherwise the branch pipeline runs.
+Workflow rules make sure there's exactly one pipeline per commit. If an MR is open, only the MR pipeline runs (so deploy + smoke-test gate the merge button). Otherwise the branch pipeline runs.
 
 ### Secrets
 
-Secrets are plain Kubernetes `Secret` objects (`gr8-secrets` for app secrets, `gitlab-registry` for the image pull secret), created **out of band** with `kubectl create secret` — never templated by CI, never committed. The cluster bootstrap is documented in [`devops/k8s/`](devops/k8s/).
+Secrets live in two plain Kubernetes `Secret` objects: `gr8-secrets` for app secrets, `gitlab-registry` for the image pull secret. We create them once with `kubectl create secret` when bootstrapping a namespace. CI never templates them and they never land in the repo. Bootstrap steps are in [`devops/k8s/`](devops/k8s/).
 
 ---
 
 ## Observability
 
-The school cluster already runs Prometheus + Grafana. Mallo plugs into them via the Helm chart:
+The school cluster already runs Prometheus + Grafana. Our Helm chart adds Mallo-specific pieces on top:
 
 - **`ServiceMonitor`** scrapes the API's `/metrics` endpoint every 15s.
-- **`PrometheusRule`** ships two alerts:
-  - `Gr8ApiHighErrorRate` — 5xx rate > 5% for 5 min (warning)
-  - `Gr8ApiNoTraffic` — 0 req/s for 15 min (info)
-- **Grafana dashboard** auto-provisioned via ConfigMap (label `grafana_dashboard: "1"`). Four panels: request rate by endpoint, 5xx rate, p95 latency by endpoint, request count by HTTP status code.
+- **`PrometheusRule`** with two alerts:
+  - `Gr8ApiHighErrorRate`: 5xx rate above 5% for 5 min (warning)
+  - `Gr8ApiNoTraffic`: 0 req/s for 15 min (info)
+- **Grafana dashboard** auto-provisioned by a ConfigMap (label `grafana_dashboard: "1"`). Four panels: request rate by endpoint, 5xx rate, p95 latency by endpoint, request count by HTTP status code.
 
 <div align="center">
 <img src="docs/media/grafana.png" alt="Grafana dashboard — request rate, 5xx, latency p95, requests by code" width="800" />
@@ -250,7 +252,7 @@ Templates: [`devops/k8s/chart/templates/`](devops/k8s/chart/templates/).
 
 ## Run it locally
 
-The fastest path: run MSSQL in Docker, then the API and frontend each in their own terminal. The root `docker-compose.yml` is shaped for the cluster deploy, not for local dev.
+The root `docker-compose.yml` is shaped for the cluster deploy, not local dev. For local work, run MSSQL in Docker and start the API and frontend each in their own terminal.
 
 ```bash
 # 1. MS SQL Server in a container.
@@ -258,14 +260,14 @@ docker run -d --name mallo-db \
   -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD='YourStrong!Password123' \
   -p 1433:1433 mcr.microsoft.com/mssql/server:2022-latest
 
-# 2. Backend — first time, set the connection string via user-secrets.
+# 2. Backend. First time only: store the connection string in user-secrets.
 cd backend/Gr8
 dotnet user-secrets --project Api set \
   "ConnectionStrings:DefaultConnection" \
   "Server=localhost;Database=CommunityDB;User Id=sa;Password=YourStrong!Password123;TrustServerCertificate=true"
 dotnet run --project Api          # → http://localhost:5225 (EF migrations run on startup)
 
-# 3. Frontend — in another terminal.
+# 3. Frontend, in a second terminal.
 cd frontend/Gr8
 echo "VITE_API_BASE_URL=http://localhost:5225" > .env.local
 echo "VITE_MAPBOX_TOKEN=<your-mapbox-token>"  >> .env.local
@@ -291,7 +293,7 @@ For Rider / Visual Studio: open [`backend/Gr8/Gr8.slnx`](backend/Gr8/Gr8.slnx).
 │   ├── swarm-setup.md        # Historical: previous Docker Swarm setup (now retired)
 │   └── README.md
 ├── docs/media/               # Demo videos and screenshots referenced from this README
-├── docker-compose.yml        # Legacy Docker Swarm composition — kept for reference, not used for local dev or current deploy
+├── docker-compose.yml        # Legacy Docker Swarm compose, kept for reference. Not used by current deploy or local dev.
 ├── .gitlab-ci.yml            # Build, deploy, smoke-test pipeline
 ├── TECHSTACK.md              # Pinned framework / language versions
 └── README.md                 # You are here.
@@ -299,7 +301,7 @@ For Rider / Visual Studio: open [`backend/Gr8/Gr8.slnx`](backend/Gr8/Gr8.slnx).
 
 ---
 
-## Team — Grupp GR8
+## Team (Grupp GR8)
 
 | Member | Role |
 |---|---|
@@ -313,7 +315,7 @@ For Rider / Visual Studio: open [`backend/Gr8/Gr8.slnx`](backend/Gr8/Gr8.slnx).
 | Anton | DevOps |
 | Reza | DevOps |
 
-Branch naming follows the team's Jira project (`UT8`) when a ticket exists — e.g. `feature/UT8-367_style_card_image_url` — and descriptive names (`feature/fix-api-inotify-crash`) for ticketless work.
+Branch naming follows the team's Jira project (`UT8`) when there's a ticket (`feature/UT8-367_style_card_image_url`). When there isn't, we use descriptive names like `feature/fix-api-inotify-crash`.
 
 ---
 

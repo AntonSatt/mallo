@@ -102,6 +102,7 @@ build frontend:
         -f frontend/Gr8/Dockerfile \
         -t "$CI_REGISTRY_IMAGE/frontend:$TAG" \
         --build-arg VITE_API_BASE_URL="/api" \
+        --build-arg VITE_MAPBOX_TOKEN="$VITE_MAPBOX_TOKEN" \
         --cache-from=type=registry,ref="$CI_REGISTRY_IMAGE/frontend:cache-$TAG" \
         --cache-from=type=registry,ref="$CI_REGISTRY_IMAGE/frontend:cache-latest" \
         --cache-to=type=registry,ref="$CI_REGISTRY_IMAGE/frontend:cache-$TAG",mode=max \
@@ -157,6 +158,12 @@ deploy develop:
     # same cluster. Image tags already match (:develop), no image rewrite.
     - sed -i 's|gr8-plain|gr8-develop|g' devops/k8s/manifests/*.yaml
     - kubectl apply -f devops/k8s/manifests/
+    # kubectl apply is a no-op when the manifest spec is byte-identical to the
+    # live resource (e.g. when only the image *contents* changed under the same
+    # :develop tag). Force a rollout so the api+frontend pods actually pull the
+    # new image. DB StatefulSet is excluded — restarting MSSQL costs ~3-4 min
+    # of schema upgrade and the DB image rarely changes.
+    - kubectl -n "$NAMESPACE" rollout restart deployment -l app.kubernetes.io/instance=gr8-develop
     - |
       helm upgrade --install gr8-develop-extras ./devops/k8s/chart \
         --namespace "$NAMESPACE" \
@@ -180,6 +187,7 @@ deploy production:
     # and image tags ":develop" → ":latest" since main builds the :latest tag.
     - sed -i 's|gr8-plain|gr8-main|g; s|backend:develop|backend:latest|g; s|frontend:develop|frontend:latest|g' devops/k8s/manifests/*.yaml
     - kubectl apply -f devops/k8s/manifests/
+    - kubectl -n "$NAMESPACE" rollout restart deployment -l app.kubernetes.io/instance=gr8-main
     - |
       helm upgrade --install gr8-main-extras ./devops/k8s/chart \
         --namespace "$NAMESPACE" \
@@ -205,7 +213,9 @@ deploy production:
     - |
       URL="${CI_ENVIRONMENT_URL}/api/openapi/v1.json"
       echo "Polling $URL"
-      for i in $(seq 1 30); do
+      # 60 * 5s = 5 min. Covers MSSQL master/msdb/model schema upgrade
+      # (~3-4 min on cold-start after PVC reattach) + .NET boot + image pull.
+      for i in $(seq 1 60); do
         status=$(curl -o /dev/null -s -w "%{http_code}" --max-time 5 "$URL" || echo "000")
         case "$status" in
           000|502|503|504)
@@ -218,7 +228,7 @@ deploy production:
             ;;
         esac
       done
-      echo "API never responded within 150s — check api/db logs with kubectl"
+      echo "API never responded within 300s — check api/db logs with kubectl"
       exit 1
 
 smoke-test develop:

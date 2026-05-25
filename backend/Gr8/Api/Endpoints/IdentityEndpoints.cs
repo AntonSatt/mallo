@@ -124,7 +124,7 @@ namespace Gr8.Api.Endpoints
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapGet("/users/me", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user) =>
+            app.MapGet("/users/me", async (UserManager<ApplicationUser> userManger, IUserTagService userTagService, ClaimsPrincipal user) =>
             {
                 var appUser = await userManger.GetUserAsync(user);
 
@@ -140,6 +140,7 @@ namespace Gr8.Api.Endpoints
                     LastName = appUser.LastName,
                     UserName = appUser.UserName,
                     Avatar = appUser.Avatar,
+                    TagIds = await userTagService.GetUserTagIdsAsync(appUser.Id),
                 };
 
                 return Results.Ok(userDto);
@@ -147,7 +148,7 @@ namespace Gr8.Api.Endpoints
             })
              .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPut("/users/me", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) =>
+            app.MapPut("/users/me", async (UserManager<ApplicationUser> userManager, IJwtTokenGenerator jwtGenerator, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) =>
                 {
                     var appUser = await userManager.GetUserAsync(user);
 
@@ -166,7 +167,8 @@ namespace Gr8.Api.Endpoints
 
                     if (changedProfil.Succeeded)
                     {
-                        return Results.Ok("User updated successfully");
+                        var token = jwtGenerator.GenerateToken(appUser.Id, appUser.Email!, appUser.UserName!, appUser.Avatar);
+                        return Results.Ok(new { Message = "User updated successfully", Token = token });
                     }
 
                     var isDuplicate = changedProfil.Errors.Any(e => e.Code.Contains("DuplicateUserName") || e.Code.Contains("DuplicateEmail"));
@@ -177,6 +179,26 @@ namespace Gr8.Api.Endpoints
                     }
 
                     return Results.BadRequest(changedProfil.Errors);
+                })
+                .RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPatch("/users/me/tags", async (UserManager<ApplicationUser> userManager, IUserTagService userTagService, ClaimsPrincipal user, [FromBody] UpdateUserTagsDto updateUserTagsDto) =>
+                {
+                    var appUser = await userManager.GetUserAsync(user);
+
+                    if (appUser == null)
+                    {
+                        return Results.NotFound("User not found.");
+                    }
+
+                    var tagsUpdated = await userTagService.UpdateUserTagIdsAsync(appUser.Id, updateUserTagsDto.TagIds);
+
+                    if (!tagsUpdated)
+                    {
+                        return Results.BadRequest("One or more tag ids are invalid.");
+                    }
+
+                    return Results.Ok("User tags updated successfully");
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 

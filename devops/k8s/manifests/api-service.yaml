@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gr8-plain-api
+  labels:
+    app.kubernetes.io/name: gr8
+    app.kubernetes.io/instance: gr8-plain
+    app.kubernetes.io/part-of: gr8
+    app.kubernetes.io/component: api
+  annotations:
+    # Sticky sessions keep a SignalR client pinned to one api pod.
+    traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
+    traefik.ingress.kubernetes.io/service.sticky.cookie.name: "gr8_signalr_sticky"
+    traefik.ingress.kubernetes.io/service.sticky.cookie.httponly: "true"
+    traefik.ingress.kubernetes.io/service.sticky.cookie.samesite: "Lax"
+    traefik.ingress.kubernetes.io/service.sticky.cookie.secure: "true"
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: gr8
+    app.kubernetes.io/instance: gr8-plain
+    app.kubernetes.io/component: api

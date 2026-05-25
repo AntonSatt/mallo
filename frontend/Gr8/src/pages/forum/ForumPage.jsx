@@ -8,7 +8,6 @@ import { useAuth } from "../../hooks/useAuth";
 import useViewport from "../../hooks/useViewport";
 import FilterPost from "../../components/filterPost/FilterPost.jsx";
 import PostCard from "../../components/postCard/PostCard.jsx";
-import ProfileBar from "../../components/layout/ProfileBar.jsx";
 import PostActionsDialog from "../../components/postActionsDialog/PostActionsDialog.jsx";
 
 import {
@@ -17,17 +16,17 @@ import {
     Dialog,
     DialogTitle,
     DialogActions,
+    Typography,
 } from "@mui/material";
 
 import { useEffect, useState, useMemo, useRef } from "react";
 
-const ForumPage = () => {
+const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
     const { currentUser } = useAuth();
     const { isDesktop } = useViewport();
     const scrollAreaRef = useRef(null);
 
     const [expanded, setExpanded] = useState(null);
-    const [openPostModal, setPostModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
     const [openReportModal, setOpenReportModal] = useState(false);
 
@@ -41,6 +40,7 @@ const ForumPage = () => {
     const [checkedCategories, setCheckedCategories] = useState([]);
     const [categories, setCategories] = useState([]);
     const [userBookmarks, setUserBookmarks] = useState([]);
+    const [userPostHugs, setUserPostHugs] = useState([]);
 
     const handleOpenEditPost = (post) => setEditPost(post);
     const handleCloseEditPost = () => setEditPost(null);
@@ -54,14 +54,9 @@ const ForumPage = () => {
         setDeletePostId(null);
     };
 
-    // Opens the post creation modal
-    const handleClickOpen = () => {
-        setPostModalOpen(true);
-    };
-
     // Closes the post creation modal
     const handleClose = async () => {
-        setPostModalOpen(false);
+        setOpenModal(false);
     };
 
     // Toggles the expansion of the comment section for a post
@@ -121,29 +116,67 @@ const ForumPage = () => {
     };
 
     const filteredPosts = useMemo(() => {
+        let result = posts;
+
+        if (searchQuery.trim()) {
+            result = result.filter(p =>
+                p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                p.content.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
+
         if (checkedCategories.length > 0) {
-            return posts.filter(p => {
+            return result.filter(p => {
                 const cat = p.category?.name || p.category;
                 return checkedCategories.includes(cat);
             });
         }
+
         if (activeNavCategory !== "Alla" && activeNavCategory !== "Sparade" && activeNavCategory !== "Dina inlägg") {
-            return posts.filter(p => {
+            return result.filter(p => {
                 const cat = p.category?.name || p.category;
                 return cat === activeNavCategory;
             });
         }
-        if (activeNavCategory == "Sparade") {
-            return posts.filter(p => {
-                return userBookmarks.some(b => b.postId === p.id);
-            });
-        }
-        if (activeNavCategory == "Dina inlägg") {
-            return posts.filter(p => p.authorInfo.id === currentUser?.sub);
+
+        if (activeNavCategory === "Sparade") {
+            return result.filter(p => userBookmarks.some(b => b.postId === p.id));
         }
 
-        return posts;
-    }, [posts, activeNavCategory, checkedCategories, userBookmarks]);
+        if (activeNavCategory === "Dina inlägg") {
+            return result.filter(p => p.authorInfo.id === currentUser?.sub);
+        }
+
+        return result;
+    }, [posts, activeNavCategory, checkedCategories, userBookmarks, searchQuery, currentUser?.sub]);
+
+    const emptyStateMessage = useMemo(() => {
+        if (filteredPosts.length > 0) {
+            return "";
+        }
+
+        if (searchQuery.trim()) {
+            return "Inga inlägg matchade din sökning.";
+        }
+
+        if (activeNavCategory === "Sparade") {
+            return "Du har inga sparade inlägg ännu.";
+        }
+
+        if (activeNavCategory === "Dina inlägg") {
+            return "Du har inte skapat några inlägg ännu.";
+        }
+
+        if (checkedCategories.length > 0) {
+            return "Det finns inga inlägg i de valda kategorierna just nu.";
+        }
+
+        if (activeNavCategory !== "Alla") {
+            return `Det finns inga inlägg i kategorin ${activeNavCategory} ännu.`;
+        }
+
+        return "Det finns inga inlägg att visa just nu.";
+    }, [filteredPosts.length, searchQuery, activeNavCategory, checkedCategories.length]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -202,6 +235,29 @@ const ForumPage = () => {
     }, []);
 
     useEffect(() => {
+        const fetchPostHugs = async () => {
+            try {
+                if (posts.length === 0) {
+                    return;
+                }
+
+                const hugsResult = await Promise.all(
+                    posts.map(post => PostServices.getPostHugs(post.id))
+                );
+
+                const allHugs = hugsResult.flat().filter(Boolean);
+
+                setUserPostHugs(allHugs);
+            }
+            catch (error) {
+                console.error("Error fetching post hugs:", error);
+            }
+        };
+
+        fetchPostHugs();
+    }, [posts]);
+
+    useEffect(() => {
         if (!isDesktop) {
             return;
         }
@@ -246,9 +302,8 @@ const ForumPage = () => {
     return (
         <>
             <div className="forum-page">
-                <div className="forum-container">
 
-                    {!isDesktop && <ProfileBar showCreate onCreatePost={handleClickOpen} />}
+                <div className="forum-container">
 
                     <DeletePost
                         postId={deletePostId}
@@ -283,7 +338,7 @@ const ForumPage = () => {
                     />
 
                     <Dialog
-                        open={openPostModal}
+                        open={openModal}
                         onClose={handleClose}
                         fullWidth
                         maxWidth="sm"
@@ -326,10 +381,13 @@ const ForumPage = () => {
                         sx={{
                             width: "100%",
 
-                            height: { xs: "auto", md: "auto" },
+                            height: { xs: "auto", md: "100%" },
+                            maxHeight: { md: "100%" },
 
-                            overflowY: { xs: "visible", md: "auto" },
+                            overflowY: { xs: "visible", md: "scroll" },
                             overflowX: "hidden",
+                            scrollbarWidth: { md: "thin" },
+                            scrollbarColor: { md: "white transparent" },
 
                             '&::-webkit-scrollbar': { width: '6px', },
 
@@ -345,18 +403,28 @@ const ForumPage = () => {
                             {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
                     each post. The PostCard component is responsible for displaying the post content, as well as handling the 
                     expand/collapse of the comment section and the menu actions for reporting, editing, and deleting posts. */}
-                            {filteredPosts.map((post) => (
-                                <PostCard
-                                    key={post.id}
-                                    post={post}
-                                    expanded={expanded === post.id}
-                                    onExpand={() => handleExpandClick(post.id)}
-                                    onMenuOpen={(event) => handleMenuOpen(event, post.id)}
-                                    userBookmarks={userBookmarks}
-                                    currentUser={currentUser}
-                                    setUserBookmarks={setUserBookmarks}
-                                />
-                            ))}
+                            {filteredPosts.length > 0 ? (
+                                filteredPosts.map((post) => (
+                                    <PostCard
+                                        key={post.id}
+                                        post={post}
+                                        expanded={expanded === post.id}
+                                        onExpand={() => handleExpandClick(post.id)}
+                                        onMenuOpen={(event) => handleMenuOpen(event, post.id)}
+                                        userBookmarks={userBookmarks}
+                                        currentUser={currentUser}
+                                        setUserBookmarks={setUserBookmarks}
+                                        userPostHugs={userPostHugs}
+                                        setUserPostHugs={setUserPostHugs}
+                                    />
+                                ))
+                            ) : (
+                                <Box className="forum-empty-state-panel">
+                                    <Typography className="forum-empty-state">
+                                        {emptyStateMessage}
+                                    </Typography>
+                                </Box>
+                            )}
                         </Box>
                     </Box>
                 </div>

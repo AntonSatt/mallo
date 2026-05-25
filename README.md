@@ -44,6 +44,25 @@ This repository is **Grupp GR8**'s submission for **Chas Challenge 2026** at [Ch
 
 ---
 
+## What it looks like
+
+<div align="center">
+
+<table>
+<tr>
+<td align="center"><img src="docs/media/landing-login.png" alt="Landing & login" width="200" /><br/><sub><b>Welcome & login</b></sub></td>
+<td align="center"><img src="docs/media/forum.png" alt="Forum feed" width="200" /><br/><sub><b>Forum feed</b></sub></td>
+<td align="center"><img src="docs/media/activity-map.png" alt="Activity map" width="200" /><br/><sub><b>Activity map</b></sub></td>
+<td align="center"><img src="docs/media/chat.png" alt="Real-time chat" width="200" /><br/><sub><b>Real-time chat</b></sub></td>
+</tr>
+</table>
+
+<sub>Mobile views — Mallo is built mobile-first.</sub>
+
+</div>
+
+---
+
 ## Features
 
 | Area | What it does | Where it lives |
@@ -54,8 +73,6 @@ This repository is **Grupp GR8**'s submission for **Chas Challenge 2026** at [Ch
 | **Accounts & auth** | Register (with Swedish personnummer + 18+ check), login, JWT bearer tokens, email-based password reset (MailKit/SMTP), profile editing, account deletion (GDPR). | [`backend/Gr8/Api/Endpoints/IdentityEndpoints.cs`](backend/Gr8/Api/Endpoints/IdentityEndpoints.cs) |
 | **Push notifications** | Firebase Cloud Messaging service-worker in the browser for activity / chat alerts. | [`frontend/Gr8/public/firebase-messaging-sw.js`](frontend/Gr8/public/firebase-messaging-sw.js) |
 | **API docs** | Live OpenAPI schema served by the API; Scalar UI for interactive browsing. | `GET /api/openapi/v1.json` on every environment |
-
-> More screenshots and short clips live in [`docs/media/`](docs/media/) — drop new ones in there and link them from this table.
 
 ---
 
@@ -220,6 +237,10 @@ The school cluster already runs Prometheus + Grafana. Mallo plugs into them via 
   - `Gr8ApiHighErrorRate` — 5xx rate > 5% for 5 min (warning)
   - `Gr8ApiNoTraffic` — 0 req/s for 15 min (info)
 - **Grafana dashboard** auto-provisioned via ConfigMap (label `grafana_dashboard: "1"`). Four panels: request rate by endpoint, 5xx rate, p95 latency by endpoint, request count by HTTP status code.
+
+<div align="center">
+<img src="docs/media/grafana.png" alt="Grafana dashboard — request rate, 5xx, latency p95, requests by code" width="800" />
+</div>
 
 Templates: [`devops/k8s/chart/templates/`](devops/k8s/chart/templates/).
 

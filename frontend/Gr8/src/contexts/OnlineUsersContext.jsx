@@ -1,5 +1,6 @@
 import ChatSignalrServices from "../services/ChatSignalrServices";
 import { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "./AuthContext.jsx";
 
 // this file is used to keep track of online users in the application. It uses the ChatSignalrServices to 
 // listen for user online and offline events and updates the onlineUsers state accordingly. The context 
@@ -9,19 +10,22 @@ const OnlineUsersContext = createContext();
 
 export const OnlineUsersProvider = ({children}) => {
 
+    const {isAuthenticated} = useAuth();
     const [onlineUsers, setOnlineUsers] = useState([]);
 
     useEffect(() => {
+        if(!isAuthenticated){
+            setOnlineUsers([]);
+            return;
+        }
+
         const setupPresence = async () => {
 
             ChatSignalrServices.onOnlineUsers((userIds) => {
-                console.log("ONLINE USERS:", userIds);
                 setOnlineUsers(userIds);
             });
 
             ChatSignalrServices.onUserOnline((userId) => {
-
-                console.log("ONLINE:", userId);
 
                 setOnlineUsers((prevUsers) => {
 
@@ -35,8 +39,6 @@ export const OnlineUsersProvider = ({children}) => {
 
             ChatSignalrServices.onUserOffline((userId) => {
 
-                console.log("OFFLINE:", userId);
-
                 setOnlineUsers((prevUsers) =>
                     prevUsers.filter((id) => id !== userId)
                 );
@@ -46,8 +48,7 @@ export const OnlineUsersProvider = ({children}) => {
         };
 
         setupPresence();
-
-    }, []);
+    }, [isAuthenticated]);
 
     const isUserOnline = (userId) => {
         return onlineUsers.includes(userId);
@@ -59,5 +60,5 @@ export const OnlineUsersProvider = ({children}) => {
         </OnlineUsersContext.Provider>
     );
 };
-
+// eslint-disable-next-line react-refresh/only-export-components
 export const useOnlineUsers = () => useContext(OnlineUsersContext);

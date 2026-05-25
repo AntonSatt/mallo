@@ -1,6 +1,7 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import UserServices from '../services/UserServices';
 import { registerAuthListener } from '../services/AuthServices';
+import ChatSignalrServices from '../services/ChatSignalrServices';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
@@ -32,7 +33,8 @@ export const AuthProvider = ({ children }) => {
     setCurrentUser(getUser());
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await ChatSignalrServices.stopConnection();
     UserServices.logout();
     setIsAuthenticated(false);
     setCurrentUser(null);
@@ -55,3 +57,5 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAuth = () => useContext(AuthContext);

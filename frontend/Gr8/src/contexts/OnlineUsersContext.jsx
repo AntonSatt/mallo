@@ -1,5 +1,5 @@
 import ChatSignalrServices from "../services/ChatSignalrServices";
-import {createContext, useContext, useEffect, useState} from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 // this file is used to keep track of online users in the application. It uses the ChatSignalrServices to 
 // listen for user online and offline events and updates the onlineUsers state accordingly. The context 
@@ -7,26 +7,45 @@ import {createContext, useContext, useEffect, useState} from "react";
 
 const OnlineUsersContext = createContext();
 
-export const OnlineUsersProviders = ({children}) => {
+export const OnlineUsersProvider = ({children}) => {
 
     const [onlineUsers, setOnlineUsers] = useState([]);
 
     useEffect(() => {
+        const setupPresence = async () => {
 
-        ChatSignalrServices.onUserOnline((userId) => {
-            setOnlineUsers((prevUsers) => {
-
-                if (prevUsers.includes(userId)) {
-                    return prevUsers;
-                }
-
-                return [...prevUsers, userId]
+            ChatSignalrServices.onOnlineUsers((userIds) => {
+                console.log("ONLINE USERS:", userIds);
+                setOnlineUsers(userIds);
             });
-        });
 
-        ChatSignalrServices.onUserOffline((userId) => {
-            setOnlineUsers((prevUsers) => prevUsers.filter((id) => id !== userId));
-        });
+            ChatSignalrServices.onUserOnline((userId) => {
+
+                console.log("ONLINE:", userId);
+
+                setOnlineUsers((prevUsers) => {
+
+                    if (prevUsers.includes(userId)) {
+                        return prevUsers;
+                    }
+
+                    return [...prevUsers, userId];
+                });
+            });
+
+            ChatSignalrServices.onUserOffline((userId) => {
+
+                console.log("OFFLINE:", userId);
+
+                setOnlineUsers((prevUsers) =>
+                    prevUsers.filter((id) => id !== userId)
+                );
+            });
+
+            await ChatSignalrServices.startConnection();
+        };
+
+        setupPresence();
 
     }, []);
 

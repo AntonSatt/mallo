@@ -4,7 +4,6 @@ stages:
   - build
   - deploy
   - smoke-test
-  - cleanup
 
 include:
   - template: Security/Secret-Detection.gitlab-ci.yml
@@ -12,9 +11,12 @@ include:
 # Ensure exactly one pipeline per commit:
 # - When an MR is open, run only the merge-request pipeline (so deploy + smoke-test
 #   are part of the gate that blocks the merge button on failure).
-# - When no MR is open, run the branch pipeline (so pre-MR feature pushes still
-#   get a review env deployed).
+# - When no MR is open, run the branch pipeline (so develop/main pushes deploy).
 workflow:
+  # Auto-cancel an older pipeline's interruptible jobs when a new commit lands,
+  # so rapid pushes don't stack up full pipelines.
+  auto_cancel:
+    on_new_commit: interruptible
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
@@ -29,6 +31,7 @@ variables:
 # Only develop can be merged into main
 check-merge-source:
   stage: test
+  interruptible: true
   script:
     - |
       if [ "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" == "main" ] && [ "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" != "develop" ]; then
@@ -44,7 +47,9 @@ check-merge-source:
 # ---------------------------------------------------------------------------
 frontend-test:
   stage: test
-  image: node:20
+  interruptible: true
+  # Placeholder job (only echoes). Restore image to node:20 when real Vitest/Jest tests are added.
+  image: alpine:3.21
   script:
     - cd frontend/Gr8
     - echo "WARNING - No test scripts found in frontend package.json"
@@ -59,7 +64,9 @@ frontend-test:
 # ---------------------------------------------------------------------------
 backend-test:
   stage: test
-  image: mcr.microsoft.com/dotnet/sdk:8.0
+  interruptible: true
+  # Placeholder job (only echoes). Restore image to the .NET SDK when real xUnit/NUnit tests are added.
+  image: alpine:3.21
   script:
     - cd backend/Gr8
     - echo "WARNING - No test projects found in backend."
@@ -76,6 +83,7 @@ backend-test:
 .build-image: &build-image
   stage: build
   image: docker:29
+  interruptible: true
   services:
     - docker:29-dind
   before_script:
@@ -113,8 +121,9 @@ build backend:
         --provenance=false --push backend/Gr8
 
 # ---------------------------------------------------------------------------
-# Deploy stage: helm upgrade --install per branch into the school k3s namespace.
-# Auth via KUBECONFIG_CHAS_LAB (File-type CI variable holding the kubeconfig).
+# Deploy stage: plain manifests (api/frontend/db/ingress/middleware) +
+# slim chart for the parts Anton doesn't own (Bitnami Redis + observability).
+# Auth via KUBECONFIG_CC_PROJECT_B64 (base64 CI variable holding the kubeconfig).
 # ---------------------------------------------------------------------------
 
 .deploy-k3s: &deploy-k3s
@@ -130,10 +139,12 @@ build backend:
     - chmod 600 /tmp/kubeconfig
     - export KUBECONFIG=/tmp/kubeconfig
     - kubectl auth whoami
+    - helm dependency update ./devops/k8s/chart
 
 # Develop deploy: persistent shared dev environment
 deploy develop:
   <<: *deploy-k3s
+  resource_group: develop
   needs:
     - job: build frontend
     - job: build backend
@@ -141,39 +152,23 @@ deploy develop:
     name: develop
     url: https://gr8-develop.${HOST_BASE}
   script:
+    # Rewrite the "gr8-plain" identifier in the checked-in plain manifests to
+    # "gr8-develop" so develop's resources don't collide with main's on the
+    # same cluster. Image tags already match (:develop), no image rewrite.
+    - sed -i 's|gr8-plain|gr8-develop|g' devops/k8s/manifests/*.yaml
+    - kubectl apply -f devops/k8s/manifests/
     - |
-      helm upgrade --install gr8-develop ./devops/k8s/chart \
+      helm upgrade --install gr8-develop-extras ./devops/k8s/chart \
         --namespace "$NAMESPACE" \
-        --set image.tag=develop \
-        --wait --timeout 20m --atomic
+        --wait --timeout 5m --atomic
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "develop" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
 
-# Review deploy: ephemeral per-branch releases for feature branches
-deploy review:
-  <<: *deploy-k3s
-  needs:
-    - job: build frontend
-    - job: build backend
-  environment:
-    name: review/$CI_COMMIT_REF_SLUG
-    url: https://gr8-$CI_COMMIT_REF_SLUG.${HOST_BASE}
-    on_stop: stop_review
-  script:
-    - |
-      helm upgrade --install "gr8-$CI_COMMIT_REF_SLUG" ./devops/k8s/chart \
-        --namespace "$NAMESPACE" \
-        -f ./devops/k8s/chart/values-feature.yaml \
-        --set image.tag="$CI_COMMIT_REF_SLUG" \
-        --wait --timeout 20m --atomic
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "main"
-    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop"
-
 # Production deploy: only on main, manual approval gate
 deploy production:
   <<: *deploy-k3s
+  resource_group: production
   needs:
     - job: build frontend
     - job: build backend
@@ -181,11 +176,14 @@ deploy production:
     name: production
     url: https://gr8-main.${HOST_BASE}
   script:
+    # Rewrite "gr8-plain" → "gr8-main" (resource names + ingress host + CORS)
+    # and image tags ":develop" → ":latest" since main builds the :latest tag.
+    - sed -i 's|gr8-plain|gr8-main|g; s|backend:develop|backend:latest|g; s|frontend:develop|frontend:latest|g' devops/k8s/manifests/*.yaml
+    - kubectl apply -f devops/k8s/manifests/
     - |
-      helm upgrade --install gr8-main ./devops/k8s/chart \
+      helm upgrade --install gr8-main-extras ./devops/k8s/chart \
         --namespace "$NAMESPACE" \
-        --set image.tag=latest \
-        --wait --timeout 20m --atomic
+        --wait --timeout 5m --atomic
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: manual
@@ -202,9 +200,10 @@ deploy production:
 .smoke-test: &smoke-test
   stage: smoke-test
   image: curlimages/curl:latest
+  interruptible: true
   script:
     - |
-      URL="https://gr8-${CI_COMMIT_REF_SLUG}.${HOST_BASE}/api/openapi/v1.json"
+      URL="${CI_ENVIRONMENT_URL}/api/openapi/v1.json"
       echo "Polling $URL"
       for i in $(seq 1 30); do
         status=$(curl -o /dev/null -s -w "%{http_code}" --max-time 5 "$URL" || echo "000")
@@ -226,54 +225,19 @@ smoke-test develop:
   <<: *smoke-test
   needs:
     - job: deploy develop
+  environment:
+    name: develop
+    action: verify
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "develop" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
-
-smoke-test review:
-  <<: *smoke-test
-  needs:
-    - job: deploy review
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "main"
-    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop"
 
 smoke-test production:
   <<: *smoke-test
   needs:
     - job: deploy production
+  environment:
+    name: production
+    action: verify
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-
-# ---------------------------------------------------------------------------
-# Cleanup: manual teardown for review releases on MR close.
-# Deletes the helm release AND the StatefulSet PVCs (helm uninstall doesn't).
-# ---------------------------------------------------------------------------
-
-stop_review:
-  stage: cleanup
-  image:
-    name: alpine/helm:3.20.2
-    entrypoint: [""]
-  variables:
-    GIT_STRATEGY: none
-  before_script:
-    - apk add --no-cache curl bash coreutils
-    - curl -LO "https://dl.k8s.io/release/v1.33.0/bin/linux/amd64/kubectl"
-    - chmod +x kubectl && mv kubectl /usr/local/bin/
-    - echo "$KUBECONFIG_CC_PROJECT_B64" | base64 -d > /tmp/kubeconfig
-    - chmod 600 /tmp/kubeconfig
-    - export KUBECONFIG=/tmp/kubeconfig
-  environment:
-    name: review/$CI_COMMIT_REF_SLUG
-    action: stop
-  script:
-    - helm uninstall "gr8-$CI_COMMIT_REF_SLUG" -n "$NAMESPACE" || true
-    - kubectl delete pvc -l app.kubernetes.io/instance="gr8-$CI_COMMIT_REF_SLUG" -n "$NAMESPACE" --ignore-not-found
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "main"
-      when: manual
-      allow_failure: true
-    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop"
-      when: manual
-      allow_failure: true

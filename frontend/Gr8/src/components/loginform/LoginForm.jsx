@@ -4,7 +4,6 @@ import { useAuth } from "../../hooks/useAuth";
 import { Grid, Typography, Box } from "@mui/material"
 import PrimaryButton from "../../design/buttons/PrimaryButton";
 import InputField from "../../design/input/InputField";
-import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import InputAdornment from "@mui/material/InputAdornment";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
@@ -67,12 +66,12 @@ const LoginForm = () => {
     <form onSubmit={handleSubmit}>
       <Grid container direction="column" spacing={2}>
         {error.general && (
-          <Grid item>
+          <Grid>
             <Typography color="error" align="center">{error.general}</Typography>
           </Grid>
         )}
 
-        <Grid item>
+        <Grid>
           <Typography variant="h6" align="center">
             Användarnamn
           </Typography>
@@ -84,21 +83,11 @@ const LoginForm = () => {
             helperText={error.userName}
             sx={{
               "& .MuiOutlinedInput-input": {
-                textAlign: "center",
-                paddingLeft: "40px"
+                textAlign: "center"
               },
               "& .MuiOutlinedInput-root": {
                 height: 40,
                 borderRadius: 20,
-              },
-            }}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                  </InputAdornment>
-                ),
               },
             }}
             value={userName}
@@ -106,7 +95,7 @@ const LoginForm = () => {
           />
         </Grid>
 
-        <Grid item>
+        <Grid>
           <Typography variant="h6" align="center">
             Lösenord
           </Typography>
@@ -121,29 +110,18 @@ const LoginForm = () => {
             onChange={(e) => setPassword(e.target.value)}
             sx={{
               "& .MuiOutlinedInput-input": {
-                textAlign: "center",
-                paddingLeft: "40px",
+                textAlign: "center"
               },
               "& .MuiOutlinedInput-root": {
                 height: 40,
                 borderRadius: 20,
-              },
-
-            }}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                  </InputAdornment>
-                ),
               },
             }}
           />
         </Grid>
 
         {error.general && (
-          <Grid item>
+          <Grid>
             <Typography color="error" align="center">
               {error.general}
             </Typography>
@@ -175,7 +153,7 @@ const LoginForm = () => {
           </Typography>
         </Box>
 
-        <Grid item>
+        <Grid>
           <PrimaryButton type="submit" sx={{ height: 40, mt: 2 }}>
             Logga in
           </PrimaryButton>

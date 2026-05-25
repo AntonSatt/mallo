@@ -47,6 +47,12 @@ const PostServices = {
         });
         return response.data;
     },
+
+    getPostHugs: async (postId) => {
+        const response = await ApiClient.get(`/forum/posts/${postId}/hugs`)
+        return response.data;
+    },
+
    bookmarkPost: async (postId, userId) => {
         const response = await ApiClient.post(`/forum/posts/${postId}/bookmark`,{
             userId

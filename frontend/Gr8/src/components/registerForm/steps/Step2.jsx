@@ -5,7 +5,6 @@ import SecondaryButton from "../../../design/buttons/SecondaryButton";
 import ageValidation from "../../../assets/images/ageValidation.png"
 import { useNavigate } from "react-router-dom";
 import InputField from "../../../design/input/InputField";
-import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import InputAdornment from "@mui/material/InputAdornment";
 import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
 import {
@@ -54,7 +53,7 @@ const Step2 = ({ formData, handleChange, onNext, error }) => {
     };
 
     return (
-        <Box container className="register-step2" spacing={0}>
+        <Box className="register-step2" spacing={0}>
 
             <Typography variant="body1" sx={{ mb: 3 }}>I vårt community är alla {" "}
                 <span style={{ color: "var(--color-primary)", fontWeight: 700 }}>verifierade</span>{" "}
@@ -73,23 +72,13 @@ const Step2 = ({ formData, handleChange, onNext, error }) => {
                 helperText={error.fullName}
                 sx={{
                     "& .MuiOutlinedInput-input": {
-                        textAlign: "center",
-                        paddingLeft: "40px",
+                        textAlign: "center"
                     },
                     "& .MuiOutlinedInput-root": {
                         height: 40,
                         borderRadius: 20,
                     },
 
-                }}
-                slotProps={{
-                    input: {
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                            </InputAdornment>
-                        ),
-                    },
                 }}
             />
 
@@ -105,23 +94,13 @@ const Step2 = ({ formData, handleChange, onNext, error }) => {
                 helperText={error.ssn}
                 sx={{
                     "& .MuiOutlinedInput-input": {
-                        textAlign: "center",
-                        paddingLeft: "40px",
+                        textAlign: "center"
                     },
                     "& .MuiOutlinedInput-root": {
                         height: 40,
                         borderRadius: 20,
                     },
 
-                }}
-                slotProps={{
-                    input: {
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <CreateOutlinedIcon sx={{ color: "var(--color-primary)" }} />
-                            </InputAdornment>
-                        ),
-                    },
                 }}
             />
 

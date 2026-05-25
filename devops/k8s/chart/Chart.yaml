@@ -4,3 +4,9 @@ description: Grupp GR8 — Chas Challenge full-stack deploy (api + frontend + ms
 type: application
 version: 0.1.0
 appVersion: "0.1.0"
+
+dependencies:
+  - name: redis
+    version: 18.6.0
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled

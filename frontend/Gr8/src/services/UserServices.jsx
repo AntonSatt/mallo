@@ -44,6 +44,9 @@ const UserServices = {
             lastName: userData.lastName,
             email: userData.email
         });
+        if (response.data?.token) {
+            localStorage.setItem("token", response.data.token);
+        }
         return response.data;
     },
     updateUserTags: async (tagIds) => {

@@ -2,6 +2,7 @@
 import {
     Dialog,
     DialogTitle,
+    DialogContent,
     DialogActions,
     Button,
     Accordion,
@@ -13,7 +14,8 @@ import {
     Select,
     MenuItem,
     OutlinedInput,
-    ListItemText
+    ListItemText,
+    ClickAwayListener
 } from "@mui/material";
 import UserServices from "../../services/UserServices";
 import { useAuth } from "../../hooks/useAuth";
@@ -25,10 +27,10 @@ import Lock from "../../assets/icons/lock.svg";
 import AvatarSlider from "../../components/avatar/avatarSlider.jsx";
 import SecondaryButton from "../../design/buttons/SecondaryButton";
 import PrimaryButton from "../../design/buttons/PrimaryButton.jsx";
-import Switch from '@mui/material/Switch';
 import "./UserSettings.css";
 import LogoutIcon from '@mui/icons-material/Logout';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import Headset from "../../assets/icons/headset.svg"
 import PostServices from "../../services/PostServices";
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
@@ -57,6 +59,7 @@ const UserSettings = () => {
         confirmNewPassword: ""
     });
     const [open, setOpen] = useState(false);
+    const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
     const [tags, setTags] = useState([]);
@@ -111,6 +114,14 @@ const UserSettings = () => {
 
     const handleClose = () => {
         setOpen(false);
+    };
+
+    const openContactDialog = () => {
+        setIsContactDialogOpen(true);
+    };
+
+    const closeContactDialog = () => {
+        setIsContactDialogOpen(false);
     };
 
     const openStatusDialog = (section, outcome) => {
@@ -270,7 +281,6 @@ const UserSettings = () => {
             <Box className="settingsContainer">
                 <Grid
                     className="settings-top-row"
-                    sx={{ display: 'flex', justifyContent: 'center', gap: 1.5, margin: '16px 0', padding: '0 8px' }}
                 >
                     <Button
                         className="settings-button"
@@ -281,20 +291,18 @@ const UserSettings = () => {
                         <LogoutIcon sx={{ color: 'var(--color-primary)' }} />
                     </Button>
 
-                    <Box
-                        className="switch-button"
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            borderRadius: 4,
-                            padding: '12px 16px',
-                            minWidth: 90,
-                            gap: 0.75,
-                        }}>
-                        <Typography className="switch-label" variant="body2">Anonym</Typography>
-                        <Switch className="settingsSwitch" defaultChecked size="small" />
-                    </Box>
+                    <Button
+                        className="settings-button"
+                        onClick={openContactDialog}
+                        sx={SettingsButtonStyles}
+                    >
+                        Kontakta oss
+                        <img src={Headset} alt="edit" style={{
+                                    width: 20,
+                                    height: 20,
+                                }} />
+                        {/* <HeadsetMicOutlinedIcon sx={{ color: 'var(--color-primary)' }} /> */}
+                    </Button>
 
                     <Button
                         className="settings-button"
@@ -638,6 +646,83 @@ const UserSettings = () => {
                         <Button variant="text " color="inherit" onClick={handleClose}>Avbryt</Button>
                         <Button variant="contained" color="error" onClick={handleDelete} id="deleteUser">Ja, ta bort konto</Button>
                     </DialogActions>
+                </Dialog>
+
+                <Dialog
+                    open={isContactDialogOpen}
+                    onClose={closeContactDialog}
+                    fullWidth
+                    maxWidth="xs"
+                    sx={{
+                        "& .MuiDialog-paper": {
+                            borderRadius: "16px",
+                            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.14)",
+                            p: 1.5,
+                        },
+                    }}
+                >
+                    <ClickAwayListener onClickAway={closeContactDialog}>
+                        <DialogContent
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                textAlign: "center",
+                                px: 2.5,
+                                pt: 1,
+                                pb: 1.5,
+                                gap: 2,
+                            }}
+                        >
+                            <Box
+                                sx={{
+                                    width: 64,
+                                    height: 64,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <img src={Headset} alt="edit" style={{
+                                    width: 50,
+                                    height: 50,
+                                }} />
+                            </Box>
+
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    color: "var(--color-text-main)",
+                                    fontWeight: 400,
+                                    lineHeight: 1.4,
+                                    maxWidth: 280,
+                                }}
+                            >
+                                Kontakta gärna oss per mejl om du har några frågor eller om du vill prata med oss om vår app. 
+                                <Typography variant="body2" sx={{ color: "var(--button-secondary-text)", fontWeight: 700 }}>
+                                    Vi ser fram emot att höra från dig!
+                                </Typography>
+                                 <Typography variant="h5" sx={{ color: "var(--button-primary-bg)", fontWeight: 700, mt: 1 }}>
+                                    info@mallo.se
+                                </Typography>
+                            </Typography>
+
+                            <PrimaryButton
+                                onClick={closeContactDialog}
+                                sx={{
+                                    mt: 0.5,
+                                    borderRadius: "999px",
+                                    width: "100%",
+                                    maxWidth: 220,
+                                    py: 1.1,
+                                    textTransform: "none",
+                                    fontWeight: 700,
+                                }}
+                            >
+                                Stäng
+                            </PrimaryButton>
+                        </DialogContent>
+                    </ClickAwayListener>
                 </Dialog>
 
                 <SettingsSuccessDialog

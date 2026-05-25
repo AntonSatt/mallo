@@ -9,5 +9,6 @@ namespace Gr8.Application.Interfaces
         Task UserTyping(string senderId);
         Task UserOnline(string userId);
         Task UserOffline(string userId);
+        Task OnlineUsers(List<string> userIds);
     }
 }

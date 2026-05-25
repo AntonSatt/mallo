@@ -12,32 +12,68 @@ namespace Gr8.Infrastructure.Hubs
     {
         private readonly IChatService _chatService;
 
+        // Stores online users and their active SignalR connection IDs in real time.
+        private static readonly Dictionary<string, HashSet<string>> OnlineUsers = new();
+
+        // Prevents multiple threads from modifying the online users list at the same time.
+        private static readonly object OnlineUsersLock = new();
+
         public ChatHub(IChatService chatService) 
         {
             _chatService = chatService;
         }
 
         // Triggers automatic when a user connects to the signalR hub.
-        public override async Task OnConnectedAsync() 
+        public override async Task OnConnectedAsync()
         {
-            var userId = Context.UserIdentifier;
+            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (!string.IsNullOrEmpty(userId)) 
+            if (!string.IsNullOrEmpty(userId))
             {
-                await Clients.All.UserOnline(userId);
+                lock (OnlineUsersLock)
+                {
+                    if (!OnlineUsers.ContainsKey(userId))
+                    {
+                        OnlineUsers[userId] = new HashSet<string>();
+                    }
+
+                    OnlineUsers[userId].Add(Context.ConnectionId);
+                }
+
+                await Clients.Caller.OnlineUsers(OnlineUsers.Keys.ToList());
+                await Clients.Others.UserOnline(userId);
             }
 
             await base.OnConnectedAsync();
         }
 
         // Triggers automatic when a user disconnects from the signalR hub.
-        public override async Task OnDisconnectedAsync(Exception? exception) 
+        public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            var userId = Context.UserIdentifier;
+            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if(!string.IsNullOrEmpty(userId)) 
+            if (!string.IsNullOrEmpty(userId))
             {
-                await Clients.All.UserOffline(userId);
+                var userWentOffline = false;
+
+                lock (OnlineUsersLock)
+                {
+                    if (OnlineUsers.ContainsKey(userId))
+                    {
+                        OnlineUsers[userId].Remove(Context.ConnectionId);
+
+                        if (!OnlineUsers[userId].Any())
+                        {
+                            OnlineUsers.Remove(userId);
+                            userWentOffline = true;
+                        }
+                    }
+                }
+
+                if (userWentOffline)
+                {
+                    await Clients.Others.UserOffline(userId);
+                }
             }
 
             await base.OnDisconnectedAsync(exception);

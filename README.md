@@ -49,7 +49,7 @@ This repository is **Grupp GR8**'s submission for **Chas Challenge 2026** at [Ch
 | Area | What it does | Where it lives |
 |---|---|---|
 | **Forum** | Posts with titles, categories (13 themes), tags (20), threaded comments, hugs (reactions), bookmarks, and user-driven reports for moderation. | [`backend/Gr8/Api/Endpoints/CommunityEndpoints.cs`](backend/Gr8/Api/Endpoints/CommunityEndpoints.cs) · [`frontend/Gr8/src/pages/forum`](frontend/Gr8/src/pages/forum) |
-| **Activity map** | Geo-tagged events with images, date ranges, and addresses, browsable on an interactive Mapbox map with marker clustering. | [`backend/Gr8/Api/Endpoints/ActivityEndpoints.cs`](backend/Gr8/Api/Endpoints/ActivityEndpoints.cs) · [`frontend/Gr8/src/components/activity/map`](frontend/Gr8/src/components/activity/map) |
+| **Activity map** | Geo-tagged events with images, date ranges, and addresses, browsable on an interactive Mapbox map. Distance helpers (Turf.js) power proximity filtering. | [`backend/Gr8/Api/Endpoints/ActivityEndpoints.cs`](backend/Gr8/Api/Endpoints/ActivityEndpoints.cs) · [`frontend/Gr8/src/components/activity/map`](frontend/Gr8/src/components/activity/map) |
 | **Real-time chat** | One-to-one direct messages over a SignalR WebSocket hub. Typing indicators, read-receipts, per-user soft-delete, auto-reconnect. | [`backend/Gr8/Api/Endpoints/ChatEndpoints.cs`](backend/Gr8/Api/Endpoints/ChatEndpoints.cs) · [`frontend/Gr8/src/services/ChatSignalrServices.jsx`](frontend/Gr8/src/services/ChatSignalrServices.jsx) |
 | **Accounts & auth** | Register (with Swedish personnummer + 18+ check), login, JWT bearer tokens, email-based password reset (MailKit/SMTP), profile editing, account deletion (GDPR). | [`backend/Gr8/Api/Endpoints/IdentityEndpoints.cs`](backend/Gr8/Api/Endpoints/IdentityEndpoints.cs) |
 | **Push notifications** | Firebase Cloud Messaging service-worker in the browser for activity / chat alerts. | [`frontend/Gr8/public/firebase-messaging-sw.js`](frontend/Gr8/public/firebase-messaging-sw.js) |
@@ -97,7 +97,7 @@ flowchart LR
     PR --> GR
 ```
 
-**Why this shape:** the SPA and API are deployed and scaled independently. The API stays stateless (auth via JWT, no in-memory sessions) so it could scale horizontally; SignalR connections are pinned with a sticky-session cookie at the ingress. MS SQL is the only stateful piece, isolated as a `StatefulSet` with its own PVC.
+**Why this shape:** the SPA and API are deployed and scaled independently. The API stays stateless (auth via JWT, no in-memory sessions); SignalR connections are pinned with a sticky-session cookie at the ingress so realtime chat survives multi-replica scale-out. MS SQL holds the durable application data as a `StatefulSet` with a Longhorn PVC; Redis (sub-chart) has its own smaller PVC for cache state.
 
 ---
 
@@ -124,7 +124,7 @@ backend/Gr8/
 | Maps | HttpClient against Mapbox geocoding API |
 | Docs | OpenAPI + Scalar UI |
 | Metrics | `prometheus-net` exposed on `/metrics` |
-| Persistence | Two `DbContext`s: `ApplicationDbContext` (Identity) and `CommunityDbContext` (domain). 24+ EF migrations across both. |
+| Persistence | Two `DbContext`s: `ApplicationDbContext` (Identity, 7 migrations) and `CommunityDbContext` (domain, 21 migrations). Categories (13) and tags (20) seeded via EF `HasData` in `CommunityDbContext`. |
 
 ### Notable design choices
 
@@ -237,28 +237,32 @@ Templates: [`devops/k8s/chart/templates/`](devops/k8s/chart/templates/).
 
 ## Run it locally
 
-Requirements: Docker, Docker Compose, and access to the GitLab container registry (the compose file pulls pre-built images).
+The fastest path: run MSSQL in Docker, then the API and frontend each in their own terminal. The root `docker-compose.yml` is shaped for the cluster deploy, not for local dev.
 
 ```bash
-# 1. Set the MSSQL SA password (any strong password).
-cp .env.example .env
-# edit .env if you want a different password
+# 1. MS SQL Server in a container.
+docker run -d --name mallo-db \
+  -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD='YourStrong!Password123' \
+  -p 1433:1433 mcr.microsoft.com/mssql/server:2022-latest
 
-# 2. Bring everything up.
-docker compose up -d
+# 2. Backend — first time, set the connection string via user-secrets.
+cd backend/Gr8
+dotnet user-secrets --project Api set \
+  "ConnectionStrings:DefaultConnection" \
+  "Server=localhost;Database=CommunityDB;User Id=sa;Password=YourStrong!Password123;TrustServerCertificate=true"
+dotnet run --project Api          # → http://localhost:5225 (EF migrations run on startup)
 
-# 3. Watch the API come up (MSSQL cold start + EF migrations take ~1-3 min).
-docker compose logs -f api
-
-# 4. Open the app.
-#    Frontend: http://localhost  (whatever port your compose config exposes)
-#    API:      http://localhost:8080/openapi/v1.json
+# 3. Frontend — in another terminal.
+cd frontend/Gr8
+echo "VITE_API_BASE_URL=http://localhost:5225" > .env.local
+echo "VITE_MAPBOX_TOKEN=<your-mapbox-token>"  >> .env.local
+npm install
+npm run dev                       # → http://localhost:5173
 ```
 
-For working on the React frontend or .NET backend directly (without Docker), see the per-project README files:
+Open `http://localhost:5173`. The API exposes OpenAPI at `http://localhost:5225/openapi/v1.json`.
 
-- [`frontend/Gr8/README.md`](frontend/Gr8/README.md)
-- [`backend/Gr8/`](backend/Gr8/) — standard .NET solution, open `Gr8.slnx` in JetBrains Rider / Visual Studio, or `dotnet run --project Api`.
+For Rider / Visual Studio: open [`backend/Gr8/Gr8.slnx`](backend/Gr8/Gr8.slnx).
 
 ---
 
@@ -274,7 +278,7 @@ For working on the React frontend or .NET backend directly (without Docker), see
 │   ├── swarm-setup.md        # Historical: previous Docker Swarm setup (now retired)
 │   └── README.md
 ├── docs/media/               # Demo videos and screenshots referenced from this README
-├── docker-compose.yml        # Local dev composition (db + api + frontend)
+├── docker-compose.yml        # Legacy Docker Swarm composition — kept for reference, not used for local dev or current deploy
 ├── .gitlab-ci.yml            # Build, deploy, smoke-test pipeline
 ├── TECHSTACK.md              # Pinned framework / language versions
 └── README.md                 # You are here.

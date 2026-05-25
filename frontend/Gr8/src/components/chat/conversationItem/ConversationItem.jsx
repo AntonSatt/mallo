@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { PersonRemoveAlt1Outlined } from "@mui/icons-material";
+import { useOnlineUsers } from "../../../contexts/OnlineUsersContext";
 import {
     Box,
     Paper,
@@ -13,6 +14,7 @@ import {
 } from "@mui/material";
 import Avatar from "../../avatar/avatar.jsx";
 import moment from "moment";
+import useViewport from "../../../hooks/useViewport";
 
 // component to display a single conversation between the user and another user.
 const ConversationItem = ({ conversation, deleteConversation }) => {
@@ -20,6 +22,10 @@ const ConversationItem = ({ conversation, deleteConversation }) => {
 
     const [showDelete, setShowDelete] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+    const { isDesktop } = useViewport();
+    const { isUserOnline } = useOnlineUsers();
+    const isOnline = isUserOnline(conversation.otherUserId);
 
     const hasUnreadMessage = conversation.hasUnreadMessage;
 
@@ -49,7 +55,30 @@ const ConversationItem = ({ conversation, deleteConversation }) => {
                         flexShrink: 0,
                     }}
                 >
-                    <Avatar className="post-avatar" avatar={conversation.avatarId} />
+                    <Box
+                        sx={{
+                            position: "relative",
+                            width: "fit-content",
+                            flexShrink: 0,
+                        }}
+                    >
+                        <Avatar
+                            className="post-avatar"
+                            avatar={conversation.avatarId}
+                        />
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                top: isDesktop ? -5 : -2,
+                                right: isDesktop ? -5 : -5,
+                                width: isDesktop ? 14 : 12,
+                                height: isDesktop ? 14 : 12,
+                                borderRadius: "50%",
+                                backgroundColor: isOnline ? "#22C55E" : "#D9D9D9",
+                                border: "2px solid var(--color-bg-surface)",
+                            }}
+                        />
+                    </Box>
 
                     {showDelete && (
                         <Box

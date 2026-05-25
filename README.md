@@ -16,7 +16,7 @@ _A Swedish-language community platform where members share posts, find local act
 ![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet&logoColor=white)
 ![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![MSSQL 2022](https://img.shields.io/badge/MSSQL-2022-CC2927?logo=microsoftsqlserver&logoColor=white)
-![k3s](https://img.shields.io/badge/k3s-Kubernetes-326CE5?logo=kubernetes&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-k3s-326CE5?logo=kubernetes&logoColor=white)
 ![SignalR](https://img.shields.io/badge/SignalR-WebSocket-512BD4)
 
 </div>
@@ -38,7 +38,7 @@ _A Swedish-language community platform where members share posts, find local act
 
 Mallo is a Swedish-language web community. Members create posts, react with "hugs", comment, save favourites, and discover real-world activities pinned to a map of Sweden. A built-in real-time chat lets members reach out to each other one-to-one.
 
-The product is built as a fullstack web app — **React 19** in the browser, a **.NET 10** API on the server, **MS SQL Server 2022** for persistence, **SignalR** for realtime, **Mapbox** for geography. Everything is containerised and deployed to the school's **k3s** Kubernetes cluster by GitLab CI.
+The product is built as a fullstack web app — **React 19** in the browser, a **.NET 10** API on the server, **MS SQL Server 2022** for persistence, **SignalR** for realtime, **Mapbox** for geography. Everything is containerised and deployed to the school's **Kubernetes** cluster by GitLab CI.
 
 This repository is **Grupp GR8**'s submission for **Chas Challenge 2026** at [Chas Academy](https://chasacademy.se).
 
@@ -67,7 +67,7 @@ flowchart LR
         UI[React 19 SPA<br/>MUI · Mapbox · SignalR client]
     end
 
-    subgraph Cluster[k3s · namespace doe25-group-8]
+    subgraph Cluster[Kubernetes · namespace doe25-group-8]
         TR[Traefik Ingress<br/>TLS · sticky cookies for SignalR]
         FE[Frontend pod<br/>nginx serving SPA]
         API[.NET 10 API pod<br/>REST + SignalR Hub]
@@ -167,7 +167,7 @@ The production build is served by nginx with an SPA fallback (`try_files $uri $u
 
 ## Deploy & infrastructure
 
-Everything ships to the school's **k3s** cluster (`*.cc.k3s.chas-lab.dev`, namespace `doe25-group-8`). The deploy shape is a deliberate hybrid:
+Everything ships to the school's **Kubernetes** cluster — a [k3s](https://k3s.io/) distribution, CNCF-certified, same APIs as upstream — at `*.cc.k3s.chas-lab.dev`, namespace `doe25-group-8`. The deploy shape is a deliberate hybrid:
 
 | Component | Deployed as | Why |
 |---|---|---|
@@ -302,4 +302,4 @@ Branch naming follows the team's Jira project (`UT8`) when a ticket exists — e
 
 ## Acknowledgements
 
-Built at **[Chas Academy](https://chasacademy.se)** as part of **Chas Challenge 2026**. Deployed on the school's k3s cluster.
+Built at **[Chas Academy](https://chasacademy.se)** as part of **Chas Challenge 2026**. Deployed on the school's Kubernetes cluster.

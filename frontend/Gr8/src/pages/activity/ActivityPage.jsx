@@ -1,5 +1,5 @@
 import { useAuth } from "../../hooks/useAuth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ActivityServices from "../../services/ActivityService.jsx";
 import ActivityForm from "../../components/activity/activityForm/ActivityForm.jsx";
 import ActivityFilter from "../../components/activity/feed/ActivityFilter.jsx";
@@ -24,6 +24,9 @@ const ActivityPage = () => {
     const { currentUser } = useAuth();
     const currentUserId = currentUser?.sub;
 
+    const mapInstanceRef = useRef(null);
+    const feedScrollRef = useRef(null);
+    const [selectedActivity, setSelectedActivity] = useState(null);
     const [editActivity, setEditActivity] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [activities, setActivities] = useState([]);
@@ -161,9 +164,9 @@ const ActivityPage = () => {
     // Apply filters to activities
     const filteredActivities = activities
         .map(activity => {
-            if (userCoords) {
+            if (userCoords && activity.longitude && activity.latitude) {
                 const from = [userCoords.lng, userCoords.lat];
-                const to = [activity.longitude, activity.latitude];
+                const to = [Number(activity.longitude), Number(activity.latitude)];
                 const distanceInMeters = distance(from, to, { units: 'meters' });
                 return { ...activity, distanceMeters: distanceInMeters };
             }
@@ -173,16 +176,15 @@ const ActivityPage = () => {
             // Search filter
             if (searchQuery.trim()) {
                 const q = searchQuery.toLowerCase();
-                if (
-                    !activity.title?.toLowerCase().includes(q) &&
-                    !activity.description?.toLowerCase().includes(q)
-                ) return false;
+                const titleMatch = activity.title?.toLowerCase().includes(q);
+                const descMatch = activity.description?.toLowerCase().includes(q);
+                if (!titleMatch && !descMatch) return false;
             }
 
             // Nearby filter
             if (activeFilters.nearby) {
                 if (!userCoords) return false;
-                if (activity.distanceMeters > 7000) return false;
+                if (!activity.distanceMeters || activity.distanceMeters > 7000) return false;
             }
 
             // Your activities filter
@@ -191,8 +193,14 @@ const ActivityPage = () => {
                 if (activity.userId !== currentUserId) return false;
             }
 
+            // Saved activities filter
+            if (activeFilters.savedActivities) {
+                if (!activity.isBookmarked) return false;
+            }
+
             // Time filter
             if (activeFilters.time) {
+                if (!activity.endAt) return false;
                 const now = new Date();
                 const activityEnd = new Date(activity.endAt);
                 if (activityEnd < now) return false;
@@ -202,8 +210,8 @@ const ActivityPage = () => {
         })
         .sort((a, b) => {
             if (activeFilters.time) {
-                const timeA = new Date(a.startAt).getTime();
-                const timeB = new Date(b.startAt).getTime();
+                const timeA = a.startAt ? new Date(a.startAt).getTime() : 0;
+                const timeB = b.startAt ? new Date(b.startAt).getTime() : 0;
                 return timeA - timeB;
             }
             if (a.distanceMeters && b.distanceMeters) {
@@ -326,8 +334,6 @@ const ActivityPage = () => {
                         startIcon={<TodayOutlinedIcon sx={{ color: "white", marginLeft: 1.5, fontSize: "25px !important" }} />}
                     >
                     </PrimaryButton>
-
-
                 </Box>
             </Box>
 

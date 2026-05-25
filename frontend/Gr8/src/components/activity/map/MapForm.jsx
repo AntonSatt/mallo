@@ -84,9 +84,8 @@ const MapForm = ({ mode = "view", onMapInstance, activities = [], selectedActivi
                 activities.forEach((activity) => {
                     if (!activity.longitude || !activity.latitude) return;
 
-                    const isSelected = selectedActivity?.id === activity.id;
                     const newMarker = new mapboxgl.Marker({
-                        color: isSelected ? "#F37D35" : "var(--color-primary)"
+                        color: "var(--color-primary)"
                     })
                         .setLngLat([Number(activity.longitude), Number(activity.latitude)])
                         .addTo(mapRef.current);

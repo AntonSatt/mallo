@@ -1,5 +1,5 @@
 import { useAuth } from "../../hooks/useAuth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ActivityServices from "../../services/ActivityService.jsx";
 import ActivityForm from "../../components/activity/activityForm/ActivityForm.jsx";
 import ActivityFilter from "../../components/activity/feed/ActivityFilter.jsx";
@@ -24,6 +24,9 @@ const ActivityPage = () => {
     const { currentUser } = useAuth();
     const currentUserId = currentUser?.sub;
 
+    const mapInstanceRef = useRef(null);
+    const feedScrollRef = useRef(null);
+    const [selectedActivity, setSelectedActivity] = useState(null);
     const [editActivity, setEditActivity] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [activities, setActivities] = useState([]);
@@ -144,57 +147,57 @@ const ActivityPage = () => {
 
     // Apply filters to activities
     const filteredActivities = activities
-    .map(activity => {
-        if (userCoords) {
-            const from = [userCoords.lng, userCoords.lat];
-            const to = [activity.longitude, activity.latitude];
-            const distanceInMeters = distance(from, to, { units: 'meters' });
-            return { ...activity, distanceMeters: distanceInMeters };
-        }
-        return activity;
-    })
-    .filter(activity => {
-        // Search filter
-        if (searchQuery.trim()) {
-            const q = searchQuery.toLowerCase();
-            if (
-                !activity.title?.toLowerCase().includes(q) &&
-                !activity.description?.toLowerCase().includes(q)
-            ) return false;
-        }
+        .map(activity => {
+            if (userCoords) {
+                const from = [userCoords.lng, userCoords.lat];
+                const to = [activity.longitude, activity.latitude];
+                const distanceInMeters = distance(from, to, { units: 'meters' });
+                return { ...activity, distanceMeters: distanceInMeters };
+            }
+            return activity;
+        })
+        .filter(activity => {
+            // Search filter
+            if (searchQuery.trim()) {
+                const q = searchQuery.toLowerCase();
+                if (
+                    !activity.title?.toLowerCase().includes(q) &&
+                    !activity.description?.toLowerCase().includes(q)
+                ) return false;
+            }
 
-        // Nearby filter
-        if (activeFilters.nearby) {
-            if (!userCoords) return false;
-            if (activity.distanceMeters > 7000) return false;
-        }
+            // Nearby filter
+            if (activeFilters.nearby) {
+                if (!userCoords) return false;
+                if (activity.distanceMeters > 7000) return false;
+            }
 
-        // Your activities filter
-        if (activeFilters.yourActivities) {
-            if (!currentUserId) return false;
-            if (activity.userId !== currentUserId) return false;
-        }
+            // Your activities filter
+            if (activeFilters.yourActivities) {
+                if (!currentUserId) return false;
+                if (activity.userId !== currentUserId) return false;
+            }
 
-        // Time filter
-        if (activeFilters.time) {
-            const now = new Date();
-            const activityEnd = new Date(activity.endAt);
-            if (activityEnd < now) return false;
-        }
+            // Time filter
+            if (activeFilters.time) {
+                const now = new Date();
+                const activityEnd = new Date(activity.endAt);
+                if (activityEnd < now) return false;
+            }
 
-        return true;
-    })
-    .sort((a, b) => {
-        if (activeFilters.time) {
-            const timeA = new Date(a.startAt).getTime();
-            const timeB = new Date(b.startAt).getTime();
-            return timeA - timeB;
-        }
-        if (a.distanceMeters && b.distanceMeters) {
-            return a.distanceMeters - b.distanceMeters;
-        }
-        return 0;
-    });
+            return true;
+        })
+        .sort((a, b) => {
+            if (activeFilters.time) {
+                const timeA = new Date(a.startAt).getTime();
+                const timeB = new Date(b.startAt).getTime();
+                return timeA - timeB;
+            }
+            if (a.distanceMeters && b.distanceMeters) {
+                return a.distanceMeters - b.distanceMeters;
+            }
+            return 0;
+        });
 
     return (
 
@@ -214,8 +217,16 @@ const ActivityPage = () => {
 
             {/* Map - default map view with short list */}
             {alignment === 'map' && (
-                <Box className="activity-map-wrapper" sx={{ position: 'relative', zIndex: 1, height: "45vh", overflow: 'hidden', borderRadius: { xs: 0, md: "15px" } }}>
-                    <MapComponent activities={filteredActivities} userCoords={userCoords} mode="view" onMapInstance={""} />
+                <Box className="activity-map-wrapper"
+                    sx={{ position: 'relative', zIndex: 1, height: "50vh", overflow: 'hidden', borderRadius: { xs: 0, md: "15px" } }}>
+                    <MapComponent activities={filteredActivities}
+                        userCoords={userCoords}
+                        mode="view"
+                        onSelectActivity={setSelectedActivity}
+                        selectedActivity={selectedActivity}
+                        feedScrollRef={feedScrollRef}
+                        onMapInstance={(map) => { mapInstanceRef.current = map; }}
+                    />
                 </Box>
             )}
 
@@ -409,19 +420,25 @@ const ActivityPage = () => {
             </Box>
 
             {/* List view - whole screen */}
-            <Box className="activity-feed-wrapper" sx={{
-                flex: 1,
-                bgcolor: 'white',
-                overflowY: 'auto',
-                pb: 10,
-                height: alignment === 'map' ? '25vh' : 'auto',
-                minHeight: alignment === 'map' ? '25vh' : 'auto',
-            }}>
+            <Box className="activity-feed-wrapper"
+                ref={feedScrollRef}
+
+
+                sx={{
+                    flex: 1,
+                    bgcolor: 'white',
+                    overflowY: 'auto',
+                    pb: 10,
+                    height: alignment === 'map' ? '25vh' : 'auto',
+                    minHeight: alignment === 'map' ? '25vh' : 'auto',
+                    scrollMarginTop: "20px"
+                }}>
                 <ActivityFeed
                     activities={filteredActivities}
                     userCoords={userCoords}
                     onCardAction={handleCardAction}
                     currentUserId={currentUserId}
+                    onSelectActivity={setSelectedActivity}
                 />
             </Box>
 

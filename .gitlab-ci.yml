@@ -174,12 +174,14 @@ deploy review:
     url: https://gr8-$CI_ENVIRONMENT_SLUG.${HOST_BASE}
     on_stop: stop_review
   script:
+    # UT8-303 test deploy: plain manifests (api/frontend/db/ingress/middleware)
+    # + slim chart with redis + observability. This whole job is stripped before
+    # merge to develop — feature-branch deploys go away with the migration.
+    - kubectl apply -f devops/k8s/manifests/
     - |
-      helm upgrade --install "gr8-$CI_ENVIRONMENT_SLUG" ./devops/k8s/chart \
+      helm upgrade --install "gr8-$CI_ENVIRONMENT_SLUG-extras" ./devops/k8s/chart \
         --namespace "$NAMESPACE" \
-        -f ./devops/k8s/chart/values-feature.yaml \
-        --set image.tag="$CI_COMMIT_REF_SLUG" \
-        --wait --timeout 20m --atomic
+        --wait --timeout 5m --atomic
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "main"
     - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop"
@@ -270,8 +272,10 @@ smoke-test production:
     - if: $CI_COMMIT_BRANCH == "main"
 
 # ---------------------------------------------------------------------------
-# Cleanup: manual teardown for review releases on MR close.
-# Deletes the helm release AND the StatefulSet PVCs (helm uninstall doesn't).
+# Cleanup: manual teardown for the UT8-303 test deploy on MR close.
+# Mirrors deploy review in reverse: kubectl delete plain manifests, drop the
+# StatefulSet PVCs (k8s doesn't GC them on StatefulSet delete), uninstall the
+# slim "extras" helm release.
 # ---------------------------------------------------------------------------
 
 stop_review:
@@ -279,8 +283,6 @@ stop_review:
   image:
     name: alpine/helm:3.20.2
     entrypoint: [""]
-  variables:
-    GIT_STRATEGY: none
   before_script:
     - apk add --no-cache curl bash coreutils
     - curl -LO "https://dl.k8s.io/release/v1.33.0/bin/linux/amd64/kubectl"
@@ -292,8 +294,9 @@ stop_review:
     name: review/$CI_COMMIT_REF_SLUG
     action: stop
   script:
-    - helm uninstall "gr8-$CI_ENVIRONMENT_SLUG" -n "$NAMESPACE" || true
-    - kubectl delete pvc -l app.kubernetes.io/instance="gr8-$CI_ENVIRONMENT_SLUG" -n "$NAMESPACE" --ignore-not-found
+    - kubectl delete -f devops/k8s/manifests/ -n "$NAMESPACE" --ignore-not-found
+    - kubectl delete pvc -l app.kubernetes.io/instance=gr8-plain -n "$NAMESPACE" --ignore-not-found
+    - helm uninstall "gr8-$CI_ENVIRONMENT_SLUG-extras" -n "$NAMESPACE" || true
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "main"
       when: manual

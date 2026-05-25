@@ -58,7 +58,6 @@ const ConversationPage = () => {
     useEffect(() => {
         const setupSignalR = async () => {
             try {
-                await ChatSignalrServices.startConnection();
 
                 ChatSignalrServices.onReceiveMessage((message) => {
                     const currentConversation =

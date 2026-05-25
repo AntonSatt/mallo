@@ -27,17 +27,6 @@ _A Swedish-language community platform where members share posts, find local act
 
 ---
 
-## For the reader in a hurry
-
-| You are a... | Start here |
-|---|---|
-| **Judge / teacher reviewing the project** | [What is Mallo?](#what-is-mallo) → [Features](#features) → [Live environments](#live-environments) |
-| **.NET reviewer** (backend / fullstack) | [Architecture](#architecture) → [Backend deep-dive](#backend--net-10--clean-architecture) → [`backend/Gr8/`](backend/Gr8/) |
-| **DevOps reviewer** | [Deploy & infrastructure](#deploy--infrastructure) → [CI/CD pipeline](#cicd-pipeline) → [Observability](#observability) → [`devops/`](devops/) |
-| **Anyone who wants to run it** | [Run it locally](#run-it-locally) |
-
----
-
 ## What is Mallo?
 
 Mallo is a Swedish-language web community. Members create posts, react with "hugs", comment, save favourites, and discover real-world activities pinned to a map of Sweden. A built-in real-time chat lets members reach out to each other one-to-one.

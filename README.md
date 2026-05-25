@@ -8,7 +8,7 @@ _A Swedish-language community platform where members share posts, find local act
 
 <br />
 
-<video src="docs/media/mallo-wave.mp4" autoplay loop muted playsinline width="320"></video>
+<img src="docs/media/mallo-wave.webp" alt="Mallo" width="320" />
 
 <br />
 

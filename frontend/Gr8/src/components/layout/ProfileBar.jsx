@@ -55,7 +55,28 @@ const ProfileBar = ({ showCreate = false, onCreatePost, onSearch }) => {
                     {showCreate === "true" ? (
                         <>
                             <Box className="profilebar-top-row">
-                                <Avatar avatar={currentUser?.picture} />
+                                <Box
+                                    sx={{
+                                        position: "relative",
+                                        width: "fit-content",
+                                        flexShrink: 0,
+                                    }}
+                                >
+                                    <Avatar avatar={currentUser?.picture} />
+
+                                    <Box
+                                        sx={{
+                                            position: "absolute",
+                                            top: -2,
+                                            right: -5,
+                                            width: 12,
+                                            height: 12,
+                                            borderRadius: "50%",
+                                            backgroundColor: isOnline ? "#22C55E" : "#D9D9D9",
+                                            border: "2px solid var(--color-bg-main)",
+                                        }}
+                                    />
+                                </Box>
                             </Box>
 
                             <Box className="profilebar-create" sx={{ position: 'relative', flex: 1 }}>

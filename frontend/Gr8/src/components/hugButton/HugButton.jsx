@@ -23,7 +23,7 @@ const HugButton = ({
     userCommentHugs }) => {
     const { currentUser } = useAuth();
     const { isDesktop } = useViewport();
-    const [hugged, setHugged] = useState(false);
+    const [hugged, setHugged] = useState(null);
     const [open, setOpen] = useState(false);
 
     //this function is called when the user clicks the hug button, it sends a request to the backend to 
@@ -33,7 +33,7 @@ const HugButton = ({
             ? Array.isArray(userPostHugs) && userPostHugs.some(hug => hug.postId === id)
             : Array.isArray(userCommentHugs) && userCommentHugs.some(hug => hug.commentId === id);
 
-    const isHugged = hugged || alreadyHugged;
+    const isHugged = hugged ?? alreadyHugged;
 
     const handleHug = async () => {
         try {

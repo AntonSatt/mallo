@@ -1,12 +1,14 @@
-{{- $component := "api" -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "gr8.fullname" (dict "Release" .Release "component" $component) }}
+  name: gr8-plain-api
   labels:
-    {{- include "gr8.labels" . | nindent 4 }}
-    app.kubernetes.io/component: {{ $component }}
+    app.kubernetes.io/name: gr8
+    app.kubernetes.io/instance: gr8-plain
+    app.kubernetes.io/part-of: gr8
+    app.kubernetes.io/component: api
   annotations:
+    # Sticky sessions keep a SignalR client pinned to one api pod.
     traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
     traefik.ingress.kubernetes.io/service.sticky.cookie.name: "gr8_signalr_sticky"
     traefik.ingress.kubernetes.io/service.sticky.cookie.httponly: "true"
@@ -17,7 +19,9 @@ spec:
   ports:
     - name: http
       port: 80
-      targetPort: {{ .Values.api.port }}
+      targetPort: 8080
       protocol: TCP
   selector:
-    {{- include "gr8.selectorLabels" (dict "Release" .Release "component" $component) | nindent 4 }}
+    app.kubernetes.io/name: gr8
+    app.kubernetes.io/instance: gr8-plain
+    app.kubernetes.io/component: api

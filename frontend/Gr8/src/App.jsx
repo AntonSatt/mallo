@@ -9,6 +9,7 @@ import LandingPage from './pages/landing/LandingPage'
 import HomePage from './pages/home/HomePage'
 import ForgotPasswordPage from './pages/resetPassword/ForgotPasswordPage'
 import ResetPasswordPage from './pages/resetPassword/ResetPasswordPage'
+import ConversationPage from './pages/chat/conversationPage/ConversationPage';
 import ActivityPage from './pages/activity/ActivityPage.jsx'
 import "moment/dist/locale/sv";
 
@@ -36,7 +37,7 @@ function App() {
           <Route path='/forum' element={<ProtectedRoute><HomePage page="forum" /></ProtectedRoute>} />
           <Route path='/message' element={<ProtectedRoute><HomePage page="message" /></ProtectedRoute>} />
           <Route path='/message/:userId' element={<ProtectedRoute><HomePage page="conversation" /></ProtectedRoute>} />
-          <Route path='/maps' element={<ProtectedRoute><ActivityPage /></ProtectedRoute>} />
+          <Route path='/maps' element={<ProtectedRoute><HomePage page="maps" /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

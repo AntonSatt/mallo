@@ -196,15 +196,11 @@ We split the deploy in two:
 
 The manifests bake in `gr8-plain` as a placeholder name. At deploy time, CI rewrites it (`sed -i 's|gr8-plain|gr8-<env>|g'`) to the per-environment release name. Production also rewrites image tags from `:develop` to `:latest`.
 
-<div align="center">
 <img src="docs/media/kubectl-pods.png" alt="kubectl get pods showing api, db, and frontend pods running" width="600" />
-</div>
 
 ### CI/CD pipeline
 
-<div align="center">
 <img src="docs/media/ci-pipeline.png" alt="GitLab pipeline: test → build → deploy → smoke-test" width="900" />
-</div>
 
 | Stage | Highlights |
 |---|---|
@@ -232,9 +228,7 @@ The school cluster already runs Prometheus + Grafana. Our Helm chart adds Mallo-
   - `Gr8ApiNoTraffic`: 0 req/s for 15 min (info)
 - **Grafana dashboard** auto-provisioned by a ConfigMap (label `grafana_dashboard: "1"`). Four panels: request rate by endpoint, 5xx rate, p95 latency by endpoint, request count by HTTP status code.
 
-<div align="center">
-<img src="docs/media/grafana.png" alt="Grafana dashboard — request rate, 5xx, latency p95, requests by code" width="800" />
-</div>
+<img src="docs/media/grafana.png" alt="Grafana dashboard with request rate, 5xx, latency p95, requests by code" width="800" />
 
 Templates: [`devops/k8s/chart/templates/`](devops/k8s/chart/templates/).
 

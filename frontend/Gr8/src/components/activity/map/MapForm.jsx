@@ -2,21 +2,17 @@ import "./MapForm.css";
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import ActivityServices from "../../../services/ActivityService.jsx";
 
-// mode: view = shows pins
-const MapForm = ({ mode = "view", onMapInstance, activities = [] }) => {
+const MapForm = ({ mode = "view", onMapInstance, activities = [], selectedActivity, onSelectActivity, feedScrollRef }) => {
     const mapRef = useRef();
     const mapContainerRef = useRef();
-
-    // Save markers in a ref so we can easily remove them later without causing re-renders
     const markersRef = useRef([]);
+    const isMovingRef = useRef(false);
 
-    // Initiate map on component 
+    // Initiate map on component mount
     useEffect(() => {
         mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
-        // Default map center & zoom
         mapRef.current = new mapboxgl.Map({
             container: mapContainerRef.current,
             center: [18.06411, 59.33163],
@@ -32,74 +28,112 @@ const MapForm = ({ mode = "view", onMapInstance, activities = [] }) => {
             if (mapRef.current) mapRef.current.remove();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Empty array means this runs only once on mount
+    }, []);
 
-    // Update markers whenever activities or mode changes
+    // Center and zoom to selected activity when it changes 
+    useEffect(() => {
+        if (!mapRef.current || !selectedActivity || !selectedActivity.longitude || !selectedActivity.latitude) return;
+
+        const center = mapRef.current.getCenter();
+        const latDiff = Math.abs(center.lat - Number(selectedActivity.latitude));
+        const lngDiff = Math.abs(center.lng - Number(selectedActivity.longitude));
+
+        if (latDiff < 0.001 && lngDiff < 0.001 && mapRef.current.getZoom() >= 13) {
+            return;
+        }
+
+        isMovingRef.current = true;
+        mapRef.current.flyTo({
+            center: [Number(selectedActivity.longitude), Number(selectedActivity.latitude)],
+            zoom: 14,
+            essential: true,
+            duration: 1200
+        });
+
+        setTimeout(() => {
+            isMovingRef.current = false;
+        }, 1300);
+
+    }, [selectedActivity]);
+
+    // Scroll to the selected activity card
+    useEffect(() => {
+        if (!selectedActivity || !feedScrollRef?.current) return;
+
+        setTimeout(() => {
+            const targetCard = document.getElementById(`activity-card-${selectedActivity.id}`);
+            if (targetCard) {
+                targetCard.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest'
+                });
+            }
+        }, 150);
+
+    }, [selectedActivity, feedScrollRef]);
+
+    // Manage pins and hoover effect
     useEffect(() => {
         if (!mapRef.current) return;
 
-        // Clear existing markers and add new ones based on mode and activities
         const updateMarkers = () => {
-            // Clear existing markers
             markersRef.current.forEach(marker => marker.remove());
             markersRef.current = [];
 
-            // If in view mode, add markers for each activity
             if (mode === "view" && Array.isArray(activities)) {
                 activities.forEach((activity) => {
-                    // Safeguard if activity doesn't have coordinates
                     if (!activity.longitude || !activity.latitude) return;
 
-                    // Create a new marker for the activity
-                    const newMarker = new mapboxgl.Marker({ color: "var(--color-primary)" })
+                    const newMarker = new mapboxgl.Marker({
+                        color: "var(--color-primary)"
+                    })
                         .setLngLat([Number(activity.longitude), Number(activity.latitude)])
                         .addTo(mapRef.current);
 
-                    // Fetch the HTML element of the marker to attach click event
                     const markerElement = newMarker.getElement();
                     markerElement.style.cursor = 'pointer';
 
-                    // Add click event to marker to scroll to corresponding card in feed
+                    //Hoover popup
+                    const popup = new mapboxgl.Popup({ offset: 25, closeButton: false })
+                        .setHTML(`<b style="color: #333; font-family: sans-serif;">${activity.title || "Aktivitet"}</b>`);
+
+                    markerElement.addEventListener('mouseenter', () => {
+                        newMarker.setPopup(popup);
+                        popup.addTo(mapRef.current);
+                    });
+
+                    markerElement.addEventListener('mouseleave', () => {
+                        popup.remove();
+                    });
+
+                    // Click on marker
                     markerElement.addEventListener('click', () => {
-                        console.log(`Klickade på pin för aktivitet ID: ${activity.id}`);
+                        if (onSelectActivity) {
+                            onSelectActivity(activity);
+                        }
 
-                        // Search for the clicked activity's card in the feed using its unique ID
                         const targetCard = document.getElementById(`activity-card-${activity.id}`);
-
                         if (targetCard) {
-                            // Soft glide scroll to the card in the feed
-                            targetCard.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'center'
-                            });
-
-                            // Find the paper element inside the card and simulate a click to expand it
                             const innerPaper = targetCard.querySelector('.MuiPaper-root');
                             if (innerPaper) {
-                                setTimeout(() => {
-                                    innerPaper.click();
-                                }, 100);
+                                innerPaper.click();
                             }
-                        } else {
-                            console.warn("Hittade inget kort i feeden med ID:", activity.id);
                         }
                     });
 
-                    // Save marker to ref for later removal
                     markersRef.current.push(newMarker);
                 });
             }
         };
 
-        // If the map style is already loaded, we can add markers immediately 
-        // Otherwise wait for the style to load before adding markers
+        // If the map style is not loaded yet, wait for it before adding markers
         if (mapRef.current.isStyleLoaded()) {
             updateMarkers();
         } else {
             mapRef.current.once('style.load', updateMarkers);
         }
 
-    }, [activities, mode]);
+    }, [activities, mode, selectedActivity, onSelectActivity]);
 
     return (
         <>

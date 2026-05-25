@@ -99,6 +99,7 @@ const ActivityFilter = ({ open, onClose, onApply, currentFilters }) => {
                         onClick={() => handleRowClick('time', filters.time)}
                         sx={{
                             display: 'flex', alignItems: 'center', px: 3, py: 2.5, cursor: 'pointer',
+                            borderBottom: '1px solid var(--color-ui-muted)',
                             bgcolor: filters.time ? "var(--color-primary-bg)" : 'transparent',
                             '&:hover': { bgcolor: '#FAFAFA' }
                         }}
@@ -111,7 +112,11 @@ const ActivityFilter = ({ open, onClose, onApply, currentFilters }) => {
 
                     <Button
                         onClick={handleClearAll}
-                        sx={{ backgroundColor: "var(--color-ui-muted)", fontSize: '0.85rem', textTransform: 'none', fontWeight: 500 }}
+                        sx={{
+                            backgroundColor: "var(--color-bg-muted)", fontSize: '0.85rem',
+                            textTransform: 'none', fontWeight: 500, width: "250px",
+                            borderRadius: '20px', alignSelf: 'center', mt: 2, mb: 2
+                        }}
                     >
                         Rensa filter
                     </Button>

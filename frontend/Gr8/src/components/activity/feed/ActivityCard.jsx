@@ -87,9 +87,13 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
         }
     };
 
-    const handleReport = (e) => {
-        handleDialogClose(e);
-        // TODO: report logic & add in ActivityServices
+    const [addedToCalendar, setAddedToCalendar] = useState(false);
+
+    const handleAddToCalendar = (e) => {
+        e.stopPropagation();
+        if (addedToCalendar) return;
+        setAddedToCalendar(true);
+        onAddToCalendar?.(activity);
     };
 
     return (
@@ -263,13 +267,15 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                         </SecondaryButton>
 
                         <SecondaryButton
-                            startIcon={<TodayOutlinedIcon sx={{ color: "var(--color-primary)", fontSize: "25px !important" }} />}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                            }}
+                            startIcon={
+                                addedToCalendar
+                                    ? <CheckCircleOutlineIcon sx={{ color: "var(--color-primary)", fontSize: "25px !important" }} />
+                                    : <TodayOutlinedIcon sx={{ color: "var(--color-primary)", fontSize: "25px !important" }} />
+                            }
+                            onClick={handleAddToCalendar}
                             sx={{ borderRadius: '20px', height: '40px', width: "180px", whiteSpace: 'nowrap', ml: "auto" }}
                         >
-                            Lägg till aktivitet
+                            {addedToCalendar ? "Tillagd!" : "Lägg till aktivitet"}
                         </SecondaryButton>
                     </Box>
                 </Box>
@@ -304,22 +310,6 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                 </Box>
 
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-
-                    <Box
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleReport(e);
-                            handleDialogClose();
-                        }}
-                        sx={{
-                            display: 'flex', alignItems: 'center', gap: 2, p: 2.5, px: 3,
-                            cursor: 'pointer', borderTop: '1px solid var(--color-ui-muted)',
-                            '&:hover': { bgcolor: "var(--color-bg-muted)" }
-                        }}
-                    >
-                        {<ReportOutlinedIcon sx={{ color: "var(--color-primary)" }} />}
-                        <Typography sx={{ fontSize: '1.1rem' }}>Anmäl aktivitet</Typography>
-                    </Box>
 
                     {isOwner && (
                         <>

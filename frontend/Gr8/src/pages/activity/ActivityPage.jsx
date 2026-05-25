@@ -18,11 +18,13 @@ import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBullet
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { Box, InputAdornment, Button, CircularProgress, Snackbar, Alert } from "@mui/material";
 import distance from "@turf/distance";
-
+import CalendarService from "../../services/CalanderService.jsx";
 
 const ActivityPage = () => {
     const { currentUser } = useAuth();
     const currentUserId = currentUser?.sub;
+
+    const [markedDates, setMarkedDates] = useState([]);
 
     const [editActivity, setEditActivity] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
@@ -53,6 +55,28 @@ const ActivityPage = () => {
         setActivities(prev => prev.map(a =>
             a.id === activityId ? { ...a, isBookmarked } : a
         ));
+    };
+
+    // Load saved calendar activities on mount
+    useEffect(() => {
+        CalendarService.getAll().then(res => {
+            const marked = res.data.map(item => ({
+                date: item.startAt,
+                activityId: item.activityId,
+            }));
+            setMarkedDates(marked);
+        });
+    }, []);
+
+    const handleAddToCalendar = async (activity) => {
+        try {
+            await CalendarService.add(activity.id);
+            setMarkedDates(prev => [...prev, { date: activity.startAt, activityId: activity.id }]);
+        } catch (error) {
+            if (error.response?.status !== 409) {
+                console.error("Kunde inte lägga till aktiviteten i kalendern.");
+            }
+        }
     };
 
     const handleOpenForm = () => {

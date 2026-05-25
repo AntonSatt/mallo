@@ -39,6 +39,7 @@ const ActivityFeed = ({ activities, currentUserId, onCardAction, onSelectActivit
                                 currentUserId={currentUserId}
                                 onCardAction={(action, data) => onCardAction(action, data)}
                                 onBookmarkToggle={onBookmarkToggle}
+                                imageUrl={activity.imageUrl}
                             />
                         </Box>
                     ))

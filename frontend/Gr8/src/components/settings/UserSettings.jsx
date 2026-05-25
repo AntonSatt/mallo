@@ -40,6 +40,14 @@ import SettingsButtonStyles from "../../design/buttons/SettingsButton.jsx";
 import SettingsSuccessDialog from "./SettingsSuccessDialog.jsx";
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
+import {
+    PERMISSION_STATE,
+    PERMISSION_TYPE,
+    getPermissionStateLabel,
+    onPermissionStateChange,
+    queryPermissionState,
+    requestPermission
+} from "../../utils/browserPermissions.js";
 
 // User Settings Page: Provides an interface for users to update their profile information, change their password, and delete their account. 
 // Utilizes accordions for organized sections and handles form validation and API interactions for user data management.
@@ -91,8 +99,10 @@ const UserSettings = () => {
     const [showNewPassword] = useState(false);
     const [showConfirmPassword] = useState(false);
 
-    const [locationEnabled, setLocationEnabled] = useState(false);
-    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+    const [geolocationPermissionState, setGeolocationPermissionState] = useState(PERMISSION_STATE.PROMPT);
+    const [notificationPermissionState, setNotificationPermissionState] = useState(PERMISSION_STATE.PROMPT);
+    const [isLocationHelpDialogOpen, setIsLocationHelpDialogOpen] = useState(false);
+    const [isNotificationsHelpDialogOpen, setIsNotificationsHelpDialogOpen] = useState(false);
 
     const normalizeTagIds = (tagIds) => {
         if (!Array.isArray(tagIds)) {
@@ -184,6 +194,44 @@ const UserSettings = () => {
         };
 
         fetchData();
+    }, []);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const syncPermissions = async () => {
+            try {
+                const [locationState, notificationsState] = await Promise.all([
+                    queryPermissionState(PERMISSION_TYPE.GEOLOCATION),
+                    queryPermissionState(PERMISSION_TYPE.NOTIFICATIONS)
+                ]);
+
+                if (!isMounted) {
+                    return;
+                }
+
+                setGeolocationPermissionState(locationState);
+                setNotificationPermissionState(notificationsState);
+            } catch (error) {
+                console.error("Kunde inte läsa behörigheter", error);
+            }
+        };
+
+        const unsubscribeLocation = onPermissionStateChange(PERMISSION_TYPE.GEOLOCATION, (state) => {
+            setGeolocationPermissionState(state);
+        });
+
+        const unsubscribeNotifications = onPermissionStateChange(PERMISSION_TYPE.NOTIFICATIONS, (state) => {
+            setNotificationPermissionState(state);
+        });
+
+        syncPermissions();
+
+        return () => {
+            isMounted = false;
+            unsubscribeLocation();
+            unsubscribeNotifications();
+        };
     }, []);
 
     const handleProfileSubmit = async (e) => {
@@ -294,6 +342,58 @@ const UserSettings = () => {
             openStatusDialog("anonymity", "error");
         }
     };
+
+    const handleLocationCtaClick = async () => {
+        if (geolocationPermissionState === PERMISSION_STATE.DENIED) {
+            setIsLocationHelpDialogOpen(true);
+            return;
+        }
+
+        try {
+            const result = await requestPermission(PERMISSION_TYPE.GEOLOCATION, {
+                geolocationOptions: { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            });
+
+            if (result?.state) {
+                setGeolocationPermissionState(result.state);
+            }
+        } catch (error) {
+            setGeolocationPermissionState(PERMISSION_STATE.DENIED);
+            console.error("Kunde inte aktivera platstjänster", error);
+            openStatusDialog("location", "error");
+        }
+    };
+
+    const handleNotificationCtaClick = async () => {
+        if (notificationPermissionState === PERMISSION_STATE.DENIED) {
+            setIsNotificationsHelpDialogOpen(true);
+            return;
+        }
+
+        try {
+            const result = await requestPermission(PERMISSION_TYPE.NOTIFICATIONS);
+            if (result?.state) {
+                setNotificationPermissionState(result.state);
+            }
+        } catch (error) {
+            console.error("Kunde inte aktivera notifikationer", error);
+            openStatusDialog("notifications", "error");
+        }
+    };
+
+    const locationStateLabel = getPermissionStateLabel(geolocationPermissionState);
+    const showLocationCta = geolocationPermissionState !== PERMISSION_STATE.GRANTED;
+    const showLocationBadge = geolocationPermissionState !== PERMISSION_STATE.PROMPT;
+    const locationCtaLabel = geolocationPermissionState === PERMISSION_STATE.DENIED
+        ? "Hjälp"
+        : "Aktivera";
+
+    const notificationsStateLabel = getPermissionStateLabel(notificationPermissionState);
+    const showNotificationsCta = notificationPermissionState !== PERMISSION_STATE.GRANTED;
+    const showNotificationsBadge = notificationPermissionState !== PERMISSION_STATE.PROMPT;
+    const notificationsCtaLabel = notificationPermissionState === PERMISSION_STATE.DENIED
+        ? "Hjälp"
+        : "Aktivera";
 
     const handleAccordionChange = (section) => (_, isExpanded) => {
         setExpandedSection(isExpanded ? section : false);
@@ -665,19 +765,30 @@ const UserSettings = () => {
 
                 <form>
                     <Accordion className="dropdown" expanded={false}>
-                        <AccordionSummary className="switch-row-summary">
+                        <AccordionSummary className="switch-row-summary" component="div">
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', px: 0.5, py: 1 }}>
                                 <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                     <LocationOnOutlinedIcon sx={{ color: 'var(--color-primary)', width: 20, height: 20 }} />
                                     Platstjänster
                                 </Typography>
-                                <Switch
-                                    className="settingsSwitch"
-                                    checked={locationEnabled}
-                                    onChange={(e) => setLocationEnabled(e.target.checked)}
-                                    size="small"
-                                    onClick={(e) => e.stopPropagation()}
-                                />
+                                <Box className="permissionStateActions">
+                                    {showLocationBadge && (
+                                        <Typography className={`permissionStateBadge permissionState-${geolocationPermissionState}`}>
+                                            {locationStateLabel}
+                                        </Typography>
+                                    )}
+                                    {showLocationCta && (
+                                        <Button
+                                            className="permissionStateCta"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                void handleLocationCtaClick();
+                                            }}
+                                        >
+                                            {locationCtaLabel}
+                                        </Button>
+                                    )}
+                                </Box>
                             </Box>
                         </AccordionSummary>
                     </Accordion>
@@ -685,19 +796,30 @@ const UserSettings = () => {
 
                 <form>
                     <Accordion className="dropdown" expanded={false}>
-                        <AccordionSummary className="switch-row-summary">
+                        <AccordionSummary className="switch-row-summary" component="div">
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', px: 0.5, py: 1 }}>
                                 <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                     <CircleNotificationsIcon sx={{ color: 'var(--color-primary)', width: 20, height: 20 }} />
                                     Notifikationer
                                 </Typography>
-                                <Switch
-                                    className="settingsSwitch"
-                                    checked={notificationsEnabled}
-                                    onChange={(e) => setNotificationsEnabled(e.target.checked)}
-                                    size="small"
-                                    onClick={(e) => e.stopPropagation()}
-                                />
+                                <Box className="permissionStateActions">
+                                    {showNotificationsBadge && (
+                                        <Typography className={`permissionStateBadge permissionState-${notificationPermissionState}`}>
+                                            {notificationsStateLabel}
+                                        </Typography>
+                                    )}
+                                    {showNotificationsCta && (
+                                        <Button
+                                            className="permissionStateCta"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                void handleNotificationCtaClick();
+                                            }}
+                                        >
+                                            {notificationsCtaLabel}
+                                        </Button>
+                                    )}
+                                </Box>
                             </Box>
                         </AccordionSummary>
                     </Accordion>
@@ -705,7 +827,7 @@ const UserSettings = () => {
 
                 <form>
                     <Accordion className="dropdown" expanded={false}>
-                        <AccordionSummary className="switch-row-summary">
+                        <AccordionSummary className="switch-row-summary" component="div">
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', px: 0.5, py: 1 }}>
                                 <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                     <img src={Avatar} alt="edit" style={{
@@ -795,6 +917,118 @@ const UserSettings = () => {
 
                             <PrimaryButton
                                 onClick={closeContactDialog}
+                                sx={{
+                                    mt: 0.5,
+                                    borderRadius: "999px",
+                                    width: "100%",
+                                    maxWidth: 220,
+                                    py: 1.1,
+                                    textTransform: "none",
+                                    fontWeight: 700,
+                                }}
+                            >
+                                Stäng
+                            </PrimaryButton>
+                        </DialogContent>
+                    </ClickAwayListener>
+                </Dialog>
+
+                <Dialog
+                    open={isLocationHelpDialogOpen}
+                    onClose={() => setIsLocationHelpDialogOpen(false)}
+                    fullWidth
+                    maxWidth="xs"
+                    sx={{
+                        "& .MuiDialog-paper": {
+                            borderRadius: "16px",
+                            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.14)",
+                            p: 1.5,
+                        },
+                    }}
+                >
+                    <ClickAwayListener onClickAway={() => setIsLocationHelpDialogOpen(false)}>
+                        <DialogContent
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                textAlign: "center",
+                                px: 2.5,
+                                pt: 1,
+                                pb: 1.5,
+                                gap: 2,
+                            }}
+                        >
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    color: "var(--color-text-main)",
+                                    fontWeight: 500,
+                                    lineHeight: 1.4,
+                                    maxWidth: 300,
+                                }}
+                            >
+                                Platstjänster är blockerade i webbläsaren. Öppna sidinställningar för den här webbplatsen och tillåt plats för att aktivera funktionen igen.
+                            </Typography>
+
+                            <PrimaryButton
+                                onClick={() => setIsLocationHelpDialogOpen(false)}
+                                sx={{
+                                    mt: 0.5,
+                                    borderRadius: "999px",
+                                    width: "100%",
+                                    maxWidth: 220,
+                                    py: 1.1,
+                                    textTransform: "none",
+                                    fontWeight: 700,
+                                }}
+                            >
+                                Stäng
+                            </PrimaryButton>
+                        </DialogContent>
+                    </ClickAwayListener>
+                </Dialog>
+
+                <Dialog
+                    open={isNotificationsHelpDialogOpen}
+                    onClose={() => setIsNotificationsHelpDialogOpen(false)}
+                    fullWidth
+                    maxWidth="xs"
+                    sx={{
+                        "& .MuiDialog-paper": {
+                            borderRadius: "16px",
+                            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.14)",
+                            p: 1.5,
+                        },
+                    }}
+                >
+                    <ClickAwayListener onClickAway={() => setIsNotificationsHelpDialogOpen(false)}>
+                        <DialogContent
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                textAlign: "center",
+                                px: 2.5,
+                                pt: 1,
+                                pb: 1.5,
+                                gap: 2,
+                            }}
+                        >
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    color: "var(--color-text-main)",
+                                    fontWeight: 500,
+                                    lineHeight: 1.4,
+                                    maxWidth: 300,
+                                }}
+                            >
+                                Notifikationer är blockerade i webbläsaren. Öppna sidinställningar för den här webbplatsen och tillåt notifikationer för att aktivera funktionen igen.
+                            </Typography>
+
+                            <PrimaryButton
+                                onClick={() => setIsNotificationsHelpDialogOpen(false)}
                                 sx={{
                                     mt: 0.5,
                                     borderRadius: "999px",

@@ -15,6 +15,8 @@ const errorMessages = {
     password: "Kunde inte uppdatera ditt lösenord.",
     triggers: "Kunde inte spara dina triggers.",
     anonymity: "Kunde inte uppdatera din anonymitetsinställning.",
+    location: "Kunde inte aktivera platstjänster.",
+    notifications: "Kunde inte aktivera notifikationer.",
 };
 
 const SettingsSuccessDialog = ({ open, onClose, section = "profile", outcome = "success" }) => {

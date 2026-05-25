@@ -18,6 +18,13 @@ import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBullet
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { Box, InputAdornment, Button, CircularProgress, Snackbar, Alert } from "@mui/material";
 import distance from "@turf/distance";
+import {
+    PERMISSION_STATE,
+    PERMISSION_TYPE,
+    onPermissionStateChange,
+    queryPermissionState,
+    requestPermission
+} from "../../utils/browserPermissions.js";
 
 const ActivityPage = () => {
     const { currentUser } = useAuth();
@@ -35,6 +42,7 @@ const ActivityPage = () => {
     const [alignment, setAlignment] = React.useState('map');
     const [filterOpen, setFilterOpen] = useState(false);
     const [userCoords, setUserCoords] = useState(null);
+    const [geolocationPermissionState, setGeolocationPermissionState] = useState(PERMISSION_STATE.PROMPT);
     const [activeFilters, setActiveFilters] = useState({
         nearby: false,
         yourActivities: false,
@@ -146,20 +154,59 @@ const ActivityPage = () => {
 
     // Get user's current location 
     useEffect(() => {
-        if (!userCoords) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    setUserCoords({
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    });
-                },
-                (err) => console.error("Kunde inte hämta position", err),
-                { enableHighAccuracy: true }
-            );
-        }
-    }, [userCoords]);
+        let isMounted = true;
+        const syncPermissionState = async () => {
+            const state = await queryPermissionState(PERMISSION_TYPE.GEOLOCATION);
+            if (isMounted) {
+                setGeolocationPermissionState(state);
+            }
+        };
 
+        const unsubscribe = onPermissionStateChange(PERMISSION_TYPE.GEOLOCATION, (state) => {
+            setGeolocationPermissionState(state);
+        });
+
+        syncPermissionState();
+
+        return () => {
+            isMounted = false;
+            unsubscribe();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (geolocationPermissionState === PERMISSION_STATE.DENIED && userCoords) {
+            setUserCoords(null);
+        }
+    }, [geolocationPermissionState, userCoords]);
+
+    useEffect(() => {
+        if (geolocationPermissionState === PERMISSION_STATE.DENIED) {
+            return;
+        }
+
+        if (!userCoords) {
+            requestPermission(PERMISSION_TYPE.GEOLOCATION, { geolocationOptions: { enableHighAccuracy: true } })
+                .then((result) => {
+                    if (result?.position) {
+                        setUserCoords({
+                            lat: result.position.coords.latitude,
+                            lng: result.position.coords.longitude
+                        });
+                    }
+
+                    if (result?.state) {
+                        setGeolocationPermissionState(result.state);
+                    }
+                })
+                .catch((err) => {
+                    if (err?.code === 1) {
+                        setGeolocationPermissionState(PERMISSION_STATE.DENIED);
+                    }
+                    console.error("Kunde inte hämta position", err);
+                });
+        }
+    }, [geolocationPermissionState, userCoords]);
     // Apply filters to activities
     const filteredActivities = activities
         .map(activity => {
@@ -183,7 +230,7 @@ const ActivityPage = () => {
 
             // Nearby filter
             if (activeFilters.nearby) {
-                if (!userCoords) return false;
+                if (geolocationPermissionState === PERMISSION_STATE.DENIED || !userCoords) return false;
                 if (activity.distanceMeters > 7000) return false;
             }
 

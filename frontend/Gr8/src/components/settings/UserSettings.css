@@ -61,7 +61,7 @@
     color: var(--color-primary) !important;
 }
 
-.settingsSwitch .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
+.settingsSwitch .MuiSwitch-switchBase.Mui-checked+.MuiSwitch-track {
     background-color: var(--color-primary-soft) !important;
     opacity: 1 !important;
 }
@@ -74,6 +74,54 @@
 
 .switch-row-summary .settingsSwitch,
 .switch-row-summary .settingsSwitch * {
+    cursor: pointer !important;
+}
+
+.permissionStateActions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.permissionStateBadge {
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+}
+
+.permissionState-granted {
+    background-color: #e9f6ee;
+    color: #2e7d32;
+}
+
+.permissionState-denied {
+    background-color: #fdecec;
+    color: #c62828;
+}
+
+.permissionState-prompt {
+    background-color: var(--color-primary-soft);
+    color: var(--color-text-main);
+}
+
+.permissionStateCta.MuiButtonBase-root {
+    min-width: 0;
+    border-radius: 999px;
+    border: 1px solid var(--color-border-light);
+    background-color: var(--color-primary-soft);
+    color: var(--color-text-main);
+    font-weight: 700;
+    text-transform: none;
+    padding: 4px 12px;
+}
+
+.permissionStateCta.MuiButtonBase-root:hover {
+    background-color: #ffe4b5;
+}
+
+.switch-row-summary .permissionStateCta,
+.switch-row-summary .permissionStateCta * {
     cursor: pointer !important;
 }
 

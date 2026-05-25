@@ -162,7 +162,43 @@ namespace Gr8.Api.Endpoints
                 var isBookmarked = await activityBookmarkService.ToggleActivityBookmarkAsync(activityId, appUser.Id);
                 return Results.Ok(new { isBookmarked });
 
-            }).RequireAuthorization(AuthorizationConstants.JwtOnly);        
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapGet("/map/activities/calendar", async (ClaimsPrincipal user, UserManager<ApplicationUser> userManager, [FromServices] IActivityCalenderService activityCalenderService) =>
+            {
+                var appUser = await userManager.GetUserAsync(user);
+                if (appUser == null) return Results.Unauthorized();
+
+                var activities = await activityCalenderService.GetUserCalendarActivitiesAsync(appUser.Id);
+                return Results.Ok(activities);
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPost("/map/activities/{activityId}/calendar", async (int activityId, ClaimsPrincipal user, UserManager<ApplicationUser> userManager, [FromServices] IActivityCalenderService activityCalenderService) =>
+            {
+                var appUser = await userManager.GetUserAsync(user);
+                if (appUser == null) return Results.Unauthorized();
+
+                var exists = await activityCalenderService.UserCalendarActivityExistsAsync(appUser.Id, activityId);
+                if (exists) return Results.Conflict();
+
+                await activityCalenderService.AddUserCalendarActivityAsync(appUser.Id, activityId);
+                return Results.Ok();
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapDelete("/map/activities/{activityId}/calendar", async (int activityId, ClaimsPrincipal user, UserManager<ApplicationUser> userManager, [FromServices] IActivityCalenderService activityCalenderService) =>
+            {
+                var appUser = await userManager.GetUserAsync(user);
+                if (appUser == null) return Results.Unauthorized();
+
+                var exists = await activityCalenderService.UserCalendarActivityExistsAsync(appUser.Id, activityId);
+                if (!exists) return Results.NotFound();
+
+                await activityCalenderService.RemoveUserCalendarActivityAsync(appUser.Id, activityId);
+                return Results.Ok();
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
         }
     }
 }

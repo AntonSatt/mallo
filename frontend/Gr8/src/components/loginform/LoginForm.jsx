@@ -66,12 +66,12 @@ const LoginForm = () => {
     <form onSubmit={handleSubmit}>
       <Grid container direction="column" spacing={2}>
         {error.general && (
-          <Grid item>
+          <Grid>
             <Typography color="error" align="center">{error.general}</Typography>
           </Grid>
         )}
 
-        <Grid item>
+        <Grid>
           <Typography variant="h6" align="center">
             Användarnamn
           </Typography>
@@ -95,7 +95,7 @@ const LoginForm = () => {
           />
         </Grid>
 
-        <Grid item>
+        <Grid>
           <Typography variant="h6" align="center">
             Lösenord
           </Typography>
@@ -121,7 +121,7 @@ const LoginForm = () => {
         </Grid>
 
         {error.general && (
-          <Grid item>
+          <Grid>
             <Typography color="error" align="center">
               {error.general}
             </Typography>
@@ -153,7 +153,7 @@ const LoginForm = () => {
           </Typography>
         </Box>
 
-        <Grid item>
+        <Grid>
           <PrimaryButton type="submit" sx={{ height: 40, mt: 2 }}>
             Logga in
           </PrimaryButton>

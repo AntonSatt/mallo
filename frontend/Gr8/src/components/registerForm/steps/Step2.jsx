@@ -53,7 +53,7 @@ const Step2 = ({ formData, handleChange, onNext, error }) => {
     };
 
     return (
-        <Box container className="register-step2" spacing={0}>
+        <Box className="register-step2" spacing={0}>
 
             <Typography variant="body1" sx={{ mb: 3 }}>I vårt community är alla {" "}
                 <span style={{ color: "var(--color-primary)", fontWeight: 700 }}>verifierade</span>{" "}

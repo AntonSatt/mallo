@@ -8,9 +8,7 @@ _A Swedish-language community platform where members share posts, find local act
 
 <br />
 
-https://git.chas-lab.dev/chas-challenge-2026/grupp-8/project/-/raw/develop/docs/media/mallo-wave.mp4
-
-<sub>(GitLab renders the file above as an inline video player — see <a href="docs/media/mallo-wave.mp4"><code>docs/media/mallo-wave.mp4</code></a>.)</sub>
+![Mallo demo](docs/media/mallo-wave.mp4)
 
 <br />
 

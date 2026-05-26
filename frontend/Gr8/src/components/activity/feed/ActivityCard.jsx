@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOnlineUsers } from "../../../contexts/OnlineUsersContext";
 import ActivityServices from "../../../services/ActivityService.jsx";
@@ -17,12 +17,15 @@ import ReportOutlinedIcon from '@mui/icons-material/ReportOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import CloseIcon from "../../../assets/icons/closeIcon.svg";
 import BookmarkButton from "../../bookmarkButton/BookmarkButton.jsx";
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
+import LinkIcon from '@mui/icons-material/Link';
 import useViewport from "../../../hooks/useViewport";
 
 
-const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookmarkToggle }) => {
-    const [expanded, setExpanded] = useState(false);
+const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookmarkToggle, onAddToCalendar, isHighlighted, markedDates }) => {
     const [isBookmarked, setIsBookmarked] = useState(activity.isBookmarked ?? false);
+
+    const [expanded, setExpanded] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -39,6 +42,10 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
     const isOwner = currentUserId === activity.userId;
     const dateText = dayjs(activity.startAt).format('D MMMM');
     const timeText = dayjs(activity.startAt).format('[Kl.] HH:mm');
+
+    const [addedToCalendar, setAddedToCalendar] = useState(
+        markedDates?.some(m => m.activityId === activity.id) ?? false
+    );
 
     const handleExpand = () => {
         setExpanded(!expanded);
@@ -96,10 +103,18 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
         }
     };
 
-    const handleReport = (e) => {
-        handleDialogClose(e);
-        // TODO: report logic & add in ActivityServices
+    const handleAddToCalendar = (e) => {
+        e.stopPropagation();
+        if (addedToCalendar) return;
+        setAddedToCalendar(true);
+        onAddToCalendar?.(activity);
     };
+
+    useEffect(() => {
+        if (isHighlighted) {
+            setExpanded(true);
+        }
+    }, [isHighlighted]);
 
     return (
         <Paper elevation={2}
@@ -165,7 +180,7 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                     >
                         <Avatar
                             className="post-avatar"
-                            avatar={activity.creator?.picture || activity.user?.picture}
+                            avatar={activity.authorInfo?.avatarId}
                         />
                         <Box
                             sx={{
@@ -189,8 +204,8 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                 </Box>
 
                 <Box sx={{ textAlign: 'center', flex: 1, pr: 2 }}>
-                    <Typography variant="body1" sx={{ color: "var( --color-ui-muted)" }}>
-                        <span style={{ fontWeight: 600 }}>27 </span>anmälda
+                    <Typography variant="body1" sx={{ color: "var(--color-ui-muted)" }}>
+                        <span style={{ fontWeight: 600 }}>{activity.calendarCount ?? 0} </span>anmälda
                     </Typography>
                 </Box>
 
@@ -220,18 +235,6 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                         {activity.fullName || "Okänd"}
                     </Typography>
 
-                    <Typography variant="caption" sx={{
-                        mt: 1, mb: 1,
-                        px: 0.5,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 0.5
-                    }}>
-                        <LocationOnOutlinedIcon sx={{ fontSize: "20px", mb: 0.5, color: "var(--color-primary)" }} />
-                        {activity.adress || "Ingen plats angiven"}
-                    </Typography>
-
-
                     {/* Description*/}
                     <Typography variant="body2" sx={{
                         mt: 1.5,
@@ -241,6 +244,76 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                     }}>
                         {activity.description || "Ingen beskrivning tillgänglig för denna aktivitet."}
                     </Typography>
+
+                    {/* Adress and URL */}
+                    <Box sx={{ display: "flex", flexDirection: "row" }} >
+                        <Typography variant="caption" sx={{
+                            mt: 1, mb: 1,
+                            px: 0.5,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.5
+                        }}>
+                            <LocationOnOutlinedIcon sx={{ fontSize: "20px", mb: 0.5, color: "var(--color-primary)" }} />
+                            {activity.adress || "Ingen plats angiven"}
+                        </Typography>
+
+                        {(activity.url || activity.Url) && (
+                            <Typography
+                                variant="caption"
+                                component="a"
+                                href={activity.url || activity.Url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                sx={{
+                                    mt: 1, mb: 1,
+                                    px: 0.5,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 0.5,
+                                    textDecoration: "none",
+                                    color: "inherit",
+                                    "&:hover": { textDecoration: "underline" }
+                                }}
+                            >
+                                <LinkIcon sx={{ fontSize: "20px", mb: 0.2, ml: 2, color: "var(--color-primary)", rotate: '135deg' }} />
+                                {(() => {
+                                    try {
+                                        const fullUrl = activity.url || activity.Url;
+                                        const validUrl = fullUrl.startsWith('http') ? fullUrl : `https://${fullUrl}`;
+                                        return new URL(validUrl).hostname; // Shorter URL text
+                                    } catch {
+                                        return "Gå till länk"; // Fallback
+                                    }
+                                })()}
+                            </Typography>
+                        )}
+                    </Box>
+
+                    {activity.imageUrl && (
+                        <Box sx={{
+                            width: '100%',
+                            mt: 1.5,
+                            mb: 1,
+                            px: 0.5,
+                            overflow: 'auto',
+                            height: '90px',
+                        }}>
+                            <Box
+                                component="img"
+                                src={activity.imageUrl}
+                                alt={activity.title || "Aktivitetsbild"}
+                                sx={{
+                                    width: '100%',
+                                    maxHeight: '200px',
+                                    objectFit: 'cover',
+                                    borderRadius: '15px',
+                                    border: '1px solid var(--color-border-light)',
+                                    opacity: 0.95,
+                                }}
+                            />
+                        </Box>
+                    )}
 
                     <Box sx={{
                         display: 'flex',
@@ -293,13 +366,15 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                         </SecondaryButton>
 
                         <SecondaryButton
-                            startIcon={<TodayOutlinedIcon sx={{ color: "var(--color-primary)", fontSize: "25px !important" }} />}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                            }}
+                            startIcon={
+                                addedToCalendar
+                                    ? <TaskAltIcon sx={{ color: "var(--color-primary)", fontSize: "25px !important" }} />
+                                    : <TodayOutlinedIcon sx={{ color: "var(--color-primary)", fontSize: "25px !important" }} />
+                            }
+                            onClick={handleAddToCalendar}
                             sx={{ borderRadius: '20px', height: '40px', width: "180px", whiteSpace: 'nowrap', ml: "auto" }}
                         >
-                            Lägg till aktivitet
+                            {addedToCalendar ? "Tillagd!" : "Lägg till aktivitet"}
                         </SecondaryButton>
                     </Box>
                 </Box>
@@ -334,22 +409,6 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                 </Box>
 
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-
-                    <Box
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleReport(e);
-                            handleDialogClose();
-                        }}
-                        sx={{
-                            display: 'flex', alignItems: 'center', gap: 2, p: 2.5, px: 3,
-                            cursor: 'pointer', borderTop: '1px solid var(--color-ui-muted)',
-                            '&:hover': { bgcolor: "var(--color-bg-muted)" }
-                        }}
-                    >
-                        {<ReportOutlinedIcon sx={{ color: "var(--color-primary)" }} />}
-                        <Typography sx={{ fontSize: '1.1rem' }}>Anmäl aktivitet</Typography>
-                    </Box>
 
                     {isOwner && (
                         <>

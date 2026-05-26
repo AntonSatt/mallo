@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gr8-plain-db
+  labels:
+    app.kubernetes.io/name: gr8
+    app.kubernetes.io/instance: gr8-plain
+    app.kubernetes.io/part-of: gr8
+    app.kubernetes.io/component: db
+spec:
+  # Must match the headless Service name in db-service.yaml.
+  serviceName: gr8-plain-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gr8
+      app.kubernetes.io/instance: gr8-plain
+      app.kubernetes.io/component: db
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: gr8
+        app.kubernetes.io/instance: gr8-plain
+        app.kubernetes.io/part-of: gr8
+        app.kubernetes.io/component: db
+    spec:
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        fsGroup: 10001
+      containers:
+        - name: mssql
+          image: "mcr.microsoft.com/mssql/server:2022-latest"
+          imagePullPolicy: Always
+          ports:
+            - name: mssql
+              containerPort: 1433
+              protocol: TCP
+          env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            # Developer edition — full features, no memory cap. Matches develop/main.
+            # (Helm feature branches override this to Express via values-feature.yaml.)
+            - name: MSSQL_PID
+              value: "Developer"
+            - name: MSSQL_SA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: gr8-secrets
+                  key: DB_PASSWORD
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1Gi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+          volumeMounts:
+            - name: data
+              mountPath: /var/opt/mssql
+          # First boot on a fresh PVC: the MSSQL image runs schema upgrades on
+          # master/msdb/model (~3-4 min before the port opens). 600s covers it.
+          startupProbe:
+            tcpSocket:
+              port: 1433
+            periodSeconds: 10
+            failureThreshold: 60
+          livenessProbe:
+            tcpSocket:
+              port: 1433
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 1433
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          app.kubernetes.io/name: gr8
+          app.kubernetes.io/instance: gr8-plain
+          app.kubernetes.io/part-of: gr8
+          app.kubernetes.io/component: db
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "longhorn"
+        resources:
+          requests:
+            storage: 5Gi

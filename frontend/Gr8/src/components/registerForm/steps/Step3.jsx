@@ -9,14 +9,26 @@ import InputAdornment from "@mui/material/InputAdornment";
 import ControlPointOutlinedIcon from '@mui/icons-material/ControlPointOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
+import { Accordion } from "../TermsAccordion";
 
 // Step 3 of registration: Finalizes account creation by collecting email, password, 
 // and handling user consent for terms, privacy policy, and notifications.
 const Step3 = ({ formData, handleChange, onNext, error }) => {
 
+    const [open, setOpen] = useState(null);
     const navigate = useNavigate();
     const [allowNotifications, setAllowNotifications] = useState(false);
     const [approveTerms, setApproveTerms] = useState(false);
+    const [termsError, setTermsError] = useState("");
+
+    const handleNext = () => {
+        if (!approveTerms) {
+            setTermsError("Du måste godkänna användarvillkoren och integritetspolicyn för att fortsätta.");
+            return;
+        }
+        setTermsError(false);
+        onNext();
+    };
 
     return (
         <Box container className="register-step3" spacing={0}>
@@ -105,13 +117,28 @@ const Step3 = ({ formData, handleChange, onNext, error }) => {
                 )}
 
                 <Typography variant="caption" sx={{ mt: 1, mb: 0.5 }}>
-                    Jag godkänner {" "}
-                    <span style={{ color: "var(--color-primary)" }}>användarvillkoren</span>{" "}
-                    och
-                    {" "}
-                    <span style={{ color: "var(--color-primary)" }}> integritetspolicyn</span>{" "}
+                    Jag godkänner{" "}
+                    <span
+                        style={{ color: "var(--color-primary)", cursor: "pointer", textDecoration: "underline" }}
+                        onClick={(e) => { e.stopPropagation(); setOpen("användarvillkor"); }}
+                    >
+                        användarvillkoren
+                    </span>{" "}
+                    och{" "}
+                    <span
+                        style={{ color: "var(--color-primary)", cursor: "pointer", textDecoration: "underline" }}
+                        onClick={(e) => { e.stopPropagation(); setOpen("integritetspolicy"); }}
+                    >
+                        integritetspolicyn
+                    </span>
                 </Typography>
             </Box>
+            
+            {termsError && (
+                <Typography variant="caption" sx={{ color: 'red', textAlign: 'center', display: 'block', mb: 1 }}>
+                    {termsError}
+                </Typography>
+            )}
 
             <Box
                 onClick={() => setAllowNotifications(!allowNotifications)}
@@ -148,11 +175,12 @@ const Step3 = ({ formData, handleChange, onNext, error }) => {
                     Avsluta
                 </SecondaryButton>
 
-                <PrimaryButton onClick={onNext} startIcon={<ControlPointOutlinedIcon sx={{ color: "white" }} />}>
+                <PrimaryButton onClick={handleNext} startIcon={<ControlPointOutlinedIcon sx={{ color: "white" }} />}>
                     Skapa konto
                 </PrimaryButton>
 
             </Box>
+            {open && <Accordion id={open} onClose={() => setOpen(null)} />}
         </Box>
     );
 };

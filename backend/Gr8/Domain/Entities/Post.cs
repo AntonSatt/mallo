@@ -11,7 +11,7 @@ namespace Gr8.Domain.Entities
         {
             Tags = new List<Tag>();
             Comments = new List<Comment>();
-            CreatedAt = DateTime.Now;
+            CreatedAt = DateTime.UtcNow;
         }
 
         // Constructor to initialize required properties from domain logic
@@ -29,6 +29,7 @@ namespace Gr8.Domain.Entities
         public DateTime UpdatedAt { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsEdited { get; set; }
+        public string? AuthorDisplayName { get; set; }
 
         public int CategoryId { get; private set; } //FK
         public Category Category { get; set; } = null!;

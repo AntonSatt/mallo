@@ -18,15 +18,6 @@
     opacity: 0.80;
 }
 
-/*avatar is a circle with the first letter of the username, and a background color based on the username. */
-.post-avatar {
-    width: 52px !important;
-    height: 52px !important;
-    background-color: var(--color-primary-soft) !important;
-    color: var(--color-text-main) !important;
-    font-weight: 700 !important;
-}
-
 /*contains the username and category. */
 .post-user-row {
     display: flex;
@@ -47,7 +38,8 @@
 }
 
 .post-card-content {
-    padding: 0 20px 12px 87px !important; /*the length of the content preview*/
+    padding: 0 20px 12px 87px !important;
+    /*the length of the content preview*/
     margin-top: -10px;
 }
 
@@ -58,15 +50,17 @@
     border-bottom: 1px solid var(--color-border-light);
     padding-bottom: 1px;
     margin-bottom: 8px !important;
-    max-width: 240px; /*length of the title*/
+    max-width: 240px;
+    /*length of the title*/
 }
 
 /* The content preview is the first few lines of the post content, and is truncated with an ellipsis if it's too long. */
 .post-content-preview {
     color: var(--color-text-main);
     line-height: 1.5 !important;
-    max-width: 2480px; /*length of the content preview*/
-   /* webkit - shows only the first 5 lines of the content, and adds 3 dots if there's more text. */
+    max-width: 2480px;
+    /*length of the content preview*/
+    /* webkit - shows only the first 5 lines of the content, and adds 3 dots if there's more text. */
     display: -webkit-box;
     line-clamp: 5;
     -webkit-line-clamp: 5;

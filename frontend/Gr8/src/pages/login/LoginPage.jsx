@@ -14,7 +14,7 @@ const LoginPage = () => {
             <Header mobileImage={hold2} desktopImage={holdingHands2} />
 
             <Grid container className="login-page" spacing={0} >
-                <Grid item className="login-content" xs={12} md={6}>
+                <Grid className="login-content" xs={12} md={6}>
                     <Typography variant="h5" sx={{ mt: 0, mb: 4 }}>
                         Logga in
                     </Typography>

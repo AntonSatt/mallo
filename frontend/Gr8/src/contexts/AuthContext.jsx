@@ -21,16 +21,19 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
   const [currentUser, setCurrentUser] = useState(getUser());
 
+  const refreshCurrentUser = () => {
+    setCurrentUser(getUser());
+    setIsAuthenticated(!!localStorage.getItem('token'));
+  };
+
   const login = async (credentials) => {
     await UserServices.login(credentials);
-    setIsAuthenticated(true);
-    setCurrentUser(getUser());
+    refreshCurrentUser();
   };
 
   const register = async (userData) => {
     await UserServices.register(userData);
-    setIsAuthenticated(true);
-    setCurrentUser(getUser());
+    refreshCurrentUser();
   };
 
   const logout = async () => {
@@ -52,7 +55,7 @@ export const AuthProvider = ({ children }) => {
   });
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, currentUser, login, register, logout, deleteAccount }}>
+    <AuthContext.Provider value={{ isAuthenticated, currentUser, login, register, logout, deleteAccount, refreshCurrentUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -53,12 +53,7 @@ const Step2 = ({ formData, handleChange, onNext, error }) => {
     };
 
     return (
-        <Box container className="register-step2" spacing={0}>
-
-            <Typography variant="body1" sx={{ mb: 3 }}>I vårt community är alla {" "}
-                <span style={{ color: "var(--color-primary)", fontWeight: 700 }}>verifierade</span>{" "}
-                för att skapa en tryggare plats
-            </Typography>
+        <Box className="register-step2" spacing={0}>           
 
             <Typography variant="body2" sx={{ mt: 0 }}>Fullständigt namn</Typography>
 
@@ -71,6 +66,7 @@ const Step2 = ({ formData, handleChange, onNext, error }) => {
                 error={!!error.fullName}
                 helperText={error.fullName}
                 sx={{
+                    mb: 3,
                     "& .MuiOutlinedInput-input": {
                         textAlign: "center"
                     },
@@ -116,8 +112,8 @@ const Step2 = ({ formData, handleChange, onNext, error }) => {
                     Avsluta
                 </SecondaryButton>
 
-                <PrimaryButton onClick={handleValidateAge} startIcon={<VerifiedOutlinedIcon sx={{ color: "white" }} />}>
-                    Verifiera
+                <PrimaryButton onClick={handleValidateAge}>
+                    Nästa
                 </PrimaryButton>
 
             </Box>

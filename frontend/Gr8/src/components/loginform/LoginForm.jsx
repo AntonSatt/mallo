@@ -14,7 +14,6 @@ const LoginForm = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
 
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -37,7 +36,7 @@ const LoginForm = () => {
     }
 
     try {
-      await login({ userName, password, rememberMe });
+      await login({ userName, password });
       navigate('/forum');
     } catch (err) {
 
@@ -58,20 +57,16 @@ const LoginForm = () => {
     navigate('/forgot-password');
   };
 
-  const handleRememberMe = () => {
-    // Handle remember me logic
-  };
-
   return (
     <form onSubmit={handleSubmit}>
       <Grid container direction="column" spacing={2}>
         {error.general && (
-          <Grid item>
+          <Grid>
             <Typography color="error" align="center">{error.general}</Typography>
           </Grid>
         )}
 
-        <Grid item>
+        <Grid>
           <Typography variant="h6" align="center">
             Användarnamn
           </Typography>
@@ -95,7 +90,7 @@ const LoginForm = () => {
           />
         </Grid>
 
-        <Grid item>
+        <Grid>
           <Typography variant="h6" align="center">
             Lösenord
           </Typography>
@@ -121,7 +116,7 @@ const LoginForm = () => {
         </Grid>
 
         {error.general && (
-          <Grid item>
+          <Grid>
             <Typography color="error" align="center">
               {error.general}
             </Typography>
@@ -132,28 +127,7 @@ const LoginForm = () => {
           Glömt ditt lösenord?
         </Typography>
 
-        <Box
-          onClick={() => setRememberMe(!rememberMe)}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 1,
-            cursor: "pointer",
-            userSelect: "none"
-          }}
-        >
-          {rememberMe ? (
-            <CheckCircleIcon sx={{ color: "var(--color-primary)", fontSize: "16px" }} />
-          ) : (
-            <CircleOutlinedIcon sx={{ color: "var(--color-primary)", fontSize: "16px", mb: 0.3 }} />
-          )}
-          <Typography variant="body2">
-            Kom ihåg mina inloggningsuppgifter
-          </Typography>
-        </Box>
-
-        <Grid item>
+        <Grid>
           <PrimaryButton type="submit" sx={{ height: 40, mt: 2 }}>
             Logga in
           </PrimaryButton>

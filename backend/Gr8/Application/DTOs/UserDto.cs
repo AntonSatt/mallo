@@ -11,6 +11,7 @@ namespace Gr8.Application.DTOs
         public string LastName { get; set; }
         public string Email { get; set; }
         public int Avatar { get; set; }
+        public bool IsAnonymousPosting { get; set; }
         public List<int> TagIds { get; set; } = new();
     }
 }

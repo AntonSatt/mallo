@@ -42,7 +42,15 @@ namespace Gr8.Application.Services
                     IsEdited = activity.IsEdited,
                     UserId = activity.UserId,
                     Image = activity.Image,
-                    ImageMimeType = activity.ImageMimeType
+                    CalendarCount = await _communityRepository.GetActivityCalendarCountAsync(activity.Id),
+                    ImageMimeType = activity.ImageMimeType,
+                    AuthorInfo = new AuthorDTO
+                    {
+                        Id = activity.UserId,
+                        UserName = await _applicationRepository.GetUserNameByIdAsync(activity.UserId) ?? "Unknown",
+                        AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(activity.UserId)
+                    }
+
                 };
 
                 var fullName = await _applicationRepository.GetFullNameByIdAsync(activity.UserId);
@@ -80,7 +88,14 @@ namespace Gr8.Application.Services
                 IsEdited = activity.IsEdited,
                 UserId = activity.UserId,
                 Image = activity.Image,
-                ImageMimeType = activity.ImageMimeType
+                CalendarCount = await _communityRepository.GetActivityCalendarCountAsync(activity.Id),
+                ImageMimeType = activity.ImageMimeType,
+                AuthorInfo = new AuthorDTO
+                {
+                    Id = activity.UserId,
+                    UserName = await _applicationRepository.GetUserNameByIdAsync(activity.UserId) ?? "Unknown",
+                    AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(activity.UserId)
+                }
             };
 
             var userName = await _applicationRepository.GetFullNameByIdAsync(activityDto.UserId);
@@ -128,7 +143,14 @@ namespace Gr8.Application.Services
                 IsEdited = activity.IsEdited,
                 UserId = activity.UserId,
                 Image = activity.Image,
-                ImageMimeType = activity.ImageMimeType
+                CalendarCount = await _communityRepository.GetActivityCalendarCountAsync(activity.Id),
+                ImageMimeType = activity.ImageMimeType,
+                AuthorInfo = new AuthorDTO
+                {
+                    Id = activity.UserId,
+                    UserName = await _applicationRepository.GetUserNameByIdAsync(activity.UserId) ?? "Unknown",
+                    AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(activity.UserId)
+                }
             };
 
             var userName = await _applicationRepository.GetFullNameByIdAsync(activityDto.UserId);
@@ -184,7 +206,14 @@ namespace Gr8.Application.Services
                 IsEdited = existing.IsEdited,
                 UserId = existing.UserId,
                 Image = existing.Image,
-                ImageMimeType = existing.ImageMimeType
+                ImageMimeType = existing.ImageMimeType,
+                CalendarCount = await _communityRepository.GetActivityCalendarCountAsync(existing.Id),
+                AuthorInfo = new AuthorDTO
+                {
+                    Id = existing.UserId,
+                    UserName = await _applicationRepository.GetUserNameByIdAsync(existing.UserId) ?? "Unknown",
+                    AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(existing.UserId)
+                }
             };
 
             var userName = await _applicationRepository.GetFullNameByIdAsync(activityDto.UserId);

@@ -46,5 +46,6 @@ namespace Gr8.Application.Interfaces
         Task AddUserCalendarActivityAsync(ActivityCalender entry);
         Task RemoveUserCalendarActivityAsync(ActivityCalender entry);
         Task<ActivityCalender?> GetUserCalendarActivityAsync(string userId, int activityId);
+        Task<int> GetActivityCalendarCountAsync(int activityId);
     }
 }

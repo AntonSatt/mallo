@@ -32,7 +32,7 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
 
     const isOwner = currentUserId === activity.userId;
     const dateText = dayjs(activity.startAt).format('D MMMM');
-    const timeText = dayjs(activity.startAt).format('[Kl.] HH:mm');    
+    const timeText = dayjs(activity.startAt).format('[Kl.] HH:mm');
 
     const [addedToCalendar, setAddedToCalendar] = useState(
         markedDates?.some(m => m.activityId === activity.id) ?? false
@@ -174,8 +174,8 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                 </Box>
 
                 <Box sx={{ textAlign: 'center', flex: 1, pr: 2 }}>
-                    <Typography variant="body1" sx={{ color: "var( --color-ui-muted)" }}>
-                        <span style={{ fontWeight: 600 }}>27 </span>anmälda
+                    <Typography variant="body1" sx={{ color: "var(--color-ui-muted)" }}>
+                        <span style={{ fontWeight: 600 }}>{activity.calendarCount ?? 0} </span>anmälda
                     </Typography>
                 </Box>
 

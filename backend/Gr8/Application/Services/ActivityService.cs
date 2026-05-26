@@ -42,6 +42,7 @@ namespace Gr8.Application.Services
                     IsEdited = activity.IsEdited,
                     UserId = activity.UserId,
                     Image = activity.Image,
+                    CalendarCount = await _communityRepository.GetActivityCalendarCountAsync(activity.Id),
                     ImageMimeType = activity.ImageMimeType,
                     AuthorInfo = new AuthorDTO
                     {
@@ -87,6 +88,7 @@ namespace Gr8.Application.Services
                 IsEdited = activity.IsEdited,
                 UserId = activity.UserId,
                 Image = activity.Image,
+                CalendarCount = await _communityRepository.GetActivityCalendarCountAsync(activity.Id),
                 ImageMimeType = activity.ImageMimeType,
                 AuthorInfo = new AuthorDTO
                 {
@@ -141,6 +143,7 @@ namespace Gr8.Application.Services
                 IsEdited = activity.IsEdited,
                 UserId = activity.UserId,
                 Image = activity.Image,
+                CalendarCount = await _communityRepository.GetActivityCalendarCountAsync(activity.Id),
                 ImageMimeType = activity.ImageMimeType,
                 AuthorInfo = new AuthorDTO
                 {
@@ -204,6 +207,7 @@ namespace Gr8.Application.Services
                 UserId = existing.UserId,
                 Image = existing.Image,
                 ImageMimeType = existing.ImageMimeType,
+                CalendarCount = await _communityRepository.GetActivityCalendarCountAsync(existing.Id),
                 AuthorInfo = new AuthorDTO
                 {
                     Id = existing.UserId,

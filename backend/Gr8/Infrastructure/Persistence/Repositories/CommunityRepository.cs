@@ -321,5 +321,17 @@ namespace Gr8.Infrastructure.Persistence.Repositories
                 .Where(ac => ac.ActivityId == activityId)
                 .CountAsync();
         }
+
+        public async Task SaveFirebaseTokenAsync(UserFirebaseToken firebaseToken)
+        {
+            await _communityDbContext.UserFirebaseTokens.AddAsync(firebaseToken);
+        }
+
+        public async Task<List<UserFirebaseToken>> GetFirebaseTokensByUserIdAsync(string userId)
+        {
+            return await _communityDbContext.UserFirebaseTokens
+                .Where(t => t.UserId == userId)
+                .ToListAsync();
+        }
     }
 }

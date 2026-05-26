@@ -561,6 +561,7 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                     onSelectActivity={setSelectedActivity}
                     onAddToCalendar={handleAddToCalendar}
                     highlightedActivityId={highlightedActivityId}
+                    markedDates={markedDates}
                 />
             </Box>
 

@@ -21,6 +21,11 @@
     margin-bottom: 31px;
 }
 
+.search-bar-placeholder {
+    visibility: hidden;
+    pointer-events: none;
+}
+
 .search-icon {
     width: 22px;
     height: 22px;

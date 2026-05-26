@@ -2,7 +2,7 @@ import { Box, Typography, Stack } from "@mui/material";
 import ActivityCard from "./ActivityCard.jsx";
 
 // Component for rendering the list of activity cards in the feed
-const ActivityFeed = ({ activities, currentUserId, onCardAction, onSelectActivity, onBookmarkToggle , onAddToCalendar, highlightedActivityId }) => {
+const ActivityFeed = ({ activities, currentUserId, onCardAction, onSelectActivity, onBookmarkToggle , onAddToCalendar, highlightedActivityId, markedDates }) => {
 
     const calculateDistanceText = (distanceMeters) => {
         if (!distanceMeters) return null;
@@ -42,6 +42,7 @@ const ActivityFeed = ({ activities, currentUserId, onCardAction, onSelectActivit
                                 onAddToCalendar={onAddToCalendar}
                                 isHighlighted={highlightedActivityId === activity.id}
                                 imageUrl={activity.imageUrl}
+                                markedDates={markedDates}
                             />
                         </Box>
                     ))

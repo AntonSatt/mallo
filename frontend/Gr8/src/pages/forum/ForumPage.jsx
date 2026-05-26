@@ -70,7 +70,6 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
         setSelectedPostId(postId);
     };
 
-    // Handles closing the menu, resetting the anchor element and selected post ID
     const handleMenuClose = () => {
         setMenuAnchorEl(null);
         setSelectedPostId(null);
@@ -82,7 +81,6 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
         setOpenReportModal(true);
     };
 
-    // Handles closing the report modal, resetting the open state and selected post ID
     const handleReportClose = () => {
         setOpenReportModal(false);
         setSelectedPostId(null);
@@ -342,17 +340,22 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
                         onClose={handleClose}
                         fullWidth
                         maxWidth="sm"
+                        sx={{
+                            "& .MuiDialog-paper": {
+                                backgroundColor: "var(--color-primary-bg) !important"
+                            },
+                            borderRadius: { xs: 0, md: "15px" },
+                            width: { md: "490px" },
+                            maxWidth: { md: "490px" },
+                            height: { md: "auto" },
+                            maxHeight: { md: "calc(100% - 80px)" },
+                            margin: { md: "auto" }
+                        }}
                     >
-                        <DialogTitle>Skapa nytt inlägg</DialogTitle>
                         <PostForm
                             onPostCreated={handlePostCreated}
                             onClose={handleClose}
                         />
-                        <DialogActions>
-                            <Button variant="text" color="inherit" onClick={handleClose}>
-                                Avbryt
-                            </Button>
-                        </DialogActions>
                     </Dialog>
 
                     <ReportForm
@@ -400,9 +403,6 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
                         }}>
 
                         <Box sx={{ px: { md: 1 } }}> {/*adds padding for scrollbar.*/}
-                            {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
-                    each post. The PostCard component is responsible for displaying the post content, as well as handling the 
-                    expand/collapse of the comment section and the menu actions for reporting, editing, and deleting posts. */}
                             {filteredPosts.length > 0 ? (
                                 filteredPosts.map((post) => (
                                     <PostCard

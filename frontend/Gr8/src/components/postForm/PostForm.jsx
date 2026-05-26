@@ -3,17 +3,20 @@ import PostServices from "../../services/PostServices";
 
 import {
   InputLabel,
-  TextField,
   Box,
   OutlinedInput,
   MenuItem,
   ListItemText,
   Select,
   FormControl,
-  Button
-} from "@mui/material"
+  Paper,
+  Typography,
+  Stack
+} from "@mui/material";
+
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import PrimaryButton from "../../design/buttons/PrimaryButton.jsx";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -96,81 +99,155 @@ const PostForm = ({ onPostCreated, onClose }) => {
   }, []);
 
   return (
-    <>
-      {error && <p>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
-            <TextField
-              fullWidth
-              value={postData.title}
-              onChange={(e) => setPostData({ ...postData, title: e.target.value })}
-              label="Titel"
-            /></Box>
-        </div>
-        <div>
-          <TextField
-            fullWidth
-            value={postData.content}
-            onChange={(e) => setPostData({ ...postData, content: e.target.value })}
-            label="Skriv ditt inlägg här..."
-            multiline
-            maxRows={6}
-          />
-        </div>
-        <div>
-          <FormControl sx={{ m: 3, width: 300 }}>
-            <InputLabel id="demo-multiple-checkbox-label">Kategorier</InputLabel>
-            <Select
-              value={postData.categoryId}
-              onChange={(e) => setPostData({ ...postData, categoryId: e.target.value })}
-              label="Kategori"
-              MenuProps={MenuProps}
-            >
-              {categories.map(category => (
-                <MenuItem key={category.id} value={category.id}>
-                  {category.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </div>
-        <div>
-          <FormControl sx={{ m: 3, width: 300 }}>
-            <InputLabel id="demo-multiple-checkbox-label">Trigger</InputLabel>
-            <Select
-              multiple
-              value={postData.tags}
-              onChange={(e) => setPostData({ ...postData, tags: e.target.value })}
-              input={<OutlinedInput label="Taggar" />}
-              MenuProps={MenuProps}
-              renderValue={(selected) =>
-                selected
-                  .map(id => tags.find(t => t.id === id)?.name)
-                  .join(", ")
-              }
-            >
-              {tags.map(tag => {
-                const selected = postData.tags.includes(tag.id);
-                const Icon = selected ? CheckBoxIcon : CheckBoxOutlineBlankIcon;
+    <Box sx={{ p: 2, mt: 6 }}>
+      {error && (
+        <Typography color="error" sx={{ mb: 2, textAlign: "center" }}>
+          {error}
+        </Typography>
+      )}
 
-                return (
-                  <MenuItem key={tag.id} value={tag.id}>
-                    <Icon fontSize="small" style={{ marginRight: 8 }} />
-                    <ListItemText primary={tag.name} />
+      <Paper
+        sx={{
+          p: 2,
+          mb: 3,
+          borderRadius: 5,
+          textAlign: "center",
+          border: "1px solid var(--color-border-light)"
+        }}
+      >
+        <Typography variant="h6">
+          Publicera{" "}
+          <span style={{ color: "var(--color-primary)", fontWeight: 700 }}>
+            Inlägg
+          </span>
+        </Typography>
+      </Paper>
+
+      <form onSubmit={handleSubmit}>
+        <Paper
+          sx={{
+            p: 3,
+            borderRadius: 8,
+            mb: 4,
+            border: "1px solid var(--color-border-light)"
+          }}
+        >
+          <Typography variant="body2" sx={{ fontWeight: "bold", mb: 1 }}>
+            Titel
+          </Typography>
+
+          <input
+            className="custom-input-simple"
+            placeholder="Skriv titel..."
+            value={postData.title}
+            onChange={(e) =>
+              setPostData({ ...postData, title: e.target.value })
+            }
+            style={{
+              width: "100%",
+              border: "none",
+              outline: "none",
+              marginBottom: "20px",
+              fontSize: "1rem"
+            }}
+          />
+
+          <Typography variant="body2" sx={{ fontWeight: "bold", mb: 1 }}>
+            Inlägg
+          </Typography>
+
+          <textarea
+            placeholder="Skriv ditt inlägg här..."
+            rows={5}
+            value={postData.content}
+            onChange={(e) =>
+              setPostData({ ...postData, content: e.target.value })
+            }
+            style={{
+              width: "100%",
+              border: "none",
+              outline: "none",
+              resize: "none",
+              fontSize: "1rem",
+              marginBottom: "20px"
+            }}
+          />
+
+          <Box
+            sx={{
+              mt: 2,
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 2
+            }}
+          >
+            <FormControl fullWidth>
+              <InputLabel>Kategori</InputLabel>
+              <Select
+                value={postData.categoryId}
+                onChange={(e) =>
+                  setPostData({ ...postData, categoryId: e.target.value })
+                }
+                label="Kategori"
+                MenuProps={MenuProps}
+              >
+                {categories.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.name}
                   </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
-        </div>
-        <Button variant="contained"
-          type="submit"
-          id="submitPost"
-          style={{ marginRight: 8 }}>
-          Lägg upp inlägg</Button>
-      </form >
-    </>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth>
+              <InputLabel>Trigger</InputLabel>
+              <Select
+                multiple
+                value={postData.tags}
+                onChange={(e) =>
+                  setPostData({ ...postData, tags: e.target.value })
+                }
+                input={<OutlinedInput label="Trigger" />}
+                MenuProps={MenuProps}
+                renderValue={(selected) =>
+                  selected
+                    .map((id) => tags.find((t) => t.id === id)?.name)
+                    .join(", ")
+                }
+              >
+                {tags.map((tag) => {
+                  const selected = postData.tags.includes(tag.id);
+                  const Icon = selected
+                    ? CheckBoxIcon
+                    : CheckBoxOutlineBlankIcon;
+
+                  return (
+                    <MenuItem key={tag.id} value={tag.id}>
+                      <Icon fontSize="small" style={{ marginRight: 8 }} />
+                      <ListItemText primary={tag.name} />
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+          </Box>
+        </Paper>
+
+        <Stack direction="row" spacing={2}>
+          <PrimaryButton
+            fullWidth
+            type="button"
+            onClick={onClose}
+          >
+            Avsluta
+          </PrimaryButton>
+
+          <PrimaryButton fullWidth type="submit">
+            Lägg upp inlägg
+          </PrimaryButton>
+        </Stack>
+      </form>
+    </Box>
   );
 };
 

@@ -287,7 +287,6 @@ For Rider / Visual Studio: open [`backend/Gr8/Gr8.slnx`](backend/Gr8/Gr8.slnx).
 │   └── README.md
 ├── docs/media/               # Demo videos and screenshots referenced from this README
 ├── .gitlab-ci.yml            # Build, deploy, smoke-test pipeline
-├── TECHSTACK.md              # Pinned framework / language versions
 └── README.md                 # You are here.
 ```
 

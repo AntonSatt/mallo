@@ -163,7 +163,7 @@ namespace Gr8.Api.Endpoints
                 return Results.Ok(new { isBookmarked });
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
-
+            
             app.MapGet("/map/activities/calendar", async (ClaimsPrincipal user, UserManager<ApplicationUser> userManager, [FromServices] IActivityCalenderService activityCalenderService) =>
             {
                 var appUser = await userManager.GetUserAsync(user);

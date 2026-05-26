@@ -1,6 +1,8 @@
 ﻿using Gr8.Application.Common.Constants;
 using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
+using Gr8.Application.Services;
+using Gr8.Domain.Entities;
 using Gr8.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -275,6 +277,36 @@ namespace Gr8.Api.Endpoints
                 var hugged = await hugService.ToggleCommentHugAsync(commentId, appUser.Id);
 
                 return Results.Ok(new { hugged });
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapGet("/forum/posts/{postId}/hugs", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IHugService hugService, int postId) =>
+            {
+                var appUser = await userManager.GetUserAsync(user);
+
+                if (appUser == null)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var hugs = await hugService.GetAllPostHugsByUserIdAsync(appUser.Id, postId);
+
+                return Results.Ok(hugs);
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapGet("/forum/comments/{commentId}/hugs", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromServices] IHugService hugService, int commentId) =>
+            {
+                var appUser = await userManager.GetUserAsync(user);
+
+                if (appUser == null)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var hugs = await hugService.GetAllCommentHugsByUserIdAsync(appUser.Id, commentId);
+
+                return Results.Ok(hugs);
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
 

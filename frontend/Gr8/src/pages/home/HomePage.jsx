@@ -8,18 +8,34 @@ import { useState } from "react";
 import { Stack, Box } from "@mui/material";
 import Navbar from "../../components/layout/Navbar.jsx";
 import ForumPage from "../forum/ForumPage.jsx";
-import ChatPage from '../chat/ChatPage';
+import ChatPage from '../chat/chatPage/ChatPage';
 import Settings from "../settings/SettingsPage.jsx";
-import ConversationPage from '../chat/ConversationPage';
+import ConversationPage from '../chat/conversationPage/ConversationPage';
 import ActivityPage from "../activity/ActivityPage.jsx";
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Homepage = ({ page }) => {
     const { isDesktop } = useViewport();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const params = new URLSearchParams(location.search);
+    const activityIdFromUrl = params.get('activityId');
+
     const [isOpen, setOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [markedDates, setMarkedDates] = useState([]);
+    const [highlightedActivityId, setHighlightedActivityId] = useState(
+        activityIdFromUrl ? parseInt(activityIdFromUrl) : null
+    );
 
-    const handleClickOpen = () => {
-        setOpen(true);
+    const handleClickOpen = () => setOpen(true);
+
+    const handleMarkedDayClick = (activityId) => {
+        setHighlightedActivityId(activityId);
+        if (page !== 'maps') {
+            navigate(`/maps?activityId=${activityId}`);
+        }
     };
 
     return (
@@ -29,7 +45,12 @@ const Homepage = ({ page }) => {
                     <aside className="sidebar-left">
                         <Stack spacing={2}>
                             <ProfileHeader />
-                            <SidebarCalendar showCreate="true" onCreatePost={handleClickOpen}/>
+                            <SidebarCalendar
+                                showCreate="true"
+                                onCreatePost={handleClickOpen}
+                                markedDates={markedDates}
+                                onMarkedDayClick={handleMarkedDayClick}
+                            />
                         </Stack>
                     </aside>
 
@@ -61,6 +82,15 @@ const Homepage = ({ page }) => {
                                     <Settings />
                                 </Box>
                             )}
+                            {page === "maps" && (
+                                <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
+                                    <ActivityPage
+                                        markedDates={markedDates}
+                                        onMarkedDatesChange={setMarkedDates}
+                                        highlightedActivityId={highlightedActivityId}
+                                    />
+                                </Box>
+                            )}
                         </Stack>
                     </main>
 
@@ -74,11 +104,19 @@ const Homepage = ({ page }) => {
                     {page === "message" && <ProfileBar showCreate="false" />}
                     {page === "conversation" && <ProfileBar showCreate="false" />}
                     {page === "settings" && <ProfileBar showCreate="false" />}
+                    {page === "maps" && <ProfileBar showCreate="false" />}
                     <Navbar />
                     {page === "forum" && <ForumPage openModal={isOpen} setOpenModal={setOpen} searchQuery={searchQuery} />}
                     {page === "message" && <ChatPage />}
                     {page === "conversation" && <ConversationPage />}
                     {page === "settings" && <Settings />}
+                    {page === "maps" && (
+                        <ActivityPage
+                            markedDates={markedDates}
+                            onMarkedDatesChange={setMarkedDates}
+                            highlightedActivityId={highlightedActivityId}
+                        />
+                    )}
                 </div>
             )}
         </div>

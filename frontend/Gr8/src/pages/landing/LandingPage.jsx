@@ -25,7 +25,7 @@ const LandingPage = () => {
             <Header mobileImage={hold1} desktopImage={holdingHands2} />
 
             <Grid container direction='column' className="landing-container">
-                <Grid item xs={8} md={8} className="landing-page">
+                <Grid xs={8} md={8} className="landing-page">
                     <Box className="landing-content">
                         <Typography variant="h3" sx={{ mt: 0, mb: 1 }}>
                             Hej!

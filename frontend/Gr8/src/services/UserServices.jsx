@@ -44,6 +44,9 @@ const UserServices = {
             lastName: userData.lastName,
             email: userData.email
         });
+        if (response.data?.token) {
+            localStorage.setItem("token", response.data.token);
+        }
         return response.data;
     },
     updateUserTags: async (tagIds) => {
@@ -57,6 +60,12 @@ const UserServices = {
            currentPassWord: userData.currentPassword,
            newPassword: userData.newPassword,
            confirmNewPassword: userData.confirmNewPassword
+        });
+        return response.data;
+    },
+    updateAnonymity: async (isAnonymousPosting) => {
+        const response = await ApiClient.patch("/users/me/anonymity", {
+            isAnonymousPosting
         });
         return response.data;
     }

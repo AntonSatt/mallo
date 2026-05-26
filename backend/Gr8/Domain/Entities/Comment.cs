@@ -10,8 +10,9 @@ namespace Gr8.Domain.Entities
         public string Content { get; set; } = null!;
         public bool IsEdited { get; set; } = false;
         public bool IsDeleted { get; set; } = false;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt {  get; set; }
+        public string? AuthorDisplayName { get; set; }
 
         public int PostId { get; set; }
         public Post Post { get; set; } = null!;

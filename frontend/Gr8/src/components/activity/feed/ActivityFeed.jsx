@@ -2,7 +2,7 @@ import { Box, Typography, Stack } from "@mui/material";
 import ActivityCard from "./ActivityCard.jsx";
 
 // Component for rendering the list of activity cards in the feed
-const ActivityFeed = ({ activities, currentUserId, onCardAction }) => {
+const ActivityFeed = ({ activities, currentUserId, onCardAction, onSelectActivity, onBookmarkToggle , onAddToCalendar, highlightedActivityId }) => {
 
     const calculateDistanceText = (distanceMeters) => {
         if (!distanceMeters) return null;
@@ -23,12 +23,25 @@ const ActivityFeed = ({ activities, currentUserId, onCardAction }) => {
                             Every box gets an unique ID based on the activity ID, 
                             which allows us to scroll to it when clicking the marker on the map
                         */
-                        <Box key={activity.id} id={`activity-card-${activity.id}`}>
+                        <Box
+                            key={activity.id}
+                            id={`activity-card-${activity.id}`}
+                            onClick={() => {
+                                if (onSelectActivity) {
+                                    onSelectActivity(activity);
+                                }
+                            }}
+                            sx={{ cursor: 'pointer' }}
+                        >
                             <ActivityCard
                                 activity={activity}
                                 distance={calculateDistanceText(activity.distanceMeters)}
                                 currentUserId={currentUserId}
                                 onCardAction={(action, data) => onCardAction(action, data)}
+                                onBookmarkToggle={onBookmarkToggle}
+                                onAddToCalendar={onAddToCalendar}
+                                isHighlighted={highlightedActivityId === activity.id}
+                                imageUrl={activity.imageUrl}
                             />
                         </Box>
                     ))

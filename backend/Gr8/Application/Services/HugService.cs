@@ -1,8 +1,6 @@
-﻿using Gr8.Application.Interfaces;
+﻿using Gr8.Application.DTOs;
+using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Gr8.Application.Common.Constants;
 
 namespace Gr8.Application.Services
@@ -69,6 +67,29 @@ namespace Gr8.Application.Services
                 await _notificationService.AddNotificationAsync(comment.PostId, NotificationTypes.CommentHugged, userId);
             }
             return true;
+        }
+        public async Task<List<HugDto>> GetAllPostHugsByUserIdAsync(string userId, int postId)
+        {
+            var hugs = await _communityRepository.GetAllPostHugsByUserIdAsync(userId, postId);
+
+            return hugs.Select(h => new HugDto
+            {
+                UserId = h.UserId,
+                PostId = h.PostId,
+                CommentId = h.CommentId
+            }).ToList();
+        }
+
+        public async Task<List<HugDto>> GetAllCommentHugsByUserIdAsync(string userId, int commentId)
+        {
+            var hugs = await _communityRepository.GetAllCommentHugsByUserIdAsync(userId, commentId);
+
+            return hugs.Select(h => new HugDto
+            {
+                UserId = h.UserId,
+                PostId = h.PostId,
+                CommentId = h.CommentId
+            }).ToList();
         }
     }
 }

@@ -30,6 +30,7 @@ const CommentForm = ({ postId }) => {
     const [selectedCommentId, setSelectedCommentId] = useState(null);
     const [reportOpen, setReportOpen] = useState(false);
     const [deleteCommentId, setDeleteCommentId] = useState(null);
+    const [userCommentHugs, setUserCommentHugs] = useState([]);
 
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editContent, setEditContent] = useState("");
@@ -93,6 +94,29 @@ const CommentForm = ({ postId }) => {
         }
     }, [postId]);
 
+    useEffect(() => {
+        const fetchCommentHugs = async () => {
+            try {
+                if (comments.length === 0) {
+                    return;
+                }
+
+                const hugsResult = await Promise.all(
+                    comments.map(comment => CommentServices.getCommentHugs(comment.id))
+                );
+
+                const allHugs = hugsResult.flat().filter(Boolean);
+
+                setUserCommentHugs(allHugs);
+            }
+            catch (error) {
+                console.error("Error fetching comment hugs:", error);
+            }
+        };
+
+        fetchCommentHugs();
+    }, [comments]);
+
     const handleOpenMenu = (event, commentId) => {
         setMenuAnchor(event.currentTarget);
         setSelectedCommentId(commentId);
@@ -141,7 +165,7 @@ const CommentForm = ({ postId }) => {
 
                                         {c.id && (
                                             <div className="comment-hug-button">
-                                                <HugButton type="comment" id={c.id} />
+                                                <HugButton type="comment" id={c.id} userCommentHugs={userCommentHugs} />
                                             </div>
                                         )}
                                     </Box>

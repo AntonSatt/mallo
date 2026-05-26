@@ -1,6 +1,7 @@
 ﻿using Gr8.Domain.Entities;
 using Gr8.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Gr8.Infrastructure.Persistence
 {
@@ -14,7 +15,9 @@ namespace Gr8.Infrastructure.Persistence
         public DbSet<Hug> Hugs => Set<Hug>();
         public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
         public DbSet<Activity> Activities => Set<Activity>();
+        public DbSet<ActivityBookmark> ActivityBookmarks => Set<ActivityBookmark>();
         public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
+        public DbSet<ActivityCalender> ActivityCalenders => Set<ActivityCalender>();
         public DbSet<PostNotification> PostNotifications => Set<PostNotification>();
 
         public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
@@ -25,6 +28,33 @@ namespace Gr8.Infrastructure.Persistence
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            var utcDateTimeConverter = new ValueConverter<DateTime, DateTime>(
+                toDb => toDb.Kind == DateTimeKind.Utc ? toDb : toDb.ToUniversalTime(),
+                fromDb => DateTime.SpecifyKind(fromDb, DateTimeKind.Utc));
+
+            var nullableUtcDateTimeConverter = new ValueConverter<DateTime?, DateTime?>(
+                toDb => toDb.HasValue
+                    ? (toDb.Value.Kind == DateTimeKind.Utc ? toDb.Value : toDb.Value.ToUniversalTime())
+                    : toDb,
+                fromDb => fromDb.HasValue
+                    ? DateTime.SpecifyKind(fromDb.Value, DateTimeKind.Utc)
+                    : fromDb);
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime))
+                    {
+                        property.SetValueConverter(utcDateTimeConverter);
+                    }
+                    else if (property.ClrType == typeof(DateTime?))
+                    {
+                        property.SetValueConverter(nullableUtcDateTimeConverter);
+                    }
+                }
+            }
 
             modelBuilder.Entity<Tag>().HasData(
                 new Tag { Name = "Självskada", Id = 1 },
@@ -67,6 +97,7 @@ namespace Gr8.Infrastructure.Persistence
 
             // Map ApplicationUser to AspNetUsers table
             modelBuilder.Entity<ApplicationUser>().ToTable("AspNetUsers");
+            modelBuilder.Entity<ApplicationUser>().Ignore(u => u.IsAnonymousPosting);
 
             // Configure many-to-many relationship between Post and Tag
             modelBuilder.Entity<Post>()
@@ -274,6 +305,23 @@ namespace Gr8.Infrastructure.Persistence
 
                 //Ensures fast loading of chat history by indexing the relationship between sender and receiver.
                 entity.HasIndex(cm => new { cm.SenderId, cm.ReceiverId });
+            });
+
+            modelBuilder.Entity<ActivityCalender>(entity =>
+            {
+                entity.HasKey(ac => ac.Id);
+
+                entity.HasOne(ac => ac.Activity)
+                    .WithMany()
+                    .HasForeignKey(ac => ac.ActivityId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne<ApplicationUser>()
+                    .WithMany()
+                    .HasForeignKey(ac => ac.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(ac => new { ac.UserId, ac.ActivityId }).IsUnique();
             });
 
             modelBuilder.Entity<PostNotification>(entity =>

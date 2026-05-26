@@ -2,6 +2,7 @@
 import {
     Dialog,
     DialogTitle,
+    DialogContent,
     DialogActions,
     Button,
     Accordion,
@@ -13,7 +14,9 @@ import {
     Select,
     MenuItem,
     OutlinedInput,
-    ListItemText
+    ListItemText,
+    ClickAwayListener,
+    Switch
 } from "@mui/material";
 import UserServices from "../../services/UserServices";
 import { useAuth } from "../../hooks/useAuth";
@@ -25,21 +28,33 @@ import Lock from "../../assets/icons/lock.svg";
 import AvatarSlider from "../../components/avatar/avatarSlider.jsx";
 import SecondaryButton from "../../design/buttons/SecondaryButton";
 import PrimaryButton from "../../design/buttons/PrimaryButton.jsx";
-import Switch from '@mui/material/Switch';
 import "./UserSettings.css";
 import LogoutIcon from '@mui/icons-material/Logout';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import Headset from "../../assets/icons/headset.svg"
+import Avatar from "../../assets/icons/avatar.svg"
 import PostServices from "../../services/PostServices";
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import SettingsButtonStyles from "../../design/buttons/SettingsButton.jsx";
+import SettingsSuccessDialog from "./SettingsSuccessDialog.jsx";
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
+import {
+    PERMISSION_STATE,
+    PERMISSION_TYPE,
+    getPermissionStateLabel,
+    onPermissionStateChange,
+    queryPermissionState,
+    requestPermission
+} from "../../utils/browserPermissions.js";
 
 // User Settings Page: Provides an interface for users to update their profile information, change their password, and delete their account. 
 // Utilizes accordions for organized sections and handles form validation and API interactions for user data management.
 
 const UserSettings = () => {
 
-    const { logout } = useAuth();
+    const { logout, refreshCurrentUser } = useAuth();
     const { deleteAccount } = useAuth();
     const [profileData, setProfileData] = useState({
         avatar: null,
@@ -56,6 +71,8 @@ const UserSettings = () => {
         confirmNewPassword: ""
     });
     const [open, setOpen] = useState(false);
+    const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
+    const [isAnonymousPublishing, setIsAnonymousPublishing] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
 
     const [tags, setTags] = useState([]);
@@ -74,10 +91,18 @@ const UserSettings = () => {
 
     const [errors, setErrors] = useState({});
     const [expandedSection, setExpandedSection] = useState(false);
+    const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+    const [statusDialogSection, setStatusDialogSection] = useState("profile");
+    const [statusDialogOutcome, setStatusDialogOutcome] = useState("success");
 
     const [showCurrentPassword] = useState(false);
     const [showNewPassword] = useState(false);
     const [showConfirmPassword] = useState(false);
+
+    const [geolocationPermissionState, setGeolocationPermissionState] = useState(PERMISSION_STATE.PROMPT);
+    const [notificationPermissionState, setNotificationPermissionState] = useState(PERMISSION_STATE.PROMPT);
+    const [isLocationHelpDialogOpen, setIsLocationHelpDialogOpen] = useState(false);
+    const [isNotificationsHelpDialogOpen, setIsNotificationsHelpDialogOpen] = useState(false);
 
     const normalizeTagIds = (tagIds) => {
         if (!Array.isArray(tagIds)) {
@@ -109,6 +134,24 @@ const UserSettings = () => {
         setOpen(false);
     };
 
+    const openContactDialog = () => {
+        setIsContactDialogOpen(true);
+    };
+
+    const closeContactDialog = () => {
+        setIsContactDialogOpen(false);
+    };
+
+    const openStatusDialog = (section, outcome) => {
+        setStatusDialogSection(section);
+        setStatusDialogOutcome(outcome);
+        setStatusDialogOpen(true);
+    };
+
+    const closeStatusDialog = () => {
+        setStatusDialogOpen(false);
+    };
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -122,6 +165,7 @@ const UserSettings = () => {
                     userName: data.userName || "",
                     email: data.email || ""
                 });
+                setIsAnonymousPublishing(data.isAnonymousPosting ?? true);
                 setSelectedTags(normalizeTagIds(data.tagIds));
             }
             catch (error) {
@@ -152,6 +196,44 @@ const UserSettings = () => {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        let isMounted = true;
+
+        const syncPermissions = async () => {
+            try {
+                const [locationState, notificationsState] = await Promise.all([
+                    queryPermissionState(PERMISSION_TYPE.GEOLOCATION),
+                    queryPermissionState(PERMISSION_TYPE.NOTIFICATIONS)
+                ]);
+
+                if (!isMounted) {
+                    return;
+                }
+
+                setGeolocationPermissionState(locationState);
+                setNotificationPermissionState(notificationsState);
+            } catch (error) {
+                console.error("Kunde inte läsa behörigheter", error);
+            }
+        };
+
+        const unsubscribeLocation = onPermissionStateChange(PERMISSION_TYPE.GEOLOCATION, (state) => {
+            setGeolocationPermissionState(state);
+        });
+
+        const unsubscribeNotifications = onPermissionStateChange(PERMISSION_TYPE.NOTIFICATIONS, (state) => {
+            setNotificationPermissionState(state);
+        });
+
+        syncPermissions();
+
+        return () => {
+            isMounted = false;
+            unsubscribeLocation();
+            unsubscribeNotifications();
+        };
+    }, []);
+
     const handleProfileSubmit = async (e) => {
         e.preventDefault();
         setErrors({});
@@ -169,6 +251,8 @@ const UserSettings = () => {
 
         try {
             await UserServices.updateUser(profileData);
+            refreshCurrentUser();
+            openStatusDialog("profile", "success");
         }
         catch (error) {
             if (error.response && error.response.status === 409) {
@@ -180,6 +264,7 @@ const UserSettings = () => {
             else {
                 setErrors({ general: "Kunde inte spara inställningarna. Försök igen senare." })
             }
+            openStatusDialog("profile", "error");
         }
 
     };
@@ -189,8 +274,10 @@ const UserSettings = () => {
 
         try {
             await UserServices.updateUserTags(selectedTags);
+            openStatusDialog("triggers", "success");
         } catch (error) {
             console.error("Kunde inte uppdatera triggers", error);
+            openStatusDialog("triggers", "error");
         }
     };
 
@@ -205,9 +292,10 @@ const UserSettings = () => {
         try {
             await UserServices.updatePassword(passwordData);
             setPasswordData({ currentPassword: "", newPassword: "", confirmNewPassword: "" });
+            openStatusDialog("password", "success");
         }
         catch (e) {
-            const serverErrors = e.response.data;
+            const serverErrors = Array.isArray(e?.response?.data) ? e.response.data : [];
             let newErrors = {};
             let hasPasswordError = false;
 
@@ -227,7 +315,12 @@ const UserSettings = () => {
                 newErrors.confirmNewPassword = allRequirements;
             }
 
+            if (Object.keys(newErrors).length === 0) {
+                newErrors = { general: "Kunde inte uppdatera lösenordet. Försök igen senare." };
+            }
+
             setErrors(newErrors);
+            openStatusDialog("password", "error");
         }
     };
 
@@ -235,6 +328,72 @@ const UserSettings = () => {
         await deleteAccount();
         setOpen(false);
     };
+
+    const handleAnonymityToggle = async (nextValue) => {
+        const previousValue = isAnonymousPublishing;
+        setIsAnonymousPublishing(nextValue);
+
+        try {
+            await UserServices.updateAnonymity(nextValue);
+            openStatusDialog("anonymity", "success");
+        } catch (error) {
+            setIsAnonymousPublishing(previousValue);
+            console.error("Kunde inte uppdatera anonymitetsinställningen", error);
+            openStatusDialog("anonymity", "error");
+        }
+    };
+
+    const handleLocationCtaClick = async () => {
+        if (geolocationPermissionState === PERMISSION_STATE.DENIED) {
+            setIsLocationHelpDialogOpen(true);
+            return;
+        }
+
+        try {
+            const result = await requestPermission(PERMISSION_TYPE.GEOLOCATION, {
+                geolocationOptions: { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            });
+
+            if (result?.state) {
+                setGeolocationPermissionState(result.state);
+            }
+        } catch (error) {
+            setGeolocationPermissionState(PERMISSION_STATE.DENIED);
+            console.error("Kunde inte aktivera platstjänster", error);
+            openStatusDialog("location", "error");
+        }
+    };
+
+    const handleNotificationCtaClick = async () => {
+        if (notificationPermissionState === PERMISSION_STATE.DENIED) {
+            setIsNotificationsHelpDialogOpen(true);
+            return;
+        }
+
+        try {
+            const result = await requestPermission(PERMISSION_TYPE.NOTIFICATIONS);
+            if (result?.state) {
+                setNotificationPermissionState(result.state);
+            }
+        } catch (error) {
+            console.error("Kunde inte aktivera notifikationer", error);
+            openStatusDialog("notifications", "error");
+        }
+    };
+
+    const locationStateLabel = getPermissionStateLabel(geolocationPermissionState);
+    const showLocationCta = geolocationPermissionState !== PERMISSION_STATE.GRANTED;
+    const showLocationBadge = geolocationPermissionState !== PERMISSION_STATE.PROMPT;
+    const locationCtaLabel = geolocationPermissionState === PERMISSION_STATE.DENIED
+        ? "Hjälp"
+        : "Aktivera";
+
+    const notificationsStateLabel = getPermissionStateLabel(notificationPermissionState);
+    const showNotificationsCta = notificationPermissionState !== PERMISSION_STATE.GRANTED;
+    const showNotificationsBadge = notificationPermissionState !== PERMISSION_STATE.PROMPT;
+    const notificationsCtaLabel = notificationPermissionState === PERMISSION_STATE.DENIED
+        ? "Hjälp"
+        : "Aktivera";
 
     const handleAccordionChange = (section) => (_, isExpanded) => {
         setExpandedSection(isExpanded ? section : false);
@@ -245,7 +404,6 @@ const UserSettings = () => {
             <Box className="settingsContainer">
                 <Grid
                     className="settings-top-row"
-                    sx={{ display: 'flex', justifyContent: 'center', gap: 1.5, margin: '16px 0', padding: '0 8px' }}
                 >
                     <Button
                         className="settings-button"
@@ -256,20 +414,17 @@ const UserSettings = () => {
                         <LogoutIcon sx={{ color: 'var(--color-primary)' }} />
                     </Button>
 
-                    <Box
-                        className="switch-button"
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            borderRadius: 4,
-                            padding: '12px 16px',
-                            minWidth: 90,
-                            gap: 0.75,
-                        }}>
-                        <Typography className="switch-label" variant="body2">Anonym</Typography>
-                        <Switch className="settingsSwitch" defaultChecked size="small" />
-                    </Box>
+                    <Button
+                        className="settings-button"
+                        onClick={openContactDialog}
+                        sx={SettingsButtonStyles}
+                    >
+                        Kontakta oss
+                        <img src={Headset} alt="edit" style={{
+                            width: 20,
+                            height: 20,
+                        }} />
+                    </Button>
 
                     <Button
                         className="settings-button"
@@ -607,6 +762,91 @@ const UserSettings = () => {
                     </Accordion>
                 </form>
 
+                <form>
+                    <Accordion className="dropdown" expanded={false}>
+                        <AccordionSummary className="switch-row-summary" component="div">
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', px: 0.5, py: 1 }}>
+                                <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <LocationOnOutlinedIcon sx={{ color: 'var(--color-primary)', width: 20, height: 20 }} />
+                                    Platstjänster
+                                </Typography>
+                                <Box className="permissionStateActions">
+                                    {showLocationBadge && (
+                                        <Typography className={`permissionStateBadge permissionState-${geolocationPermissionState}`}>
+                                            {locationStateLabel}
+                                        </Typography>
+                                    )}
+                                    {showLocationCta && (
+                                        <Button
+                                            className="permissionStateCta"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                void handleLocationCtaClick();
+                                            }}
+                                        >
+                                            {locationCtaLabel}
+                                        </Button>
+                                    )}
+                                </Box>
+                            </Box>
+                        </AccordionSummary>
+                    </Accordion>
+                </form>
+
+                <form>
+                    <Accordion className="dropdown" expanded={false}>
+                        <AccordionSummary className="switch-row-summary" component="div">
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', px: 0.5, py: 1 }}>
+                                <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <CircleNotificationsIcon sx={{ color: 'var(--color-primary)', width: 20, height: 20 }} />
+                                    Notifikationer
+                                </Typography>
+                                <Box className="permissionStateActions">
+                                    {showNotificationsBadge && (
+                                        <Typography className={`permissionStateBadge permissionState-${notificationPermissionState}`}>
+                                            {notificationsStateLabel}
+                                        </Typography>
+                                    )}
+                                    {showNotificationsCta && (
+                                        <Button
+                                            className="permissionStateCta"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                void handleNotificationCtaClick();
+                                            }}
+                                        >
+                                            {notificationsCtaLabel}
+                                        </Button>
+                                    )}
+                                </Box>
+                            </Box>
+                        </AccordionSummary>
+                    </Accordion>
+                </form>
+
+                <form>
+                    <Accordion className="dropdown" expanded={false}>
+                        <AccordionSummary className="switch-row-summary" component="div">
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', px: 0.5, py: 1 }}>
+                                <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <img src={Avatar} alt="edit" style={{
+                                        width: 20,
+                                        height: 20,
+                                    }} />
+                                    Publicera anonymt
+                                </Typography>
+                                <Switch
+                                    className="settingsSwitch"
+                                    checked={isAnonymousPublishing}
+                                    onChange={(e) => handleAnonymityToggle(e.target.checked)}
+                                    size="small"
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+                            </Box>
+                        </AccordionSummary>
+                    </Accordion>
+                </form>
+
                 <Dialog open={open} onClose={handleClose}>
                     <DialogTitle>Är du säker på att du vill ta bort ditt konto?</DialogTitle>
                     <DialogActions>
@@ -614,6 +854,202 @@ const UserSettings = () => {
                         <Button variant="contained" color="error" onClick={handleDelete} id="deleteUser">Ja, ta bort konto</Button>
                     </DialogActions>
                 </Dialog>
+
+                <Dialog
+                    open={isContactDialogOpen}
+                    onClose={closeContactDialog}
+                    fullWidth
+                    maxWidth="xs"
+                    sx={{
+                        "& .MuiDialog-paper": {
+                            borderRadius: "16px",
+                            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.14)",
+                            p: 1.5,
+                        },
+                    }}
+                >
+                    <ClickAwayListener onClickAway={closeContactDialog}>
+                        <DialogContent
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                textAlign: "center",
+                                px: 2.5,
+                                pt: 1,
+                                pb: 1.5,
+                                gap: 2,
+                            }}
+                        >
+                            <Box
+                                sx={{
+                                    width: 64,
+                                    height: 64,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <img src={Headset} alt="edit" style={{
+                                    width: 50,
+                                    height: 50,
+                                }} />
+                            </Box>
+
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    color: "var(--color-text-main)",
+                                    fontWeight: 400,
+                                    lineHeight: 1.4,
+                                    maxWidth: 280,
+                                }}
+                            >
+                                Kontakta gärna oss per mejl om du har några frågor eller om du vill prata med oss om vår app.
+                                <Typography variant="body2" sx={{ color: "var(--button-secondary-text)", fontWeight: 700 }}>
+                                    Vi ser fram emot att höra från dig!
+                                </Typography>
+                                <Typography variant="h5" sx={{ color: "var(--button-primary-bg)", fontWeight: 700, mt: 1 }}>
+                                    info@mallo.se
+                                </Typography>
+                            </Typography>
+
+                            <PrimaryButton
+                                onClick={closeContactDialog}
+                                sx={{
+                                    mt: 0.5,
+                                    borderRadius: "999px",
+                                    width: "100%",
+                                    maxWidth: 220,
+                                    py: 1.1,
+                                    textTransform: "none",
+                                    fontWeight: 700,
+                                }}
+                            >
+                                Stäng
+                            </PrimaryButton>
+                        </DialogContent>
+                    </ClickAwayListener>
+                </Dialog>
+
+                <Dialog
+                    open={isLocationHelpDialogOpen}
+                    onClose={() => setIsLocationHelpDialogOpen(false)}
+                    fullWidth
+                    maxWidth="xs"
+                    sx={{
+                        "& .MuiDialog-paper": {
+                            borderRadius: "16px",
+                            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.14)",
+                            p: 1.5,
+                        },
+                    }}
+                >
+                    <ClickAwayListener onClickAway={() => setIsLocationHelpDialogOpen(false)}>
+                        <DialogContent
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                textAlign: "center",
+                                px: 2.5,
+                                pt: 1,
+                                pb: 1.5,
+                                gap: 2,
+                            }}
+                        >
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    color: "var(--color-text-main)",
+                                    fontWeight: 500,
+                                    lineHeight: 1.4,
+                                    maxWidth: 300,
+                                }}
+                            >
+                                Platstjänster är blockerade i webbläsaren. Öppna sidinställningar för den här webbplatsen och tillåt plats för att aktivera funktionen igen.
+                            </Typography>
+
+                            <PrimaryButton
+                                onClick={() => setIsLocationHelpDialogOpen(false)}
+                                sx={{
+                                    mt: 0.5,
+                                    borderRadius: "999px",
+                                    width: "100%",
+                                    maxWidth: 220,
+                                    py: 1.1,
+                                    textTransform: "none",
+                                    fontWeight: 700,
+                                }}
+                            >
+                                Stäng
+                            </PrimaryButton>
+                        </DialogContent>
+                    </ClickAwayListener>
+                </Dialog>
+
+                <Dialog
+                    open={isNotificationsHelpDialogOpen}
+                    onClose={() => setIsNotificationsHelpDialogOpen(false)}
+                    fullWidth
+                    maxWidth="xs"
+                    sx={{
+                        "& .MuiDialog-paper": {
+                            borderRadius: "16px",
+                            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.14)",
+                            p: 1.5,
+                        },
+                    }}
+                >
+                    <ClickAwayListener onClickAway={() => setIsNotificationsHelpDialogOpen(false)}>
+                        <DialogContent
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                textAlign: "center",
+                                px: 2.5,
+                                pt: 1,
+                                pb: 1.5,
+                                gap: 2,
+                            }}
+                        >
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    color: "var(--color-text-main)",
+                                    fontWeight: 500,
+                                    lineHeight: 1.4,
+                                    maxWidth: 300,
+                                }}
+                            >
+                                Notifikationer är blockerade i webbläsaren. Öppna sidinställningar för den här webbplatsen och tillåt notifikationer för att aktivera funktionen igen.
+                            </Typography>
+
+                            <PrimaryButton
+                                onClick={() => setIsNotificationsHelpDialogOpen(false)}
+                                sx={{
+                                    mt: 0.5,
+                                    borderRadius: "999px",
+                                    width: "100%",
+                                    maxWidth: 220,
+                                    py: 1.1,
+                                    textTransform: "none",
+                                    fontWeight: 700,
+                                }}
+                            >
+                                Stäng
+                            </PrimaryButton>
+                        </DialogContent>
+                    </ClickAwayListener>
+                </Dialog>
+
+                <SettingsSuccessDialog
+                    open={statusDialogOpen}
+                    onClose={closeStatusDialog}
+                    section={statusDialogSection}
+                    outcome={statusDialogOutcome}
+                />
             </Box>
         </>
     );

@@ -140,6 +140,7 @@ namespace Gr8.Api.Endpoints
                     LastName = appUser.LastName,
                     UserName = appUser.UserName,
                     Avatar = appUser.Avatar,
+                    IsAnonymousPosting = appUser.IsAnonymousPosting,
                     TagIds = await userTagService.GetUserTagIdsAsync(appUser.Id),
                 };
 
@@ -148,7 +149,7 @@ namespace Gr8.Api.Endpoints
             })
              .RequireAuthorization(AuthorizationConstants.JwtOnly);
 
-            app.MapPut("/users/me", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) =>
+            app.MapPut("/users/me", async (UserManager<ApplicationUser> userManager, IJwtTokenGenerator jwtGenerator, ClaimsPrincipal user, [FromBody] UpdateProfileDto updateProfileDto) =>
                 {
                     var appUser = await userManager.GetUserAsync(user);
 
@@ -167,7 +168,8 @@ namespace Gr8.Api.Endpoints
 
                     if (changedProfil.Succeeded)
                     {
-                        return Results.Ok("User updated successfully");
+                        var token = jwtGenerator.GenerateToken(appUser.Id, appUser.Email!, appUser.UserName!, appUser.Avatar);
+                        return Results.Ok(new { Message = "User updated successfully", Token = token });
                     }
 
                     var isDuplicate = changedProfil.Errors.Any(e => e.Code.Contains("DuplicateUserName") || e.Code.Contains("DuplicateEmail"));
@@ -198,6 +200,27 @@ namespace Gr8.Api.Endpoints
                     }
 
                     return Results.Ok("User tags updated successfully");
+                })
+                .RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPatch("/users/me/anonymity", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdateAnonymityDto updateAnonymityDto) =>
+                {
+                    var appUser = await userManager.GetUserAsync(user);
+
+                    if (appUser == null)
+                    {
+                        return Results.NotFound("User not found.");
+                    }
+
+                    appUser.IsAnonymousPosting = updateAnonymityDto.IsAnonymousPosting;
+                    var changedSetting = await userManager.UpdateAsync(appUser);
+
+                    if (!changedSetting.Succeeded)
+                    {
+                        return Results.BadRequest(changedSetting.Errors);
+                    }
+
+                    return Results.Ok("Anonymity preference updated successfully.");
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 

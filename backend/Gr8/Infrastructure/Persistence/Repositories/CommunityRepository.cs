@@ -1,4 +1,5 @@
-﻿using Gr8.Application.Interfaces;
+﻿using Gr8.Application.DTOs;
+using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
 using Gr8.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -117,6 +118,20 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             await _communityDbContext.Hugs.AddAsync(hug);
         }
 
+        public async Task<List<Hug>> GetAllPostHugsByUserIdAsync(string userId, int postId)
+        {
+            return await _communityDbContext.Hugs
+                .Where(h => h.UserId == userId && h.PostId == postId)
+                .ToListAsync();
+        }
+
+        public async Task<List<Hug>> GetAllCommentHugsByUserIdAsync(string userId, int commentId)
+        {
+            return await _communityDbContext.Hugs
+                .Where(h => h.UserId == userId && h.CommentId == commentId)
+                .ToListAsync();
+        }
+
         public void RemoveHug(Hug hug)
         {
             _communityDbContext.Hugs.Remove(hug);
@@ -231,6 +246,54 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             activity.IsDeleted = true;
             _communityDbContext.Activities.Update(activity);
             await Task.CompletedTask;
+        }
+
+        public Task<ActivityBookmark?> GetActivityBookmarkAsync(int activityId, string userId)
+        {
+            return _communityDbContext.ActivityBookmarks
+                .FirstOrDefaultAsync(ab => ab.ActivityId == activityId && ab.UserId == userId);
+        }
+
+        public void RemoveActivityBookmark(ActivityBookmark bookmark)
+        {
+            _communityDbContext.ActivityBookmarks.Remove(bookmark);
+        }
+
+        public async Task AddActivityBookmarkAsync(ActivityBookmark bookmark)
+        {
+            await _communityDbContext.ActivityBookmarks.AddAsync(bookmark);
+        }
+
+        public Task<List<ActivityBookmark>> GetAllActivityBookmarksByUserIdAsync(string userId)
+        {
+            return _communityDbContext.ActivityBookmarks
+                .Where(ab => ab.UserId == userId)
+                .ToListAsync();
+        }
+
+        public async Task<List<ActivityCalender>> GetUserCalendarActivitiesAsync(string userId)
+        {
+            return await _communityDbContext.ActivityCalenders
+                .Where(ac => ac.UserId == userId)
+                .Include(ac => ac.Activity)
+                .ToListAsync();
+        }
+
+        public async Task AddUserCalendarActivityAsync(ActivityCalender entry)
+        {
+            await _communityDbContext.ActivityCalenders.AddAsync(entry);
+        }
+
+        public Task RemoveUserCalendarActivityAsync(ActivityCalender entry)
+        {
+            _communityDbContext.ActivityCalenders.Remove(entry);
+            return Task.CompletedTask;
+        }
+
+        public async Task<ActivityCalender?> GetUserCalendarActivityAsync(string userId, int activityId)
+        {
+            return await _communityDbContext.ActivityCalenders
+                .FirstOrDefaultAsync(ac => ac.UserId == userId && ac.ActivityId == activityId);
         }
 
         public async Task<List<PostNotification>> GetAllNotificationsByUserIdAsync(string userId)

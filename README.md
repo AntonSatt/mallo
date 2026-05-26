@@ -2,7 +2,7 @@
 
 # Mallo
 
-**A place for community, conversation and connection — built by Grupp GR8.**
+**A place for community, conversation and connection — built by Group GR8.**
 
 _A Swedish-language community platform where members share posts, find local activities on a map, and chat in real time._
 

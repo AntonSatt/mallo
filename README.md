@@ -2,7 +2,7 @@
 
 # Mallo
 
-**En plats för community, samtal och möten — byggd av Grupp GR8.**
+**A place for community, conversation and connection — built by Group GR8.**
 
 _A Swedish-language community platform where members share posts, find local activities on a map, and chat in real time._
 
@@ -299,15 +299,15 @@ For Rider / Visual Studio: open [`backend/Gr8/Gr8.slnx`](backend/Gr8/Gr8.slnx).
 
 | Member | Role |
 |---|---|
-| Daniel | .NET Fullstack |
-| Elina | .NET Fullstack |
-| Jonna | .NET Fullstack |
-| Sebastian | .NET Fullstack |
-| Victoria | .NET Fullstack |
-| Chipego | Frontend |
-| Jennifer | UX |
-| Anton | DevOps |
-| Reza | DevOps |
+| [Daniel Hultmark](https://www.linkedin.com/in/daniel-hultmark-666b7113a/) | .NET Fullstack |
+| [Elina Jonsson](https://www.linkedin.com/in/elina-jonsson-904bba383/) | .NET Fullstack |
+| [Jonna Barvsten](https://www.linkedin.com/in/jonna-barvsten/) | .NET Fullstack |
+| [Sebastian Enerstrand](https://www.linkedin.com/in/sebastian-enerstrand-393aba17b/) | .NET Fullstack |
+| [Victoria Lindén](https://www.linkedin.com/in/victoria-linden/) | .NET Fullstack |
+| Chipego Elikya Liambi | Frontend |
+| [Jennifer Gahne](https://www.linkedin.com/in/jennifer-gahne-797321382/) | UX |
+| [Anton Sätterkvist](https://www.linkedin.com/in/anton-satterkvist/) | DevOps |
+| [Reza Damavandi](https://www.linkedin.com/in/reza-damavandi/) | DevOps |
 
 Branch naming follows the team's Jira project (`UT8`) when there's a ticket (`feature/UT8-367_style_card_image_url`). When there isn't, we use descriptive names like `feature/fix-api-inotify-crash`.
 

@@ -12,14 +12,30 @@ import ChatPage from '../chat/chatPage/ChatPage';
 import Settings from "../settings/SettingsPage.jsx";
 import ConversationPage from '../chat/conversationPage/ConversationPage';
 import ActivityPage from "../activity/ActivityPage.jsx";
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Homepage = ({ page }) => {
     const { isDesktop } = useViewport();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const params = new URLSearchParams(location.search);
+    const activityIdFromUrl = params.get('activityId');
+
     const [isOpen, setOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [markedDates, setMarkedDates] = useState([]);
+    const [highlightedActivityId, setHighlightedActivityId] = useState(
+        activityIdFromUrl ? parseInt(activityIdFromUrl) : null
+    );
 
-    const handleClickOpen = () => {
-        setOpen(true);
+    const handleClickOpen = () => setOpen(true);
+
+    const handleMarkedDayClick = (activityId) => {
+        setHighlightedActivityId(activityId);
+        if (page !== 'maps') {
+            navigate(`/maps?activityId=${activityId}`);
+        }
     };
 
     useEffect(() => {
@@ -35,7 +51,12 @@ const Homepage = ({ page }) => {
                     <aside className="sidebar-left">
                         <Stack spacing={2}>
                             <ProfileHeader />
-                            <SidebarCalendar showCreate={page === "forum" ? "true" : "false"} onCreatePost={handleClickOpen}/>
+                            <SidebarCalendar
+                                showCreate={page === "forum" ? "true" : "false"}
+                                onCreatePost={handleClickOpen}
+                                markedDates={markedDates}
+                                onMarkedDayClick={handleMarkedDayClick}
+                            />
                         </Stack>
                     </aside>
 
@@ -64,7 +85,11 @@ const Homepage = ({ page }) => {
                             )}
                             {page === "maps" && (
                                 <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
-                                    <ActivityPage />
+                                    <ActivityPage
+                                        markedDates={markedDates}
+                                        onMarkedDatesChange={setMarkedDates}
+                                        highlightedActivityId={highlightedActivityId}
+                                    />
                                 </Box>
                             )}
                         </Stack>
@@ -89,7 +114,13 @@ const Homepage = ({ page }) => {
                     {page === "message" && <ChatPage />}
                     {page === "conversation" && <ConversationPage />}
                     {page === "settings" && <Settings />}
-                    {page === "maps" && <ActivityPage />}
+                    {page === "maps" && (
+                        <ActivityPage
+                            markedDates={markedDates}
+                            onMarkedDatesChange={setMarkedDates}
+                            highlightedActivityId={highlightedActivityId}
+                        />
+                    )}
                 </div>
             )}
         </div>

@@ -74,5 +74,17 @@ namespace Gr8.Application.Services
 
             return true;
         }
+
+        public async Task SaveFirebaseTokenAsync(string userId, string token)
+        {
+            var firebaseToken = new UserFirebaseToken
+            {
+                UserId = userId,
+                Token = token
+            };
+
+            await _communityRepository.SaveFirebaseTokenAsync(firebaseToken);
+            await _communityRepository.SaveChangesAsync();
+        }
     }
 }

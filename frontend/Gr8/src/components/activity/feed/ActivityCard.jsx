@@ -20,9 +20,7 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import LinkIcon from '@mui/icons-material/Link';
 
 
-const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookmarkToggle, onAddToCalendar, isHighlighted, markedDates }) => {
-    const [isBookmarked, setIsBookmarked] = useState(activity.isBookmarked ?? false);
-
+const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookmarkToggle, onAddToCalendar, isHighlighted, markedDates, scrollingActivityId, clearScrollingActivityId }) => {
     const [expanded, setExpanded] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [error, setError] = useState("");
@@ -38,19 +36,20 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
         markedDates?.some(m => m.activityId === activity.id) ?? false
     );
 
+    useEffect(() => {
+        if (scrollingActivityId && scrollingActivityId === activity.id) {
+            setExpanded(true);
+
+            //When card is expanded, scroll to it
+            if (clearScrollingActivityId) {
+                clearScrollingActivityId();
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [scrollingActivityId, activity.id]);
+
     const handleExpand = () => {
         setExpanded(!expanded);
-    };
-
-    const handleBookmarkedClick = async (e) => {
-        e.stopPropagation();
-        try {
-            const response = await ActivityServices.toggleBookmark(activity.id);
-            setIsBookmarked(response.data.isBookmarked);
-            onBookmarkToggle(activity.id, response.data.isBookmarked);
-        } catch (error) {
-            setError("Kunde inte bokmärka aktiviteten. Försök igen.");
-        }
     };
 
     // Open 3 dots menu
@@ -134,15 +133,23 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                 }}>
                     {activity.title}
                 </Typography>
-                <BookmarkButton
-                    isBookmarked={activity.isBookmarked}
-                    onToggle={async () => {
-                        const result = await ActivityServices.toggleBookmark(activity.id);
-                        onBookmarkToggle(activity.id, result.isBookmarked);
-                        return result.isBookmarked;
-                    }}
-                    savedText="Du har sparat aktiviteten"
-                />
+                <Box onClick={(e) => e.stopPropagation()} sx={{ paddingTop: 1, paddingRight: 1 }}>
+                    <BookmarkButton
+                        isBookmarked={activity.isBookmarked}
+                        onToggle={async () => {
+                            try {
+                                const response = await ActivityServices.toggleBookmark(activity.id);
+                                const newBookmarkStatus = response.data ? response.data.isBookmarked : response.isBookmarked;
+                                onBookmarkToggle(activity.id, newBookmarkStatus);
+                                return newBookmarkStatus;
+                            } catch (err) {
+                                console.error("Kunde inte toggla bokmärke", err);
+                                return activity.isBookmarked;
+                            }
+                        }}
+                        savedText="Du har sparat aktiviteten"
+                    />
+                </Box>
             </Box>
 
             {/* Bottom part - white info*/}

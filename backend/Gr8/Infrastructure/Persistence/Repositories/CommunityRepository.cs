@@ -315,5 +315,11 @@ namespace Gr8.Infrastructure.Persistence.Repositories
         {
              _communityDbContext.PostNotifications.Remove(notification);
         }
+        public async Task<int> GetActivityCalendarCountAsync(int activityId)
+        {
+            return await _communityDbContext.ActivityCalenders
+                .Where(ac => ac.ActivityId == activityId)
+                .CountAsync();
+        }
     }
 }

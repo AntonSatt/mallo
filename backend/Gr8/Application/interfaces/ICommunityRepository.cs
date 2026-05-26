@@ -50,5 +50,6 @@ namespace Gr8.Application.Interfaces
         Task<PostNotification?> GetNotificationByIdAsync(int notificationId);
         Task AddPostNotificationAsync(PostNotification notification);
         void RemovePostNotifications(PostNotification notification);
+        Task<int> GetActivityCalendarCountAsync(int activityId);
     }
 }

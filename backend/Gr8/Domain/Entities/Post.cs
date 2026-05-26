@@ -11,7 +11,7 @@ namespace Gr8.Domain.Entities
         {
             Tags = new List<Tag>();
             Comments = new List<Comment>();
-            CreatedAt = DateTime.Now;
+            CreatedAt = DateTime.UtcNow;
         }
 
         // Constructor to initialize required properties from domain logic

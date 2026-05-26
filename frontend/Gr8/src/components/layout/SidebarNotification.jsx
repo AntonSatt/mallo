@@ -5,9 +5,16 @@ import NotificationRing from "../../assets/icons/notificationRing.svg";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import "./SidebarNotification.css";
 
-const SidebarNotification = ({ onSearch }) => { //TODO: Add search functionality
+const SidebarNotification = ({ onSearch, isForumPage = false }) => {
     const [postAlignment, setPostAlignment] = useState("all");
     const [activityAlignment, setActivityAlignment] = useState("all");
+    const [searchValue, setSearchValue] = useState("");
+
+    const handleSearchChange = (event) => {
+        const value = event.target.value;
+        setSearchValue(value);
+        onSearch?.(value);
+    };
 
     const handleActivityChange = (event, newAligment) => {
         if (newAligment) {
@@ -23,18 +30,24 @@ const SidebarNotification = ({ onSearch }) => { //TODO: Add search functionality
 
     return (
         <Stack className="notification-wrapper">
-            <Box className="search-bar">
-                <img
-                    src={SearchHeartButton}
-                    alt="Sök"
-                    className="search-icon"
-                />
-                <input
-                    type="text"
-                    placeholder="Sök"
-                    className="search-input"
-                />
-            </Box>
+            {isForumPage ? (
+                <Box className="search-bar">
+                    <img
+                        src={SearchHeartButton}
+                        alt="Sök"
+                        className="search-icon"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Sök"
+                        className="search-input"
+                        value={searchValue}
+                        onChange={handleSearchChange}
+                    />
+                </Box>
+            ) : (
+                <Box className="search-bar search-bar-placeholder" aria-hidden="true" />
+            )}
 
             <Stack className="notification-box">
                 <Box className="notification-header">

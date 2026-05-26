@@ -3,6 +3,7 @@ import ReportForm from "../../components/reportForm/ReportForm";
 import PostForm from "../../components/postForm/PostForm";
 import DeletePost from "../../components/deleteForm/DeletePost.jsx";
 import PostServices from "../../services/PostServices";
+import CommentServices from "../../services/CommentServices";
 import EditPostForm from "../../components/editPostForm/EditPostForm.jsx";
 import { useAuth } from "../../hooks/useAuth";
 import useViewport from "../../hooks/useViewport";
@@ -41,6 +42,7 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
     const [categories, setCategories] = useState([]);
     const [userBookmarks, setUserBookmarks] = useState([]);
     const [userPostHugs, setUserPostHugs] = useState([]);
+    const [commentsByPostId, setCommentsByPostId] = useState({});
 
     const handleOpenEditPost = (post) => setEditPost(post);
     const handleCloseEditPost = () => setEditPost(null);
@@ -119,10 +121,17 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
         let result = posts;
 
         if (searchQuery.trim()) {
-            result = result.filter(p =>
-                p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                p.content.toLowerCase().includes(searchQuery.toLowerCase())
-            );
+            const query = searchQuery.toLowerCase();
+            result = result.filter((p) => {
+                const titleMatches = (p.title || "").toLowerCase().includes(query);
+                const contentMatches = (p.content || "").toLowerCase().includes(query);
+                const authorMatches = (p.authorInfo?.userName || "").toLowerCase().includes(query);
+                const commentMatches = (commentsByPostId[p.id] || []).some((commentText) =>
+                    (commentText || "").toLowerCase().includes(query)
+                );
+
+                return titleMatches || contentMatches || authorMatches || commentMatches;
+            });
         }
 
         if (checkedCategories.length > 0) {
@@ -148,7 +157,7 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
         }
 
         return result;
-    }, [posts, activeNavCategory, checkedCategories, userBookmarks, searchQuery, currentUser?.sub]);
+    }, [posts, activeNavCategory, checkedCategories, userBookmarks, searchQuery, currentUser?.sub, commentsByPostId]);
 
     const emptyStateMessage = useMemo(() => {
         if (filteredPosts.length > 0) {
@@ -255,6 +264,57 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
         };
 
         fetchPostHugs();
+    }, [posts]);
+
+    useEffect(() => {
+        let isCancelled = false;
+
+        const buildCommentsIndex = async () => {
+            if (posts.length === 0) {
+                if (!isCancelled) {
+                    setCommentsByPostId({});
+                }
+                return;
+            }
+
+            const commentResults = await Promise.allSettled(
+                posts.map(async (post) => {
+                    const comments = await CommentServices.getAll(post.id);
+                    const searchableTexts = (comments || [])
+                        .map((comment) => comment?.content ?? comment?.Content ?? "")
+                        .filter(Boolean);
+
+                    return { postId: post.id, searchableTexts };
+                })
+            );
+
+            if (isCancelled) {
+                return;
+            }
+
+            const nextCommentsByPostId = {};
+            commentResults.forEach((result, index) => {
+                const postId = posts[index]?.id;
+                if (!postId) {
+                    return;
+                }
+
+                if (result.status === "fulfilled") {
+                    nextCommentsByPostId[postId] = result.value.searchableTexts;
+                } else {
+                    nextCommentsByPostId[postId] = [];
+                    console.error(`Error fetching comments for post ${postId}:`, result.reason);
+                }
+            });
+
+            setCommentsByPostId(nextCommentsByPostId);
+        };
+
+        buildCommentsIndex();
+
+        return () => {
+            isCancelled = true;
+        };
     }, [posts]);
 
     useEffect(() => {

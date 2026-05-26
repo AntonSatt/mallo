@@ -19,6 +19,16 @@ const Step3 = ({ formData, handleChange, onNext, error }) => {
     const navigate = useNavigate();
     const [allowNotifications, setAllowNotifications] = useState(false);
     const [approveTerms, setApproveTerms] = useState(false);
+    const [termsError, setTermsError] = useState("");
+
+    const handleNext = () => {
+        if (!approveTerms) {
+            setTermsError("Du måste godkänna användarvillkoren och integritetspolicyn för att fortsätta.");
+            return;
+        }
+        setTermsError(false);
+        onNext();
+    };
 
     return (
         <Box container className="register-step3" spacing={0}>
@@ -123,6 +133,12 @@ const Step3 = ({ formData, handleChange, onNext, error }) => {
                     </span>
                 </Typography>
             </Box>
+            
+            {termsError && (
+                <Typography variant="caption" sx={{ color: 'red', textAlign: 'center', display: 'block', mb: 1 }}>
+                    {termsError}
+                </Typography>
+            )}
 
             <Box
                 onClick={() => setAllowNotifications(!allowNotifications)}
@@ -159,7 +175,7 @@ const Step3 = ({ formData, handleChange, onNext, error }) => {
                     Avsluta
                 </SecondaryButton>
 
-                <PrimaryButton onClick={onNext} startIcon={<ControlPointOutlinedIcon sx={{ color: "white" }} />}>
+                <PrimaryButton onClick={handleNext} startIcon={<ControlPointOutlinedIcon sx={{ color: "white" }} />}>
                     Skapa konto
                 </PrimaryButton>
 

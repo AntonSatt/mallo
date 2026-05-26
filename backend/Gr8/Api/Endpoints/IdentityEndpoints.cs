@@ -140,6 +140,7 @@ namespace Gr8.Api.Endpoints
                     LastName = appUser.LastName,
                     UserName = appUser.UserName,
                     Avatar = appUser.Avatar,
+                    IsAnonymousPosting = appUser.IsAnonymousPosting,
                     TagIds = await userTagService.GetUserTagIdsAsync(appUser.Id),
                 };
 
@@ -199,6 +200,27 @@ namespace Gr8.Api.Endpoints
                     }
 
                     return Results.Ok("User tags updated successfully");
+                })
+                .RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPatch("/users/me/anonymity", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user, [FromBody] UpdateAnonymityDto updateAnonymityDto) =>
+                {
+                    var appUser = await userManager.GetUserAsync(user);
+
+                    if (appUser == null)
+                    {
+                        return Results.NotFound("User not found.");
+                    }
+
+                    appUser.IsAnonymousPosting = updateAnonymityDto.IsAnonymousPosting;
+                    var changedSetting = await userManager.UpdateAsync(appUser);
+
+                    if (!changedSetting.Succeeded)
+                    {
+                        return Results.BadRequest(changedSetting.Errors);
+                    }
+
+                    return Results.Ok("Anonymity preference updated successfully.");
                 })
                 .RequireAuthorization(AuthorizationConstants.JwtOnly);
 

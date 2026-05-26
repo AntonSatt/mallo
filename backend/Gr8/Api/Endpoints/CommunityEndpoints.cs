@@ -344,6 +344,43 @@ namespace Gr8.Api.Endpoints
                 return Results.Ok(savedBookmarks);
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapGet("/forum/notifications", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user, [FromServices] INotificationService notificationService) =>
+            {
+                var appUser = await userManger.GetUserAsync(user);
+
+                if(appUser == null) 
+                {
+                    return Results.Unauthorized();
+                }
+
+                var notifications = await notificationService.GetAllPostNotificationsByUserIdAsync(appUser.Id);
+                
+                if(notifications.Count == 0) 
+                {
+                    return Results.NoContent(); 
+                }
+
+                return Results.Ok(notifications);
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPut("/forum/notifications/{notificationId}/seen", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user, [FromServices] INotificationService notificationService, int notificationId) =>
+            {
+                var appUser = await userManger.GetUserAsync(user);
+
+                if (appUser == null)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var marked = await notificationService.MarkPostNotificationAsSeenAsync(appUser.Id, notificationId);
+                if (!marked)
+                {
+                    return Results.NotFound();
+                }
+
+                return Results.NoContent();
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
         }
     }
 }

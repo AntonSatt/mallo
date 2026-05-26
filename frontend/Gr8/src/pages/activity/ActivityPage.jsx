@@ -20,14 +20,23 @@ import { Box, InputAdornment, Button, CircularProgress, Snackbar, Alert, Dialog,
 import CloseIcon from '@mui/icons-material/Close';
 
 import distance from "@turf/distance";
+import CalendarService from "../../services/CalanderService.jsx";
+import {
+    PERMISSION_STATE,
+    PERMISSION_TYPE,
+    onPermissionStateChange,
+    queryPermissionState,
+    requestPermission
+} from "../../utils/browserPermissions.js";
 
-const ActivityPage = () => {
+const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivityId }) => {
     const { currentUser } = useAuth();
     const currentUserId = currentUser?.sub;
 
-    const mapInstanceRef = useRef(null);
-    const feedScrollRef = useRef(null);
     const [selectedActivity, setSelectedActivity] = useState(null);
+    const feedScrollRef = useRef(null);
+    const mapInstanceRef = useRef(null);
+
     const [editActivity, setEditActivity] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [activities, setActivities] = useState([]);
@@ -37,6 +46,7 @@ const ActivityPage = () => {
     const [alignment, setAlignment] = React.useState('map');
     const [filterOpen, setFilterOpen] = useState(false);
     const [userCoords, setUserCoords] = useState(null);
+    const [geolocationPermissionState, setGeolocationPermissionState] = useState(PERMISSION_STATE.PROMPT);
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
     const [latestCreatedId, setLatestCreatedId] = useState(null);
     const [scrollingActivityId, setScrollingActivityId] = useState(null);
@@ -61,6 +71,55 @@ const ActivityPage = () => {
         setActivities(prev => prev.map(a =>
             a.id === activityId ? { ...a, isBookmarked } : a
         ));
+    };
+
+    // Fetch calendar activities from backend
+    useEffect(() => {
+        if (!onMarkedDatesChange) return;
+        CalendarService.getAll().then(res => {
+            const data = Array.isArray(res.data) ? res.data : [];
+            const marked = data.map(item => ({
+                date: item.startAt,
+                activityId: item.activityId,
+            }));
+            onMarkedDatesChange(marked);
+        }).catch(err => {
+            console.error("Kunde inte hämta kalenderaktiviteter", err);
+        });
+    }, []);
+
+    // Load saved calendar activities on mount
+    useEffect(() => {
+        if (!highlightedActivityId) return;
+
+        const activity = activities.find(a => a.id === highlightedActivityId);
+        if (!activity) return;
+
+        // Switch to list view
+        setAlignment('list');
+
+        // Use the same mechanism as map pin click
+        setTimeout(() => {
+            setSelectedActivity(activity);
+            const el = document.getElementById(`activity-card-${highlightedActivityId}`);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.click(); // expand the card
+            }
+        }, 150);
+    }, [highlightedActivityId, activities]);
+
+    const handleAddToCalendar = async (activity) => {
+        try {
+            await CalendarService.add(activity.id);
+            if (onMarkedDatesChange) {
+                onMarkedDatesChange(prev => [...prev, { date: activity.startAt, activityId: activity.id }]);
+            }
+        } catch (error) {
+            if (error.response?.status !== 409) {
+                console.error("Kunde inte lägga till aktiviteten i kalendern.");
+            }
+        }
     };
 
     const handleOpenForm = () => {
@@ -184,20 +243,59 @@ const ActivityPage = () => {
 
     // Get user's current location 
     useEffect(() => {
-        if (!userCoords) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    setUserCoords({
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    });
-                },
-                (err) => console.error("Kunde inte hämta position", err),
-                { enableHighAccuracy: true }
-            );
-        }
-    }, [userCoords]);
+        let isMounted = true;
+        const syncPermissionState = async () => {
+            const state = await queryPermissionState(PERMISSION_TYPE.GEOLOCATION);
+            if (isMounted) {
+                setGeolocationPermissionState(state);
+            }
+        };
 
+        const unsubscribe = onPermissionStateChange(PERMISSION_TYPE.GEOLOCATION, (state) => {
+            setGeolocationPermissionState(state);
+        });
+
+        syncPermissionState();
+
+        return () => {
+            isMounted = false;
+            unsubscribe();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (geolocationPermissionState === PERMISSION_STATE.DENIED && userCoords) {
+            setUserCoords(null);
+        }
+    }, [geolocationPermissionState, userCoords]);
+
+    useEffect(() => {
+        if (geolocationPermissionState === PERMISSION_STATE.DENIED) {
+            return;
+        }
+
+        if (!userCoords) {
+            requestPermission(PERMISSION_TYPE.GEOLOCATION, { geolocationOptions: { enableHighAccuracy: true } })
+                .then((result) => {
+                    if (result?.position) {
+                        setUserCoords({
+                            lat: result.position.coords.latitude,
+                            lng: result.position.coords.longitude
+                        });
+                    }
+
+                    if (result?.state) {
+                        setGeolocationPermissionState(result.state);
+                    }
+                })
+                .catch((err) => {
+                    if (err?.code === 1) {
+                        setGeolocationPermissionState(PERMISSION_STATE.DENIED);
+                    }
+                    console.error("Kunde inte hämta position", err);
+                });
+        }
+    }, [geolocationPermissionState, userCoords]);
     // Apply filters to activities
     const filteredActivities = useMemo(() => {
         return activities
@@ -222,7 +320,7 @@ const ActivityPage = () => {
 
                 // Nearby filter
                 if (activeFilters.nearby) {
-                    if (!userCoords) return false;
+                    if (geolocationPermissionState === PERMISSION_STATE.DENIED || !userCoords) return false;
                     if (activity.distanceMeters > 7000) return false;
                 }
 
@@ -498,6 +596,9 @@ const ActivityPage = () => {
                     currentUserId={currentUserId}
                     onBookmarkToggle={handleBookmarkToggle}
                     onSelectActivity={setSelectedActivity}
+                    onAddToCalendar={handleAddToCalendar}
+                    highlightedActivityId={highlightedActivityId}
+                    markedDates={markedDates}
                     scrollingActivityId={scrollingActivityId}
                     clearScrollingActivityId={clearScrollingActivityId}
                 />

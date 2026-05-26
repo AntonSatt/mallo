@@ -112,6 +112,31 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                     b.ToTable("ActivityBookmarks");
                 });
 
+            modelBuilder.Entity("Gr8.Domain.Entities.ActivityCalender", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ActivityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
+
+                    b.HasIndex("UserId", "ActivityId")
+                        .IsUnique();
+
+                    b.ToTable("ActivityCalenders");
+                });
+
             modelBuilder.Entity("Gr8.Domain.Entities.Bookmark", b =>
                 {
                     b.Property<int>("Id")
@@ -276,6 +301,9 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AuthorDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -356,6 +384,9 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AuthorDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
@@ -390,6 +421,41 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                     b.HasIndex("UserId");
 
                     b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("Gr8.Domain.Entities.PostNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsSeen")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PostNotifications");
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Report", b =>
@@ -682,6 +748,23 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                     b.Navigation("Activity");
                 });
 
+            modelBuilder.Entity("Gr8.Domain.Entities.ActivityCalender", b =>
+                {
+                    b.HasOne("Gr8.Domain.Entities.Activity", "Activity")
+                        .WithMany()
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Gr8.Infrastructure.Identity.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Activity");
+                });
+
             modelBuilder.Entity("Gr8.Domain.Entities.Bookmark", b =>
                 {
                     b.HasOne("Gr8.Domain.Entities.Post", "Post")
@@ -783,6 +866,15 @@ namespace Gr8.Infrastructure.Migrations.CommunityDb
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Gr8.Domain.Entities.PostNotification", b =>
+                {
+                    b.HasOne("Gr8.Infrastructure.Identity.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Gr8.Domain.Entities.Report", b =>

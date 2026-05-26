@@ -3,6 +3,7 @@ import ReportForm from "../../components/reportForm/ReportForm";
 import PostForm from "../../components/postForm/PostForm";
 import DeletePost from "../../components/deleteForm/DeletePost.jsx";
 import PostServices from "../../services/PostServices";
+import CommentServices from "../../services/CommentServices";
 import EditPostForm from "../../components/editPostForm/EditPostForm.jsx";
 import { useAuth } from "../../hooks/useAuth";
 import useViewport from "../../hooks/useViewport";
@@ -41,6 +42,7 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
     const [categories, setCategories] = useState([]);
     const [userBookmarks, setUserBookmarks] = useState([]);
     const [userPostHugs, setUserPostHugs] = useState([]);
+    const [commentsByPostId, setCommentsByPostId] = useState({});
 
     const handleOpenEditPost = (post) => setEditPost(post);
     const handleCloseEditPost = () => setEditPost(null);
@@ -70,7 +72,6 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
         setSelectedPostId(postId);
     };
 
-    // Handles closing the menu, resetting the anchor element and selected post ID
     const handleMenuClose = () => {
         setMenuAnchorEl(null);
         setSelectedPostId(null);
@@ -82,7 +83,6 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
         setOpenReportModal(true);
     };
 
-    // Handles closing the report modal, resetting the open state and selected post ID
     const handleReportClose = () => {
         setOpenReportModal(false);
         setSelectedPostId(null);
@@ -119,10 +119,17 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
         let result = posts;
 
         if (searchQuery.trim()) {
-            result = result.filter(p =>
-                p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                p.content.toLowerCase().includes(searchQuery.toLowerCase())
-            );
+            const query = searchQuery.toLowerCase();
+            result = result.filter((p) => {
+                const titleMatches = (p.title || "").toLowerCase().includes(query);
+                const contentMatches = (p.content || "").toLowerCase().includes(query);
+                const authorMatches = (p.authorInfo?.userName || "").toLowerCase().includes(query);
+                const commentMatches = (commentsByPostId[p.id] || []).some((commentText) =>
+                    (commentText || "").toLowerCase().includes(query)
+                );
+
+                return titleMatches || contentMatches || authorMatches || commentMatches;
+            });
         }
 
         if (checkedCategories.length > 0) {
@@ -148,7 +155,7 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
         }
 
         return result;
-    }, [posts, activeNavCategory, checkedCategories, userBookmarks, searchQuery, currentUser?.sub]);
+    }, [posts, activeNavCategory, checkedCategories, userBookmarks, searchQuery, currentUser?.sub, commentsByPostId]);
 
     const emptyStateMessage = useMemo(() => {
         if (filteredPosts.length > 0) {
@@ -258,6 +265,57 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
     }, [posts]);
 
     useEffect(() => {
+        let isCancelled = false;
+
+        const buildCommentsIndex = async () => {
+            if (posts.length === 0) {
+                if (!isCancelled) {
+                    setCommentsByPostId({});
+                }
+                return;
+            }
+
+            const commentResults = await Promise.allSettled(
+                posts.map(async (post) => {
+                    const comments = await CommentServices.getAll(post.id);
+                    const searchableTexts = (comments || [])
+                        .map((comment) => comment?.content ?? comment?.Content ?? "")
+                        .filter(Boolean);
+
+                    return { postId: post.id, searchableTexts };
+                })
+            );
+
+            if (isCancelled) {
+                return;
+            }
+
+            const nextCommentsByPostId = {};
+            commentResults.forEach((result, index) => {
+                const postId = posts[index]?.id;
+                if (!postId) {
+                    return;
+                }
+
+                if (result.status === "fulfilled") {
+                    nextCommentsByPostId[postId] = result.value.searchableTexts;
+                } else {
+                    nextCommentsByPostId[postId] = [];
+                    console.error(`Error fetching comments for post ${postId}:`, result.reason);
+                }
+            });
+
+            setCommentsByPostId(nextCommentsByPostId);
+        };
+
+        buildCommentsIndex();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [posts]);
+
+    useEffect(() => {
         if (!isDesktop) {
             return;
         }
@@ -268,8 +326,15 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
                 return;
             }
 
-            const inDialog = event.target instanceof Element && !!event.target.closest(".MuiDialog-root");
+            const targetElement = event.target instanceof Element ? event.target : null;
+
+            const inDialog = !!targetElement?.closest(".MuiDialog-root");
             if (inDialog) {
+                return;
+            }
+
+            const inSidebar = !!targetElement?.closest(".sidebar-left, .sidebar-right");
+            if (inSidebar) {
                 return;
             }
 
@@ -342,17 +407,22 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
                         onClose={handleClose}
                         fullWidth
                         maxWidth="sm"
+                        sx={{
+                            "& .MuiDialog-paper": {
+                                backgroundColor: "var(--color-primary-bg) !important"
+                            },
+                            borderRadius: { xs: 0, md: "15px" },
+                            width: { md: "490px" },
+                            maxWidth: { md: "490px" },
+                            height: { md: "auto" },
+                            maxHeight: { md: "calc(100% - 80px)" },
+                            margin: { md: "auto" }
+                        }}
                     >
-                        <DialogTitle>Skapa nytt inlägg</DialogTitle>
                         <PostForm
                             onPostCreated={handlePostCreated}
                             onClose={handleClose}
                         />
-                        <DialogActions>
-                            <Button variant="text" color="inherit" onClick={handleClose}>
-                                Avbryt
-                            </Button>
-                        </DialogActions>
                     </Dialog>
 
                     <ReportForm
@@ -400,9 +470,6 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
                         }}>
 
                         <Box sx={{ px: { md: 1 } }}> {/*adds padding for scrollbar.*/}
-                            {/* This is where the posts are rendered. It maps through the filteredPosts array and renders a PostCard for 
-                    each post. The PostCard component is responsible for displaying the post content, as well as handling the 
-                    expand/collapse of the comment section and the menu actions for reporting, editing, and deleting posts. */}
                             {filteredPosts.length > 0 ? (
                                 filteredPosts.map((post) => (
                                     <PostCard

@@ -4,7 +4,7 @@ import ProfileBar from "../../components/layout/ProfileBar.jsx";
 import ProfileHeader from "../../components/layout/ProfileHeader.jsx";
 import SidebarCalendar from '../../components/layout/SidebarCalendar.jsx';
 import SidebarNotification from "../../components/layout/SidebarNotification.jsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Stack, Box } from "@mui/material";
 import Navbar from "../../components/layout/Navbar.jsx";
 import ForumPage from "../forum/ForumPage.jsx";
@@ -21,6 +21,12 @@ const Homepage = ({ page }) => {
     const handleClickOpen = () => {
         setOpen(true);
     };
+
+    useEffect(() => {
+        if (page !== "forum") {
+            setSearchQuery("");
+        }
+    }, [page]);
 
     return (
         <div className="homepage-container">
@@ -65,7 +71,10 @@ const Homepage = ({ page }) => {
                     </main>
 
                     <aside className="sidebar-right">
-                        <SidebarNotification onSearch={setSearchQuery} />
+                        <SidebarNotification
+                            onSearch={page === "forum" ? setSearchQuery : undefined}
+                            isForumPage={page === "forum"}
+                        />
                     </aside>
                 </div>
             ) : (

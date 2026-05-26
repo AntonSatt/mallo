@@ -34,7 +34,7 @@ namespace Gr8.Infrastructure
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IHugService, HugService>();
             services.AddScoped<IEmailService, EmailService>();
-            services.AddScoped <IBookmarkService,BookmarkService>();
+            services.AddScoped<IBookmarkService,BookmarkService>();
             services.AddScoped<IActivityService, ActivityService>();
             services.AddScoped<IChatRepository, ChatRepository>();
             services.AddScoped<IChatService, ChatService>();
@@ -42,6 +42,7 @@ namespace Gr8.Infrastructure
             services.AddScoped<IActivityBookmarkService, ActivityBookmarkService>();
             services.AddScoped<IActivityCalenderService, ActivityCalenderService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IFirebasePushService, FirebasePushService>();
 
             // Configure ASP.NET Core Identity to use the ApplicationUser and ApplicationRole classes, and to use Entity Framework Core for storage
             services.AddIdentity<ApplicationUser, ApplicationRole>()

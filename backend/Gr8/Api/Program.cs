@@ -12,6 +12,8 @@ using System.Text;
 using Prometheus;
 using Gr8.Application.Interfaces;
 using Gr8.Infrastructure.Services;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 namespace Gr8
 {
@@ -20,6 +22,11 @@ namespace Gr8
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            FirebaseApp.Create(new AppOptions() 
+            {
+                Credential = GoogleCredential.FromFile("firebase-adminsdk.json")
+            });
 
             var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 

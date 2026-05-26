@@ -232,5 +232,20 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             _communityDbContext.Activities.Update(activity);
             await Task.CompletedTask;
         }
+
+        public async Task<List<PostNotification>> GetAllNotificationsByUserIdAsync(string userId)
+        {
+            return await _communityDbContext.PostNotifications.Where(pn => pn.UserId == userId).ToListAsync();
+        }
+
+        public async Task AddPostNotificationAsync(PostNotification notification)
+        {
+            await _communityDbContext.PostNotifications.AddAsync(notification);
+        }
+
+        public void RemovePostNotifications(PostNotification notification)
+        {
+             _communityDbContext.PostNotifications.Remove(notification);
+        }
     }
 }

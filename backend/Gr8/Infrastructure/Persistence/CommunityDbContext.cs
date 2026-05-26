@@ -280,10 +280,14 @@ namespace Gr8.Infrastructure.Persistence
             {
                 entity.HasKey(pn => pn.Id);
 
-                entity.Property(pn => pn.Content)
+                entity.Property(pn => pn.Title)
                 .IsRequired()
                 .HasMaxLength(500);
-                
+
+                entity.Property(pn => pn.Type)
+               .IsRequired()
+               .HasMaxLength(500);
+
                 entity.HasOne<ApplicationUser>()
                 .WithMany()
                 .HasForeignKey(pn => pn.UserId)

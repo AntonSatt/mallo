@@ -35,5 +35,8 @@ namespace Gr8.Application.Interfaces
         Task AddActivityAsync(Activity activity);
         Task UpdateActivityAsync(Activity activity);
         Task DeleteActivityAsync(Activity activity);
+        Task<List<PostNotification>> GetAllNotificationsByUserIdAsync(string userId);
+        Task AddPostNotificationAsync(PostNotification notification);
+        void RemovePostNotifications(PostNotification notification);
     }
 }

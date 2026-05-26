@@ -312,6 +312,25 @@ namespace Gr8.Api.Endpoints
                 return Results.Ok(savedBookmarks);
 
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapGet("/forum/notifications", async (UserManager<ApplicationUser> userManger, ClaimsPrincipal user, [FromServices] INotificationService notificationService) =>
+            {
+                var appUser = await userManger.GetUserAsync(user);
+
+                if(appUser == null) 
+                {
+                    return Results.Unauthorized();
+                }
+
+                var notifications = await notificationService.GetAllPostNotificationsByUserIdAsync(appUser.Id);
+                
+                if(notifications.Count == 0) 
+                {
+                    return Results.NoContent(); 
+                }
+
+                return Results.Ok(notifications);
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
         }
     }
 }

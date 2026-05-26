@@ -23,10 +23,16 @@ namespace Gr8
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            FirebaseApp.Create(new AppOptions() 
+            // Initialize Firebase Admin SDK if service account path is provided in configuration.
+            var firebaseServiceAccountPath = builder.Configuration["Firebase:ServiceAccountPath"];
+
+            if (!string.IsNullOrEmpty(firebaseServiceAccountPath))
             {
-                Credential = GoogleCredential.FromFile("firebase-adminsdk.json")
-            });
+                FirebaseApp.Create(new AppOptions
+                {
+                    Credential = GoogleCredential.FromFile(firebaseServiceAccountPath)
+                });
+            }
 
             var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 

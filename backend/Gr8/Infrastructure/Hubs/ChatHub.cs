@@ -12,15 +12,12 @@ namespace Gr8.Infrastructure.Hubs
     {
         private readonly IChatService _chatService;
 
-        // Stores online users and their active SignalR connection IDs in real time.
-        private static readonly Dictionary<string, HashSet<string>> OnlineUsers = new();
+        private readonly IPresenceService _presenceService;
 
-        // Prevents multiple threads from modifying the online users list at the same time.
-        private static readonly object OnlineUsersLock = new();
-
-        public ChatHub(IChatService chatService) 
+        public ChatHub(IChatService chatService, IPresenceService presenceService) 
         {
             _chatService = chatService;
+            _presenceService = presenceService;
         }
 
         // Triggers automatic when a user connects to the signalR hub.
@@ -30,17 +27,9 @@ namespace Gr8.Infrastructure.Hubs
 
             if (!string.IsNullOrEmpty(userId))
             {
-                lock (OnlineUsersLock)
-                {
-                    if (!OnlineUsers.ContainsKey(userId))
-                    {
-                        OnlineUsers[userId] = new HashSet<string>();
-                    }
-
-                    OnlineUsers[userId].Add(Context.ConnectionId);
-                }
-
-                await Clients.Caller.OnlineUsers(OnlineUsers.Keys.ToList());
+                _presenceService.UserConnected(userId, Context.ConnectionId);
+                
+                await Clients.Caller.OnlineUsers(_presenceService.GetOnlineUsers());
                 await Clients.Others.UserOnline(userId);
             }
 
@@ -54,21 +43,7 @@ namespace Gr8.Infrastructure.Hubs
 
             if (!string.IsNullOrEmpty(userId))
             {
-                var userWentOffline = false;
-
-                lock (OnlineUsersLock)
-                {
-                    if (OnlineUsers.ContainsKey(userId))
-                    {
-                        OnlineUsers[userId].Remove(Context.ConnectionId);
-
-                        if (!OnlineUsers[userId].Any())
-                        {
-                            OnlineUsers.Remove(userId);
-                            userWentOffline = true;
-                        }
-                    }
-                }
+                var userWentOffline = _presenceService.UserDisconnected(userId, Context.ConnectionId);
 
                 if (userWentOffline)
                 {

@@ -1,6 +1,7 @@
 import { Box, Stack, Typography, InputAdornment } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DateCalendar, LocalizationProvider } from '@mui/x-date-pickers';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import 'dayjs/locale/sv';
@@ -11,6 +12,7 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import InputField from '../../design/input/InputField.jsx';
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
 import "./SidebarCalendar.css"
+import { useNavigate } from 'react-router-dom';
 
 dayjs.locale('sv');
 
@@ -45,7 +47,57 @@ const CustomCalendarHeader = (props) => {
     );
 };
 
-const SidebarCalendar = ({ showCreate = false, onCreatePost }) => {
+const MarkedDay = ({ markedDates = [], onMarkedDayClick, day, outsideCurrentMonth, ...other }) => {
+    const match = !outsideCurrentMonth
+        ? markedDates.find(m => dayjs(m.date).startOf('day').isSame(day.startOf('day')))
+        : null;
+
+    return (
+        <Box sx={{ position: 'relative', display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Box
+                component="button"
+                onClick={match ? (e) => { e.stopPropagation(); onMarkedDayClick(match.activityId); } : other.onClick}
+                sx={{
+                    width: 36,
+                    height: 36,
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: match ? 'pointer' : 'default',
+                    fontWeight: 600,
+                    fontSize: '0.875rem',
+                    backgroundColor: match ? 'var(--color-primary)' : 'var(--color-text-inverse)',
+                    color: match ? 'white' : 'inherit',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: outsideCurrentMonth ? 0.4 : 1,
+                    '&:hover': { opacity: 0.85 },
+                }}
+            >
+                {day.date()}
+            </Box>
+
+            {match && (
+                <Box sx={{
+                    position: 'absolute',
+                    bottom: -4,
+                    width: 5,
+                    height: 5,
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--color-primary)',
+                }} />
+            )}
+        </Box>
+    );
+};
+
+const SidebarCalendar = ({ showCreate = false, onCreatePost, markedDates = [], onMarkedDayClick }) => {
+
+    const handleMarkedDayClick = (activityId) => {
+        onMarkedDayClick?.(activityId);
+    };
+
     return (
         <Box className="sidebar-calendar-container">
             <Stack spacing={2}>
@@ -82,20 +134,19 @@ const SidebarCalendar = ({ showCreate = false, onCreatePost }) => {
                             <DateCalendar
                                 className="calendar"
                                 showDaysOutsideCurrentMonth
-
                                 slots={{
                                     calendarHeader: CustomCalendarHeader,
+                                    day: MarkedDay,
                                 }}
-
                                 slotProps={{
                                     day: {
+                                        markedDates,
+                                        onMarkedDayClick: handleMarkedDayClick,
                                         sx: {
-                                            className: "calendar-day",
                                             backgroundColor: "var(--color-text-inverse)",
                                             borderRadius: "8px",
                                             boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
                                             fontWeight: 600,
-
                                             "&.Mui-selected": {
                                                 backgroundColor: "var(--color-primary) !important",
                                                 color: "var(--color-text-inverse) !important",
@@ -104,39 +155,24 @@ const SidebarCalendar = ({ showCreate = false, onCreatePost }) => {
                                     }
                                 }}
                             />
-
                         </LocalizationProvider>
                     </Box>
-                    <Stack className="button-wrapper"
-                        direction="row"
-                        justifyContent="center"
-                    >
+
+                    <Stack className="button-wrapper" direction="row" justifyContent="center">
                         <PrimaryButton className="button-choice">
-                            <LocationOnOutlinedIcon
-                                sx={{
-                                    color: "var(--color-primary) !important"
-                                }}
-                            />
-                            <Typography className="button-title">
-                                Hitta
-                            </Typography>
+                            <LocationOnOutlinedIcon sx={{ color: "var(--color-primary) !important" }} />
+                            <Typography className="button-title">Hitta</Typography>
                         </PrimaryButton>
 
                         <PrimaryButton className="button-choice">
-                            <BookmarkBorderIcon
-                                sx={{
-                                    color: "var(--color-primary) !important",
-                                }}
-                            />
-                            <Typography className="button-title">
-                                Favoriter
-                            </Typography>
+                            <BookmarkBorderIcon sx={{ color: "var(--color-primary) !important" }} />
+                            <Typography className="button-title">Favoriter</Typography>
                         </PrimaryButton>
                     </Stack>
                 </Box>
             </Stack>
         </Box>
-    )
+    );
 };
 
-export default SidebarCalendar; 
+export default SidebarCalendar;

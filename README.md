@@ -246,7 +246,7 @@ Templates: [`devops/k8s/chart/templates/`](devops/k8s/chart/templates/).
 
 ## Run it locally
 
-The root `docker-compose.yml` is shaped for the cluster deploy, not local dev. For local work, run MSSQL in Docker and start the API and frontend each in their own terminal.
+For local dev, run MSSQL in Docker and start the API and frontend each in their own terminal.
 
 ```bash
 # 1. MS SQL Server in a container.
@@ -284,12 +284,9 @@ For Rider / Visual Studio: open [`backend/Gr8/Gr8.slnx`](backend/Gr8/Gr8.slnx).
 ├── devops/
 │   ├── k8s/manifests/        # Plain YAML for api / frontend / db / ingress / middleware
 │   ├── k8s/chart/            # Helm chart: Redis + observability (ServiceMonitor, PrometheusRule, dashboard)
-│   ├── swarm-setup.md        # Historical: previous Docker Swarm setup (now retired)
 │   └── README.md
 ├── docs/media/               # Demo videos and screenshots referenced from this README
-├── docker-compose.yml        # Legacy Docker Swarm compose, kept for reference. Not used by current deploy or local dev.
 ├── .gitlab-ci.yml            # Build, deploy, smoke-test pipeline
-├── TECHSTACK.md              # Pinned framework / language versions
 └── README.md                 # You are here.
 ```
 

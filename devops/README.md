@@ -7,7 +7,6 @@ CI/CD and Kubernetes deploy for Mallo. For the big picture (architecture, stack,
 ```
 devops/
 ├── README.md             this file
-├── swarm-setup.md        historical: the retired Portainer + Swarm pipeline
 └── k8s/
     ├── manifests/        plain YAML, applied with kubectl
     │   ├── api-deployment.yaml
@@ -166,7 +165,3 @@ A YAML editor with the Kubernetes schema attached catches most of the dumb mista
 - **Wildcard cert is one subdomain deep.** The cluster's `*.cc.k3s.chas-lab.dev` certificate covers a single level only. `api.gr8-foo.cc.k3s.chas-lab.dev` would NOT be covered. We route the API behind `/api` on the same host (`gr8-<env>.cc.k3s.chas-lab.dev`) and strip the prefix in `middleware.yaml` for that reason.
 - **SignalR + multiple API replicas.** The API Service has Traefik sticky-cookie annotations so a WebSocket stays pinned to one pod. We run `replicas: 1` today, but if you ever scale up, also move EF migrations out of `Program.cs` into a Helm `pre-upgrade` `Job`, otherwise two pods race to migrate.
 - **Pipeline shows "Blocked".** It's waiting on a manual job (production deploy). Your review/develop deploy already ran.
-
-## History
-
-`swarm-setup.md` documents the Portainer + Docker Swarm setup we used until the move to k3s in May 2026. The root `docker-compose.yml` is from that era too. Neither is wired into the current CI. They're kept around for reference until we're confident we won't roll back.

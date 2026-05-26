@@ -29,6 +29,7 @@ namespace Gr8.Domain.Entities
         public DateTime UpdatedAt { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsEdited { get; set; }
+        public string? AuthorDisplayName { get; set; }
 
         public int CategoryId { get; private set; } //FK
         public Category Category { get; set; } = null!;

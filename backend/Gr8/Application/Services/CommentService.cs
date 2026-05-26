@@ -42,12 +42,7 @@ namespace Gr8.Application.Services
                     }
                 };
 
-                var userName = await _applicationRepository.GetUserNameByIdAsync(comment.UserId);
-
-                if (userName != null)
-                {
-                    commentDto.AuthorInfo.UserName = userName;
-                }
+                commentDto.AuthorInfo.UserName = await ResolveAuthorNameAsync(comment.UserId, comment.AuthorDisplayName);
 
                 commentsDtoList.Add(commentDto);
 
@@ -58,10 +53,13 @@ namespace Gr8.Application.Services
 
         public async Task<CommentDto?> CreateAsync(CommentDto commentDto, int postId, string userId)
         {
+            var authorDisplayName = await _applicationRepository.GetAuthorDisplayNameForNewContentAsync(userId);
+
             var comment = new Comment(userId)
             {
                 Content = commentDto.Content,
-                PostId = postId
+                PostId = postId,
+                AuthorDisplayName = authorDisplayName
             };
 
             await _communityRepository.AddCommentAsync(comment);
@@ -71,8 +69,6 @@ namespace Gr8.Application.Services
             {
                 return null;
             }
-
-            var userName = await _applicationRepository.GetUserNameByIdAsync(comment.UserId);
 
             var resultDto = new CommentDto
             {
@@ -89,10 +85,7 @@ namespace Gr8.Application.Services
                 }
             };
 
-            if (userName != null)
-            {
-                resultDto.AuthorInfo.UserName = userName;
-            }
+            resultDto.AuthorInfo.UserName = await ResolveAuthorNameAsync(comment.UserId, comment.AuthorDisplayName);
 
             return resultDto;
         }
@@ -140,11 +133,7 @@ namespace Gr8.Application.Services
                 }
             };
 
-            var userName = await _applicationRepository.GetUserNameByIdAsync(comment.UserId);
-            if (userName != null)
-            {
-                commentDto.AuthorInfo.UserName = userName;
-            }
+            commentDto.AuthorInfo.UserName = await ResolveAuthorNameAsync(comment.UserId, comment.AuthorDisplayName);
 
             return commentDto;
         }
@@ -163,6 +152,16 @@ namespace Gr8.Application.Services
 
             await _communityRepository.UpdateCommentAsync(existing);
             return await _communityRepository.SaveChangesAsync();
+        }
+
+        private async Task<string?> ResolveAuthorNameAsync(string userId, string? authorDisplayName)
+        {
+            if (!string.IsNullOrWhiteSpace(authorDisplayName))
+            {
+                return authorDisplayName;
+            }
+
+            return await _applicationRepository.GetUserNameByIdAsync(userId);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Gr8.Application.Interfaces;
+using Gr8.Application.Common.Formatting;
+using Gr8.Application.Interfaces;
 using Gr8.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace Gr8.Infrastructure.Persistence.Repositories
     public class ApplicationRepository : IApplicationRepository
     {
         private readonly ApplicationDbContext _applicationDbContext;
+
         public ApplicationRepository(ApplicationDbContext applicationDbContext)
         {
             _applicationDbContext = applicationDbContext;
@@ -39,6 +41,33 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             }
 
             return $"{user.FirstName} {user.LastName}";
+        }
+
+        public async Task<string?> GetAuthorDisplayNameForNewContentAsync(string userId)
+        {
+            var authorIdentity = await _applicationDbContext.Users
+                .Where(u => u.Id == userId)
+                .Select(u => new
+                {
+                    u.UserName,
+                    u.FirstName,
+                    u.LastName,
+                    u.IsAnonymousPosting
+                })
+                .FirstOrDefaultAsync();
+
+            if (authorIdentity == null)
+            {
+                return null;
+            }
+
+            if (authorIdentity.IsAnonymousPosting)
+            {
+                return authorIdentity.UserName;
+            }
+
+            var fullName = AuthorNameFormatter.BuildCapitalizedFullName(authorIdentity.FirstName, authorIdentity.LastName);
+            return fullName ?? authorIdentity.UserName;
         }
     }
 }

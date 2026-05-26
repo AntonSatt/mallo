@@ -63,10 +63,10 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                 setFormData({
                     title: activityToEdit.title || "",
                     description: activityToEdit.description || "",
-                    Url: activityToEdit.url || "",
+                    Url: activityToEdit.url || activityToEdit.Url || "",
                     latitude: activityToEdit.latitude || "",
                     longitude: activityToEdit.longitude || "",
-                    adressName: activityToEdit.adressName || "",
+                    adressName: activityToEdit.adress || activityToEdit.Adress || activityToEdit.adressName || "",
                     startAt: dayjs(activityToEdit.startAt),
                     endAt: dayjs(activityToEdit.endAt),
                 });
@@ -124,7 +124,7 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                     description: formData.description,
                     latitude: Number(formData.latitude),
                     longitude: Number(formData.longitude),
-                    adressName: formData.adressName,
+                    adress: formData.adressName,
                     startAt: dayjs(formData.startAt).toISOString(),
                     endAt: dayjs(formData.endAt).toISOString(),
                     url: formData.Url

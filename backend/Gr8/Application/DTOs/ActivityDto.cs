@@ -21,5 +21,6 @@ namespace Gr8.Application.DTOs
 
         public byte[]? Image { get; set; }
         public string? ImageMimeType { get; set; }
+        public AuthorDTO AuthorInfo { get; set; } = null!;
     }
 }

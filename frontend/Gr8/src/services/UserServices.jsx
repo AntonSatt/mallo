@@ -62,6 +62,12 @@ const UserServices = {
            confirmNewPassword: userData.confirmNewPassword
         });
         return response.data;
+    },
+    updateAnonymity: async (isAnonymousPosting) => {
+        const response = await ApiClient.patch("/users/me/anonymity", {
+            isAnonymousPosting
+        });
+        return response.data;
     }
 };
 

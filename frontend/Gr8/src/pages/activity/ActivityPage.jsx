@@ -18,6 +18,13 @@ import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBullet
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { Box, InputAdornment, Button, CircularProgress, Snackbar, Alert } from "@mui/material";
 import distance from "@turf/distance";
+import {
+    PERMISSION_STATE,
+    PERMISSION_TYPE,
+    onPermissionStateChange,
+    queryPermissionState,
+    requestPermission
+} from "../../utils/browserPermissions.js";
 
 const ActivityPage = () => {
     const { currentUser } = useAuth();
@@ -35,6 +42,7 @@ const ActivityPage = () => {
     const [alignment, setAlignment] = React.useState('map');
     const [filterOpen, setFilterOpen] = useState(false);
     const [userCoords, setUserCoords] = useState(null);
+    const [geolocationPermissionState, setGeolocationPermissionState] = useState(PERMISSION_STATE.PROMPT);
     const [activeFilters, setActiveFilters] = useState({
         nearby: false,
         yourActivities: false,
@@ -72,12 +80,18 @@ const ActivityPage = () => {
         setIsFormOpen(false);
 
         setActivities(prevActivities => {
-            const exists = prevActivities.some(act => act.id === savedActivity.id);
+            const formattedSavedActivity = {
+                ...savedActivity,
+                imageUrl: savedActivity.image ? `data:${savedActivity.imageMimeType || 'image/jpeg'};base64,${savedActivity.image}` : null,
+                adress: savedActivity.adress ? savedActivity.adress.split(',')[0].trim() : savedActivity.adress
+            };
+
+            const exists = prevActivities.some(act => act.id === formattedSavedActivity.id);
 
             if (exists) {
-                return prevActivities.map(act => act.id === savedActivity.id ? savedActivity : act);
+                return prevActivities.map(act => act.id === formattedSavedActivity.id ? formattedSavedActivity : act);
             } else {
-                return [savedActivity, ...prevActivities];
+                return [formattedSavedActivity, ...prevActivities];
             }
         });
 
@@ -130,7 +144,9 @@ const ActivityPage = () => {
                 const bookmarkedIds = new Set(bookmarksData.map(b => b.actvityId));
                 const activitiesWithBookmarks = (activitiesData || []).map(a => ({
                     ...a,
-                    isBookmarked: bookmarkedIds.has(a.id)
+                    isBookmarked: bookmarkedIds.has(a.id),
+                    imageUrl: a.image ? `data:${a.imageMimeType || 'image/jpeg'};base64,${a.image}` : null,
+                    adress: a.adress ? a.adress.split(',')[0].trim() : a.adress
                 }));
 
                 setActivities(activitiesWithBookmarks);
@@ -146,20 +162,59 @@ const ActivityPage = () => {
 
     // Get user's current location 
     useEffect(() => {
-        if (!userCoords) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    setUserCoords({
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    });
-                },
-                (err) => console.error("Kunde inte hämta position", err),
-                { enableHighAccuracy: true }
-            );
-        }
-    }, [userCoords]);
+        let isMounted = true;
+        const syncPermissionState = async () => {
+            const state = await queryPermissionState(PERMISSION_TYPE.GEOLOCATION);
+            if (isMounted) {
+                setGeolocationPermissionState(state);
+            }
+        };
 
+        const unsubscribe = onPermissionStateChange(PERMISSION_TYPE.GEOLOCATION, (state) => {
+            setGeolocationPermissionState(state);
+        });
+
+        syncPermissionState();
+
+        return () => {
+            isMounted = false;
+            unsubscribe();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (geolocationPermissionState === PERMISSION_STATE.DENIED && userCoords) {
+            setUserCoords(null);
+        }
+    }, [geolocationPermissionState, userCoords]);
+
+    useEffect(() => {
+        if (geolocationPermissionState === PERMISSION_STATE.DENIED) {
+            return;
+        }
+
+        if (!userCoords) {
+            requestPermission(PERMISSION_TYPE.GEOLOCATION, { geolocationOptions: { enableHighAccuracy: true } })
+                .then((result) => {
+                    if (result?.position) {
+                        setUserCoords({
+                            lat: result.position.coords.latitude,
+                            lng: result.position.coords.longitude
+                        });
+                    }
+
+                    if (result?.state) {
+                        setGeolocationPermissionState(result.state);
+                    }
+                })
+                .catch((err) => {
+                    if (err?.code === 1) {
+                        setGeolocationPermissionState(PERMISSION_STATE.DENIED);
+                    }
+                    console.error("Kunde inte hämta position", err);
+                });
+        }
+    }, [geolocationPermissionState, userCoords]);
     // Apply filters to activities
     const filteredActivities = activities
         .map(activity => {
@@ -183,7 +238,7 @@ const ActivityPage = () => {
 
             // Nearby filter
             if (activeFilters.nearby) {
-                if (!userCoords) return false;
+                if (geolocationPermissionState === PERMISSION_STATE.DENIED || !userCoords) return false;
                 if (activity.distanceMeters > 7000) return false;
             }
 
@@ -223,7 +278,7 @@ const ActivityPage = () => {
             width: { xs: '100vw', md: '490px' },
             height: { xs: '100vh', md: 'auto' },
             overflow: { xs: 'hidden', md: 'visible' },
-            margin: { xs: 0, md: '40px auto' },
+            margin: { xs: 0, md: 0 },
             backgroundColor: { xs: 'transparent', md: 'var(--button-secondary-bg)' },
             borderRadius: { xs: 0, md: '20px' },
             padding: { xs: 0, md: '16px' },
@@ -233,7 +288,7 @@ const ActivityPage = () => {
             {/* Map - default map view with short list */}
             {alignment === 'map' && (
                 <Box className="activity-map-wrapper"
-                    sx={{ position: 'relative', zIndex: 1, height: "50vh", overflow: 'hidden', borderRadius: { xs: 0, md: "15px" } }}>
+                    sx={{ position: 'relative', zIndex: 1, height: { xs: '40vh', md: '55vh' }, overflow: 'hidden', borderRadius: { xs: 0, md: "15px" } }}>
                     <MapComponent activities={filteredActivities}
                         userCoords={userCoords}
                         mode="view"

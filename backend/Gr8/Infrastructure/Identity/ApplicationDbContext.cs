@@ -33,6 +33,9 @@ namespace Gr8.Infrastructure.Identity
                 entity.Property(u => u.Avatar)
                     .HasDefaultValue(1);
 
+                entity.Property(u => u.IsAnonymousPosting)
+                    .HasDefaultValue(true);
+
                 entity.ToTable(t =>
                     t.HasCheckConstraint("CK_AspNetUsers_Avatar_Range", "[Avatar] BETWEEN 1 AND 9"));
             });

@@ -69,8 +69,8 @@ namespace Gr8.Api.Endpoints
                     Latitude = decimal.Parse(form["latitude"]!, CultureInfo.InvariantCulture),
                     Longitude = decimal.Parse(form["longitude"]!, CultureInfo.InvariantCulture),
                     Adress = form["adressName"],
-                    StartAt = DateTime.Parse(form["startAt"]!, CultureInfo.InvariantCulture),
-                    EndAt = DateTime.Parse(form["endAt"]!, CultureInfo.InvariantCulture),
+                    StartAt = DateTimeOffset.Parse(form["startAt"]!, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind).UtcDateTime,
+                    EndAt = DateTimeOffset.Parse(form["endAt"]!, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind).UtcDateTime,
                     Image = imageBytes,
                     ImageMimeType = mimeType
                 };

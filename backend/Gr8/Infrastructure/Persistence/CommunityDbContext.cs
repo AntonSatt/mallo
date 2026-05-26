@@ -1,6 +1,7 @@
 ﻿using Gr8.Domain.Entities;
 using Gr8.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Gr8.Infrastructure.Persistence
 {
@@ -25,6 +26,33 @@ namespace Gr8.Infrastructure.Persistence
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            var utcDateTimeConverter = new ValueConverter<DateTime, DateTime>(
+                toDb => toDb.Kind == DateTimeKind.Utc ? toDb : toDb.ToUniversalTime(),
+                fromDb => DateTime.SpecifyKind(fromDb, DateTimeKind.Utc));
+
+            var nullableUtcDateTimeConverter = new ValueConverter<DateTime?, DateTime?>(
+                toDb => toDb.HasValue
+                    ? (toDb.Value.Kind == DateTimeKind.Utc ? toDb.Value : toDb.Value.ToUniversalTime())
+                    : toDb,
+                fromDb => fromDb.HasValue
+                    ? DateTime.SpecifyKind(fromDb.Value, DateTimeKind.Utc)
+                    : fromDb);
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime))
+                    {
+                        property.SetValueConverter(utcDateTimeConverter);
+                    }
+                    else if (property.ClrType == typeof(DateTime?))
+                    {
+                        property.SetValueConverter(nullableUtcDateTimeConverter);
+                    }
+                }
+            }
 
             modelBuilder.Entity<Tag>().HasData(
                 new Tag { Name = "Självskada", Id = 1 },

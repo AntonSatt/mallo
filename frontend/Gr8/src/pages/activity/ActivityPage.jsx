@@ -20,11 +20,13 @@ import { Box, InputAdornment, Button, CircularProgress, Snackbar, Alert } from "
 import distance from "@turf/distance";
 import CalendarService from "../../services/CalanderService.jsx";
 
-const ActivityPage = () => {
+const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivityId }) => {
     const { currentUser } = useAuth();
     const currentUserId = currentUser?.sub;
 
-    const [markedDates, setMarkedDates] = useState([]);
+    const [selectedActivity, setSelectedActivity] = useState(null);
+    const feedScrollRef = useRef(null);
+    const mapInstanceRef = useRef(null);
 
     const [editActivity, setEditActivity] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
@@ -57,21 +59,48 @@ const ActivityPage = () => {
         ));
     };
 
-    // Load saved calendar activities on mount
+    // Fetch calendar activities from backend
     useEffect(() => {
+        if (!onMarkedDatesChange) return;
         CalendarService.getAll().then(res => {
-            const marked = res.data.map(item => ({
+            const data = Array.isArray(res.data) ? res.data : [];
+            const marked = data.map(item => ({
                 date: item.startAt,
                 activityId: item.activityId,
             }));
-            setMarkedDates(marked);
+            onMarkedDatesChange(marked);
+        }).catch(err => {
+            console.error("Kunde inte hämta kalenderaktiviteter", err);
         });
     }, []);
+
+    // Load saved calendar activities on mount
+    useEffect(() => {
+        if (!highlightedActivityId) return;
+
+        const activity = activities.find(a => a.id === highlightedActivityId);
+        if (!activity) return;
+
+        // Switch to list view
+        setAlignment('list');
+
+        // Use the same mechanism as map pin click
+        setTimeout(() => {
+            setSelectedActivity(activity);
+            const el = document.getElementById(`activity-card-${highlightedActivityId}`);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.click(); // expand the card
+            }
+        }, 150);
+    }, [highlightedActivityId, activities]);
 
     const handleAddToCalendar = async (activity) => {
         try {
             await CalendarService.add(activity.id);
-            setMarkedDates(prev => [...prev, { date: activity.startAt, activityId: activity.id }]);
+            if (onMarkedDatesChange) {
+                onMarkedDatesChange(prev => [...prev, { date: activity.startAt, activityId: activity.id }]);
+            }
         } catch (error) {
             if (error.response?.status !== 409) {
                 console.error("Kunde inte lägga till aktiviteten i kalendern.");
@@ -475,6 +504,8 @@ const ActivityPage = () => {
                     currentUserId={currentUserId}
                     onBookmarkToggle={handleBookmarkToggle}
                     onSelectActivity={setSelectedActivity}
+                    onAddToCalendar={handleAddToCalendar}
+                    highlightedActivityId={highlightedActivityId}
                 />
             </Box>
 

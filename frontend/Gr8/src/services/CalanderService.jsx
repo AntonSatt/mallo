@@ -1,9 +1,9 @@
-import axios from 'axios';
+import ApiClient from "../api/ApiClient";
 
 const CalendarService = {
-    getAll: () => axios.get('/map/activities/calendar'),
-    add: (activityId) => axios.post(`/map/activities/${activityId}/calendar`),
-    remove: (activityId) => axios.delete(`/map/activities/${activityId}/calendar`),
+    getAll: () => ApiClient.get('/map/activities/calendar'),
+    add: (activityId) => ApiClient.post(`/map/activities/${activityId}/calendar`),
+    remove: (activityId) => ApiClient.delete(`/map/activities/${activityId}/calendar`),
 };
 
 export default CalendarService;

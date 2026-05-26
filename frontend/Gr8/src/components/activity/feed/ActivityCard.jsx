@@ -20,9 +20,10 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import LinkIcon from '@mui/icons-material/Link';
 
 
-const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookmarkToggle, onAddToCalendar, isHighlighted }) => {
-    const [expanded, setExpanded] = useState(false);
+const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookmarkToggle, onAddToCalendar, isHighlighted, markedDates }) => {
     const [isBookmarked, setIsBookmarked] = useState(activity.isBookmarked ?? false);
+
+    const [expanded, setExpanded] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -31,7 +32,11 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
 
     const isOwner = currentUserId === activity.userId;
     const dateText = dayjs(activity.startAt).format('D MMMM');
-    const timeText = dayjs(activity.startAt).format('[Kl.] HH:mm');
+    const timeText = dayjs(activity.startAt).format('[Kl.] HH:mm');    
+
+    const [addedToCalendar, setAddedToCalendar] = useState(
+        markedDates?.some(m => m.activityId === activity.id) ?? false
+    );
 
     const handleExpand = () => {
         setExpanded(!expanded);
@@ -88,8 +93,6 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
             setLoading(false);
         }
     };
-
-    const [addedToCalendar, setAddedToCalendar] = useState(false);
 
     const handleAddToCalendar = (e) => {
         e.stopPropagation();

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ActivityServices from "../../../services/ActivityService.jsx";
 import { Paper, Box, Typography, IconButton, Collapse, Dialog } from "@mui/material";
@@ -16,10 +16,11 @@ import ReportOutlinedIcon from '@mui/icons-material/ReportOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import CloseIcon from "../../../assets/icons/closeIcon.svg";
 import BookmarkButton from "../../bookmarkButton/BookmarkButton.jsx";
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import LinkIcon from '@mui/icons-material/Link';
 
 
-const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookmarkToggle }) => {
+const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookmarkToggle, onAddToCalendar, isHighlighted }) => {
     const [expanded, setExpanded] = useState(false);
     const [isBookmarked, setIsBookmarked] = useState(activity.isBookmarked ?? false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -87,6 +88,21 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
             setLoading(false);
         }
     };
+
+    const [addedToCalendar, setAddedToCalendar] = useState(false);
+
+    const handleAddToCalendar = (e) => {
+        e.stopPropagation();
+        if (addedToCalendar) return;
+        setAddedToCalendar(true);
+        onAddToCalendar?.(activity);
+    };
+
+    useEffect(() => {
+        if (isHighlighted) {
+            setExpanded(true);
+        }
+    }, [isHighlighted]);
 
     return (
         <Paper elevation={2}
@@ -317,13 +333,15 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                         </SecondaryButton>
 
                         <SecondaryButton
-                            startIcon={<TodayOutlinedIcon sx={{ color: "var(--color-primary)", fontSize: "25px !important" }} />}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                            }}
+                            startIcon={
+                                addedToCalendar
+                                    ? <TaskAltIcon sx={{ color: "var(--color-primary)", fontSize: "25px !important" }} />
+                                    : <TodayOutlinedIcon sx={{ color: "var(--color-primary)", fontSize: "25px !important" }} />
+                            }
+                            onClick={handleAddToCalendar}
                             sx={{ borderRadius: '20px', height: '40px', width: "180px", whiteSpace: 'nowrap', ml: "auto" }}
                         >
-                            Lägg till aktivitet
+                            {addedToCalendar ? "Tillagd!" : "Lägg till aktivitet"}
                         </SecondaryButton>
                     </Box>
                 </Box>

@@ -270,5 +270,26 @@ namespace Gr8.Infrastructure.Persistence.Repositories
                 .Where(ab => ab.UserId == userId)
                 .ToListAsync();
         }
+        public async Task<List<ActivityCalender>> GetUserCalendarActivitiesAsync(string userId)
+        {
+            return await _communityDbContext.ActivityCalenders
+                .Where(ac => ac.UserId == userId)
+                .Include(ac => ac.Activity)
+                .ToListAsync();
+        }
+        public async Task AddUserCalendarActivityAsync(ActivityCalender entry)
+        {
+            await _communityDbContext.ActivityCalenders.AddAsync(entry);
+        }
+        public Task RemoveUserCalendarActivityAsync(ActivityCalender entry)
+        {
+            _communityDbContext.ActivityCalenders.Remove(entry);
+            return Task.CompletedTask;
+        }
+        public async Task<ActivityCalender?> GetUserCalendarActivityAsync(string userId, int activityId)
+        {
+            return await _communityDbContext.ActivityCalenders
+                .FirstOrDefaultAsync(ac => ac.UserId == userId && ac.ActivityId == activityId);
+        }
     }
 }

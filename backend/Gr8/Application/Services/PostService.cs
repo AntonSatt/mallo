@@ -158,7 +158,7 @@ namespace Gr8.Application.Services
             oldPost.Title = updatePostDto.Title;
             oldPost.Content = updatePostDto.Content;
             oldPost.IsEdited = true;
-            oldPost.UpdatedAt = DateTime.Now;
+            oldPost.UpdatedAt = DateTime.UtcNow;
 
             var updatedTags = await _communityRepository.GetTagsByIdAsync(updatePostDto.TagIds);
             if (updatedTags.Count > 0)

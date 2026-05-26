@@ -8,5 +8,10 @@ const NotificationService = {
     markAsSeen: async (notificationId) => {
         await ApiClient.put(`/forum/notifications/${notificationId}/seen`);
     },
+    saveFirebaseToken: async (token) => {
+        await ApiClient.post("/notifications/firebase-token", {
+            token: token
+        });
+    },
 }
 export default NotificationService; 

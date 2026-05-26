@@ -17,6 +17,7 @@
     align-items: center;
     gap: 10px;
     padding: 16px 10px !important;
+    flex-shrink: 0;
 }
 
 .settings-button:hover {
@@ -31,32 +32,8 @@
     padding: 0 8px;
 }
 
-.switch-button {
-    width: 116px;
-    height: 87px;
-    background-color: var(--color-primary-soft) !important;
-    border-radius: 20px;
-    box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);;
-    border: 0;
-    color: var(--color-text-main);
-    justify-content: center;
-    transition: background-color 0.2s ease;
-}
-
-.switch-button:hover {
-    background-color: #ffe4b5 !important;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
-}
-
-.switch-label {
-    color: var(--color-text-main);
-    font-size: 15px !important;
-    font-weight: 700 !important;
-    line-height: 1.2;
-}
-
 .settingsSwitch .MuiSwitch-track {
-    background-color: var(--color-bg-surface) !important;
+    background-color: #ffffff !important;
     opacity: 1 !important;
     border-radius: 13px !important;
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -82,6 +59,70 @@
 .settingsSwitch .MuiSwitch-switchBase.Mui-checked {
     transform: translateX(20px) !important;
     color: var(--color-primary) !important;
+}
+
+.settingsSwitch .MuiSwitch-switchBase.Mui-checked+.MuiSwitch-track {
+    background-color: var(--color-primary-soft) !important;
+    opacity: 1 !important;
+}
+
+.switch-row-summary.MuiButtonBase-root,
+.switch-row-summary .MuiAccordionSummary-content,
+.switch-row-summary .MuiAccordionSummary-content * {
+    cursor: default !important;
+}
+
+.switch-row-summary .settingsSwitch,
+.switch-row-summary .settingsSwitch * {
+    cursor: pointer !important;
+}
+
+.permissionStateActions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.permissionStateBadge {
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+}
+
+.permissionState-granted {
+    background-color: #e9f6ee;
+    color: #2e7d32;
+}
+
+.permissionState-denied {
+    background-color: #fdecec;
+    color: #c62828;
+}
+
+.permissionState-prompt {
+    background-color: var(--color-primary-soft);
+    color: var(--color-text-main);
+}
+
+.permissionStateCta.MuiButtonBase-root {
+    min-width: 0;
+    border-radius: 999px;
+    border: 1px solid var(--color-border-light);
+    background-color: var(--color-primary-soft);
+    color: var(--color-text-main);
+    font-weight: 700;
+    text-transform: none;
+    padding: 4px 12px;
+}
+
+.permissionStateCta.MuiButtonBase-root:hover {
+    background-color: #ffe4b5;
+}
+
+.switch-row-summary .permissionStateCta,
+.switch-row-summary .permissionStateCta * {
+    cursor: pointer !important;
 }
 
 .dropdown {
@@ -110,7 +151,7 @@
         height: auto;
         margin: 0 auto;
         background-color: var(--button-secondary-bg);
-        border-radius: 10px;
+        border-radius: 16px;
         padding: 16px;
         box-sizing: border-box;
         overflow: hidden;
@@ -127,5 +168,25 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         border-radius: 20px !important;
         margin: 10px;
+    }
+
+}
+
+@media (max-width: 480px) {
+    .settings-top-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        padding: 0;
+        margin: 12px 0;
+    }
+
+    .settings-button {
+        width: 100%;
+        height: 82px;
+        padding: 12px 6px !important;
+        font-size: clamp(13px, 3.6vw, 15px) !important;
+        gap: 8px;
+        white-space: nowrap;
     }
 }

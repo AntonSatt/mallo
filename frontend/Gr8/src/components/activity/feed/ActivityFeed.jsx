@@ -41,6 +41,7 @@ const ActivityFeed = ({ activities, currentUserId, onCardAction, onSelectActivit
                                 onBookmarkToggle={onBookmarkToggle}
                                 onAddToCalendar={onAddToCalendar}
                                 isHighlighted={highlightedActivityId === activity.id}
+                                imageUrl={activity.imageUrl}
                             />
                         </Box>
                     ))

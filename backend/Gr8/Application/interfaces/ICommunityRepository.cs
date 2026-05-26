@@ -46,6 +46,10 @@ namespace Gr8.Application.Interfaces
         Task AddUserCalendarActivityAsync(ActivityCalender entry);
         Task RemoveUserCalendarActivityAsync(ActivityCalender entry);
         Task<ActivityCalender?> GetUserCalendarActivityAsync(string userId, int activityId);
+        Task<List<PostNotification>> GetAllNotificationsByUserIdAsync(string userId);
+        Task<PostNotification?> GetNotificationByIdAsync(int notificationId);
+        Task AddPostNotificationAsync(PostNotification notification);
+        void RemovePostNotifications(PostNotification notification);
         Task<int> GetActivityCalendarCountAsync(int activityId);
     }
 }

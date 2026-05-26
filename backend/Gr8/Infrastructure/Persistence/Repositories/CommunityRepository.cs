@@ -270,6 +270,7 @@ namespace Gr8.Infrastructure.Persistence.Repositories
                 .Where(ab => ab.UserId == userId)
                 .ToListAsync();
         }
+
         public async Task<List<ActivityCalender>> GetUserCalendarActivitiesAsync(string userId)
         {
             return await _communityDbContext.ActivityCalenders
@@ -277,19 +278,42 @@ namespace Gr8.Infrastructure.Persistence.Repositories
                 .Include(ac => ac.Activity)
                 .ToListAsync();
         }
+
         public async Task AddUserCalendarActivityAsync(ActivityCalender entry)
         {
             await _communityDbContext.ActivityCalenders.AddAsync(entry);
         }
+
         public Task RemoveUserCalendarActivityAsync(ActivityCalender entry)
         {
             _communityDbContext.ActivityCalenders.Remove(entry);
             return Task.CompletedTask;
         }
+
         public async Task<ActivityCalender?> GetUserCalendarActivityAsync(string userId, int activityId)
         {
             return await _communityDbContext.ActivityCalenders
                 .FirstOrDefaultAsync(ac => ac.UserId == userId && ac.ActivityId == activityId);
+        }
+
+        public async Task<List<PostNotification>> GetAllNotificationsByUserIdAsync(string userId)
+        {
+            return await _communityDbContext.PostNotifications.Where(pn => pn.UserId == userId).ToListAsync();
+        }
+
+        public async Task<PostNotification?> GetNotificationByIdAsync(int notificationId)
+        {
+            return await _communityDbContext.PostNotifications.FirstOrDefaultAsync(pn => pn.Id == notificationId);
+        }
+
+        public async Task AddPostNotificationAsync(PostNotification notification)
+        {
+            await _communityDbContext.PostNotifications.AddAsync(notification);
+        }
+
+        public void RemovePostNotifications(PostNotification notification)
+        {
+             _communityDbContext.PostNotifications.Remove(notification);
         }
         public async Task<int> GetActivityCalendarCountAsync(int activityId)
         {

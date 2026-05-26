@@ -14,7 +14,6 @@ const LoginForm = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
 
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -37,7 +36,7 @@ const LoginForm = () => {
     }
 
     try {
-      await login({ userName, password, rememberMe });
+      await login({ userName, password });
       navigate('/forum');
     } catch (err) {
 
@@ -56,10 +55,6 @@ const LoginForm = () => {
 
   const handleForgotPassword = () => {
     navigate('/forgot-password');
-  };
-
-  const handleRememberMe = () => {
-    // Handle remember me logic
   };
 
   return (
@@ -131,27 +126,6 @@ const LoginForm = () => {
         <Typography variant="h9" align="center" sx={{ cursor: "pointer", color: "var(--color-border-light)", fontWeight: 540 }} onClick={handleForgotPassword}>
           Glömt ditt lösenord?
         </Typography>
-
-        <Box
-          onClick={() => setRememberMe(!rememberMe)}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 1,
-            cursor: "pointer",
-            userSelect: "none"
-          }}
-        >
-          {rememberMe ? (
-            <CheckCircleIcon sx={{ color: "var(--color-primary)", fontSize: "16px" }} />
-          ) : (
-            <CircleOutlinedIcon sx={{ color: "var(--color-primary)", fontSize: "16px", mb: 0.3 }} />
-          )}
-          <Typography variant="body2">
-            Kom ihåg mina inloggningsuppgifter
-          </Typography>
-        </Box>
 
         <Grid>
           <PrimaryButton type="submit" sx={{ height: 40, mt: 2 }}>

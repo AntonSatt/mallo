@@ -1,4 +1,5 @@
-﻿using Gr8.Application.DTOs;
+﻿using Gr8.Application.Common.Constants;
+using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
 using System;
@@ -12,11 +13,13 @@ namespace Gr8.Application.Services
     {
         private readonly ICommunityRepository _communityRepository;
         private readonly IApplicationRepository _applicationRepository;
+        private readonly INotificationService _notificationService;
 
-        public CommentService(ICommunityRepository communityRepository, IApplicationRepository applicationRepository)
+        public CommentService(ICommunityRepository communityRepository, IApplicationRepository applicationRepository, INotificationService notificationService)
         {
             _communityRepository = communityRepository;
             _applicationRepository = applicationRepository;
+            _notificationService = notificationService;
         }
 
         public async Task<List<CommentDto>> GetCommentsByPostAsync(int postId)
@@ -86,6 +89,8 @@ namespace Gr8.Application.Services
             };
 
             resultDto.AuthorInfo.UserName = await ResolveAuthorNameAsync(comment.UserId, comment.AuthorDisplayName);
+
+            await _notificationService.AddNotificationAsync(postId, NotificationTypes.CommentCreated, comment.UserId);
 
             return resultDto;
         }

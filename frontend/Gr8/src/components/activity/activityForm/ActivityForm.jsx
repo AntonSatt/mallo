@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Dialog, Box, Typography, Paper, Stack, CircularProgress, IconButton } from "@mui/material";
+import { Dialog, Box, Typography, Paper, Stack, CircularProgress, IconButton, DialogContent } from "@mui/material";
 import LinkIcon from '@mui/icons-material/Link';
 import SecondaryButton from "../../../design/buttons/SecondaryButton.jsx";
 import ActivityServices from "../../../services/ActivityService.jsx";
@@ -13,7 +13,6 @@ import 'dayjs/locale/sv';
 import CalendarPicker from "../calender/CalenderPicker.jsx";
 import TimePicker from "../time/TimePicker.jsx";
 import InputField from "../../../design/input/InputField.jsx";
-import CloseIcon from '@mui/icons-material/Close';
 
 dayjs.locale('sv');
 
@@ -36,6 +35,7 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
         adressName: "",
         startAt: dayjs(),
         endAt: dayjs(),
+        hasSelectedDate: false
     });
 
     const [selectedImage, setSelectedImage] = useState(null);
@@ -69,6 +69,7 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                     adressName: activityToEdit.adress || activityToEdit.Adress || activityToEdit.adressName || "",
                     startAt: dayjs(activityToEdit.startAt),
                     endAt: dayjs(activityToEdit.endAt),
+                    hasSelectedDate: true
                 });
                 setImagePreview(activityToEdit.imageUrl || null);
             } else {
@@ -82,6 +83,7 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                     adressName: "",
                     startAt: dayjs(),
                     endAt: dayjs(),
+                    hasSelectedDate: false
                 });
                 setSelectedImage(null);
                 setImagePreview(null);
@@ -109,6 +111,21 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
 
         if (!formData.adressName) {
             alert("Du måste välja en plats innan du publicerar.");
+            return;
+        }
+
+        if (!formData.title) {
+            alert("Du måste fylla i en titel.");
+            return;
+        }
+
+        if (!formData.description) {
+            alert("Du måste fylla i en beskrivning.");
+            return;
+        }
+
+        if (!formData.startAt || !formData.endAt) {
+            alert("Du måste fylla i start- och sluttid.");
             return;
         }
 
@@ -220,6 +237,40 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 style={{ width: '100%', border: 'none', outline: 'none', resize: 'none', fontSize: '1rem' }}
                             />
+
+                            {/* Live view of adress and date during creation/editing */}
+                            {(formData.adressName || formData.hasSelectedDate) && (
+                                <Box sx={{
+                                    mt: 2,
+                                    pt: 2,
+                                    borderTop: '1px solid var(--color-border-light)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 1
+                                }}>
+                                    {formData.adressName && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <FmdGoodOutlinedIcon sx={{ color: "var(--color-primary)", fontSize: '1.2rem' }} />
+                                            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                                {formData.adressName.includes(',')
+                                                    ? formData.adressName.split(',')[0].trim()
+                                                    : formData.adressName
+                                                }
+                                            </Typography>
+                                        </Box>
+                                    )}
+
+                                    {formData.hasSelectedDate && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <CalendarMonthOutlinedIcon sx={{ color: "var(--color-primary)", fontSize: '1.2rem' }} />
+                                            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                                {dayjs(formData.startAt).format("D MMMM YYYY, [kl.] HH:mm")}
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </Box>
+                            )}
+
                             <Box sx={{ mt: 2, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, alignItems: 'center' }}>
                                 <InputField startIcon={<LinkIcon sx={{ color: "var(--color-primary)" }} />}
                                     value={formData.Url || ""}
@@ -316,9 +367,18 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                 value={calendarMode === 'start' ? formData.startAt : formData.endAt}
                 onChange={(newDate) => {
                     if (calendarMode === 'start') {
-                        setFormData({ ...formData, startAt: newDate, endAt: newDate });
+                        setFormData({
+                            ...formData,
+                            startAt: newDate,
+                            endAt: newDate,
+                            hasSelectedDate: true
+                        });
                     } else {
-                        setFormData({ ...formData, endAt: newDate });
+                        setFormData({
+                            ...formData,
+                            endAt: newDate,
+                            hasSelectedDate: true
+                        });
                     }
                     setCalendarOpen(false);
                     setTimeConfigOpen(true);

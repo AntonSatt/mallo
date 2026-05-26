@@ -17,6 +17,8 @@ namespace Gr8.Infrastructure.Persistence
         public DbSet<Activity> Activities => Set<Activity>();
         public DbSet<ActivityBookmark> ActivityBookmarks => Set<ActivityBookmark>();
         public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
+        public DbSet<ActivityCalender> ActivityCalenders => Set<ActivityCalender>();
+        public DbSet<PostNotification> PostNotifications => Set<PostNotification>();
 
         public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
         {
@@ -273,7 +275,7 @@ namespace Gr8.Infrastructure.Persistence
                 entity.HasIndex(b => new { b.UserId, b.PostId }).IsUnique();
             });
 
-            modelBuilder.Entity<ChatMessage>(entity => 
+            modelBuilder.Entity<ChatMessage>(entity =>
             {
                 entity.HasKey(cm => cm.Id);
 
@@ -303,6 +305,44 @@ namespace Gr8.Infrastructure.Persistence
 
                 //Ensures fast loading of chat history by indexing the relationship between sender and receiver.
                 entity.HasIndex(cm => new { cm.SenderId, cm.ReceiverId });
+            });
+
+            modelBuilder.Entity<ActivityCalender>(entity =>
+            {
+                entity.HasKey(ac => ac.Id);
+
+                entity.HasOne(ac => ac.Activity)
+                    .WithMany()
+                    .HasForeignKey(ac => ac.ActivityId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne<ApplicationUser>()
+                    .WithMany()
+                    .HasForeignKey(ac => ac.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(ac => new { ac.UserId, ac.ActivityId }).IsUnique();
+            });
+
+            modelBuilder.Entity<PostNotification>(entity =>
+            {
+                entity.HasKey(pn => pn.Id);
+
+                entity.Property(pn => pn.Title)
+                .IsRequired()
+                .HasMaxLength(500);
+
+                entity.Property(pn => pn.Type)
+               .IsRequired()
+               .HasMaxLength(500);
+
+                entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(pn => pn.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(pn => pn.UserId);
             });
         }
     }

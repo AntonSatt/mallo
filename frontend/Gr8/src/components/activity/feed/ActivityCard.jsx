@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ActivityServices from "../../../services/ActivityService.jsx";
 import { Paper, Box, Typography, IconButton, Collapse, Dialog } from "@mui/material";
@@ -16,12 +16,12 @@ import ReportOutlinedIcon from '@mui/icons-material/ReportOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import CloseIcon from "../../../assets/icons/closeIcon.svg";
 import BookmarkButton from "../../bookmarkButton/BookmarkButton.jsx";
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import LinkIcon from '@mui/icons-material/Link';
 
 
-const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookmarkToggle }) => {
+const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookmarkToggle, onAddToCalendar, isHighlighted, markedDates, scrollingActivityId, clearScrollingActivityId }) => {
     const [expanded, setExpanded] = useState(false);
-    const [isBookmarked, setIsBookmarked] = useState(activity.isBookmarked ?? false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -32,19 +32,24 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
     const dateText = dayjs(activity.startAt).format('D MMMM');
     const timeText = dayjs(activity.startAt).format('[Kl.] HH:mm');
 
+    const [addedToCalendar, setAddedToCalendar] = useState(
+        markedDates?.some(m => m.activityId === activity.id) ?? false
+    );
+
+    useEffect(() => {
+        if (scrollingActivityId && scrollingActivityId === activity.id) {
+            setExpanded(true);
+
+            //When card is expanded, scroll to it
+            if (clearScrollingActivityId) {
+                clearScrollingActivityId();
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [scrollingActivityId, activity.id]);
+
     const handleExpand = () => {
         setExpanded(!expanded);
-    };
-
-    const handleBookmarkedClick = async (e) => {
-        e.stopPropagation();
-        try {
-            const response = await ActivityServices.toggleBookmark(activity.id);
-            setIsBookmarked(response.data.isBookmarked);
-            onBookmarkToggle(activity.id, response.data.isBookmarked);
-        } catch (error) {
-            setError("Kunde inte bokmärka aktiviteten. Försök igen.");
-        }
     };
 
     // Open 3 dots menu
@@ -88,6 +93,19 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
         }
     };
 
+    const handleAddToCalendar = (e) => {
+        e.stopPropagation();
+        if (addedToCalendar) return;
+        setAddedToCalendar(true);
+        onAddToCalendar?.(activity);
+    };
+
+    useEffect(() => {
+        if (isHighlighted) {
+            setExpanded(true);
+        }
+    }, [isHighlighted]);
+
     return (
         <Paper elevation={2}
             onClick={handleExpand}
@@ -115,15 +133,23 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                 }}>
                     {activity.title}
                 </Typography>
-                <BookmarkButton
-                    isBookmarked={activity.isBookmarked}
-                    onToggle={async () => {
-                        const result = await ActivityServices.toggleBookmark(activity.id);
-                        onBookmarkToggle(activity.id, result.isBookmarked);
-                        return result.isBookmarked;
-                    }}
-                    savedText="Du har sparat aktiviteten"
-                />
+                <Box onClick={(e) => e.stopPropagation()} sx={{ paddingTop: 1, paddingRight: 1 }}>
+                    <BookmarkButton
+                        isBookmarked={activity.isBookmarked}
+                        onToggle={async () => {
+                            try {
+                                const response = await ActivityServices.toggleBookmark(activity.id);
+                                const newBookmarkStatus = response.data ? response.data.isBookmarked : response.isBookmarked;
+                                onBookmarkToggle(activity.id, newBookmarkStatus);
+                                return newBookmarkStatus;
+                            } catch (err) {
+                                console.error("Kunde inte toggla bokmärke", err);
+                                return activity.isBookmarked;
+                            }
+                        }}
+                        savedText="Du har sparat aktiviteten"
+                    />
+                </Box>
             </Box>
 
             {/* Bottom part - white info*/}
@@ -155,8 +181,8 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                 </Box>
 
                 <Box sx={{ textAlign: 'center', flex: 1, pr: 2 }}>
-                    <Typography variant="body1" sx={{ color: "var( --color-ui-muted)" }}>
-                        <span style={{ fontWeight: 600 }}>27 </span>anmälda
+                    <Typography variant="body1" sx={{ color: "var(--color-ui-muted)" }}>
+                        <span style={{ fontWeight: 600 }}>{activity.calendarCount ?? 0} </span>anmälda
                     </Typography>
                 </Box>
 
@@ -317,13 +343,15 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                         </SecondaryButton>
 
                         <SecondaryButton
-                            startIcon={<TodayOutlinedIcon sx={{ color: "var(--color-primary)", fontSize: "25px !important" }} />}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                            }}
+                            startIcon={
+                                addedToCalendar
+                                    ? <TaskAltIcon sx={{ color: "var(--color-primary)", fontSize: "25px !important" }} />
+                                    : <TodayOutlinedIcon sx={{ color: "var(--color-primary)", fontSize: "25px !important" }} />
+                            }
+                            onClick={handleAddToCalendar}
                             sx={{ borderRadius: '20px', height: '40px', width: "180px", whiteSpace: 'nowrap', ml: "auto" }}
                         >
-                            Lägg till aktivitet
+                            {addedToCalendar ? "Tillagd!" : "Lägg till aktivitet"}
                         </SecondaryButton>
                     </Box>
                 </Box>

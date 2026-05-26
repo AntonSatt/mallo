@@ -1,5 +1,5 @@
 import { useAuth } from "../../hooks/useAuth";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import ActivityServices from "../../services/ActivityService.jsx";
 import ActivityForm from "../../components/activity/activityForm/ActivityForm.jsx";
 import ActivityFilter from "../../components/activity/feed/ActivityFilter.jsx";
@@ -16,8 +16,11 @@ import TodayOutlinedIcon from '@mui/icons-material/TodayOutlined';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import { Box, InputAdornment, Button, CircularProgress, Snackbar, Alert } from "@mui/material";
+import { Box, InputAdornment, Button, CircularProgress, Snackbar, Alert, Dialog, IconButton, Typography } from "@mui/material";
+import CloseIcon from '@mui/icons-material/Close';
+
 import distance from "@turf/distance";
+import CalendarService from "../../services/CalanderService.jsx";
 import {
     PERMISSION_STATE,
     PERMISSION_TYPE,
@@ -26,13 +29,14 @@ import {
     requestPermission
 } from "../../utils/browserPermissions.js";
 
-const ActivityPage = () => {
+const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivityId }) => {
     const { currentUser } = useAuth();
     const currentUserId = currentUser?.sub;
 
-    const mapInstanceRef = useRef(null);
-    const feedScrollRef = useRef(null);
     const [selectedActivity, setSelectedActivity] = useState(null);
+    const feedScrollRef = useRef(null);
+    const mapInstanceRef = useRef(null);
+
     const [editActivity, setEditActivity] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [activities, setActivities] = useState([]);
@@ -43,6 +47,9 @@ const ActivityPage = () => {
     const [filterOpen, setFilterOpen] = useState(false);
     const [userCoords, setUserCoords] = useState(null);
     const [geolocationPermissionState, setGeolocationPermissionState] = useState(PERMISSION_STATE.PROMPT);
+    const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+    const [latestCreatedId, setLatestCreatedId] = useState(null);
+    const [scrollingActivityId, setScrollingActivityId] = useState(null);
     const [activeFilters, setActiveFilters] = useState({
         nearby: false,
         yourActivities: false,
@@ -54,6 +61,7 @@ const ActivityPage = () => {
         message: "",
         severity: "success"
     });
+
     const handleCloseToast = (event, reason) => {
         if (reason === 'clickaway') return;
         setToast(prev => ({ ...prev, open: false }));
@@ -63,6 +71,55 @@ const ActivityPage = () => {
         setActivities(prev => prev.map(a =>
             a.id === activityId ? { ...a, isBookmarked } : a
         ));
+    };
+
+    // Fetch calendar activities from backend
+    useEffect(() => {
+        if (!onMarkedDatesChange) return;
+        CalendarService.getAll().then(res => {
+            const data = Array.isArray(res.data) ? res.data : [];
+            const marked = data.map(item => ({
+                date: item.startAt,
+                activityId: item.activityId,
+            }));
+            onMarkedDatesChange(marked);
+        }).catch(err => {
+            console.error("Kunde inte hämta kalenderaktiviteter", err);
+        });
+    }, []);
+
+    // Load saved calendar activities on mount
+    useEffect(() => {
+        if (!highlightedActivityId) return;
+
+        const activity = activities.find(a => a.id === highlightedActivityId);
+        if (!activity) return;
+
+        // Switch to list view
+        setAlignment('list');
+
+        // Use the same mechanism as map pin click
+        setTimeout(() => {
+            setSelectedActivity(activity);
+            const el = document.getElementById(`activity-card-${highlightedActivityId}`);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.click(); // expand the card
+            }
+        }, 150);
+    }, [highlightedActivityId, activities]);
+
+    const handleAddToCalendar = async (activity) => {
+        try {
+            await CalendarService.add(activity.id);
+            if (onMarkedDatesChange) {
+                onMarkedDatesChange(prev => [...prev, { date: activity.startAt, activityId: activity.id }]);
+            }
+        } catch (error) {
+            if (error.response?.status !== 409) {
+                console.error("Kunde inte lägga till aktiviteten i kalendern.");
+            }
+        }
     };
 
     const handleOpenForm = () => {
@@ -75,17 +132,38 @@ const ActivityPage = () => {
         setEditActivity(null);
     };
 
+    // Show activity after creating it - scroll to it and open the card
+    const handleShowActivity = () => {
+        if (!latestCreatedId) return;
+
+        setShowSuccessDialog(false);
+
+        setTimeout(() => {
+            const element = document.getElementById(`activity-card-${latestCreatedId}`);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Id for expanding card
+                setScrollingActivityId(latestCreatedId);
+            }
+        }, 100);
+    };
+
+    const clearScrollingActivityId = () => {
+        setScrollingActivityId(null);
+    };
+
     // Handles both create and edit Activity
     const handleFormSuccess = (savedActivity) => {
         setIsFormOpen(false);
 
-        setActivities(prevActivities => {
-            const formattedSavedActivity = {
-                ...savedActivity,
-                imageUrl: savedActivity.image ? `data:${savedActivity.imageMimeType || 'image/jpeg'};base64,${savedActivity.image}` : null,
-                adress: savedActivity.adress ? savedActivity.adress.split(',')[0].trim() : savedActivity.adress
-            };
+        const formattedSavedActivity = {
+            ...savedActivity,
+            imageUrl: savedActivity.image ? `data:${savedActivity.imageMimeType || 'image/jpeg'};base64,${savedActivity.image}` : null,
+            adress: savedActivity.adress ? savedActivity.adress.split(',')[0].trim() : savedActivity.adress
+        };
 
+        setActivities(prevActivities => {
             const exists = prevActivities.some(act => act.id === formattedSavedActivity.id);
 
             if (exists) {
@@ -101,9 +179,12 @@ const ActivityPage = () => {
                 message: "Aktiviteten har redigerats!",
                 severity: "success"
             });
+            setEditActivity(null);
+        } else {
+            // Save Id for the newly created activity so we can scroll to it and open it after closing the form
+            setLatestCreatedId(formattedSavedActivity.id);
+            setShowSuccessDialog(true);
         }
-
-        setEditActivity(null);
     };
 
     const handleChange = (event, newAlignment) => {
@@ -141,7 +222,7 @@ const ActivityPage = () => {
                     ActivityServices.getBookmarks()
                 ]);
 
-                const bookmarkedIds = new Set(bookmarksData.map(b => b.actvityId));
+                const bookmarkedIds = new Set(bookmarksData.map(b => b.activityId || b.actvityId));
                 const activitiesWithBookmarks = (activitiesData || []).map(a => ({
                     ...a,
                     isBookmarked: bookmarkedIds.has(a.id),
@@ -216,58 +297,66 @@ const ActivityPage = () => {
         }
     }, [geolocationPermissionState, userCoords]);
     // Apply filters to activities
-    const filteredActivities = activities
-        .map(activity => {
-            if (userCoords) {
-                const from = [userCoords.lng, userCoords.lat];
-                const to = [activity.longitude, activity.latitude];
-                const distanceInMeters = distance(from, to, { units: 'meters' });
-                return { ...activity, distanceMeters: distanceInMeters };
-            }
-            return activity;
-        })
-        .filter(activity => {
-            // Search filter
-            if (searchQuery.trim()) {
-                const q = searchQuery.toLowerCase();
-                if (
-                    !activity.title?.toLowerCase().includes(q) &&
-                    !activity.description?.toLowerCase().includes(q)
-                ) return false;
-            }
+    const filteredActivities = useMemo(() => {
+        return activities
+            .map(activity => {
+                if (userCoords) {
+                    const from = [userCoords.lng, userCoords.lat];
+                    const to = [activity.longitude, activity.latitude];
+                    const distanceInMeters = distance(from, to, { units: 'meters' });
+                    return { ...activity, distanceMeters: distanceInMeters };
+                }
+                return activity;
+            })
+            .filter(activity => {
+                // Search filter
+                if (searchQuery.trim()) {
+                    const q = searchQuery.toLowerCase();
+                    if (
+                        !activity.title?.toLowerCase().includes(q) &&
+                        !activity.description?.toLowerCase().includes(q)
+                    ) return false;
+                }
 
-            // Nearby filter
-            if (activeFilters.nearby) {
-                if (geolocationPermissionState === PERMISSION_STATE.DENIED || !userCoords) return false;
-                if (activity.distanceMeters > 7000) return false;
-            }
+                // Nearby filter
+                if (activeFilters.nearby) {
+                    if (geolocationPermissionState === PERMISSION_STATE.DENIED || !userCoords) return false;
+                    if (activity.distanceMeters > 7000) return false;
+                }
 
-            // Your activities filter
-            if (activeFilters.yourActivities) {
-                if (!currentUserId) return false;
-                if (activity.userId !== currentUserId) return false;
-            }
+                // Your activities filter
+                if (activeFilters.yourActivities) {
+                    if (!currentUserId) return false;
+                    if (activity.userId !== currentUserId) return false;
+                }
 
-            // Time filter
-            if (activeFilters.time) {
-                const now = new Date();
-                const activityEnd = new Date(activity.endAt);
-                if (activityEnd < now) return false;
-            }
+                // Time filter
+                if (activeFilters.time) {
+                    const now = new Date();
+                    const activityEnd = new Date(activity.endAt);
+                    if (activityEnd < now) return false;
+                }
 
-            return true;
-        })
-        .sort((a, b) => {
-            if (activeFilters.time) {
-                const timeA = new Date(a.startAt).getTime();
-                const timeB = new Date(b.startAt).getTime();
-                return timeA - timeB;
-            }
-            if (a.distanceMeters && b.distanceMeters) {
-                return a.distanceMeters - b.distanceMeters;
-            }
-            return 0;
-        });
+                // Saved activities filter
+                if (activeFilters.savedActivities) {
+                    if (!currentUserId) return false;
+                    if (!activity.isBookmarked) return false;
+                }
+
+                return true;
+            })
+            .sort((a, b) => {
+                if (activeFilters.time) {
+                    const timeA = new Date(a.startAt).getTime();
+                    const timeB = new Date(b.startAt).getTime();
+                    return timeA - timeB;
+                }
+                if (a.distanceMeters && b.distanceMeters) {
+                    return a.distanceMeters - b.distanceMeters;
+                }
+                return 0;
+            });
+    }, [activities, userCoords, searchQuery, activeFilters, currentUserId]);
 
     return (
 
@@ -376,7 +465,6 @@ const ActivityPage = () => {
                                 height: "24px"
                             }}
                         />
-
                     </Button>
 
                     <PrimaryButton
@@ -508,6 +596,11 @@ const ActivityPage = () => {
                     currentUserId={currentUserId}
                     onBookmarkToggle={handleBookmarkToggle}
                     onSelectActivity={setSelectedActivity}
+                    onAddToCalendar={handleAddToCalendar}
+                    highlightedActivityId={highlightedActivityId}
+                    markedDates={markedDates}
+                    scrollingActivityId={scrollingActivityId}
+                    clearScrollingActivityId={clearScrollingActivityId}
                 />
             </Box>
 
@@ -524,6 +617,41 @@ const ActivityPage = () => {
                 activityToEdit={editActivity}
                 onSuccess={handleFormSuccess}
             />
+
+            <Dialog
+                open={showSuccessDialog}
+                onClose={() => setShowSuccessDialog(false)}
+                sx={{
+                    "& .MuiPaper-root": {
+                        borderRadius: "30px",
+                        overflow: "hidden",
+                        padding: "20px",
+                        backgroundColor: "var(--color-primary-bg) !important",
+                        textAlign: "center",
+                        position: "relative",
+                        flexDirection: "column",
+                    }
+                }}
+            >
+                <IconButton
+                    onClick={() => setShowSuccessDialog(false)}
+                    sx={{ position: "absolute", top: "10px", right: "10px", }}
+                >
+                    <CloseIcon sx={{ color: "var(--color-primary)", fontSize: "35px" }} />
+                </IconButton>
+
+                <Box sx={{ mt: 8, mb: 3, px: 2 }}>
+                    <Typography sx={{ fontWeight: 700, fontSize: "1.2rem", color: "var(--color-text-main)" }}>
+                        Din aktivitet har nu publicerats!
+                    </Typography>
+                </Box>
+                <PrimaryButton
+                    onClick={handleShowActivity}
+                    sx={{ width: "250px", mb: 4, mt: 2, ml: 4 }}
+                >
+                    Visa aktivitet
+                </PrimaryButton>
+            </Dialog>
 
             < Snackbar
                 open={toast.open}

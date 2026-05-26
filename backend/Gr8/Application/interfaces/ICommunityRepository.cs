@@ -42,5 +42,14 @@ namespace Gr8.Application.Interfaces
         void RemoveActivityBookmark(ActivityBookmark bookmark);
         Task AddActivityBookmarkAsync(ActivityBookmark bookmark);
         Task<List<ActivityBookmark>> GetAllActivityBookmarksByUserIdAsync(string userId);
+        Task<List<ActivityCalender>> GetUserCalendarActivitiesAsync(string userId);
+        Task AddUserCalendarActivityAsync(ActivityCalender entry);
+        Task RemoveUserCalendarActivityAsync(ActivityCalender entry);
+        Task<ActivityCalender?> GetUserCalendarActivityAsync(string userId, int activityId);
+        Task<List<PostNotification>> GetAllNotificationsByUserIdAsync(string userId);
+        Task<PostNotification?> GetNotificationByIdAsync(int notificationId);
+        Task AddPostNotificationAsync(PostNotification notification);
+        void RemovePostNotifications(PostNotification notification);
+        Task<int> GetActivityCalendarCountAsync(int activityId);
     }
 }

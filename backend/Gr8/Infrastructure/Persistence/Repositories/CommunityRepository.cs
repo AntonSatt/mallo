@@ -301,6 +301,11 @@ namespace Gr8.Infrastructure.Persistence.Repositories
             return await _communityDbContext.PostNotifications.Where(pn => pn.UserId == userId).ToListAsync();
         }
 
+        public async Task<PostNotification?> GetNotificationByIdAsync(int notificationId)
+        {
+            return await _communityDbContext.PostNotifications.FirstOrDefaultAsync(pn => pn.Id == notificationId);
+        }
+
         public async Task AddPostNotificationAsync(PostNotification notification)
         {
             await _communityDbContext.PostNotifications.AddAsync(notification);

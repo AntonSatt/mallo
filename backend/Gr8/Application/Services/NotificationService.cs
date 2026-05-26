@@ -44,18 +44,6 @@ namespace Gr8.Application.Services
         {
             var notifications = await _communityRepository.GetAllNotificationsByUserIdAsync(userId);
 
-            var unseenNotifications = notifications.Where(n => !n.IsSeen).ToList();
-
-            if (unseenNotifications.Any())
-            {
-                foreach (var notification in unseenNotifications)
-                {
-                    notification.IsSeen = true;
-                }
-
-                await _communityRepository.SaveChangesAsync();
-            }
-
             return notifications.Select(n => new PostNotificationDto
             {
                 Id = n.Id,
@@ -66,6 +54,25 @@ namespace Gr8.Application.Services
             })
             .OrderByDescending(n => n.CreatedAt)
             .ToList();
+        }
+
+        public async Task<bool> MarkPostNotificationAsSeenAsync(string userId, int notificationId)
+        {
+            var notification = await _communityRepository.GetNotificationByIdAsync(notificationId);
+            if (notification == null || notification.UserId != userId)
+            {
+                return false;
+            }
+
+            if (notification.IsSeen)
+            {
+                return true;
+            }
+
+            notification.IsSeen = true;
+            await _communityRepository.SaveChangesAsync();
+
+            return true;
         }
     }
 }

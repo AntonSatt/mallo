@@ -29,6 +29,7 @@ const SidebarNotification = ({ onSearch }) => {
 
     const handleNotificationClick = async (notificationId) => {
         try {
+            await NotificationService.markAsSeen(notificationId);
             setNotifications(prevNotifications =>
                 prevNotifications.map(n =>
                     n.id === notificationId ? { ...n, isSeen: true } : n
@@ -53,14 +54,13 @@ const SidebarNotification = ({ onSearch }) => {
             try {
                 const notificationResult = await NotificationService.getAll();
                 let allNotifications = [];
-
                 if (Array.isArray(notificationResult)) {
                     allNotifications = notificationResult.map((notification) => {
                         return {
                             id: notification.id,
                             type: notification.type,
                             title: notification.title,
-                            isSeen: false,
+                            isSeen: notification.isSeen ?? notification.seen ?? false,
                             createdAt: notification.createdAt
                         };
                     });

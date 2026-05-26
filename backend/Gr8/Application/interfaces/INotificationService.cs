@@ -9,5 +9,6 @@ namespace Gr8.Application.Interfaces
     {
         Task AddNotificationAsync(int postId, string type, string userId);
         Task<List<PostNotificationDto>> GetAllPostNotificationsByUserIdAsync(string userId);
+        Task<bool> MarkPostNotificationAsSeenAsync(string userId, int notificationId);
     }
 }

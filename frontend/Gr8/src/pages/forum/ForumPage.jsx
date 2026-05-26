@@ -326,8 +326,15 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
                 return;
             }
 
-            const inDialog = event.target instanceof Element && !!event.target.closest(".MuiDialog-root");
+            const targetElement = event.target instanceof Element ? event.target : null;
+
+            const inDialog = !!targetElement?.closest(".MuiDialog-root");
             if (inDialog) {
+                return;
+            }
+
+            const inSidebar = !!targetElement?.closest(".sidebar-left, .sidebar-right");
+            if (inSidebar) {
                 return;
             }
 

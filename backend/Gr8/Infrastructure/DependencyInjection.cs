@@ -43,6 +43,7 @@ namespace Gr8.Infrastructure
             services.AddScoped<IActivityCalenderService, ActivityCalenderService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IFirebasePushService, FirebasePushService>();
+            services.AddSingleton<IPresenceService, PresenceService>();
 
             // Configure ASP.NET Core Identity to use the ApplicationUser and ApplicationRole classes, and to use Entity Framework Core for storage
             services.AddIdentity<ApplicationUser, ApplicationRole>()

@@ -29,7 +29,7 @@ const Homepage = ({ page }) => {
                     <aside className="sidebar-left">
                         <Stack spacing={2}>
                             <ProfileHeader />
-                            <SidebarCalendar showCreate="true" onCreatePost={handleClickOpen}/>
+                            <SidebarCalendar showCreate={page === "forum" ? "true" : "false"} onCreatePost={handleClickOpen}/>
                         </Stack>
                     </aside>
 

@@ -238,6 +238,10 @@ const PostForm = ({ onPostCreated, onClose }) => {
             fullWidth
             type="button"
             onClick={onClose}
+            style={{
+                backgroundColor: "white",
+                color: "var(--color-text-main)"
+              }}
           >
             Avsluta
           </PrimaryButton>

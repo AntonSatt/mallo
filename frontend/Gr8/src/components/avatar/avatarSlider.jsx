@@ -12,8 +12,8 @@ import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import useViewport from '../../hooks/useViewport';
 
 export default function AvatarSlider({ formData, handleChange, mt = 2, mb = 2 }) {
-    // 0 represents the "Select Icon" text placeholder, 1-9 are actual avatars
-    const avatarIds = [1, 2, 3, 4, 0, 5, 6, 7, 8, 9];
+    // 0 represents the "Select Icon" text placeholder, 1-18 are actual avatars
+    const avatarIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 10, 11, 12, 13, 14, 15, 16, 17, 18];
     const middleIndex = avatarIds.indexOf(0);
     const { isMobile, isDesktop } = useViewport();
 
@@ -30,6 +30,7 @@ export default function AvatarSlider({ formData, handleChange, mt = 2, mb = 2 })
             <Box sx={{ width: isMobile ? '100%' : '500px', position: 'relative', marginTop: isMobile ? 2 : 0 }}>
                 <Swiper
                     modules={[Navigation]}
+                    loop={true}
                     navigation={{
                         prevEl: '.swiper-button-prev-custom',
                         nextEl: '.swiper-button-next-custom',
@@ -45,7 +46,7 @@ export default function AvatarSlider({ formData, handleChange, mt = 2, mb = 2 })
                         : middleIndex}
 
                     onSlideChange={(swiper) => {
-                        const selectedId = avatarIds[swiper.activeIndex];
+                        const selectedId = avatarIds[swiper.realIndex];
 
                         // If user slides to the placeholder (0), set value to null to prevent selection
                         if (selectedId === 0) {

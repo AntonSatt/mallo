@@ -14,11 +14,7 @@ namespace Gr8.Infrastructure.Identity
 
             var userId = "00000000-0000-0000-0000-000000000001";
             var appUser = await userManager.FindByIdAsync(userId);
-            var appUserEmail = "Anna@mail.se";
-
-            var adminId = "00000000-0000-0000-0000-000000000002";
-            var adminUser = await userManager.FindByIdAsync(adminId);
-            var adminEmail = "Sebastian.enerstrand@chasacademy.se";
+            var appUserEmail = "Anna@mail.se";            
 
             if (appUser == null)
             {
@@ -44,32 +40,6 @@ namespace Gr8.Infrastructure.Identity
                     throw new Exception($"Failed to create seed user: {string.Join(';', result.Errors)}");
                 }
             }
-
-            if (adminUser == null)
-            {
-                var newUser = new ApplicationUser
-                {
-                    Id = adminId, // fixed id (optional)
-                    UserName = "Admin",
-                    NormalizedUserName = "ADMIN",
-                    Email = adminEmail,
-                    NormalizedEmail = adminEmail.ToUpperInvariant(),
-                    FirstName = "Admin",
-                    LastName = "Adminsson",
-                    SocialNumber = "19700101",
-                    EmailConfirmed = true,
-                    SecurityStamp = Guid.NewGuid().ToString("D"),
-                    ConcurrencyStamp = Guid.NewGuid().ToString("D"),
-                    Avatar = 9
-                };
-
-                var result = await userManager.CreateAsync(newUser, "Admin123!");
-                if (!result.Succeeded)
-                {
-                    throw new Exception($"Failed to create seed user: {string.Join(';', result.Errors)}");
-                }
-            }
-
             return;
         }
     }

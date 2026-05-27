@@ -78,11 +78,6 @@ const Homepage = ({ page }) => {
                                     <ConversationPage />
                                 </Box>
                             )}
-                            {page== "maps" && (
-                                <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
-                                    <ActivityPage />
-                                </Box>
-                            )}
                             {page === "settings" && (
                                 <Box sx={{ flex: 1, minHeight: 0, width: "100%" }}>
                                     <Settings />

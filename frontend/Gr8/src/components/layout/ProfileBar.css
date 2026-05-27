@@ -28,15 +28,6 @@
   gap: 20px;
 }
 
-.avatar-wrapper {
-  position: relative;
-}
-
-.profile-avatar {
-  width: 78px !important;
-  height: 78px !important;
-}
-
 .profile-name {
   font-size: 1rem !important;
   font-weight: 500 !important;
@@ -88,4 +79,18 @@
   width: 20px;
   height: 20px;
   display: block; 
+}
+
+.notification-icon {
+    width: 50px;
+    height: 50px;
+    display: block;
+    margin-top: 7px;
+}
+
+/* Slightly wider spacing on forum top row between avatar, create, and search */
+.profilebar-container.forum-profilebar {
+  gap: 18px;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
 }

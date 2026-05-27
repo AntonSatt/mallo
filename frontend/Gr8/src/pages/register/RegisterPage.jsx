@@ -42,7 +42,7 @@ const RegisterPage = () => {
             <Header mobileImage={getImageForStep(step)} desktopImage={holdingHands2} />
 
             <Grid container className="register-container">
-                <Grid className="register-page" item="true" xs={12} md={6}>
+                <Grid className="register-page">
                     <Box className="register-content">
                         <Typography variant="h4" >
                             Skapa konto

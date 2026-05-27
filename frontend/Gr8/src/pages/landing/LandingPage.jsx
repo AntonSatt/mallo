@@ -25,7 +25,7 @@ const LandingPage = () => {
             <Header mobileImage={hold1} desktopImage={holdingHands2} />
 
             <Grid container direction='column' className="landing-container">
-                <Grid xs={8} md={8} className="landing-page">
+                <Grid className="landing-page">
                     <Box className="landing-content">
                         <Typography variant="h3" sx={{ mt: 0, mb: 1 }}>
                             Hej!
@@ -38,7 +38,7 @@ const LandingPage = () => {
                             är här!
                         </Typography>
 
-                        <Typography variant="body2" sx={{ mt: 5 }}>
+                        <Typography variant="body2" sx={{ mt: 3 }}>
                             Har du redan ett konto?
                         </Typography>
 
@@ -49,7 +49,7 @@ const LandingPage = () => {
                             Logga in med E-post
                         </PrimaryButton>
 
-                        <Typography variant="body2" sx={{ mt: 5 }}>
+                        <Typography variant="body2" sx={{ mt: 2 }}>
                             Vill du också bli medlem i vårt community?
                         </Typography>
 

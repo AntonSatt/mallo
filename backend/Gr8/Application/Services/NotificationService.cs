@@ -3,6 +3,14 @@ using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
 
+// This file defines the NotificationService class, which implements the INotificationService interface. The NotificationService is
+// responsible for managing notifications in the application, including adding new notifications, retrieving notifications for a user,
+// marking notifications as seen, and saving Firebase tokens for push notifications. It interacts with the ICommunityRepository to
+// perform database operations related to notifications and Firebase tokens, and it also uses the IFirebasePushService to send push
+// notifications when users are offline. The service ensures that users receive timely notifications about activities such as comments,
+// hugs, and attended activities, while also optimizing push notifications by checking the user's online status through the IPresence
+// service.
+
 namespace Gr8.Application.Services
 {
     public class NotificationService : INotificationService

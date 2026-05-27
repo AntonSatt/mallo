@@ -4,12 +4,6 @@
     background-color: var(--color-primary-bg);
 }
 
-.protected-route-nav {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
 .protected-route-content {
     min-height: 0;
     box-sizing: border-box;

@@ -345,7 +345,9 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                 }
                 return 0;
             });
-    }, [activities, userCoords, searchQuery, activeFilters, currentUserId]);
+    }, [activities, userCoords, searchQuery, activeFilters, currentUserId, geolocationPermissionState]);
+
+    const shouldShowDistance = geolocationPermissionState === PERMISSION_STATE.GRANTED && Boolean(userCoords);
 
     return (
 
@@ -381,7 +383,7 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
             {/* Search header */}
             <Box className="activity-search-header" sx={{
                 bgcolor: 'var(--color-primary-soft)',
-                pt: 3, pb: 2,
+                pt: 2, pb: 2,
                 px: 2,
                 display: 'flex',
                 borderTopLeftRadius: "20px",
@@ -407,14 +409,14 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                             "& .MuiOutlinedInput-root": {
                                 height: 50,
                                 borderRadius: 25,
-                                width: { xs: "220px", md: '280px' },
+                                width: { xs: "235px", md: '340px' },
                                 bgcolor: 'white !important'
                             },
                         }}
                         slotProps={{
                             input: {
-                                endAdornment: (
-                                    <InputAdornment position="end">
+                                startAdornment: (
+                                    <InputAdornment position="start">
                                         <img
                                             src={SearchHeart}
                                             alt="search"
@@ -593,7 +595,7 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                 }}>
                 <ActivityFeed
                     activities={filteredActivities}
-                    userCoords={userCoords}
+                    showDistance={shouldShowDistance}
                     onCardAction={handleCardAction}
                     currentUserId={currentUserId}
                     onBookmarkToggle={handleBookmarkToggle}
@@ -607,7 +609,8 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
             </Box>
 
             <ActivityFilter
-                open={filterOpen}
+                key={filterOpen ? "filter-open" : "filter-closed"}
+                open={filterOpen === true}
                 onClose={() => setFilterOpen(false)}
                 currentFilters={activeFilters}
                 onApply={setActiveFilters}
@@ -658,7 +661,7 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                 </Box>
                 <PrimaryButton
                     onClick={handleShowActivity}
-                    sx={{ width: "250px", mb: 4, mt: 2, ml: 4 }}
+                    sx={{ width: "250px", mb: 4, mt: 2, ml: { xs: 2.5, md: 4 } }}
                 >
                     Visa aktivitet
                 </PrimaryButton>

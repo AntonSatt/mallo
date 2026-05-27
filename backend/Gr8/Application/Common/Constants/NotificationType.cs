@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace Gr8.Application.Common.Constants
 {
     public static class NotificationTypes

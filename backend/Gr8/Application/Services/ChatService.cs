@@ -2,6 +2,15 @@
 using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
 
+// this file defines the ChatService class, which implements the IChatService interface. The ChatService is responsible for
+// handling chat-related operations in the application, such as sending messages, retrieving chat history, managing conversations,
+// and marking messages as read. It interacts with the IChatRepository to perform database operations related to chat messages
+// and with the IApplicationRepository to retrieve user information for conversations. The service provides methods to send
+// messages between users, get the chat history between two users, retrieve all conversations for a user, delete a conversation
+// for a user, and mark messages as read.
+// The ChatService ensures that chat functionality is properly encapsulated and can be easily used by other parts of the application,
+// such as the ChatHub for real-time communication.
+
 namespace Gr8.Application.Services
 {
     public class ChatService : IChatService

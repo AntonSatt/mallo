@@ -40,7 +40,7 @@ const ForgotPasswordPage = () => {
 
             <form onSubmit={handleSubmit}>
                 <Grid container direction="column" spacing={2} sx={{ mt: 4 }}>
-                    <Grid item>
+                    <Grid>
                         <Typography variant="h6" align="center">
                             Ange din e-postadress
                         </Typography>
@@ -57,20 +57,20 @@ const ForgotPasswordPage = () => {
                     </Grid>
 
                     {error && (
-                        <Grid item>
+                        <Grid>
                             <Typography color="error">{error}</Typography>
                         </Grid>
                     )}
 
                     {status === "sent" && (
-                        <Grid item>
+                        <Grid>
                             <Typography align="center" sx={{ color: "var(--color-primary)" }}>
                                 Om en användare med den e-postadressen finns har en återställningslänk skickats.
                             </Typography>
                         </Grid>
                     )}
 
-                    <Grid item>
+                    <Grid>
                         <PrimaryButton type="submit" sx={{ height: 40, mt: 2 }}>
                             Skicka återställningslänk
                         </PrimaryButton>

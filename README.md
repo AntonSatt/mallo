@@ -31,9 +31,9 @@ _A Swedish-language community platform where members share posts, find local act
 
 Mallo is a Swedish-language web community. Members write posts, react with "hugs", comment, save favourites, and find real-world activities pinned to a map of Sweden. A built-in chat lets them message each other directly.
 
-Under the hood: **React 19** in the browser, a **.NET 10** API, **MS SQL Server 2022**, **SignalR** for realtime, **Mapbox** for the maps. Everything runs in containers on the school's **Kubernetes** cluster, deployed by GitLab CI.
+Under the hood: **React 19** in the browser, a **.NET 10** API, **MS SQL Server 2022**, **SignalR** for realtime, **Mapbox** for the maps, **Firebase** for notifications. Everything runs in containers on the school's **Kubernetes** cluster, deployed by GitLab CI.
 
-We built this as Grupp GR8's submission for **Chas Challenge 2026** at [Chas Academy](https://chasacademy.se).
+We built this as Group GR8's submission for **Chas Challenge 2026** at [Chas Academy](https://chasacademy.se).
 
 ---
 

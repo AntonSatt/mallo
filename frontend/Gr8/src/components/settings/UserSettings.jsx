@@ -22,7 +22,7 @@ import UserServices from "../../services/UserServices";
 import { useAuth } from "../../hooks/useAuth";
 import ArrowDropDownCircleOutlinedIcon from '@mui/icons-material/ArrowDropDownCircleOutlined';
 import InputField from "../../design/input/InputField";
-import Settings from "../../assets/icons/Settings.svg";
+import Settings from "../../assets/icons/settings.svg";
 import Report from "../../assets/icons/Wavy_Warning.svg";
 import Lock from "../../assets/icons/lock.svg";
 import AvatarSlider from "../../components/avatar/avatarSlider.jsx";

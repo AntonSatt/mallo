@@ -16,7 +16,6 @@ namespace Gr8.Infrastructure.Persistence.Repositories
         }
 
         // Added isDeleted filter to ensure only active posts and comments are retrieved on all Get operations and Delete operations
-        // Not sure if this is the best way to handle soft deletes?
         public async Task<List<Post>> GetAllPostsAsync()
         {
             return await _communityDbContext.Posts

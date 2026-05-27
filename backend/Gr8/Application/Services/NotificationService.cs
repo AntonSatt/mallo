@@ -74,5 +74,24 @@ namespace Gr8.Application.Services
 
             return true;
         }
+
+ public async Task AddActivityNotificationAsync(int activityId, string userId)
+{
+    var activity = await _communityRepository.GetActivityByIdAsync(activityId);
+    
+    if (activity == null) return;
+
+    var notification = new PostNotification
+    {
+        UserId = userId,               
+        Type = NotificationTypes.ActivityAttended,    
+        Title = activity.Title,     
+        IsSeen = false,
+        CreatedAt = activity.StartAt 
+    };
+
+    await _communityRepository.AddPostNotificationAsync(notification);
+    await _communityRepository.SaveChangesAsync();
+}
     }
 }

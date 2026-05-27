@@ -9,5 +9,6 @@ namespace Gr8.Application.Common.Constants
         public const string CommentCreated = "comment_created";
         public const string CommentHugged = "comment_hugged";
         public const string PostHugged = "post_hugged";
+        public const string ActivityAttended = "activity_attended";
     }
 }

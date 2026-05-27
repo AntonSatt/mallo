@@ -26,7 +26,10 @@ namespace Gr8.Application.Services
         public async Task<IEnumerable<ActivityDto>> GetAllActivitiesAsync()
         {
             var activities = await _communityRepository.GetAllActivitiesAsync();
-            var visibleActivities = activities.Where(activity => !activity.IsDeleted).ToList();
+            var now = DateTime.UtcNow;
+            var visibleActivities = activities
+                .Where(activity => !activity.IsDeleted && activity.StartAt >= now)
+                .ToList();
             var authorIdentities = await _applicationRepository.GetAuthorIdentitiesByUserIdsAsync(visibleActivities.Select(a => a.UserId));
             var calendarCounts = await _communityRepository.GetActivityCalendarCountsAsync(visibleActivities.Select(a => a.Id));
 

@@ -287,6 +287,8 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
     }, [geolocationPermissionState, userCoords]);
     // Apply filters to activities
     const filteredActivities = useMemo(() => {
+        const now = new Date();
+
         return activities
             .map(activity => {
                 if (userCoords) {
@@ -298,6 +300,11 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                 return activity;
             })
             .filter(activity => {
+                const activityStart = new Date(activity.startAt);
+                if (Number.isNaN(activityStart.getTime()) || activityStart < now) {
+                    return false;
+                }
+
                 // Search filter
                 if (searchQuery.trim()) {
                     const q = searchQuery.toLowerCase();
@@ -321,7 +328,6 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
 
                 // Time filter
                 if (activeFilters.time) {
-                    const now = new Date();
                     const activityEnd = new Date(activity.endAt);
                     if (activityEnd < now) return false;
                 }

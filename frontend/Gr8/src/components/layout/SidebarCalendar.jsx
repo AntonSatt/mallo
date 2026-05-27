@@ -53,7 +53,16 @@ const MarkedDay = ({ markedDates = [], onMarkedDayClick, day, outsideCurrentMont
         : null;
 
     return (
-        <Box sx={{ position: 'relative', display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box
+            sx={{
+                position: 'relative',
+                width: 36,
+                height: 36,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}
+        >
             <Box
                 component="button"
                 onClick={match ? (e) => { e.stopPropagation(); onMarkedDayClick(match.activityId); } : other.onClick}
@@ -92,14 +101,24 @@ const MarkedDay = ({ markedDates = [], onMarkedDayClick, day, outsideCurrentMont
     );
 };
 
-const SidebarCalendar = ({ showCreate = false, onCreatePost, markedDates = [], onMarkedDayClick }) => {
+const SidebarCalendar = ({ showCreate = false, onCreatePost, markedDates = [], onMarkedDayClick, transparentBackground = false }) => {
 
     const handleMarkedDayClick = (activityId) => {
         onMarkedDayClick?.(activityId);
     };
 
     return (
-        <Box className="sidebar-calendar-container">
+        <Box
+            className="sidebar-calendar-container"
+            sx={{
+                backgroundColor: transparentBackground
+                    ? "transparent"
+                    : "var(--color-primary-soft)",
+                boxShadow: transparentBackground
+                    ? "none"
+                    : undefined
+            }}
+        >
             <Stack spacing={2}>
                 {showCreate === "true" &&
                     <Box className="profilebar-create">
@@ -134,6 +153,11 @@ const SidebarCalendar = ({ showCreate = false, onCreatePost, markedDates = [], o
                             <DateCalendar
                                 className="calendar"
                                 showDaysOutsideCurrentMonth
+                                sx={{
+                                    "& .MuiDayCalendar-weekContainer": {
+                                        justifyContent: "space-between"
+                                    }
+                                }}
                                 slots={{
                                     calendarHeader: CustomCalendarHeader,
                                     day: MarkedDay,

@@ -13,6 +13,7 @@ import Settings from "../settings/SettingsPage.jsx";
 import ConversationPage from '../chat/conversationPage/ConversationPage';
 import ActivityPage from "../activity/ActivityPage.jsx";
 import { useNavigate, useLocation } from 'react-router-dom';
+import CalendarService from "../../services/CalanderService.jsx";
 
 const Homepage = ({ page }) => {
     const { isDesktop } = useViewport();
@@ -43,6 +44,19 @@ const Homepage = ({ page }) => {
             setSearchQuery("");
         }
     }, [page]);
+
+    useEffect(() => {
+        CalendarService.getAll().then(res => {
+            const data = Array.isArray(res.data) ? res.data : [];
+            const marked = data.map(item => ({
+                date: item.startAt,
+                activityId: item.activityId,
+            }));
+            setMarkedDates(marked);
+        }).catch(err => {
+            console.error("Kunde inte hämta kalenderaktiviteter", err);
+        });
+    }, []);
 
     return (
         <div className="homepage-container">

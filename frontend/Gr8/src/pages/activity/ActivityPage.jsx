@@ -20,7 +20,6 @@ import { Box, InputAdornment, Button, CircularProgress, Snackbar, Alert, Dialog,
 import CloseIcon from '@mui/icons-material/Close';
 
 import distance from "@turf/distance";
-import CalendarService from "../../services/CalanderService.jsx";
 import {
     PERMISSION_STATE,
     PERMISSION_TYPE,
@@ -72,21 +71,6 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
             a.id === activityId ? { ...a, isBookmarked } : a
         ));
     };
-
-    // Fetch calendar activities from backend
-    useEffect(() => {
-        if (!onMarkedDatesChange) return;
-        CalendarService.getAll().then(res => {
-            const data = Array.isArray(res.data) ? res.data : [];
-            const marked = data.map(item => ({
-                date: item.startAt,
-                activityId: item.activityId,
-            }));
-            onMarkedDatesChange(marked);
-        }).catch(err => {
-            console.error("Kunde inte hämta kalenderaktiviteter", err);
-        });
-    }, []);
 
     // Load saved calendar activities on mount
     useEffect(() => {

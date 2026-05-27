@@ -128,7 +128,6 @@ namespace Gr8
             {
                 app.MapOpenApi();
                 app.MapScalarApiReference();
-                await SeedData.EnsureSeedDataAsync(app.Services);
             }
 
             app.UseRouting();

@@ -1,11 +1,9 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getMessaging, getToken } from "firebase/messaging";
+import NotificationService from "./services/NotificationService";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDH-IzGfcHRxjxtOztTJ7OOBqJXeXes5WE",
   authDomain: "mallo-c1351.firebaseapp.com",
@@ -18,24 +16,36 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+getAnalytics(app);
+
 export const messaging = getMessaging(app);
 
-// Function to request permission and get the FCM Device Token
+// Requests notification permission and gets the FCM token
 export const requestNotificationPermission = async () => {
   try {
     const permission = await Notification.requestPermission();
-    if (permission === "granted") {
-      // Get the token using your VAPID key from the Cloud Messaging tab
-      const token = await getToken(messaging, { 
-        vapidKey: "YOUR_PUBLIC_VAPID_KEY" 
-      });
-      return token;
-    } else {
+
+    if (permission !== "granted") {
       console.log("Notification permission denied.");
       return null;
     }
+
+    // Get the FCM token using the VAPID key
+    const token = await getToken(messaging, {
+      vapidKey: "BLSL_B5gBtPVE_8wVHjXlHU2wQSmy2FP2TY4BNqPh-O3CxCDwjOguKpW2w12JfUFs-xo3PZwdExPLuAqKy0tbOA"
+    });
+
+    if (!token) {
+      return null;
+    }
+
+    // Save the token to the backend
+    await NotificationService.saveFirebaseToken(token);
+
+    return token;
+
   } catch (error) {
     console.error("Error getting notification permission:", error);
+    return null;
   }
 };

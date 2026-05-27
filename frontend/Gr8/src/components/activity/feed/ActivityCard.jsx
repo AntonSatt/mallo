@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useOnlineUsers } from "../../../contexts/OnlineUsersContext";
 import ActivityServices from "../../../services/ActivityService.jsx";
 import { Paper, Box, Typography, IconButton, Collapse, Dialog } from "@mui/material";
 import BookmarkIcon from '@mui/icons-material/Bookmark';
@@ -18,6 +19,7 @@ import CloseIcon from "../../../assets/icons/closeIcon.svg";
 import BookmarkButton from "../../bookmarkButton/BookmarkButton.jsx";
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import LinkIcon from '@mui/icons-material/Link';
+import useViewport from "../../../hooks/useViewport";
 
 
 const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookmarkToggle, onAddToCalendar, isHighlighted, markedDates, scrollingActivityId, clearScrollingActivityId }) => {
@@ -27,6 +29,13 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+
+    const { isDesktop } = useViewport();
+    const { isUserOnline } = useOnlineUsers();
+
+    const isOnline = isUserOnline(
+        activity.creator?.id || activity.user?.id || activity.userId
+    );
 
     const isOwner = currentUserId === activity.userId;
     const dateText = dayjs(activity.startAt).format('D MMMM');
@@ -162,17 +171,38 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                 justifyContent: 'space-between'
             }}>
                 {/* Avatar component*/}
-                <Box sx={{
-                    position: 'absolute',
-                    top: "10px",
-                    left: '15px',
-                }}>
-                    <Avatar
-                        className="post-avatar"
-                        avatar={activity.authorInfo?.avatarId}
-                    />
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: "10px",
+                        left: '15px',
+                    }}
+                >
+                    <Box
+                        sx={{
+                            position: "relative",
+                            width: "fit-content",
+                            flexShrink: 0,
+                        }}
+                    >
+                        <Avatar
+                            className="post-avatar"
+                            avatar={activity.authorInfo?.avatarId}
+                        />
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                top: isDesktop ? -5 : -2,
+                                right: isDesktop ? -5 : -5,
+                                width: isDesktop ? 14 : 12,
+                                height: isDesktop ? 14 : 12,
+                                borderRadius: "50%",
+                                backgroundColor: isOnline ? "#22C55E" : "#D9D9D9",
+                                border: "2px solid var(--color-bg-main)",
+                            }}
+                        />
+                    </Box>
                 </Box>
-
 
                 {/* Info texts */}
                 <Box sx={{ ml: 8, flex: 1 }}>

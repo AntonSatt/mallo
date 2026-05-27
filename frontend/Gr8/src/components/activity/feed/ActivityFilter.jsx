@@ -144,7 +144,6 @@ const ActivityFilter = ({ open, onClose, onApply, currentFilters }) => {
                         <PrimaryButton
                             onClick={handleSave}
                             sx={{ width: { xs: "130px", md: "150px" }, px: 0, ml: 2 }}>
-
                             Spara
                         </PrimaryButton>
                     </Box>

@@ -74,13 +74,6 @@ namespace Gr8
                     policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                     policy.RequireAuthenticatedUser();
                 });
-
-                //TODO: Add Admin role
-                //options.AddPolicy(AuthorizationConstants.AdminOnly, policy =>
-                //{
-                //    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
-                //    policy.RequireRole("Admin");
-                //});
             });
 
             // Add HttpClient dependency injection for MapBoxService with baseurl settings

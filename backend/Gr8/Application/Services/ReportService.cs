@@ -38,10 +38,5 @@ namespace Gr8.Application.Services
 
             return reportDto;
         }
-
-        //TODO: This one should be reviewd by an admin instead by a user.
-        //public Task<List<ReportDto>> GetReportByUserIdAsync(string userId)
-        //{
-        //}
     }
 }

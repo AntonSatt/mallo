@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Box, Stack, Typography, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import SearchHeartButton from "../../assets/icons/searchHeartForum.svg";
 import NotificationRing from "../../assets/icons/notificationRing.svg";
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import "./SidebarNotification.css";
 import NotificationService from "../../services/NotificationService";
 import moment from "moment";
@@ -13,8 +12,10 @@ const SidebarNotification = ({ onSearch, isForumPage = false }) => {
     const [activityAlignment, setActivityAlignment] = useState("all");
 
     const [notifications, setNotifications] = useState([]);
-    const [showAllNotifications, setShowAllNotifications] = useState(false);
     const [searchValue, setSearchValue] = useState("");
+
+    const [showAllPosts, setShowAllPosts] = useState(false);
+    const [showAllActivities, setShowAllActivities] = useState(false);
 
     const handleSearchChange = (event) => {
         const value = event.target.value;
@@ -47,14 +48,45 @@ const SidebarNotification = ({ onSearch, isForumPage = false }) => {
         }
     };
 
-    const filteredNotifications = notifications.filter(notification => {
-        if (postAlignment === "unread") {
-            return !notification.isSeen;
-        }
+    const postNotifications = notifications.filter(n => {
+        if (n.type === "activity_attended") return false;
+        if (postAlignment === "unread") return !n.isSeen;
         return true;
     });
 
-    const visibleNotifications = showAllNotifications ? filteredNotifications : filteredNotifications.slice(0, 3);
+    const visiblePosts = showAllPosts ? postNotifications : postNotifications.slice(0, 3);
+
+    const activityNotifications = notifications
+        .filter(n => {
+            if (n.type !== "activity_attended") return false;
+            if (activityAlignment === "unread") return !n.isSeen;
+
+            if (n.title.includes("börjar om -")) {
+                const match = n.title.match(/börjar om -(\d+)/);
+                if (match) {
+                    const passedMinutes = parseInt(match[1], 10);
+                    if (passedMinutes > 60) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        })
+        .map(n => {
+            let updatedTitle = n.title;
+
+            if (n.title.includes("börjar om -")) {
+                const parts = n.title.split(" börjar ");
+                updatedTitle = `${parts[0]} börjar Pågår nu`;
+            }
+
+            return {
+                ...n,
+                title: updatedTitle
+            };
+        });
+
+    const visibleActivities = showAllActivities ? activityNotifications : activityNotifications.slice(0, 3);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -83,24 +115,20 @@ const SidebarNotification = ({ onSearch, isForumPage = false }) => {
 
     return (
         <Stack className="notification-wrapper">
-            {isForumPage ? (
-                <Box className="search-bar">
-                    <img
-                        src={SearchHeartButton}
-                        alt="Sök"
-                        className="search-icon"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Sök"
-                        className="search-input"
-                        value={searchValue}
-                        onChange={handleSearchChange}
-                    />
-                </Box>
-            ) : (
-                <Box className="search-bar search-bar-placeholder" aria-hidden="true" />
-            )}
+            <Box className="search-bar">
+                <img
+                    src={SearchHeartButton}
+                    alt="Sök"
+                    className="search-icon"
+                />
+                <input
+                    type="text"
+                    placeholder="Sök"
+                    className="search-input"
+                    value={searchValue}
+                    onChange={handleSearchChange}
+                />
+            </Box>
 
             <Stack className="notification-box">
                 <Box className="notification-header">
@@ -110,7 +138,6 @@ const SidebarNotification = ({ onSearch, isForumPage = false }) => {
                         </div>
                         <Typography className="header-title">Notifikationer</Typography>
                     </Box>
-                    <MoreHorizIcon sx={{ color: "#ccc", cursor: "pointer" }} />
                 </Box>
 
                 <Box className="notification-card content-card">
@@ -129,17 +156,13 @@ const SidebarNotification = ({ onSearch, isForumPage = false }) => {
                     </Box>
 
                     <Box className="card-body-placeholder">
-                        {visibleNotifications.map((notification) => (
+                        {visiblePosts.map((notification) => (
                             <div
                                 key={notification.id}
-                                className={"notification-item ${notification.isSeen ? 'seen' : 'unread'}"}
+                                className={`notification-item ${notification.isSeen ? 'seen' : 'unread'}`}
                                 onClick={() => handleNotificationClick(notification.id)}
                             >
-                                {!notification.isSeen ? (
-                                    <span className="dot" />
-                                ) : (
-                                    <div className="dot-placeholder" />
-                                )}
+                                {!notification.isSeen ? <span className="dot" /> : <div className="dot-placeholder" />}
 
                                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                                     <Typography
@@ -170,13 +193,13 @@ const SidebarNotification = ({ onSearch, isForumPage = false }) => {
                         ))}
                     </Box>
 
-                    {filteredNotifications.length > 3 && (
+                    {postNotifications.length > 3 && (
                         <Typography
                             className="show-all-btn"
-                            onClick={() => setShowAllNotifications(!showAllNotifications)}
+                            onClick={() => setShowAllPosts(!showAllPosts)}
                             sx={{ cursor: 'pointer', userSelect: 'none' }}
                         >
-                            {showAllNotifications ? "Visa färre" : "Visa alla"}
+                            {showAllPosts ? "Visa färre" : "Visa alla"}
                         </Typography>
                     )}
                 </Box>
@@ -197,17 +220,53 @@ const SidebarNotification = ({ onSearch, isForumPage = false }) => {
                     </Box>
 
                     <Box className="card-body-placeholder">
-                        <div className="notification-item unread">
-                            <span className="dot" />
-                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                <Typography sx={{ fontSize: '0.95rem', color: '#2D3748', fontWeight: 550 }}>
-                                    <span className="highlight">Loppis - Säljsugen?</span> börjar om 30 min
-                                </Typography>
-                            </Box>
-                        </div>
+                        {visibleActivities.map((notification) => {
+                            const parts = notification.title.split(" börjar ");
+                            const activityName = parts[0];
+                            const restOfText = parts[1] ? ` börjar ${parts[1]}` : "";
+
+                            return (
+                                <div
+                                    key={notification.id}
+                                    className={`notification-item ${notification.isSeen ? 'seen' : 'unread'}`}
+                                    onClick={() => handleNotificationClick(notification.id)}
+                                >
+                                    {!notification.isSeen ? <span className="dot" /> : <div className="dot-placeholder" />}
+                                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                        <Typography
+                                            className="notification-text"
+                                            sx={{
+                                                fontSize: '0.95rem',
+                                                color: notification.isSeen ? '#718096' : '#2D3748',
+                                                fontWeight: notification.isSeen ? 400 : 550,
+                                                lineHeight: 1.3
+                                            }}
+                                        >
+                                            <span className="highlight">{activityName}</span>
+                                            {restOfText.includes("Pågår nu") ? (
+                                                <span style={{ fontWeight: 400, color: notification.isSeen ? '#718096' : '#2D3748' }}> pågår nu</span>
+                                            ) : (
+                                                <span style={{ fontWeight: 400 }}>{restOfText}</span>
+                                            )}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ color: '#A0AEC0', fontSize: '0.8rem', marginTop: '4px' }}>
+                                            {moment(notification.createdAt).fromNow()}
+                                        </Typography>
+                                    </Box>
+                                </div>
+                            );
+                        })}
                     </Box>
 
-                    <Typography className="show-all-btn">Visa alla</Typography>
+                    {activityNotifications.length > 3 && (
+                        <Typography
+                            className="show-all-btn"
+                            onClick={() => setShowAllActivities(!showAllActivities)}
+                            sx={{ cursor: 'pointer', userSelect: 'none' }}
+                        >
+                            {showAllActivities ? "Visa färre" : "Visa alla"}
+                        </Typography>
+                    )}
                 </Box>
             </Stack>
         </Stack>

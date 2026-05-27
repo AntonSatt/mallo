@@ -686,7 +686,7 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                         width: '100%',
                         borderRadius: '20px',
                         boxShadow: '0px 4px 12px rgba(0,0,0,0.15)',
-                        bgcolor: 'var(--color-primary-soft, #FFF8F1)',
+                        bgcolor: 'white',
                         color: 'var(--color-text-main, #333333)',
                         fontWeight: 600,
 

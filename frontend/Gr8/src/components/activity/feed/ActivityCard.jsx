@@ -333,20 +333,34 @@ const ActivityCard = ({ activity, distance, showDistance = false, currentUserId,
                         mt: 'auto',
                         pt: 2
                     }}>
-                        <SecondaryButton
-                            onClick={handleDialogOpen}
-                            sx={{
-                                borderRadius: "50%", height: "40px", width: "40px", minWidth: "unset",
-                                p: 0,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                flexShrink: 0,
-                                mr: 2, ml: 0.5
-                            }}
-                            startIcon={<MoreHorizIcon sx={{ color: "var(--color-primary)", marginLeft: 1.5, fontSize: "25px !important" }} />}
-                        >
-                        </SecondaryButton>
+
+                        {isOwner && (
+                            <SecondaryButton
+                                onClick={handleDialogOpen}
+                                sx={{
+                                    borderRadius: "50%",
+                                    height: "40px",
+                                    width: "40px",
+                                    minWidth: "unset",
+                                    p: 0,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flexShrink: 0,
+                                    ml: isDesktop ? 19 : 11
+                                }}
+                                startIcon={
+                                    <MoreHorizIcon
+                                        sx={{
+                                            color: "var(--color-primary)",
+                                            marginLeft: 1.5,
+                                            fontSize: "25px !important"
+                                        }}
+                                    />
+                                }
+                            >
+                            </SecondaryButton>
+                        )}
 
                         {!isOwner && (
                             <SecondaryButton
@@ -368,7 +382,8 @@ const ActivityCard = ({ activity, distance, showDistance = false, currentUserId,
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    flexShrink: 0
+                                    flexShrink: 0,
+                                    ml: isDesktop ? 19 : 11
                                 }}
                             >
                                 <img

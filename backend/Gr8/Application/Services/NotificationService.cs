@@ -107,7 +107,7 @@ namespace Gr8.Application.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _communityRepository.SaveFirebaseTokenAsync(firebaseToken);
+            await _communityRepository.AddFirebaseTokenAsync(firebaseToken);
             await _communityRepository.SaveChangesAsync();
         }
     }

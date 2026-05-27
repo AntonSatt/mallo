@@ -322,7 +322,7 @@ namespace Gr8.Infrastructure.Persistence.Repositories
                 .CountAsync();
         }
 
-        public async Task SaveFirebaseTokenAsync(UserFirebaseToken firebaseToken)
+        public async Task AddFirebaseTokenAsync(UserFirebaseToken firebaseToken)
         {
             await _communityDbContext.UserFirebaseTokens.AddAsync(firebaseToken);
         }

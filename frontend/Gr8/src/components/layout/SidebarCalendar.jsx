@@ -154,8 +154,17 @@ const SidebarCalendar = ({ showCreate = false, onCreatePost, markedDates = [], o
                                 className="calendar"
                                 showDaysOutsideCurrentMonth
                                 sx={{
+                                    width: '100%',
+                                    maxWidth: '100%',
                                     "& .MuiDayCalendar-weekContainer": {
-                                        justifyContent: "space-between"
+                                        justifyContent: "center",
+                                        gap: "4px",
+                                    },
+                                    "& .MuiDayCalendar-header": {
+                                        justifyContent: "center"
+                                    },
+                                    "& .MuiPickersSlideTransition-root": {
+                                        minHeight: '220px'
                                     }
                                 }}
                                 slots={{

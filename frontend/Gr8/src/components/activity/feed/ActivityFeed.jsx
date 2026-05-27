@@ -38,7 +38,7 @@ const ActivityFeed = ({ activities, currentUserId, onCardAction, onSelectActivit
                                 distance={calculateDistanceText(activity.distanceMeters)}
                                 showDistance={showDistance}
                                 currentUserId={currentUserId}
-                                onCardAction={(action, data) => onCardAction(action, data)}
+                                onCardAction={onCardAction}
                                 onBookmarkToggle={onBookmarkToggle}
                                 onAddToCalendar={onAddToCalendar}
                                 isHighlighted={highlightedActivityId === activity.id}

@@ -89,3 +89,10 @@
   height: 20px;
   display: block; 
 }
+
+/* Slightly wider spacing on forum top row between avatar, create, and search */
+.profilebar-container.forum-profilebar {
+  gap: 18px;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}

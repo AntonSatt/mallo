@@ -3,6 +3,5 @@
     public static class AuthorizationConstants
     {
         public const string JwtOnly = "JwtOnly";
-        //public const string AdminOnly = "AdminOnly"; //TODO: Add Admin role
     }
 }

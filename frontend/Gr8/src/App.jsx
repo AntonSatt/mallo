@@ -1,6 +1,7 @@
 import './App.css'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
+import { OnlineUsersProvider } from './contexts/OnlineUsersContext'
 import ProtectedRoute from './components/protectedRoute/ProtectedRoute'
 import { useAuth } from './hooks/useAuth'
 import LoginPage from './pages/login/LoginPage'
@@ -26,6 +27,7 @@ function RootRoute() {
 function App() {
   return (
     <AuthProvider>
+      <OnlineUsersProvider>
       <Router>
         <Routes>
           <Route path='/' element={<RootRoute />} />
@@ -40,6 +42,7 @@ function App() {
           <Route path='/maps' element={<ProtectedRoute><HomePage page="maps" /></ProtectedRoute>} />
         </Routes>
       </Router>
+      </OnlineUsersProvider>
     </AuthProvider>
   )
 }

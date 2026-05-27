@@ -381,6 +381,21 @@ namespace Gr8.Api.Endpoints
 
                 return Results.NoContent();
             }).RequireAuthorization(AuthorizationConstants.JwtOnly);
+
+            app.MapPost("/notifications/firebase-token", async (UserManager<ApplicationUser> userManager, ClaimsPrincipal user,[FromServices] INotificationService notificationService,[FromBody] SaveFirebaseTokenDto dto) =>
+            {
+                var appUser = await userManager.GetUserAsync(user);
+
+                if (appUser == null)
+                {
+                    return Results.Unauthorized();
+                }
+
+                await notificationService.SaveFirebaseTokenAsync(appUser.Id, dto.Token);
+
+                return Results.NoContent();
+
+            }).RequireAuthorization(AuthorizationConstants.JwtOnly);
         }
     }
 }

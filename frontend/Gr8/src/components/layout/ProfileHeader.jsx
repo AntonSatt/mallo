@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import Avatar from "../avatar/avatar";
+import { useOnlineUsers } from "../../contexts/OnlineUsersContext";
 import { Icon, IconButton, Stack, Typography, ClickAwayListener, Box, Button } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import Avatar from "../avatar/avatar";
 import PrimaryButton from '../../design/buttons/PrimaryButton';
 import "./ProfileHeader.css"
 
 const ProfileHeader = () => {
     const { currentUser, logout } = useAuth();
+    const { isUserOnline } = useOnlineUsers();
+    const isOnline = isUserOnline(currentUser?.sub);
     const [menuOpen, setMenuOpen] = useState(false);
 
     const toggleMenu = () => { setMenuOpen((prev) => !prev) };
@@ -21,10 +24,31 @@ const ProfileHeader = () => {
                     className="profileHeader-container"
                     spacing={1}
                 >
-                    <Avatar
-                        className="header-avatar"
-                        avatar={currentUser?.picture}
-                    />
+                    <Box
+                        sx={{
+                            position: "relative",
+                            width: "fit-content",
+                            flexShrink: 0,
+                        }}
+                    >
+                        <Avatar
+                            className="header-avatar"
+                            avatar={currentUser?.picture}
+                        />
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                top: -2,
+                                right: -5,
+                                width: 12,
+                                height: 12,
+                                borderRadius: "50%",
+                                backgroundColor: isOnline ? "#22C55E" : "#D9D9D9",
+                                border: "2px solid var(--color-bg-main)",
+                            }}
+                        />
+                    </Box>
+
                     <Typography
                         className="header-username"
                     >
@@ -51,7 +75,7 @@ const ProfileHeader = () => {
                 {menuOpen && (
                     <Box
                         sx={{
-                            position: "fixed" 
+                            position: "fixed"
                         }}
                     >
                         <Stack>

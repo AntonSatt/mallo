@@ -247,7 +247,7 @@ const PostForm = ({ onPostCreated, onClose }) => {
           </PrimaryButton>
 
           <PrimaryButton fullWidth type="submit">
-            Lägg upp inlägg
+            Publicera
           </PrimaryButton>
         </Stack>
       </form>

@@ -7,5 +7,8 @@ namespace Gr8.Application.Interfaces
         //Defines real time chat events that the connected users can receive from the server.
         Task ReceiveMessage(ChatMessageResponseDto message);
         Task UserTyping(string senderId);
+        Task UserOnline(string userId);
+        Task UserOffline(string userId);
+        Task OnlineUsers(List<string> userIds);
     }
 }

@@ -1,14 +1,12 @@
 ﻿using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
-using System.Xml.Linq;
 
 namespace Gr8.Application.Services
 {
     public class PostService : IPostService
     {
         private readonly ICommunityRepository _communityRepository;
-
         private readonly IApplicationRepository _applicationRepository;
 
         public PostService(ICommunityRepository communityRepository, IApplicationRepository applicationRepository)
@@ -38,6 +36,8 @@ namespace Gr8.Application.Services
             }
 
             var category = await _communityRepository.GetCategoryByIdAsync(post.CategoryId);
+            var authorIdentities = await _applicationRepository.GetAuthorIdentitiesByUserIdsAsync(new[] { post.UserId });
+            authorIdentities.TryGetValue(post.UserId, out var authorIdentity);
 
             var postDto = new PostDto
             {
@@ -52,7 +52,8 @@ namespace Gr8.Application.Services
                 AuthorInfo = new AuthorDTO
                 {
                     Id = post.UserId,
-                    AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(post.UserId)
+                    AvatarId = authorIdentity?.AvatarId ?? 0,
+                    UserName = ResolveAuthorName(post.AuthorDisplayName, authorIdentity?.UserName)
                 }
             };
 
@@ -64,8 +65,6 @@ namespace Gr8.Application.Services
                     Name = category.Name
                 };
             }
-
-            postDto.AuthorInfo.UserName = await ResolveAuthorNameAsync(post.UserId, post.AuthorDisplayName);
 
             return postDto;
         }
@@ -83,13 +82,14 @@ namespace Gr8.Application.Services
                     .ToList();
             }
 
-            var postDtoList = new List<PostDto>();
+            var authorIdentities = await _applicationRepository.GetAuthorIdentitiesByUserIdsAsync(posts.Select(p => p.UserId));
+            var postDtoList = new List<PostDto>(posts.Count);
 
             foreach (var post in posts)
             {
-                var commentsOnPostCount = await _communityRepository.CountCommentsByPostIdAsync(post.Id);
+                authorIdentities.TryGetValue(post.UserId, out var authorIdentity);
 
-                var postDto = new PostDto
+                postDtoList.Add(new PostDto
                 {
                     Id = post.Id,
                     Title = post.Title,
@@ -104,17 +104,14 @@ namespace Gr8.Application.Services
                         Id = post.Category.Id
                     },
                     Tags = post.Tags.Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList(),
-                    CountOfComments = commentsOnPostCount,
+                    CountOfComments = post.Comments.Count,
                     AuthorInfo = new AuthorDTO
                     {
                         Id = post.UserId,
-                        AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(post.UserId)
+                        AvatarId = authorIdentity?.AvatarId ?? 0,
+                        UserName = ResolveAuthorName(post.AuthorDisplayName, authorIdentity?.UserName)
                     }
-                };
-
-                postDto.AuthorInfo.UserName = await ResolveAuthorNameAsync(post.UserId, post.AuthorDisplayName);
-
-                postDtoList.Add(postDto);
+                });
             }
 
             return postDtoList.OrderByDescending(p => p.CreatedAt).ToList();
@@ -123,8 +120,10 @@ namespace Gr8.Application.Services
         public async Task<PostDto> GetPostByIdAsync(int postId, string userId)
         {
             var post = await _communityRepository.GetPostByIdAsync(postId);
+            var authorIdentities = await _applicationRepository.GetAuthorIdentitiesByUserIdsAsync(new[] { post.UserId });
+            authorIdentities.TryGetValue(post.UserId, out var authorIdentity);
 
-            var postDto = new PostDto
+            return new PostDto
             {
                 Category = new CategoryDto { Id = post.CategoryId, Name = post.Category.Name },
                 Content = post.Content,
@@ -138,13 +137,10 @@ namespace Gr8.Application.Services
                 AuthorInfo = new AuthorDTO
                 {
                     Id = post.UserId,
-                    AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(post.UserId)
+                    AvatarId = authorIdentity?.AvatarId ?? 0,
+                    UserName = ResolveAuthorName(post.AuthorDisplayName, authorIdentity?.UserName)
                 }
             };
-
-            postDto.AuthorInfo.UserName = await ResolveAuthorNameAsync(post.UserId, post.AuthorDisplayName);
-
-            return postDto;
         }
 
         public async Task<PostDto?> UpdatePostAsync(int postId, UpdatePostDto updatePostDto, string userId)
@@ -181,7 +177,10 @@ namespace Gr8.Application.Services
 
             if (result > 0)
             {
-                var postDto = new PostDto
+                var authorIdentities = await _applicationRepository.GetAuthorIdentitiesByUserIdsAsync(new[] { oldPost.UserId });
+                authorIdentities.TryGetValue(oldPost.UserId, out var authorIdentity);
+
+                return new PostDto
                 {
                     Id = oldPost.Id,
                     Title = oldPost.Title,
@@ -195,13 +194,10 @@ namespace Gr8.Application.Services
                     AuthorInfo = new AuthorDTO
                     {
                         Id = oldPost.UserId,
-                        AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(oldPost.UserId)
+                        AvatarId = authorIdentity?.AvatarId ?? 0,
+                        UserName = ResolveAuthorName(oldPost.AuthorDisplayName, authorIdentity?.UserName)
                     }
                 };
-
-                postDto.AuthorInfo.UserName = await ResolveAuthorNameAsync(oldPost.UserId, oldPost.AuthorDisplayName);
-
-                return postDto;
             }
 
             return null;
@@ -232,14 +228,14 @@ namespace Gr8.Application.Services
             return result > 0;
         }
 
-        private async Task<string?> ResolveAuthorNameAsync(string userId, string? authorDisplayName)
+        private static string? ResolveAuthorName(string? authorDisplayName, string? fallbackUserName)
         {
             if (!string.IsNullOrWhiteSpace(authorDisplayName))
             {
                 return authorDisplayName;
             }
 
-            return await _applicationRepository.GetUserNameByIdAsync(userId);
+            return fallbackUserName;
         }
     }
 }

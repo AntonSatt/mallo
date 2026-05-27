@@ -1,13 +1,6 @@
 import "./PostCard.css";
-import moment from "moment";
 import { useState } from "react";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
-import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
-import HugButton from "../hugButton/HugButton";
-import CommentForm from "../commentForm/CommentForm";
-import CommentBubble from "../../assets/icons/commentBubble.svg";
-import FilledCommentBubble from "../../assets/icons/filledCommentBubble.svg";
+import { useOnlineUsers } from "../../contexts/OnlineUsersContext";
 import {
     Card,
     CardActions,
@@ -18,9 +11,18 @@ import {
     Box,
     IconButton
 } from "@mui/material";
+import moment from "moment";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
+import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
+import CommentBubble from "../../assets/icons/commentBubble.svg";
+import FilledCommentBubble from "../../assets/icons/filledCommentBubble.svg";
 import BookmarkButton from "../../components/bookmarkButton/BookmarkButton.jsx";
+import HugButton from "../hugButton/HugButton";
+import CommentForm from "../commentForm/CommentForm";
 import Avatar from "../avatar/avatar.jsx";
 import PostServices from "../../services/PostServices";
+import useViewport from "../../hooks/useViewport";
 
 //this file contains the PostCard component, which is used to display a post in the feed. 
 // It takes in the post data as props and displays the post's title, content, author, category, tags, 
@@ -35,14 +37,43 @@ const PostCard = ({
     setUserBookmarks,
     userPostHugs }) => {
     const categoryName = post.category?.name || post.category || "Ingen kategori";
+
     const [showFullContent, setShowFullContent] = useState(false);
+    const { isDesktop } = useViewport();
+    const { isUserOnline } = useOnlineUsers();
+    const isOnline = isUserOnline(post.authorInfo.id);
 
     return (
         <>
             <Card className="post-card">
-                <CardHeader avatar={
-                    <Avatar className="post-avatar" avatar={post.authorInfo.avatarId} />
-                }
+                <CardHeader
+                    avatar={
+                        <Box
+                            sx={{
+                                position: "relative",
+                                width: "fit-content",
+                                flexShrink: 0,
+                            }}
+                        >
+                            <Avatar
+                                className="post-avatar"
+                                avatar={post.authorInfo.avatarId}
+                            />
+
+                            <Box
+                                sx={{
+                                    position: "absolute",
+                                    top: isDesktop ? -5 : -2,
+                                    right: isDesktop ? -5 : -5,
+                                    width: isDesktop ? 14 : 12,
+                                    height: isDesktop ? 14 : 12,
+                                    borderRadius: "50%",
+                                    backgroundColor: isOnline ? "#22C55E" : "#D9D9D9",
+                                    border: "2px solid var(--color-bg-surface)",
+                                }}
+                            />
+                        </Box>
+                    }
                     title={
                         <Box className="post-user-row">
                             <Typography className="post-username">

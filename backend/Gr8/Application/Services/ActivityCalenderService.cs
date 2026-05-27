@@ -10,10 +10,12 @@ namespace Gr8.Application.Services
     public class ActivityCalenderService : IActivityCalenderService
     {
         private readonly ICommunityRepository _communityRepository;
+        private readonly INotificationService _notificationService;
 
-        public ActivityCalenderService(ICommunityRepository communityRepository)
+        public ActivityCalenderService(ICommunityRepository communityRepository, INotificationService notificationService)
         {
             _communityRepository = communityRepository;
+            _notificationService = notificationService;
         }
 
         public async Task<List<ActivityCalenderDto>> GetUserCalendarActivitiesAsync(string userId)
@@ -39,6 +41,7 @@ namespace Gr8.Application.Services
             var entry = new ActivityCalender { UserId = userId, ActivityId = activityId };
             await _communityRepository.AddUserCalendarActivityAsync(entry);
             await _communityRepository.SaveChangesAsync();
+            await _notificationService.AddActivityNotificationAsync(activityId, userId);
         }
 
         public async Task RemoveUserCalendarActivityAsync(string userId, int activityId)
@@ -50,6 +53,7 @@ namespace Gr8.Application.Services
                 await _communityRepository.SaveChangesAsync();
             }
         }
+
         public async Task<List<ActivityCalenderDto>> GetActivitiesForMonthAsync(int year, int month)
         {
             var activities = await _communityRepository.GetAllActivitiesAsync();

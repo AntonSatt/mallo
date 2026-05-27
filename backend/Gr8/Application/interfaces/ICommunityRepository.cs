@@ -51,5 +51,10 @@ namespace Gr8.Application.Interfaces
         Task AddPostNotificationAsync(PostNotification notification);
         void RemovePostNotifications(PostNotification notification);
         Task<int> GetActivityCalendarCountAsync(int activityId);
+        Task AddFirebaseTokenAsync(UserFirebaseToken firebaseToken);
+        Task<List<UserFirebaseToken>> GetFirebaseTokensByUserIdAsync(string userId);
+        Task<UserFirebaseToken?> GetFirebaseTokenAsync(string token);
+        Task RemoveFirebaseTokenAsync(UserFirebaseToken token);
+        Task<Dictionary<int, int>> GetActivityCalendarCountsAsync(IEnumerable<int> activityIds);
     }
 }

@@ -22,7 +22,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import useViewport from "../../../hooks/useViewport";
 
 
-const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookmarkToggle, onAddToCalendar, isHighlighted, markedDates, scrollingActivityId, clearScrollingActivityId }) => {
+const ActivityCard = ({ activity, distance, showDistance = false, currentUserId, onCardAction, onBookmarkToggle, onAddToCalendar, isHighlighted, markedDates, scrollingActivityId, clearScrollingActivityId }) => {
     const [expanded, setExpanded] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [error, setError] = useState("");
@@ -217,21 +217,23 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                     </Typography>
                 </Box>
 
-                {/* Vertical line & distance*/}
-                <Box sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    borderLeft: '2px solid var( --color-ui-muted)',
-                    pl: 2,
-                    height: '30px'
-                }}>
-                    <Typography variant="h9" sx={{
-                        fontWeight: 800,
-                        color: 'var(--color-primary)',
+                {/* Vertical line & distance */}
+                {showDistance && distance && (
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        borderLeft: '2px solid var( --color-ui-muted)',
+                        pl: 2,
+                        height: '30px'
                     }}>
-                        {distance ? distance : "-- m"}
-                    </Typography>
-                </Box>
+                        <Typography variant="h9" sx={{
+                            fontWeight: 800,
+                            color: 'var(--color-primary)',
+                        }}>
+                            {distance}
+                        </Typography>
+                    </Box>
+                )}
             </Box>
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <Box sx={{ p: 2, pt: 0, borderBottomLeftRadius: '25px', borderBottomRightRadius: '25px' }}>

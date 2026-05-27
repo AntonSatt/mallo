@@ -378,7 +378,7 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
 
     return (
         <>
-            <div className="forum-page">
+            <div className="forum-page page-container">
 
                 <div className="forum-container">
 
@@ -481,7 +481,10 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
                             },
                         }}>
 
-                        <Box sx={{ px: { md: 1 } }}> {/*adds padding for scrollbar.*/}
+                        <Box sx={{
+                            px: { md: 1 },
+                            pb: { xs: "80px", md: "20px" }
+                        }}> {/*adds padding for scrollbar.*/}
                             {filteredPosts.length > 0 ? (
                                 filteredPosts.map((post) => (
                                     <PostCard

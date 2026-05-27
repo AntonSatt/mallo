@@ -333,6 +333,18 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
                 return;
             }
 
+            const inFloatingMenu = !!targetElement?.closest(
+                ".MuiPopover-root, .MuiMenu-root, .MuiPopper-root, .MuiAutocomplete-popper"
+            );
+            if (inFloatingMenu) {
+                return;
+            }
+
+            if (openModal) {
+                event.preventDefault();
+                return;
+            }
+
             const inSidebar = !!targetElement?.closest(".sidebar-left, .sidebar-right");
             if (inSidebar) {
                 return;
@@ -349,7 +361,7 @@ const ForumPage = ({ openModal, setOpenModal, searchQuery }) => {
 
         window.addEventListener("wheel", handleWheel, { passive: false });
         return () => window.removeEventListener("wheel", handleWheel);
-    }, [isDesktop]);
+    }, [isDesktop, openModal]);
 
     const handlePostCreated = (newPost) => {
         const formattedPost = {

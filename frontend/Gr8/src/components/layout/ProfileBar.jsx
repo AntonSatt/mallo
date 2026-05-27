@@ -43,11 +43,15 @@ const ProfileBar = ({ showCreate = false, onCreatePost, onSearch }) => {
                             <Box
                                 sx={{
                                     position: "relative",
-                                    width: "fit-content",
+                                    width: 46,
+                                    height: 46,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
                                     flexShrink: 0,
                                 }}
                             >
-                                <Avatar avatar={currentUser?.picture} />
+                                <Avatar avatar={currentUser?.picture} size={46} />
 
                                 <Box
                                     sx={{

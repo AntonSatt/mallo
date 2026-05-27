@@ -170,6 +170,10 @@
         margin: 10px;
     }
 
+    .settings-button {
+        background-color: var(--color-text-inverse) !important;
+    }
+
 }
 
 @media (max-width: 480px) {

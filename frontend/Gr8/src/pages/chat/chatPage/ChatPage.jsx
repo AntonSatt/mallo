@@ -17,7 +17,6 @@ const ChatPage = () => {
     useEffect(() => {
         const initializeChat = async () => {
             try {
-                await ChatSignalrServices.startConnection();
 
                 ChatSignalrServices.onReceiveMessage((message) => {
 

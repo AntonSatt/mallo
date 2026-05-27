@@ -321,5 +321,46 @@ namespace Gr8.Infrastructure.Persistence.Repositories
                 .Where(ac => ac.ActivityId == activityId)
                 .CountAsync();
         }
+
+        public async Task AddFirebaseTokenAsync(UserFirebaseToken firebaseToken)
+        {
+            await _communityDbContext.UserFirebaseTokens.AddAsync(firebaseToken);
+        }
+
+        public async Task<List<UserFirebaseToken>> GetFirebaseTokensByUserIdAsync(string userId)
+        {
+            return await _communityDbContext.UserFirebaseTokens
+                .Where(t => t.UserId == userId)
+                .ToListAsync();
+        }
+
+        public async Task<UserFirebaseToken?> GetFirebaseTokenAsync(string token)
+        {
+            return await _communityDbContext.UserFirebaseTokens
+                .FirstOrDefaultAsync(t => t.Token == token);
+        }
+
+        public async Task RemoveFirebaseTokenAsync(UserFirebaseToken token)
+        {
+            _communityDbContext.UserFirebaseTokens.Remove(token);
+
+            await Task.CompletedTask;
+        }
+
+        public async Task<Dictionary<int, int>> GetActivityCalendarCountsAsync(IEnumerable<int> activityIds)
+        {
+            var ids = activityIds.Distinct().ToList();
+
+            if (ids.Count == 0)
+            {
+                return new Dictionary<int, int>();
+            }
+
+            return await _communityDbContext.ActivityCalenders
+                .Where(ac => ids.Contains(ac.ActivityId))
+                .GroupBy(ac => ac.ActivityId)
+                .Select(group => new { ActivityId = group.Key, Count = group.Count() })
+                .ToDictionaryAsync(x => x.ActivityId, x => x.Count);
+        }
     }
 }

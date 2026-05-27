@@ -55,16 +55,22 @@ spec:
               value: "https://gr8-plain.cc.k3s.chas-lab.dev"
             - name: Cors__AllowedOrigins__1
               value: "http://localhost:5173"
+            - name: Firebase__ServiceAccountPath
+              value: "/secrets/firebase/firebase-adminsdk.json"
           envFrom:
             - secretRef:
                 name: gr8-secrets
                 optional: false
+          volumeMounts:
+            - name: firebase-sa
+              mountPath: /secrets/firebase
+              readOnly: true
           resources:
             requests:
               cpu: 25m
               memory: 256Mi
             limits:
-              cpu: 500m
+              cpu: 1000m
               memory: 512Mi
           # API waits for the DB to come up (a cold PVC includes the MSSQL schema
           # upgrade, ~3-4 min) then runs EF migrations. 600s (60 x 10s) covers
@@ -83,3 +89,8 @@ spec:
             tcpSocket:
               port: 8080
             periodSeconds: 10
+      volumes:
+        - name: firebase-sa
+          secret:
+            secretName: gr8-firebase
+            defaultMode: 0400

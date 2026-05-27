@@ -1,4 +1,5 @@
-﻿using Gr8.Application.DTOs;
+﻿using Gr8.Application.Common.Formatting;
+using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
 
@@ -7,7 +8,6 @@ namespace Gr8.Application.Services
     public class ActivityService : IActivityService
     {
         private readonly ICommunityRepository _communityRepository;
-
         private readonly IApplicationRepository _applicationRepository;
 
         public ActivityService(ICommunityRepository communityRepository, IApplicationRepository applicationRepository)
@@ -19,14 +19,16 @@ namespace Gr8.Application.Services
         public async Task<IEnumerable<ActivityDto>> GetAllActivitiesAsync()
         {
             var activities = await _communityRepository.GetAllActivitiesAsync();
-            var activitiesDtoList = new List<ActivityDto>();
+            var visibleActivities = activities.Where(activity => !activity.IsDeleted).ToList();
+            var authorIdentities = await _applicationRepository.GetAuthorIdentitiesByUserIdsAsync(visibleActivities.Select(a => a.UserId));
+            var calendarCounts = await _communityRepository.GetActivityCalendarCountsAsync(visibleActivities.Select(a => a.Id));
 
-            foreach (var activity in activities)
+            var activitiesDtoList = new List<ActivityDto>(visibleActivities.Count);
+
+            foreach (var activity in visibleActivities)
             {
-                if (activity.IsDeleted)
-                {
-                    continue; 
-                }
+                authorIdentities.TryGetValue(activity.UserId, out var authorIdentity);
+                calendarCounts.TryGetValue(activity.Id, out var calendarCount);
 
                 var activityDto = new ActivityDto
                 {
@@ -42,26 +44,20 @@ namespace Gr8.Application.Services
                     IsEdited = activity.IsEdited,
                     UserId = activity.UserId,
                     Image = activity.Image,
-                    CalendarCount = await _communityRepository.GetActivityCalendarCountAsync(activity.Id),
+                    CalendarCount = calendarCount,
                     ImageMimeType = activity.ImageMimeType,
                     AuthorInfo = new AuthorDTO
                     {
                         Id = activity.UserId,
-                        UserName = await _applicationRepository.GetUserNameByIdAsync(activity.UserId) ?? "Unknown",
-                        AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(activity.UserId)
-                    }
-
+                        UserName = authorIdentity?.UserName ?? "Unknown",
+                        AvatarId = authorIdentity?.AvatarId ?? 1
+                    },
+                    FullName = AuthorNameFormatter.BuildCapitalizedFullName(authorIdentity?.FirstName, authorIdentity?.LastName)
                 };
-
-                var fullName = await _applicationRepository.GetFullNameByIdAsync(activity.UserId);
-
-                if (fullName != null)
-                {
-                    activityDto.FullName = fullName;
-                }
 
                 activitiesDtoList.Add(activityDto);
             }
+
             return activitiesDtoList;
         }
 
@@ -74,7 +70,10 @@ namespace Gr8.Application.Services
                 return null;
             }
 
-            var activityDto = new ActivityDto
+            var authorIdentities = await _applicationRepository.GetAuthorIdentitiesByUserIdsAsync(new[] { activity.UserId });
+            authorIdentities.TryGetValue(activity.UserId, out var authorIdentity);
+
+            return new ActivityDto
             {
                 Id = activity.Id,
                 Title = activity.Title,
@@ -93,19 +92,11 @@ namespace Gr8.Application.Services
                 AuthorInfo = new AuthorDTO
                 {
                     Id = activity.UserId,
-                    UserName = await _applicationRepository.GetUserNameByIdAsync(activity.UserId) ?? "Unknown",
-                    AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(activity.UserId)
-                }
+                    UserName = authorIdentity?.UserName ?? "Unknown",
+                    AvatarId = authorIdentity?.AvatarId ?? 1
+                },
+                FullName = AuthorNameFormatter.BuildCapitalizedFullName(authorIdentity?.FirstName, authorIdentity?.LastName)
             };
-
-            var userName = await _applicationRepository.GetFullNameByIdAsync(activityDto.UserId);
-
-            if (userName != null)
-            {
-                activityDto.FullName = userName;
-            }
-
-            return activityDto;
         }
 
         public async Task<ActivityDto> CreateActivityAsync(CreateActivityDto createDto, string userId)
@@ -129,7 +120,10 @@ namespace Gr8.Application.Services
             await _communityRepository.AddActivityAsync(activity);
             await _communityRepository.SaveChangesAsync();
 
-            var activityDto = new ActivityDto
+            var authorIdentities = await _applicationRepository.GetAuthorIdentitiesByUserIdsAsync(new[] { activity.UserId });
+            authorIdentities.TryGetValue(activity.UserId, out var authorIdentity);
+
+            return new ActivityDto
             {
                 Id = activity.Id,
                 Title = activity.Title,
@@ -148,19 +142,11 @@ namespace Gr8.Application.Services
                 AuthorInfo = new AuthorDTO
                 {
                     Id = activity.UserId,
-                    UserName = await _applicationRepository.GetUserNameByIdAsync(activity.UserId) ?? "Unknown",
-                    AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(activity.UserId)
-                }
+                    UserName = authorIdentity?.UserName ?? "Unknown",
+                    AvatarId = authorIdentity?.AvatarId ?? 1
+                },
+                FullName = AuthorNameFormatter.BuildCapitalizedFullName(authorIdentity?.FirstName, authorIdentity?.LastName)
             };
-
-            var userName = await _applicationRepository.GetFullNameByIdAsync(activityDto.UserId);
-
-            if (userName != null)
-            {
-                activityDto.FullName = userName;
-            }
-
-            return activityDto;
         }
 
         public async Task<ActivityDto?> UpdateActivityAsync(int id, UpdateActivityDto updateDto, string userId)
@@ -192,7 +178,10 @@ namespace Gr8.Application.Services
             await _communityRepository.UpdateActivityAsync(existing);
             await _communityRepository.SaveChangesAsync();
 
-            var activityDto = new ActivityDto
+            var authorIdentities = await _applicationRepository.GetAuthorIdentitiesByUserIdsAsync(new[] { existing.UserId });
+            authorIdentities.TryGetValue(existing.UserId, out var authorIdentity);
+
+            return new ActivityDto
             {
                 Id = existing.Id,
                 Title = existing.Title,
@@ -211,19 +200,11 @@ namespace Gr8.Application.Services
                 AuthorInfo = new AuthorDTO
                 {
                     Id = existing.UserId,
-                    UserName = await _applicationRepository.GetUserNameByIdAsync(existing.UserId) ?? "Unknown",
-                    AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(existing.UserId)
-                }
+                    UserName = authorIdentity?.UserName ?? "Unknown",
+                    AvatarId = authorIdentity?.AvatarId ?? 1
+                },
+                FullName = AuthorNameFormatter.BuildCapitalizedFullName(authorIdentity?.FirstName, authorIdentity?.LastName)
             };
-
-            var userName = await _applicationRepository.GetFullNameByIdAsync(activityDto.UserId);
-
-            if (userName != null)
-            {
-                activityDto.FullName = userName;
-            }
-
-            return activityDto;
         }
 
         public async Task<bool> DeleteActivityAsync(int id, string userId)

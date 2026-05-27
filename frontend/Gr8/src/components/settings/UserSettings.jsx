@@ -23,7 +23,7 @@ import { useAuth } from "../../hooks/useAuth";
 import ArrowDropDownCircleOutlinedIcon from '@mui/icons-material/ArrowDropDownCircleOutlined';
 import InputField from "../../design/input/InputField";
 import Settings from "../../assets/icons/settings.svg";
-import Report from "../../assets/icons/report.svg";
+import Report from "../../assets/icons/Wavy_Warning.svg";
 import Lock from "../../assets/icons/lock.svg";
 import AvatarSlider from "../../components/avatar/avatarSlider.jsx";
 import SecondaryButton from "../../design/buttons/SecondaryButton";
@@ -48,6 +48,7 @@ import {
     queryPermissionState,
     requestPermission
 } from "../../utils/browserPermissions.js";
+import AboutDialog from "./AboutDialog.jsx";
 
 // User Settings Page: Provides an interface for users to update their profile information, change their password, and delete their account. 
 // Utilizes accordions for organized sections and handles form validation and API interactions for user data management.
@@ -94,6 +95,7 @@ const UserSettings = () => {
     const [statusDialogOpen, setStatusDialogOpen] = useState(false);
     const [statusDialogSection, setStatusDialogSection] = useState("profile");
     const [statusDialogOutcome, setStatusDialogOutcome] = useState("success");
+    const [openAbout, setOpenAbout] = useState(false);
 
     const [showCurrentPassword] = useState(false);
     const [showNewPassword] = useState(false);
@@ -423,15 +425,16 @@ const UserSettings = () => {
                         <img src={Headset} alt="edit" style={{
                             width: 20,
                             height: 20,
+                            color: 'var(--color-primary)'
                         }} />
                     </Button>
 
                     <Button
                         className="settings-button"
-                        // onClick={() => window.location.href = "/forum"}
+                        onClick={() => setOpenAbout(true)}
                         sx={SettingsButtonStyles}
                     >
-                        Om appen
+                        Om Mallo
                         <InfoOutlinedIcon sx={{ color: 'var(--color-primary)' }} />
                     </Button>
                 </Grid>
@@ -447,7 +450,7 @@ const UserSettings = () => {
                                 <img src={Settings} alt="edit" style={{
                                     width: 20,
                                     height: 20,
-                                    filter: 'invert(78%) sepia(50%) saturate(500%) hue-rotate(330deg)'
+                                    color: 'var(--color-primary)'
                                 }} />
                                 Profilinställningar
                             </Typography>
@@ -607,7 +610,6 @@ const UserSettings = () => {
                                 <img src={Lock} alt="edit" style={{
                                     width: 20,
                                     height: 20,
-                                    filter: 'invert(78%) sepia(50%) saturate(500%) hue-rotate(330deg)'
                                 }} />Lösenordsinställningar</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
@@ -717,7 +719,6 @@ const UserSettings = () => {
                                 <img src={Report} alt="edit" style={{
                                     width: 20,
                                     height: 20,
-                                    filter: 'saturate(500%)'
                                 }} />
                                 Triggers
                             </Typography>
@@ -1043,6 +1044,11 @@ const UserSettings = () => {
                         </DialogContent>
                     </ClickAwayListener>
                 </Dialog>
+
+                <AboutDialog
+                    open={openAbout}
+                    onClose={() => setOpenAbout(false)}
+                />
 
                 <SettingsSuccessDialog
                     open={statusDialogOpen}

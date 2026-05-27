@@ -12,9 +12,46 @@ namespace Gr8.Infrastructure.Hubs
     {
         private readonly IChatService _chatService;
 
-        public ChatHub(IChatService chatService) 
+        private readonly IPresenceService _presenceService;
+
+        public ChatHub(IChatService chatService, IPresenceService presenceService) 
         {
             _chatService = chatService;
+            _presenceService = presenceService;
+        }
+
+        // Triggers automatic when a user connects to the signalR hub.
+        public override async Task OnConnectedAsync()
+        {
+            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                _presenceService.UserConnected(userId, Context.ConnectionId);
+                
+                await Clients.Caller.OnlineUsers(_presenceService.GetOnlineUsers());
+                await Clients.Others.UserOnline(userId);
+            }
+
+            await base.OnConnectedAsync();
+        }
+
+        // Triggers automatic when a user disconnects from the signalR hub.
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var userWentOffline = _presenceService.UserDisconnected(userId, Context.ConnectionId);
+
+                if (userWentOffline)
+                {
+                    await Clients.Others.UserOffline(userId);
+                }
+            }
+
+            await base.OnDisconnectedAsync(exception);
         }
 
         // Sends a chat message and broadcasts it to the receiver in real time.

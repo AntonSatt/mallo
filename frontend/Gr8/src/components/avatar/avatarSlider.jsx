@@ -64,9 +64,6 @@ export default function AvatarSlider({ formData, handleChange, mt = 2, mb = 2 })
                         <SwiperSlide key={id} className='swiper-slide'>
                             {({ isActive }) => (
                                 <Box
-                                    display="flex"
-                                    justifycontent="center"
-                                    alignitems="center"
                                     sx={{
                                         height: '100px',
                                         transition: 'all 0.3s ease',

@@ -70,7 +70,7 @@ const ResetPasswordPage = () => {
                             onChange={(e) => setNewPassword(e.target.value)}
                         />
                     </Grid>
-                    <Grid item>
+                    <Grid>
                         <InputField
                             fullWidth
                             type="password"
@@ -80,11 +80,11 @@ const ResetPasswordPage = () => {
                         />
                     </Grid>
                     {error && (
-                        <Grid item>
+                        <Grid>
                             <Typography color="error">{error}</Typography>
                         </Grid>
                     )}
-                    <Grid item>
+                    <Grid>
                         <PrimaryButton type="submit" fullWidth>
                             Återställ lösenord
                         </PrimaryButton>

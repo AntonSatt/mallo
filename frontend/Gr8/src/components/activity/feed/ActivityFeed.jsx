@@ -2,10 +2,10 @@ import { Box, Typography, Stack } from "@mui/material";
 import ActivityCard from "./ActivityCard.jsx";
 
 // Component for rendering the list of activity cards in the feed
-const ActivityFeed = ({ activities, currentUserId, onCardAction, onSelectActivity, onBookmarkToggle, scrollingActivityId, clearScrollingActivityId, onAddToCalendar, highlightedActivityId, markedDates }) => {
+const ActivityFeed = ({ activities, currentUserId, onCardAction, onSelectActivity, onBookmarkToggle, scrollingActivityId, clearScrollingActivityId, onAddToCalendar, highlightedActivityId, markedDates, showDistance = false }) => {
 
     const calculateDistanceText = (distanceMeters) => {
-        if (!distanceMeters) return null;
+        if (!Number.isFinite(distanceMeters)) return null;
 
         //If it's over 1 km, show in km with one decimal, otherwise in meters
         if (distanceMeters > 1000) {
@@ -36,6 +36,7 @@ const ActivityFeed = ({ activities, currentUserId, onCardAction, onSelectActivit
                             <ActivityCard
                                 activity={activity}
                                 distance={calculateDistanceText(activity.distanceMeters)}
+                                showDistance={showDistance}
                                 currentUserId={currentUserId}
                                 onCardAction={(action, data) => onCardAction(action, data)}
                                 onBookmarkToggle={onBookmarkToggle}

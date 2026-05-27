@@ -33,7 +33,6 @@ const RegisterPage = () => {
         return (
             <Box className="success-page">
                 <Step4 onContinue={() => navigate("/forum")} />
-                <img src={groupPhoto} alt="Group of people holding eachother" className='group-photo' />
             </Box>
         );
     }

@@ -19,6 +19,7 @@ namespace Gr8.Infrastructure.Persistence
         public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
         public DbSet<ActivityCalender> ActivityCalenders => Set<ActivityCalender>();
         public DbSet<PostNotification> PostNotifications => Set<PostNotification>();
+        public DbSet<UserFirebaseToken> UserFirebaseTokens => Set<UserFirebaseToken>();
 
         public CommunityDbContext(DbContextOptions<CommunityDbContext> options) : base(options)
         {
@@ -343,6 +344,17 @@ namespace Gr8.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasIndex(pn => pn.UserId);
+            });
+
+            modelBuilder.Entity<UserFirebaseToken>(entity => 
+            {
+                entity.HasKey(t => t.Id);
+
+                entity.Property(t => t.UserId)
+                    .IsRequired();
+
+                entity.Property(t => t.Token)
+                    .IsRequired();
             });
         }
     }

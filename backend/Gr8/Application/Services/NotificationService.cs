@@ -2,19 +2,19 @@
 using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
-using System.Linq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Gr8.Application.Services
 {
     public class NotificationService : INotificationService
     {
         private readonly ICommunityRepository _communityRepository;
-        public NotificationService(ICommunityRepository communityRepository)
+        private readonly IFirebasePushService _firebasePushService;
+        private readonly IPresenceService _presenceService;
+        public NotificationService(ICommunityRepository communityRepository, IFirebasePushService firebasePushService, IPresenceService presenceService)
         {
             _communityRepository = communityRepository;
+            _firebasePushService = firebasePushService;
+            _presenceService = presenceService;
         }
 
         public async Task AddNotificationAsync(int postId, string type, string userId)
@@ -38,6 +38,16 @@ namespace Gr8.Application.Services
             await _communityRepository.AddPostNotificationAsync(notification);
 
             await _communityRepository.SaveChangesAsync();
+
+            // Send a Firebase push notification only if the receiver is currently offline.
+            if (!_presenceService.IsOnline(post.UserId))
+            {
+                await _firebasePushService.SendToUserAsync(
+                    post.UserId,
+                    "Ny notis från Mallo",
+                    notification.Title
+                );
+            }
         }
 
         public async Task<List<PostNotificationDto>> GetAllPostNotificationsByUserIdAsync(string userId)
@@ -73,6 +83,32 @@ namespace Gr8.Application.Services
             await _communityRepository.SaveChangesAsync();
 
             return true;
+        }
+
+        // Prevents duplicate Firebase tokens by reusing the existing device token
+        // and updating it to the latest logged in user.
+        public async Task SaveFirebaseTokenAsync(string userId, string token)
+        {
+            var existingToken = await _communityRepository.GetFirebaseTokenAsync(token);
+
+            if (existingToken != null)
+            {
+                existingToken.UserId = userId;
+                existingToken.CreatedAt = DateTime.UtcNow;
+
+                await _communityRepository.SaveChangesAsync();
+                return;
+            }
+
+            var firebaseToken = new UserFirebaseToken
+            {
+                UserId = userId,
+                Token = token,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _communityRepository.AddFirebaseTokenAsync(firebaseToken);
+            await _communityRepository.SaveChangesAsync();
         }
     }
 }

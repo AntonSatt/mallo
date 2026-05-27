@@ -183,9 +183,9 @@ deploy production:
     name: production
     url: https://gr8-main.${HOST_BASE}
   script:
-    # Rewrite "gr8-plain" → "gr8-main" (resource names + ingress host + CORS)
-    # and image tags ":develop" → ":latest" since main builds the :latest tag.
-    - sed -i 's|gr8-plain|gr8-main|g; s|backend:develop|backend:latest|g; s|frontend:develop|frontend:latest|g' devops/k8s/manifests/*.yaml
+    # Rewrite plain → main, develop image tags → latest, and bump api
+    # request cpu (main only — develop stays cheap, no real traffic).
+    - sed -i 's|gr8-plain|gr8-main|g; s|backend:develop|backend:latest|g; s|frontend:develop|frontend:latest|g; s|cpu: 25m|cpu: 300m|' devops/k8s/manifests/*.yaml
     - kubectl apply -f devops/k8s/manifests/
     - kubectl -n "$NAMESPACE" rollout restart deployment -l app.kubernetes.io/instance=gr8-main
     - |

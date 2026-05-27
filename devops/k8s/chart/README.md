@@ -44,6 +44,19 @@ The chart references this Secret via:
 - `valueFrom.secretKeyRef` for `DB_PASSWORD` (used in connection string and as `MSSQL_SA_PASSWORD`)
 - `envFrom.secretRef` for everything else (.NET binds `Jwt__Key`, `Email__SmtpUser`, etc. via env-var configuration automatically)
 
+### 3. Firebase service account
+
+Used by the api for push notifications to offline users (SignalR handles online realtime; Firebase Admin SDK handles offline FCM dispatch). Get the JSON from Firebase Console → Project Settings → Service accounts → "Generate new private key", then:
+
+```bash
+kubectl -n doe25-group-8 create secret generic gr8-firebase \
+  --from-file=firebase-adminsdk.json=/path/to/firebase-adminsdk.json
+```
+
+The api Deployment mounts this Secret at `/secrets/firebase/firebase-adminsdk.json` (readOnly) and sets `Firebase__ServiceAccountPath` to that path. Kept separate from `gr8-secrets` because that one is consumed via `envFrom`, which would turn the JSON blob into a malformed env var.
+
+One Secret serves both `gr8-develop` and `gr8-main` (same namespace).
+
 ## Deploy
 
 ```bash

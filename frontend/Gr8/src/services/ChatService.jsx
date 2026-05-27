@@ -6,8 +6,6 @@ const ChatService = {
     getConversations: async () => {
     const response = await ApiClient.get(`/chat/conversations`);
 
-    console.log("GET conversations response:", response.data);
-
     return response.data;
 },
 

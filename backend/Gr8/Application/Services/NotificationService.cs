@@ -42,11 +42,23 @@ namespace Gr8.Application.Services
             // Send a Firebase push notification only if the receiver is currently offline.
             if (!_presenceService.IsOnline(post.UserId))
             {
-                await _firebasePushService.SendToUserAsync(
-                    post.UserId,
-                    "Ny notis från Mallo",
-                    notification.Title
-                );
+                var pushTitle = "Mallo";
+                var pushBody = type switch
+                {
+                    "Comment" => $"Någon kommenterade ditt inlägg: {post.Title}",
+                    "Hug" => $"Du har fått en kram: {post.Title}",
+                    _ => $"Du har en ny notis: {post.Title}"
+                };
+
+                // Send a Firebase push notification only if the receiver is currently offline.
+                if (!_presenceService.IsOnline(post.UserId))
+                {
+                    await _firebasePushService.SendToUserAsync(
+                        post.UserId,
+                        pushTitle,
+                        pushBody
+                    );
+                }
             }
         }
 

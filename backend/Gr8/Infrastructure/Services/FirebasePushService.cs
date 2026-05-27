@@ -23,10 +23,11 @@ namespace Gr8.Infrastructure.Services
                     var message = new Message
                     {
                         Token = firebaseToken.Token,
-                        Notification = new Notification
+                        Data = new Dictionary<string, string>
+                        //Notification = new Notification
                         {
-                            Title = title,
-                            Body = body
+                            ["Title"] = title,
+                            ["Body"] = body
                         }
                     };
 

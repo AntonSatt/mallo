@@ -16,6 +16,7 @@ namespace Gr8.Application.DTOs
         [StringLength(8, MinimumLength = 8, ErrorMessage = "Social number must be 8 characters.")]
         [Required(ErrorMessage = "Social number is required")]
         public string SocialNumber { get; set; } = string.Empty;
+        [Range(1, 18, ErrorMessage = "Avatar must be between 1 and 18.")]
         public int Avatar { get; set; } 
         [Required(ErrorMessage = "Email address is required")]
         [EmailAddress]

@@ -15,7 +15,7 @@ namespace Gr8.Infrastructure.Identity
         [MaxLength(10)]
         [Required]
         public string SocialNumber { get; set; }
-        [Range(1, 9)]
+        [Range(1, 18)]
         public int Avatar { get; set; }
         public bool IsAnonymousPosting { get; set; } = true;
 

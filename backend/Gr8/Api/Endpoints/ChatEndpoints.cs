@@ -5,6 +5,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
+// This file registers endpoints for the chat system in the API.
+// Here are routes to retrieve the user's conversations,
+// read the chat history with another user, and delete a conversation.
+// The endpoints require JWT authentication and use IChatService
+// to handle the chat logic.
+
 namespace Gr8.Api.Endpoints
 {
     public static class ChatEndpoints

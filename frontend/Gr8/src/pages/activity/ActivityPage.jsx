@@ -347,6 +347,8 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
             });
     }, [activities, userCoords, searchQuery, activeFilters, currentUserId, geolocationPermissionState]);
 
+    const shouldShowDistance = geolocationPermissionState === PERMISSION_STATE.GRANTED && Boolean(userCoords);
+
     return (
 
         //Wrapper for the whole container
@@ -407,7 +409,7 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                             "& .MuiOutlinedInput-root": {
                                 height: 50,
                                 borderRadius: 25,
-                                width: { xs: "235px", md: '300px' },
+                                width: { xs: "235px", md: '340px' },
                                 bgcolor: 'white !important'
                             },
                         }}
@@ -593,7 +595,7 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                 }}>
                 <ActivityFeed
                     activities={filteredActivities}
-                    userCoords={userCoords}
+                    showDistance={shouldShowDistance}
                     onCardAction={handleCardAction}
                     currentUserId={currentUserId}
                     onBookmarkToggle={handleBookmarkToggle}

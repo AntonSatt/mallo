@@ -216,7 +216,8 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                     <Box sx={{ p: 2, mt: 6 }}>
                         <Paper sx={{ p: 2, mb: 3, borderRadius: 5, textAlign: 'center', border: '1px solid var(--color-border-light) opacity: 0.5' }}>
                             <Typography variant="h6" sx={{ justifyContent: 'center', alignItems: 'center', gap: 1 }}>
-                                Publicera <span style={{ color: "var(--color-primary)", fontWeight: 700 }}>Aktivitet</span>
+                                {isEditMode ? "Redigera " : "Publicera "}
+                                <span style={{ color: "var(--color-primary)", fontWeight: 700 }}>Aktivitet</span>
                             </Typography>
                         </Paper>
 
@@ -375,7 +376,13 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
 
                             <PrimaryButton fullWidth onClick={handleSubmit}
                             >
-                                {loading ? <CircularProgress size={24} /> : "Publicera"}
+                                {loading ? (
+                                    <CircularProgress size={24} />
+                                ) : isEditMode ? (
+                                    "Spara"
+                                ) : (
+                                    "Publicera"
+                                )}
                             </PrimaryButton>
                         </Stack>
                     </Box>

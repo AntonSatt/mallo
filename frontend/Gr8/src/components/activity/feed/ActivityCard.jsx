@@ -102,11 +102,16 @@ const ActivityCard = ({ activity, distance, showDistance = false, currentUserId,
         }
     };
 
-    const handleAddToCalendar = (e) => {
+    const handleCalendarClick = async (e) => {
         e.stopPropagation();
-        if (addedToCalendar) return;
-        setAddedToCalendar(true);
-        onAddToCalendar?.(activity);
+
+        try {
+            if (onAddToCalendar) {
+                await onAddToCalendar(activity);
+            }
+        } catch (err) {
+            console.error("Kunde inte lägga till i kalendern", err);
+        }
     };
 
     useEffect(() => {
@@ -114,6 +119,12 @@ const ActivityCard = ({ activity, distance, showDistance = false, currentUserId,
             setExpanded(true);
         }
     }, [isHighlighted]);
+
+    useEffect(() => {
+        setAddedToCalendar(
+            markedDates?.some(m => m.activityId === activity.id) ?? false
+        );
+    }, [markedDates, activity.id]);
 
     return (
         <Paper elevation={2}
@@ -333,20 +344,34 @@ const ActivityCard = ({ activity, distance, showDistance = false, currentUserId,
                         mt: 'auto',
                         pt: 2
                     }}>
-                        <SecondaryButton
-                            onClick={handleDialogOpen}
-                            sx={{
-                                borderRadius: "50%", height: "40px", width: "40px", minWidth: "unset",
-                                p: 0,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                flexShrink: 0,
-                                mr: 2, ml: 0.5
-                            }}
-                            startIcon={<MoreHorizIcon sx={{ color: "var(--color-primary)", marginLeft: 1.5, fontSize: "25px !important" }} />}
-                        >
-                        </SecondaryButton>
+
+                        {isOwner && (
+                            <SecondaryButton
+                                onClick={handleDialogOpen}
+                                sx={{
+                                    borderRadius: "50%",
+                                    height: "40px",
+                                    width: "40px",
+                                    minWidth: "unset",
+                                    p: 0,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flexShrink: 0,
+                                    ml: isDesktop ? 19 : 11
+                                }}
+                                startIcon={
+                                    <MoreHorizIcon
+                                        sx={{
+                                            color: "var(--color-primary)",
+                                            marginLeft: 1.5,
+                                            fontSize: "25px !important"
+                                        }}
+                                    />
+                                }
+                            >
+                            </SecondaryButton>
+                        )}
 
                         {!isOwner && (
                             <SecondaryButton
@@ -368,7 +393,8 @@ const ActivityCard = ({ activity, distance, showDistance = false, currentUserId,
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    flexShrink: 0
+                                    flexShrink: 0,
+                                    ml: isDesktop ? 19 : 11
                                 }}
                             >
                                 <img
@@ -389,7 +415,7 @@ const ActivityCard = ({ activity, distance, showDistance = false, currentUserId,
                                     ? <TaskAltIcon sx={{ color: "var(--color-primary)", fontSize: "25px !important" }} />
                                     : <TodayOutlinedIcon sx={{ color: "var(--color-primary)", fontSize: "25px !important" }} />
                             }
-                            onClick={handleAddToCalendar}
+                            onClick={handleCalendarClick}
                             sx={{ borderRadius: '20px', height: '40px', width: "180px", whiteSpace: 'nowrap', ml: "auto" }}
                         >
                             {addedToCalendar ? "Tillagd!" : "Lägg till aktivitet"}
@@ -434,7 +460,6 @@ const ActivityCard = ({ activity, distance, showDistance = false, currentUserId,
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleDelete(e);
-                                    handleDialogClose();
                                 }}
                                 sx={{
                                     display: 'flex', alignItems: 'center', gap: 2, p: 2.5, px: 3,
@@ -450,7 +475,6 @@ const ActivityCard = ({ activity, distance, showDistance = false, currentUserId,
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleEdit(e);
-                                    handleDialogClose();
                                 }}
                                 sx={{
                                     display: 'flex', alignItems: 'center', gap: 2, p: 2.5, px: 3,

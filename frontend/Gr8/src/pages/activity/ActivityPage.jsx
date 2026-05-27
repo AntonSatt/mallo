@@ -19,6 +19,7 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import { Box, InputAdornment, Button, CircularProgress, Snackbar, Alert, Dialog, IconButton, Typography } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import ActivityCalendarDialog from "../../components/activity/calender/ActivityCalendarDialog.jsx";
+import CalendarService from "../../services/CalanderService.jsx";
 
 import distance from "@turf/distance";
 import {
@@ -98,16 +99,70 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
         }, 150);
     }, [highlightedActivityId, activities]);
 
-    const handleAddToCalendar = async (activity) => {
+    const handleCalendarToggle = async (activity) => {
+        const isAlreadyAdded = markedDates?.some(m => m.activityId === activity.id);
+
         try {
-            await CalendarService.add(activity.id);
-            if (onMarkedDatesChange) {
-                onMarkedDatesChange(prev => [...prev, { date: activity.startAt, activityId: activity.id }]);
+            if (isAlreadyAdded) {
+                await CalendarService.remove(activity.id);
+
+                if (onMarkedDatesChange) {
+                    onMarkedDatesChange(markedDates.filter(m => m.activityId !== activity.id));
+                }
+
+                if (typeof setActivities === 'function') {
+                    setActivities(prevActivities =>
+                        prevActivities.map(act =>
+                            act.id === activity.id
+                                ? { ...act, calendarCount: Math.max(0, (act.calendarCount || 1) - 1) }
+                                : act
+                        )
+                    );
+                }
+
+                setToast({
+                    open: true,
+                    message: "Aktiviteten har tagits bort från din kalender.",
+                    severity: "info"
+                });
+
+            } else {
+                await CalendarService.add(activity.id);
+
+                if (onMarkedDatesChange) {
+
+                    const newMarkedDate = {
+                        activityId: activity.id,
+                        date: activity.startAt
+                    };
+
+                    onMarkedDatesChange([...markedDates, newMarkedDate]);
+                }
+
+                if (typeof setActivities === 'function') {
+                    setActivities(prevActivities =>
+                        prevActivities.map(act =>
+                            act.id === activity.id
+                                ? { ...act, calendarCount: (act.calendarCount || 0) + 1 }
+                                : act
+                        )
+                    );
+                }
+
+                setToast({
+                    open: true,
+                    message: "Aktiviteten har lagts till i din kalender!",
+                    severity: "success"
+                });
             }
-        } catch (error) {
-            if (error.response?.status !== 409) {
-                console.error("Kunde inte lägga till aktiviteten i kalendern.");
-            }
+        } catch (err) {
+            console.error("Kunde inte uppdatera kalendern", err);
+            setToast({
+                open: true,
+                message: "Något gick fel när kalendern skulle uppdateras.",
+                severity: "error"
+            });
+            throw err;
         }
     };
 
@@ -606,7 +661,7 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                     currentUserId={currentUserId}
                     onBookmarkToggle={handleBookmarkToggle}
                     onSelectActivity={setSelectedActivity}
-                    onAddToCalendar={handleAddToCalendar}
+                    onAddToCalendar={handleCalendarToggle}
                     highlightedActivityId={highlightedActivityId}
                     markedDates={markedDates}
                     scrollingActivityId={scrollingActivityId}
@@ -686,7 +741,7 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                         width: '100%',
                         borderRadius: '20px',
                         boxShadow: '0px 4px 12px rgba(0,0,0,0.15)',
-                        bgcolor: 'var(--color-primary-soft, #FFF8F1)',
+                        bgcolor: 'white',
                         color: 'var(--color-text-main, #333333)',
                         fontWeight: 600,
 

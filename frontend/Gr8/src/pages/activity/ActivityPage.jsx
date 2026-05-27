@@ -18,6 +18,7 @@ import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBullet
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { Box, InputAdornment, Button, CircularProgress, Snackbar, Alert, Dialog, IconButton, Typography } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
+import ActivityCalendarDialog from "../../components/activity/calender/ActivityCalendarDialog.jsx";
 
 import distance from "@turf/distance";
 import {
@@ -41,12 +42,16 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
     const [activities, setActivities] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [isFormOpen, setIsFormOpen] = useState(false);
+
     const [alignment, setAlignment] = React.useState('map');
     const [filterOpen, setFilterOpen] = useState(false);
     const [userCoords, setUserCoords] = useState(null);
     const [geolocationPermissionState, setGeolocationPermissionState] = useState(PERMISSION_STATE.PROMPT);
+
+    const [isFormOpen, setIsFormOpen] = useState(false);
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+    const [calendarOpen, setCalendarOpen] = useState(false);
+
     const [latestCreatedId, setLatestCreatedId] = useState(null);
     const [scrollingActivityId, setScrollingActivityId] = useState(null);
     const [activeFilters, setActiveFilters] = useState({
@@ -452,21 +457,31 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                     </Button>
 
                     <PrimaryButton
+                        onClick={() => setCalendarOpen(true)}
                         sx={{
                             display: {
                                 xs: "flex",
                                 sm: "none"
                             },
-                            borderRadius: "50%", height: "50px", width: "50px", minWidth: "unset",
+                            borderRadius: "50%",
+                            height: "50px",
+                            width: "50px",
+                            minWidth: "unset",
                             p: 0,
                             alignItems: "center",
                             justifyContent: "center",
                             flexShrink: 0
                         }}
-                        startIcon={<TodayOutlinedIcon sx={{ color: "white", marginLeft: 1.5, fontSize: "25px !important" }} />}
-                    >
-                    </PrimaryButton>
-
+                        startIcon={
+                            <TodayOutlinedIcon
+                                sx={{
+                                    color: "white",
+                                    marginLeft: 1.5,
+                                    fontSize: "25px !important"
+                                }}
+                            />
+                        }
+                    />
 
                 </Box>
             </Box>
@@ -603,6 +618,15 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                 handleClose={handleCloseForm}
                 activityToEdit={editActivity}
                 onSuccess={handleFormSuccess}
+            />
+
+            <ActivityCalendarDialog
+                open={calendarOpen}
+                onClose={() => setCalendarOpen(false)}
+                markedDates={markedDates}
+                activities={activities}
+                setAlignment={setAlignment}
+                setSelectedActivity={setSelectedActivity}
             />
 
             <Dialog

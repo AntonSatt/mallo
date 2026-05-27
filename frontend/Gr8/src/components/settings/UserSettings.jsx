@@ -24,7 +24,7 @@ import ArrowDropDownCircleOutlinedIcon from '@mui/icons-material/ArrowDropDownCi
 import InputField from "../../design/input/InputField";
 import Settings from "../../assets/icons/Settings.svg";
 import Report from "../../assets/icons/Wavy_Warning.svg";
-import Lock from "../../assets/icons/Lock.svg";
+import Lock from "../../assets/icons/lock.svg";
 import AvatarSlider from "../../components/avatar/avatarSlider.jsx";
 import SecondaryButton from "../../design/buttons/SecondaryButton";
 import PrimaryButton from "../../design/buttons/PrimaryButton.jsx";

@@ -346,5 +346,21 @@ namespace Gr8.Infrastructure.Persistence.Repositories
 
             await Task.CompletedTask;
         }
+
+        public async Task<Dictionary<int, int>> GetActivityCalendarCountsAsync(IEnumerable<int> activityIds)
+        {
+            var ids = activityIds.Distinct().ToList();
+
+            if (ids.Count == 0)
+            {
+                return new Dictionary<int, int>();
+            }
+
+            return await _communityDbContext.ActivityCalenders
+                .Where(ac => ids.Contains(ac.ActivityId))
+                .GroupBy(ac => ac.ActivityId)
+                .Select(group => new { ActivityId = group.Key, Count = group.Count() })
+                .ToDictionaryAsync(x => x.ActivityId, x => x.Count);
+        }
     }
 }

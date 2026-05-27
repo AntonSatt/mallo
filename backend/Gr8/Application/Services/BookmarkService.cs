@@ -1,9 +1,14 @@
 ﻿using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
+// This file defines the BookmarkService class, which implements the IBookmarkService interface. The BookmarkService is
+// responsible for managing bookmark-related operations in the application. It interacts with the ICommunityRepository to
+// retrieve and update bookmark information in the database. The GetAllBookmarksByUserIdAsync method retrieves a list of
+// bookmarks for a specific user and post, while the TogglePostBookmarkAsync method allows users to add or remove a bookmark
+// for a specific post. If a bookmark already exists for the user and post, it will be removed and the method will return false.
+// If no bookmark exists, a new bookmark will be created and saved to the database, and the method will return true.
+// This functionality allows users to easily manage their bookmarks for posts in the application.
 
 namespace Gr8.Application.Services
 {

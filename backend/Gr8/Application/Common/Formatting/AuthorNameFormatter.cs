@@ -1,5 +1,8 @@
 using System.Globalization;
 
+// This file defines the AuthorNameFormatter class, which provides a method for building a capitalized full name
+// from given first and last names.
+
 namespace Gr8.Application.Common.Formatting
 {
     public static class AuthorNameFormatter

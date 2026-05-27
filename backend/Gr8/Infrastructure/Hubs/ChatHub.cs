@@ -5,6 +5,12 @@ using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 using Gr8.Application.Common.Constants;
 
+// This file defines the ChatHub class, which is a SignalR hub responsible for handling real-time chat functionality in the application.
+// The hub is protected by JWT authentication, ensuring that only authenticated users can connect and interact with it.
+// The ChatHub provides methods for sending messages, retrieving chat history, managing conversations, and notifying users about
+// typing status. It also integrates with a presence service to track online users and a Firebase push service to send notifications
+// when users are offline.
+
 namespace Gr8.Infrastructure.Hubs
 {
     [Authorize(Policy = AuthorizationConstants.JwtOnly)]

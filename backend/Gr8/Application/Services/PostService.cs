@@ -2,6 +2,9 @@
 using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
 
+// This file defines the PostService class, which implements the IPostService interface. The PostService is responsible for
+// managing post-related operations in the application, such as creating, retrieving, updating, and deleting posts. 
+
 namespace Gr8.Application.Services
 {
     public class PostService : IPostService

@@ -1,9 +1,14 @@
 ﻿using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
+// This file defines the ActivityCalenderService class, which implements the IActivityCalenderService interface.
+// The ActivityCalenderService is responsible for managing user calendar activities in the application. It interacts
+// with the ICommunityRepository to retrieve and update user calendar activity information in the database.
+// The service provides methods to get a user's calendar activities, check if a specific activity is in a user's calendar,
+// add or remove activities from a user's calendar, and retrieve activities for a specific month or check if any activities
+// are scheduled on a given date. Additionally, when an activity is added to a user's calendar, it also triggers the addition
+// of an activity notification for that user.
 
 namespace Gr8.Application.Services
 {

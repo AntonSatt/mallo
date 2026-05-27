@@ -1,8 +1,8 @@
 ﻿using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
+// This file defines the TagService class, which implements the ITagService interface. The TagService is responsible for managing
+// tag-related operations in the application. It interacts with the ICommunityRepository to retrieve tag information from the database.
 
 namespace Gr8.Application.Services
 {

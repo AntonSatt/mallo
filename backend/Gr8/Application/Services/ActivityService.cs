@@ -3,6 +3,13 @@ using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
 
+// This file defines the ActivityService class, which implements the IActivityService interface. The ActivityService is responsible
+// for managing activities in the application. It interacts with the ICommunityRepository to perform CRUD operations on activities
+// and retrieve related data such as author information and calendar counts. The service provides methods to get all activities,
+// get an activity by ID, create a new activity, update an existing activity, and delete an activity.
+// It also handles authorization checks to ensure that only the owner of an activity can update or delete it.
+// The service returns data in the form of ActivityDto objects, which include details about the activity and its author.
+
 namespace Gr8.Application.Services
 {
     public class ActivityService : IActivityService

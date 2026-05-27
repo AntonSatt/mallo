@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace Gr8.Application.DTOs
 {
-    //This file is for when backend sends back a message to frontend.
     public class ChatMessageResponseDto
     {
         public int Id { get; set; }

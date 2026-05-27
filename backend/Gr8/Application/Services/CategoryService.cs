@@ -1,8 +1,12 @@
 ﻿using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
+// This file defines the CategoryService class, which implements the ICategoryService interface. The CategoryService is
+// responsible for managing category-related operations in the application. It interacts with the ICommunityRepository to
+// retrieve category information from the database.
+// The GetAllCategoriesAsync method retrieves all categories from the repository and maps them to a list of CategoryDto objects,
+// which are then returned to the caller. This service allows other parts of the application to access category data
+// without needing to directly interact with the data layer.
 
 namespace Gr8.Application.Services
 {

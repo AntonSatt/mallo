@@ -18,10 +18,6 @@ const InputField = ({ autoComplete = "off", inputProps, ...props }) => (
     <StyledInputField
         {...props}
         autoComplete={autoComplete}
-        inputprops={{
-            ...inputProps,
-            autoComplete: inputProps?.autoComplete ?? autoComplete
-        }}
     />
 );
 

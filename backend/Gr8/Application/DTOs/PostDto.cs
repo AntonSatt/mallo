@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
+﻿
 namespace Gr8.Application.DTOs
 {
     public class PostDto

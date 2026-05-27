@@ -76,10 +76,6 @@
     -webkit-line-clamp: unset;
 }
 
-.post-content-wrapper {
-    position: relative;
-}
-
 .post-read-more {
     color: var(--color-text-main) !important;
     opacity: 0.55;
@@ -104,11 +100,6 @@
 
 .post-action-icon {
     opacity: 0.45;
-}
-
-.post-save-icon,
-.post-comment-button {
-    color: var(--color-primary) !important;
 }
 
 .post-comments {

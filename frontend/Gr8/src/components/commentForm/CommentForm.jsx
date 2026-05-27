@@ -149,7 +149,7 @@ const CommentForm = ({ postId }) => {
 
                                     <Box className="comment-content">
                                         <Box className="comment-card-header">
-                                            <Typography className="comment-meta" display="block">
+                                            <Typography className="comment-meta">
                                                 {`${c.authorInfo.userName} \u2022 ${moment(c.createdAt).fromNow()}`}
                                             </Typography>
                                             {c.id && (

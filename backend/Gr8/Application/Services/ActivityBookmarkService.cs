@@ -1,9 +1,14 @@
 ﻿using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
+// This file defines the ActivityBookmarkService class, which implements the IActivityBookmarkService interface.
+// The ActivityBookmarkService is responsible for managing activity bookmark-related operations in the application.
+// It interacts with the ICommunityRepository to retrieve, add, and remove activity bookmarks from the database.
+// The GetAllActivityBookmarksByUserId method retrieves all activity bookmarks for a specific user, while the
+// ToggleActivityBookmarkAsync method toggles the bookmark status for a given activity and user, adding a bookmark if it
+// doesn't exist or removing it if it does. The service ensures that changes are saved to the database and returns
+// appropriate results based on the operations performed. 
 
 namespace Gr8.Application.Services
 {

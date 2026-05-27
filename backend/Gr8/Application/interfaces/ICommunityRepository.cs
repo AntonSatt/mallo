@@ -1,5 +1,7 @@
-﻿using Gr8.Application.DTOs;
-using Gr8.Domain.Entities;
+﻿using Gr8.Domain.Entities;
+
+// This file defines the ICommunityRepository interface, which serves as a contract for the community-related data operations
+// in the application.
 
 namespace Gr8.Application.Interfaces
 {

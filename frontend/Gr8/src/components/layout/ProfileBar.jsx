@@ -7,7 +7,8 @@ import {
     Paper,
     Typography,
     Button,
-    InputAdornment
+    InputAdornment,
+    Dialog
 } from "@mui/material";
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -16,6 +17,10 @@ import ControlPointIcon from "@mui/icons-material/ControlPoint";
 import SearchHeartButton from "../../assets/icons/searchHeartForum.svg";
 import Avatar from "../avatar/avatar";
 import InputField from '../../design/input/InputField.jsx';
+import notificationButton from "../../assets/icons/notificationButton.svg";
+import SidebarNotification from "../../components/layout/SidebarNotification.jsx";
+import { useEffect } from "react";
+import NotificationService from "../../services/NotificationService";
 
 // this is the profile bar that appears at the top of the forum page. It shows the user's avatar and name,
 // and has an optional "create post"
@@ -28,6 +33,37 @@ const ProfileBar = ({ showCreate = false, onCreatePost, onSearch }) => {
 
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchValue, setSearchValue] = useState("");
+
+    const [open, setOpen] = useState(false);
+
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+
+    const [notifications, setNotifications] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            try {
+                const data = await NotificationService.getAll();
+                const list = Array.isArray(data)
+                    ? data
+                    : data.notifications
+                    ?? data.data
+                    ?? data.content
+                    ?? [];
+
+                setNotifications(list);
+                setUnreadCount(list.filter(n => !n.isSeen).length);
+
+            } catch (err) {
+                console.error("Failed to load notifications", err);
+            }
+        };
+
+        fetchNotifications();
+    }, []);
+
 
     const handleSearchChange = (e) => {
         setSearchValue(e.target.value);
@@ -43,11 +79,15 @@ const ProfileBar = ({ showCreate = false, onCreatePost, onSearch }) => {
                             <Box
                                 sx={{
                                     position: "relative",
-                                    width: "fit-content",
+                                    width: 46,
+                                    height: 46,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
                                     flexShrink: 0,
                                 }}
                             >
-                                <Avatar avatar={currentUser?.picture} />
+                                <Avatar avatar={currentUser?.picture} size={46} />
 
                                 <Box
                                     sx={{
@@ -124,6 +164,54 @@ const ProfileBar = ({ showCreate = false, onCreatePost, onSearch }) => {
                             onClick={() => setSearchOpen(true)}>
                             <img src={SearchHeartButton} alt="" className="profilebar-search-icon" />
                         </Button>
+
+                        <Box sx={{ position: "relative" }}>
+                            <Button
+                                onClick={handleOpen}
+                                aria-label="Notifikationer"
+                                disableRipple
+                                sx={{
+                                    minWidth: 0,
+                                    padding: 0,
+                                    background: "transparent",
+                                    boxShadow: "none",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    "&:hover": { background: "transparent" },
+                                    "&:focus": { outline: "none" },
+                                    "&:focus-visible": { outline: "none" }
+                                }}
+                            >
+                                <img src={notificationButton} alt="" className="notification-icon" />
+                            </Button>
+
+                            {unreadCount > 0 && (
+                                <Box
+                                    sx={{
+                                        position: "absolute",
+                                        top: 2,
+                                        right: 2,
+                                        backgroundColor: "var(--color-primary-soft)",
+                                        color: "#374957",
+                                        borderRadius: "50%",
+                                        width: 18,
+                                        height: 18,
+                                        fontSize: "0.7rem",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    {unreadCount}
+                                </Box>
+                            )}
+                        </Box>
+
+                        <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+                            <SidebarNotification onClose={handleClose} />
+                        </Dialog>
+
                     </>
                 ) : (
                     <>

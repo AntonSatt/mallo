@@ -21,11 +21,6 @@
     margin-bottom: 31px;
 }
 
-.search-bar-placeholder {
-    visibility: hidden;
-    pointer-events: none;
-}
-
 .search-icon {
     width: 22px;
     height: 22px;
@@ -182,4 +177,28 @@
 .notification-item .highlight {
     color: var(--color-primary);
     font-weight: bold;
+}
+
+.notification-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 7px;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    background-color: var(--color-primary-soft);
+    color: #374957;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    pointer-events: none;
 }

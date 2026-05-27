@@ -2,6 +2,7 @@
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded";
 import PrimaryButton from "../../design/buttons/PrimaryButton.jsx";
+import InfoIcon from "../../assets/icons/info.svg";
 
 const successMessages = {
     profile: "Dina profilinställningar har sparats.",
@@ -19,11 +20,12 @@ const errorMessages = {
     notifications: "Kunde inte aktivera notifikationer.",
 };
 
-const SettingsSuccessDialog = ({ open, onClose, section = "profile", outcome = "success" }) => {
+const SettingsSuccessDialog = ({ open, onClose, section = "profile", outcome = "success", customMessage = "" }) => {
     const isSuccess = outcome === "success";
-    const message = isSuccess
+    const useAnonymityIconStyle = section === "anonymity";
+    const message = customMessage || (isSuccess
         ? (successMessages[section] ?? successMessages.profile)
-        : (errorMessages[section] ?? errorMessages.profile);
+        : (errorMessages[section] ?? errorMessages.profile));
 
     const handleDialogClose = () => {
         onClose();
@@ -60,14 +62,21 @@ const SettingsSuccessDialog = ({ open, onClose, section = "profile", outcome = "
                         sx={{
                             width: 64,
                             height: 64,
-                            borderRadius: "50%",
-                            backgroundColor: isSuccess ? "var(--color-primary-soft)" : "var(--button-danger-bg)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                         }}
                     >
-                        {isSuccess ? (
+                        {useAnonymityIconStyle ? (
+                            <img
+                                src={InfoIcon}
+                                alt=""
+                                style={{
+                                    width: 50,
+                                    height: 50,
+                                }}
+                            />
+                        ) : isSuccess ? (
                             <CheckCircleRoundedIcon sx={{ color: "var(--color-primary)", fontSize: 36 }} />
                         ) : (
                             <ErrorOutlineRoundedIcon sx={{ color: "var(--color-text-inverse)", fontSize: 36 }} />
@@ -78,7 +87,7 @@ const SettingsSuccessDialog = ({ open, onClose, section = "profile", outcome = "
                         variant="body1"
                         sx={{
                             color: "var(--color-text-main)",
-                            fontWeight: 700,
+                            fontWeight: useAnonymityIconStyle ? 400 : 700,
                             lineHeight: 1.4,
                             maxWidth: 260,
                         }}

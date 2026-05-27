@@ -3,6 +3,11 @@ using MailKit.Net.Smtp;
 using MimeKit;
 using Microsoft.Extensions.Configuration;
 
+// This file defines the EmailService class, which implements the IEmailService interface. It uses the MailKit library to
+// send emails via SMTP. The service retrieves email configuration settings from the application's configuration,
+// such as the SMTP host, port, username, and password. The SendAsync method constructs an email message and sends it
+// to the specified recipient with the given subject and HTML body content.
+
 namespace Gr8.Infrastructure.Services
 {
     public class EmailService : IEmailService

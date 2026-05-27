@@ -22,7 +22,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import useViewport from "../../../hooks/useViewport";
 
 
-const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookmarkToggle, onAddToCalendar, isHighlighted, markedDates, scrollingActivityId, clearScrollingActivityId }) => {
+const ActivityCard = ({ activity, distance, showDistance = false, currentUserId, onCardAction, onBookmarkToggle, onAddToCalendar, isHighlighted, markedDates, scrollingActivityId, clearScrollingActivityId }) => {
     const [expanded, setExpanded] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [error, setError] = useState("");
@@ -130,19 +130,20 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
             <Box sx={{
                 bgcolor: 'var(--color-primary-soft)',
                 p: 0,
+                pt: 1,
                 pb: 2,
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'flex-start'
+                alignItems: "center"
             }}>
                 <Typography variant="h7" sx={{
                     fontWeight: 600,
                     paddingLeft: 2,
-                    paddingTop: 1
+                    lineHeight: 1.2,
                 }}>
                     {activity.title}
                 </Typography>
-                <Box onClick={(e) => e.stopPropagation()} sx={{ paddingTop: 1, paddingRight: 1 }}>
+                <Box onClick={(e) => e.stopPropagation()} sx={{ paddingRight: 1 }}>
                     <BookmarkButton
                         isBookmarked={activity.isBookmarked}
                         onToggle={async () => {
@@ -216,21 +217,23 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                     </Typography>
                 </Box>
 
-                {/* Vertical line & distance*/}
-                <Box sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    borderLeft: '2px solid var( --color-ui-muted)',
-                    pl: 2,
-                    height: '30px'
-                }}>
-                    <Typography variant="h9" sx={{
-                        fontWeight: 800,
-                        color: 'var(--color-primary)',
+                {/* Vertical line & distance */}
+                {showDistance && distance && (
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        borderLeft: '2px solid var( --color-ui-muted)',
+                        pl: 2,
+                        height: '30px'
                     }}>
-                        {distance ? distance : "-- m"}
-                    </Typography>
-                </Box>
+                        <Typography variant="h9" sx={{
+                            fontWeight: 800,
+                            color: 'var(--color-primary)',
+                        }}>
+                            {distance}
+                        </Typography>
+                    </Box>
+                )}
             </Box>
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <Box sx={{ p: 2, pt: 0, borderBottomLeftRadius: '25px', borderBottomRightRadius: '25px' }}>
@@ -304,15 +307,15 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                             mb: 1,
                             px: 0.5,
                             overflow: 'auto',
-                            height: '90px',
+                            height: '100%',
                         }}>
                             <Box
                                 component="img"
                                 src={activity.imageUrl}
                                 alt={activity.title || "Aktivitetsbild"}
                                 sx={{
-                                    width: '100%',
                                     maxHeight: '200px',
+                                    maxWidth: '200px',
                                     objectFit: 'cover',
                                     borderRadius: '15px',
                                     border: '1px solid var(--color-border-light)',
@@ -345,32 +348,40 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                         >
                         </SecondaryButton>
 
-                        <SecondaryButton
-                            onClick={(e) => {
-                                e.stopPropagation();
+                        {!isOwner && (
+                            <SecondaryButton
+                                onClick={(e) => {
+                                    e.stopPropagation();
 
-                                navigate(`/message/${activity.userId}`);
-                            }}
-                            sx={{
-                                borderRadius: "50%", height: "40px", width: "40px", minWidth: "unset",
-                                p: 0,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                flexShrink: 0
-                            }}
-
-                        >
-                            <img
-                                src={ChatBubble}
-                                alt="Chat"
-                                style={{
-                                    width: "23px",
-                                    height: "23px",
-                                    color: "var(--color-primary)",
+                                    navigate(`/message/${activity.userId}`, {
+                                        state: {
+                                            otherUserId: activity.userId,
+                                            otherUserFullName: activity.fullName,
+                                            avatarId: activity.authorInfo?.avatarId,
+                                            activityId: activity.id
+                                        }
+                                    });
                                 }}
-                            />
-                        </SecondaryButton>
+                                sx={{
+                                    borderRadius: "50%", height: "40px", width: "40px", minWidth: "unset",
+                                    p: 0,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flexShrink: 0
+                                }}
+                            >
+                                <img
+                                    src={ChatBubble}
+                                    alt="Chat"
+                                    style={{
+                                        width: "23px",
+                                        height: "23px",
+                                        color: "var(--color-primary)",
+                                    }}
+                                />
+                            </SecondaryButton>
+                        )}
 
                         <SecondaryButton
                             startIcon={

@@ -95,6 +95,7 @@ const UserSettings = () => {
     const [statusDialogOpen, setStatusDialogOpen] = useState(false);
     const [statusDialogSection, setStatusDialogSection] = useState("profile");
     const [statusDialogOutcome, setStatusDialogOutcome] = useState("success");
+    const [statusDialogMessage, setStatusDialogMessage] = useState("");
     const [openAbout, setOpenAbout] = useState(false);
 
     const [showCurrentPassword] = useState(false);
@@ -144,9 +145,10 @@ const UserSettings = () => {
         setIsContactDialogOpen(false);
     };
 
-    const openStatusDialog = (section, outcome) => {
+    const openStatusDialog = (section, outcome, customMessage = "") => {
         setStatusDialogSection(section);
         setStatusDialogOutcome(outcome);
+        setStatusDialogMessage(customMessage);
         setStatusDialogOpen(true);
     };
 
@@ -337,7 +339,10 @@ const UserSettings = () => {
 
         try {
             await UserServices.updateAnonymity(nextValue);
-            openStatusDialog("anonymity", "success");
+            const successMessage = nextValue
+                ? "Dina inlägg och kommentarer kommer nu att publiceras anonymt."
+                : "Ditt namn kommer att synas på de inlägg och kommentarer som du publicerar.";
+            openStatusDialog("anonymity", "success", successMessage);
         } catch (error) {
             setIsAnonymousPublishing(previousValue);
             console.error("Kunde inte uppdatera anonymitetsinställningen", error);
@@ -1055,6 +1060,7 @@ const UserSettings = () => {
                     onClose={closeStatusDialog}
                     section={statusDialogSection}
                     outcome={statusDialogOutcome}
+                    customMessage={statusDialogMessage}
                 />
             </Box>
         </>

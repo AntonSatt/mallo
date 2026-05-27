@@ -5,6 +5,12 @@ using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 using Gr8.Application.Common.Constants;
 
+// This file defines the ChatHub class, which is a SignalR hub responsible for handling real-time chat functionality in the application.
+// The hub is protected by JWT authentication, ensuring that only authenticated users can connect and interact with it.
+// The ChatHub provides methods for sending messages, retrieving chat history, managing conversations, and notifying users about
+// typing status. It also integrates with a presence service to track online users and a Firebase push service to send notifications
+// when users are offline.
+
 namespace Gr8.Infrastructure.Hubs
 {
     [Authorize(Policy = AuthorizationConstants.JwtOnly)]
@@ -14,10 +20,13 @@ namespace Gr8.Infrastructure.Hubs
 
         private readonly IPresenceService _presenceService;
 
-        public ChatHub(IChatService chatService, IPresenceService presenceService) 
+        private readonly IFirebasePushService _firebasePushService;
+
+        public ChatHub(IChatService chatService, IPresenceService presenceService, IFirebasePushService firebasePushService) 
         {
             _chatService = chatService;
             _presenceService = presenceService;
+            _firebasePushService = firebasePushService;
         }
 
         // Triggers automatic when a user connects to the signalR hub.
@@ -55,11 +64,12 @@ namespace Gr8.Infrastructure.Hubs
         }
 
         // Sends a chat message and broadcasts it to the receiver in real time.
-        public async Task SendMessage(SendChatMessageDto dto) 
+
+        public async Task SendMessage(SendChatMessageDto dto)
         {
             var senderId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (string.IsNullOrEmpty(senderId)) 
+            if (string.IsNullOrEmpty(senderId))
             {
                 throw new HubException("User is not authenticated.");
             }
@@ -69,8 +79,17 @@ namespace Gr8.Infrastructure.Hubs
             await Clients.User(dto.ReceiverId).ReceiveMessage(message);
 
             await Clients.Caller.ReceiveMessage(message);
-        }
 
+            if (!_presenceService.IsOnline(dto.ReceiverId))
+            {
+                await _firebasePushService.SendToUserAsync(
+                    dto.ReceiverId,
+                    "Mallo",
+                    "Du har fått ett nytt meddelande"
+                );
+            }
+        }
+     
         // Retrieves the full chat history between two users.
         public async Task<List<ChatMessageResponseDto>> GetChatHistory(string otherUserId) 
         {

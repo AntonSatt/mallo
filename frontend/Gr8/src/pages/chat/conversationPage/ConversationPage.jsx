@@ -33,15 +33,20 @@ const ConversationPage = () => {
 
         const loadConversation = async () => {
             try {
-                const conversations = await ChatService.getConversations();
-                const selectedConversation = conversations?.find(
+                const conversationsData = await ChatService.getConversations();
+                const conversations = Array.isArray(conversationsData) ? conversationsData : [];
+
+                const selectedConversation = conversations.find(
                     (conversation) => conversation.otherUserId === userId
                 );
 
                 setConversationInfo(selectedConversation ?? null);
 
                 const history = await ChatService.getChatHistory(userId);
-                setMessages(history ?? []);
+
+                console.log("GET chat history response:", history);
+
+                setMessages(Array.isArray(history) ? history : []);
 
                 await ChatSignalrServices.markConversationAsRead(userId);
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, Grid, Typography } from "@mui/material";
 import PrimaryButton from "../../../design/buttons/PrimaryButton";
 import SecondaryButton from "../../../design/buttons/SecondaryButton";
-import ageValidation from "../../../assets/images/ageValidation.png"
+import loudMallo from "../../../assets/images/loudMallo.png"
 import { useNavigate } from "react-router-dom";
 import InputField from "../../../design/input/InputField";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -145,13 +145,14 @@ const Step2 = ({ formData, handleChange, onNext, error }) => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     textAlign: 'center',
+                    width: { xs: '100%', md: '400px' }
                 }}
 
                 >
                     <img
-                        src={ageValidation}
+                        src={loudMallo}
                         alt="Åldersgräns"
-                        style={{ width: '60%', height: 'auto', marginBottom: '20px' }}
+                        style={{ width: '50%', height: 'auto', marginBottom: '20px' }}
                     />
                     <DialogContentText>
                         Så fint att du vill vara med i vårt community! <br />

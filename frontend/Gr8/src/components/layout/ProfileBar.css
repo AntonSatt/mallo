@@ -89,3 +89,10 @@
   height: 20px;
   display: block; 
 }
+
+.notification-icon {
+    width: 50px;
+    height: 50px;
+    display: block;
+    margin-top: 7px;
+}

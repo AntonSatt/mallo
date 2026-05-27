@@ -346,39 +346,40 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                         >
                         </SecondaryButton>
 
-                        <SecondaryButton
-                            onClick={(e) => {
-                                e.stopPropagation();
+                        {!isOwner && (
+                            <SecondaryButton
+                                onClick={(e) => {
+                                    e.stopPropagation();
 
-                                navigate(`/message/${activity.userId}`, {
-                                    state: {
-                                        otherUserId: activity.userId,
-                                        otherUserFullName: activity.fullName,
-                                        avatarId: activity.authorInfo?.avatarId,
-                                        activityId: activity.id
-                                    }
-                                });
-                            }}
-                            sx={{
-                                borderRadius: "50%", height: "40px", width: "40px", minWidth: "unset",
-                                p: 0,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                flexShrink: 0
-                            }}
-
-                        >
-                            <img
-                                src={ChatBubble}
-                                alt="Chat"
-                                style={{
-                                    width: "23px",
-                                    height: "23px",
-                                    color: "var(--color-primary)",
+                                    navigate(`/message/${activity.userId}`, {
+                                        state: {
+                                            otherUserId: activity.userId,
+                                            otherUserFullName: activity.fullName,
+                                            avatarId: activity.authorInfo?.avatarId,
+                                            activityId: activity.id
+                                        }
+                                    });
                                 }}
-                            />
-                        </SecondaryButton>
+                                sx={{
+                                    borderRadius: "50%", height: "40px", width: "40px", minWidth: "unset",
+                                    p: 0,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flexShrink: 0
+                                }}
+                            >
+                                <img
+                                    src={ChatBubble}
+                                    alt="Chat"
+                                    style={{
+                                        width: "23px",
+                                        height: "23px",
+                                        color: "var(--color-primary)",
+                                    }}
+                                />
+                            </SecondaryButton>
+                        )}
 
                         <SecondaryButton
                             startIcon={

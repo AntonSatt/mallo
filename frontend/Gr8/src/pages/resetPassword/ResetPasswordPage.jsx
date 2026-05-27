@@ -58,7 +58,7 @@ const ResetPasswordPage = () => {
 
             <form onSubmit={handleSubmit}>
                 <Grid container direction="column" spacing={2} sx={{ mt: 4 }}>
-                    <Grid item>
+                    <Grid>
                         <Typography variant="h6" align="center">
                             Ange ditt nya lösenord
                         </Typography>

@@ -182,7 +182,7 @@ const SidebarCalendar = ({ showCreate = false, onCreatePost, markedDates = [], o
                         </LocalizationProvider>
                     </Box>
 
-                    <Stack className="button-wrapper" direction="row" justifyContent="center">
+                    <Stack className="button-wrapper" direction="row">
                         <PrimaryButton className="button-choice">
                             <LocationOnOutlinedIcon sx={{ color: "var(--color-primary) !important" }} />
                             <Typography className="button-title">Hitta</Typography>

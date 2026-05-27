@@ -122,7 +122,6 @@ const Homepage = ({ page }) => {
                     {page === "message" && <ProfileBar showCreate="false" />}
                     {page === "conversation" && <ProfileBar showCreate="false" />}
                     {page === "settings" && <ProfileBar showCreate="false" />}
-                    {page === "maps" && <ProfileBar showCreate="false" />}
                     <Navbar />
                     {page === "forum" && <ForumPage openModal={isOpen} setOpenModal={setOpen} searchQuery={searchQuery} />}
                     {page === "message" && <ChatPage />}

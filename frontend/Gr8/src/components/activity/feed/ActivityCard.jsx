@@ -126,7 +126,7 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                 justifyContent: 'space-between',
                 alignItems: 'flex-start'
             }}>
-                <Typography variant="h6" sx={{
+                <Typography variant="h7" sx={{
                     fontWeight: 600,
                     paddingLeft: 2,
                     paddingTop: 1

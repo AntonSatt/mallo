@@ -10,6 +10,12 @@ using System.Globalization;
 using Gr8.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
+// This file defines the IdentityEndpoints class, which contains a static method MapIdentityEndpoints.
+// This method configures the application's HTTP request pipeline to include endpoints for identity-related
+// operations such as user registration, login, logout, profile management, password reset, and user tag management.
+// The endpoints utilize ASP.NET Core Identity for user management and JWT for authentication.
+// Each endpoint includes validation and appropriate responses based on the success or failure of the operations performed.
+
 namespace Gr8.Api.Endpoints
 {
     public static class IdentityEndpoints

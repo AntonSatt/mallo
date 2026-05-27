@@ -6,13 +6,9 @@ namespace Gr8.Application.Interfaces
     public interface IChatService
     {
         Task<ChatMessageResponseDto> SendMessageAsync(string senderId, SendChatMessageDto dto);
-
         Task<List<ChatMessageResponseDto>> GetChatHistoryAsync(string currentUserId, string otherUserId);
-
         Task<List<ChatConversationDto>> GetUserConversationsAsync(string userId);
-
         Task MarkMessagesAsReadAsync(string currentUserId, string otherUserId);
-
         Task DeleteConversationForUserAsync(string currentUserId, string otherUserId);
     }
 }

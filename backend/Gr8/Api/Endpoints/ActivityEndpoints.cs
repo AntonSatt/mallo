@@ -2,12 +2,13 @@
 using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Infrastructure.Identity;
-using Gr8.Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Security.Claims;
+
+// This file defines the ActivityEndpoints class, which contains extension methods for mapping activity-related API endpoints in the application.
 
 namespace Gr8.Api.Endpoints
 {

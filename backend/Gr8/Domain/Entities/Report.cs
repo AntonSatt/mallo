@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace Gr8.Domain.Entities
 {
     public class Report
@@ -10,7 +7,7 @@ namespace Gr8.Domain.Entities
         public string ReportedByUserId { get; set; } = null!;
         public string Reason { get; set; } = null!;
         public string? Description { get; set; }
-        public string Status { get; set; } = null!; //add enums for pending, reviews etc.
+        public string Status { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? ReviewedAt { get; set; }
         public string? ReviewedByAdminId { get; set; }

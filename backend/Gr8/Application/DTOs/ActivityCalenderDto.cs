@@ -1,8 +1,4 @@
-﻿using Gr8.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace Gr8.Application.DTOs
 {
     public class ActivityCalenderDto

@@ -1,9 +1,10 @@
 ﻿using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
+// This file defines the ReportService class, which implements the IReportService interface.
+// The ReportService is responsible for handling the creation of reports in the application. It interacts with the ICommunityRepository
+// to add new reports to the database.
 
 namespace Gr8.Application.Services
 {

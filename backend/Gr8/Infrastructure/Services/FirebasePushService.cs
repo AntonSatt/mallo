@@ -1,6 +1,8 @@
 ﻿using FirebaseAdmin.Messaging;
 using Gr8.Application.Interfaces;
 
+// This file defines the FirebasePushService class, which implements the IFirebasePushService interface.
+
 namespace Gr8.Infrastructure.Services
 {
     public class FirebasePushService : IFirebasePushService

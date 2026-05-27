@@ -74,7 +74,7 @@ const AboutDialog = ({ open, onClose }) => {
                             color: "var(--color-text-main)",
                         }}
                     >
-                        Vi tror på kraften i gemenskap — och Mallo är vår väg att förverkliga det.
+                        Vi tror på kraften i gemenskap och Mallo är vår väg att förverkliga det.
                     </Typography>
 
                     <PrimaryButton

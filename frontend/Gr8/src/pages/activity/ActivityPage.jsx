@@ -409,7 +409,7 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                             "& .MuiOutlinedInput-root": {
                                 height: 50,
                                 borderRadius: 25,
-                                width: { xs: "235px", md: '300px' },
+                                width: { xs: "235px", md: '340px' },
                                 bgcolor: 'white !important'
                             },
                         }}

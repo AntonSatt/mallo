@@ -9,6 +9,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+// this file is responsible for setting up the dependency injection for the infrastructure layer of the application.
+// It registers the necessary services, repositories, and configurations required for the application to function properly.
+// This includes configuring Entity Framework Core to use SQL Server, setting up ASP.NET Core Identity, and registering various application services and repositories.
+
 namespace Gr8.Infrastructure
 {
     public static class DependencyInjection

@@ -3,6 +3,13 @@ using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
 
+// This file defines the CommentService class, which implements the ICommentService interface. The CommentService is responsible for
+// managing comment-related operations in the application, such as creating, retrieving, updating, and deleting comments.
+// It interacts with the ICommunityRepository to perform database operations related to comments and the IApplicationRepository to
+// retrieve author information for comments. Additionally, it uses the INotificationService to send notifications when a new comment
+// is created on a post. The service ensures that only the author of a comment can delete it and provides functionality to retrieve
+// comments for a specific post, as well as individual comments by their ID.
+
 namespace Gr8.Application.Services
 {
     public class CommentService : ICommentService

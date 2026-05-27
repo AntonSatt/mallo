@@ -49,7 +49,7 @@ const CustomCalendarHeader = (props) => {
 
 const MarkedDay = ({ markedDates = [], onMarkedDayClick, day, outsideCurrentMonth, ...other }) => {
     const match = !outsideCurrentMonth
-        ? markedDates.find(m => dayjs(m.date).startOf('day').isSame(day.startOf('day')))
+        ? markedDates.find(m => dayjs(m.date).isSame(dayjs(day), 'day'))
         : null;
 
     return (
@@ -67,8 +67,8 @@ const MarkedDay = ({ markedDates = [], onMarkedDayClick, day, outsideCurrentMont
                 component="button"
                 onClick={match ? (e) => { e.stopPropagation(); onMarkedDayClick(match.activityId); } : other.onClick}
                 sx={{
-                    width: 36,
-                    height: 36,
+                    width: { xs: 30, sm: 36 },
+                    height: { xs: 30, sm: 36 },
                     border: 'none',
                     borderRadius: '8px',
                     cursor: match ? 'pointer' : 'default',
@@ -156,16 +156,7 @@ const SidebarCalendar = ({ showCreate = false, onCreatePost, markedDates = [], o
                                 sx={{
                                     width: '100%',
                                     maxWidth: '100%',
-                                    "& .MuiDayCalendar-weekContainer": {
-                                        justifyContent: "center",
-                                        gap: "4px",
-                                    },
-                                    "& .MuiDayCalendar-header": {
-                                        justifyContent: "center"
-                                    },
-                                    "& .MuiPickersSlideTransition-root": {
-                                        minHeight: '220px'
-                                    }
+                                    minWidth: 0,
                                 }}
                                 slots={{
                                     calendarHeader: CustomCalendarHeader,
@@ -191,8 +182,8 @@ const SidebarCalendar = ({ showCreate = false, onCreatePost, markedDates = [], o
                         </LocalizationProvider>
                     </Box>
                 </Box>
-            </Stack>
-        </Box>
+            </Stack >
+        </Box >
     );
 };
 

@@ -24,7 +24,8 @@
 .profilebar-left {
   display: flex;
   align-items: center;
-  flex-shrink: 0; /*we dont want the avatar to grow bigger on profilebar*/
+  flex-shrink: 0;
+  /*we dont want the avatar to grow bigger on profilebar*/
   gap: 20px;
 }
 
@@ -69,7 +70,7 @@
   flex-shrink: 0;
   border-radius: 50% !important;
   background-color: var(--color-bg-muted) !important;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.08) !important;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.08) !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,14 +79,7 @@
 .profilebar-search-icon {
   width: 20px;
   height: 20px;
-  display: block; 
-}
-
-.notification-icon {
-    width: 50px;
-    height: 50px;
-    display: block;
-    margin-top: 7px;
+  display: block;
 }
 
 /* Slightly wider spacing on forum top row between avatar, create, and search */
@@ -93,4 +87,17 @@
   gap: 18px;
   padding-top: 10px !important;
   padding-bottom: 10px !important;
+}
+
+.profilebar-notification-button {
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  flex-shrink: 0;
+  border-radius: 50% !important;
+  background-color: var(--color-primary) !important;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

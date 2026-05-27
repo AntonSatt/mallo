@@ -53,6 +53,8 @@ namespace Gr8.Application.Interfaces
         Task<int> GetActivityCalendarCountAsync(int activityId);
         Task SaveFirebaseTokenAsync(UserFirebaseToken firebaseToken);
         Task<List<UserFirebaseToken>> GetFirebaseTokensByUserIdAsync(string userId);
+        Task<UserFirebaseToken?> GetFirebaseTokenAsync(string token);
+        Task RemoveFirebaseTokenAsync(UserFirebaseToken token);
 
     }
 }

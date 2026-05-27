@@ -7,28 +7,40 @@ namespace Gr8.Infrastructure.Services
     {
         private readonly ICommunityRepository _communityRepository;
 
-        public FirebasePushService(ICommunityRepository communityRepository) 
+        public FirebasePushService(ICommunityRepository communityRepository)
         {
             _communityRepository = communityRepository;
         }
 
-        public async Task SendToUserAsync(string userId, string Title, string body)
+        public async Task SendToUserAsync(string userId, string title, string body)
         {
             var tokens = await _communityRepository.GetFirebaseTokensByUserIdAsync(userId);
 
-            foreach(var firebaseToken in tokens)
+            foreach (var firebaseToken in tokens)
             {
-                var message = new Message
+                try
                 {
-                    Token = firebaseToken.Token,
-                    Notification = new Notification
+                    var message = new Message
                     {
-                        Title = Title,
-                        Body = body
-                    }
-                };
+                        Token = firebaseToken.Token,
+                        Notification = new Notification
+                        {
+                            Title = title,
+                            Body = body
+                        }
+                    };
 
-                await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                    await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                }
+                catch (FirebaseMessagingException ex)
+                {
+                    if (ex.MessagingErrorCode == MessagingErrorCode.Unregistered)
+                    {
+                        await _communityRepository.RemoveFirebaseTokenAsync(firebaseToken);
+
+                        await _communityRepository.SaveChangesAsync();
+                    }
+                }
             }
         }
     }

@@ -85,12 +85,26 @@ namespace Gr8.Application.Services
             return true;
         }
 
+        // Prevents duplicate Firebase tokens by reusing the existing device token
+        // and updating it to the latest logged in user.
         public async Task SaveFirebaseTokenAsync(string userId, string token)
         {
+            var existingToken = await _communityRepository.GetFirebaseTokenAsync(token);
+
+            if (existingToken != null)
+            {
+                existingToken.UserId = userId;
+                existingToken.CreatedAt = DateTime.UtcNow;
+
+                await _communityRepository.SaveChangesAsync();
+                return;
+            }
+
             var firebaseToken = new UserFirebaseToken
             {
                 UserId = userId,
-                Token = token
+                Token = token,
+                CreatedAt = DateTime.UtcNow
             };
 
             await _communityRepository.SaveFirebaseTokenAsync(firebaseToken);

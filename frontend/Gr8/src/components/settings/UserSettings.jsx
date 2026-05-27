@@ -48,6 +48,7 @@ import {
     queryPermissionState,
     requestPermission
 } from "../../utils/browserPermissions.js";
+import AboutDialog from "./AboutDialog.jsx";
 
 // User Settings Page: Provides an interface for users to update their profile information, change their password, and delete their account. 
 // Utilizes accordions for organized sections and handles form validation and API interactions for user data management.
@@ -94,6 +95,7 @@ const UserSettings = () => {
     const [statusDialogOpen, setStatusDialogOpen] = useState(false);
     const [statusDialogSection, setStatusDialogSection] = useState("profile");
     const [statusDialogOutcome, setStatusDialogOutcome] = useState("success");
+    const [openAbout, setOpenAbout] = useState(false);
 
     const [showCurrentPassword] = useState(false);
     const [showNewPassword] = useState(false);
@@ -429,10 +431,10 @@ const UserSettings = () => {
 
                     <Button
                         className="settings-button"
-                        // onClick={() => window.location.href = "/forum"}
+                        onClick={() => setOpenAbout(true)}
                         sx={SettingsButtonStyles}
                     >
-                        Om appen
+                        Om Mallo
                         <InfoOutlinedIcon sx={{ color: 'var(--color-primary)' }} />
                     </Button>
                 </Grid>
@@ -1042,6 +1044,11 @@ const UserSettings = () => {
                         </DialogContent>
                     </ClickAwayListener>
                 </Dialog>
+
+                <AboutDialog
+                    open={openAbout}
+                    onClose={() => setOpenAbout(false)}
+                />
 
                 <SettingsSuccessDialog
                     open={statusDialogOpen}

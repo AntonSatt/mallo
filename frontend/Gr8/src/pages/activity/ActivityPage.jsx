@@ -453,9 +453,12 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
 
                     <PrimaryButton
                         sx={{
+                            display: {
+                                xs: "flex",
+                                sm: "none"
+                            },
                             borderRadius: "50%", height: "50px", width: "50px", minWidth: "unset",
                             p: 0,
-                            display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             flexShrink: 0

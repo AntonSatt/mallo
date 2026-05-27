@@ -37,7 +37,7 @@ namespace Gr8.Infrastructure.Identity
                     .HasDefaultValue(true);
 
                 entity.ToTable(t =>
-                    t.HasCheckConstraint("CK_AspNetUsers_Avatar_Range", "[Avatar] BETWEEN 1 AND 9"));
+                    t.HasCheckConstraint("CK_AspNetUsers_Avatar_Range", "[Avatar] BETWEEN 1 AND 18"));
             });
         }
     }

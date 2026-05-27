@@ -1,23 +1,34 @@
 import { Dialog, DialogTitle, DialogContent, Box, Typography, IconButton, Button } from "@mui/material";
 import CloseIcon from "../../../assets/icons/closeIcon.svg";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import PrimaryButton from "../../../design/buttons/PrimaryButton.jsx";
+import { useState } from "react";
 
 const ActivityFilter = ({ open, onClose, onApply, currentFilters }) => {
 
-
-    const filters = currentFilters || { nearby: false, yourActivities: false, savedActivities: false, time: false };
+    const [localFilters, setLocalFilters] = useState(
+        currentFilters || { nearby: false, yourActivities: false, savedActivities: false, time: false }
+    );
 
     // Function for clear filters
     const handleClearAll = () => {
-        onApply({ nearby: false, yourActivities: false, savedActivities: false, time: false });
+        const cleared = { nearby: false, yourActivities: false, savedActivities: false, time: false };
+
+        setLocalFilters(cleared);
+        onApply(cleared);
     };
 
-    // OnApply function to save immediately when a filter is toggled
     const handleRowClick = (filterKey) => {
-        onApply({
-            ...filters, // Copy the existing filters
-            [filterKey]: !filters[filterKey] // Find the filter we clicked on and toggle it (true becomes false / false becomes true)
+        setLocalFilters({
+            ...localFilters,
+            [filterKey]: !localFilters[filterKey]
         });
+    };
+
+    // Save selected filters and close dialog
+    const handleSave = () => {
+        onApply(localFilters);
+        onClose();
     };
 
     return (
@@ -55,12 +66,12 @@ const ActivityFilter = ({ open, onClose, onApply, currentFilters }) => {
                         sx={{
                             display: 'flex', alignItems: 'center', px: 3, py: 2.5, cursor: 'pointer',
                             borderBottom: '1px solid var(--color-ui-muted)',
-                            bgcolor: filters.nearby ? "var(--color-primary-bg)" : 'transparent',
+                            bgcolor: localFilters.nearby ? "var(--color-primary-bg)" : 'transparent',
                             '&:hover': { bgcolor: '#FAFAFA' }
                         }}
                     >
-                        {filters.nearby && <FiberManualRecordIcon sx={{ color: "var(--color-primary)", fontSize: '10px', mr: 1.5 }} />}
-                        <Typography sx={{ fontWeight: 500, ml: filters.nearby ? 0 : '22px' }}>
+                        {localFilters.nearby && <FiberManualRecordIcon sx={{ color: "var(--color-primary)", fontSize: '10px', mr: 1.5 }} />}
+                        <Typography sx={{ fontWeight: 500, ml: localFilters.nearby ? 0 : '22px' }}>
                             Nära dig
                         </Typography>
                     </Box>
@@ -70,12 +81,12 @@ const ActivityFilter = ({ open, onClose, onApply, currentFilters }) => {
                         sx={{
                             display: 'flex', alignItems: 'center', px: 3, py: 2.5, cursor: 'pointer',
                             borderBottom: '1px solid var(--color-ui-muted)',
-                            bgcolor: filters.yourActivities ? "var(--color-primary-bg)" : 'transparent',
+                            bgcolor: localFilters.yourActivities ? "var(--color-primary-bg)" : 'transparent',
                             '&:hover': { bgcolor: '#FAFAFA' }
                         }}
                     >
-                        {filters.yourActivities && <FiberManualRecordIcon sx={{ color: "var(--color-primary)", fontSize: '10px', mr: 1.5 }} />}
-                        <Typography sx={{ fontWeight: 500, color: '#444', ml: filters.yourActivities ? 0 : '22px' }}>
+                        {localFilters.yourActivities && <FiberManualRecordIcon sx={{ color: "var(--color-primary)", fontSize: '10px', mr: 1.5 }} />}
+                        <Typography sx={{ fontWeight: 500, color: '#444', ml: localFilters.yourActivities ? 0 : '22px' }}>
                             Dina aktiviteter
                         </Typography>
                     </Box>
@@ -85,41 +96,57 @@ const ActivityFilter = ({ open, onClose, onApply, currentFilters }) => {
                         sx={{
                             display: 'flex', alignItems: 'center', px: 3, py: 2.5, cursor: 'pointer',
                             borderBottom: '1px solid var(--color-ui-muted)',
-                            bgcolor: filters.savedActivities ? "var(--color-primary-bg)" : 'transparent',
+                            bgcolor: localFilters.savedActivities ? "var(--color-primary-bg)" : 'transparent',
                             '&:hover': { bgcolor: '#FAFAFA' }
                         }}
                     >
-                        {filters.savedActivities && <FiberManualRecordIcon sx={{ color: "var(--color-primary)", fontSize: '10px', mr: 1.5 }} />}
-                        <Typography sx={{ fontWeight: 500, ml: filters.savedActivities ? 0 : '22px' }}>
+                        {localFilters.savedActivities && <FiberManualRecordIcon sx={{ color: "var(--color-primary)", fontSize: '10px', mr: 1.5 }} />}
+                        <Typography sx={{ fontWeight: 500, ml: localFilters.savedActivities ? 0 : '22px' }}>
                             Sparade aktiviteter
                         </Typography>
                     </Box>
 
                     <Box
-                        onClick={() => handleRowClick('time', filters.time)}
+                        onClick={() => handleRowClick('time', localFilters.time)}
                         sx={{
                             display: 'flex', alignItems: 'center', px: 3, py: 2.5, cursor: 'pointer',
                             borderBottom: '1px solid var(--color-ui-muted)',
-                            bgcolor: filters.time ? "var(--color-primary-bg)" : 'transparent',
+                            bgcolor: localFilters.time ? "var(--color-primary-bg)" : 'transparent',
                             '&:hover': { bgcolor: '#FAFAFA' }
                         }}
                     >
-                        {filters.time && <FiberManualRecordIcon sx={{ color: "var(--color-primary)", fontSize: '10px', mr: 1.5 }} />}
-                        <Typography sx={{ fontWeight: 500, ml: filters.time ? 0 : '22px' }}>
+                        {localFilters.time && <FiberManualRecordIcon sx={{ color: "var(--color-primary)", fontSize: '10px', mr: 1.5 }} />}
+                        <Typography sx={{ fontWeight: 500, ml: localFilters.time ? 0 : '22px' }}>
                             Tidpunkt
                         </Typography>
                     </Box>
 
-                    <Button
-                        onClick={handleClearAll}
-                        sx={{
-                            backgroundColor: "var(--color-bg-muted)", fontSize: '0.85rem',
-                            textTransform: 'none', fontWeight: 500, width: "250px",
-                            borderRadius: '20px', alignSelf: 'center', mt: 2, mb: 2
-                        }}
-                    >
-                        Rensa filter
-                    </Button>
+                    <Box sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: "100%",
+                        mt: 2,
+                        mb: 2
+                    }}>
+                        <Button
+                            onClick={handleClearAll}
+                            sx={{
+                                backgroundColor: "var(--color-bg-muted)", fontSize: '0.85rem',
+                                textTransform: 'none', fontWeight: 500, width: { xs: "130px", md: "150px" },
+                                borderRadius: '20px', px: 0,
+                            }}
+                        >
+                            Rensa
+                        </Button>
+
+                        <PrimaryButton
+                            onClick={handleSave}
+                            sx={{ width: { xs: "130px", md: "150px" }, px: 0, ml: 2 }}>
+                            Spara
+                        </PrimaryButton>
+                    </Box>
 
                 </Box>
             </DialogContent>

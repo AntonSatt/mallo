@@ -49,7 +49,7 @@ const Homepage = ({ page }) => {
         CalendarService.getAll().then(res => {
             const data = Array.isArray(res.data) ? res.data : [];
             const marked = data.map(item => ({
-                date: item.startAt,
+                date: item.startAt ? item.startAt.split('T')[0] : '',
                 activityId: item.activityId,
             }));
             setMarkedDates(marked);

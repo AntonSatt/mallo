@@ -21,6 +21,7 @@ import notificationButton from "../../assets/icons/notificationButton.svg";
 import SidebarNotification from "../../components/layout/SidebarNotification.jsx";
 import { useEffect } from "react";
 import NotificationService from "../../services/NotificationService";
+import notificationBell from "../../assets/icons/notificationBell.svg";
 
 // this is the profile bar that appears at the top of the forum page. It shows the user's avatar and name,
 // and has an optional "create post"
@@ -167,30 +168,20 @@ const ProfileBar = ({ showCreate = false, onCreatePost, onSearch }) => {
 
                         <Box sx={{ position: "relative" }}>
                             <Button
+                                type="button"
+                                className="profilebar-notification-button"
                                 onClick={handleOpen}
-                                aria-label="Notifikationer"
-                                disableRipple
-                                sx={{
-                                    minWidth: 0,
-                                    padding: 0,
-                                    background: "transparent",
-                                    boxShadow: "none",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    "&:hover": { background: "transparent" },
-                                    "&:focus": { outline: "none" },
-                                    "&:focus-visible": { outline: "none" }
-                                }}
+                                aria-label="Notifikationer"                                
                             >
-                                <img src={notificationButton} alt="" className="notification-icon" />
+                                <img src={notificationBell} alt="" className="notification-icon" />
                             </Button>
 
                             {unreadCount > 0 && (
                                 <Box
                                     sx={{
                                         position: "absolute",
-                                        top: 2,
-                                        right: 2,
+                                        top: -1,
+                                        right: -1,
                                         backgroundColor: "var(--color-primary-soft)",
                                         color: "#374957",
                                         borderRadius: "50%",

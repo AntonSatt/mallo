@@ -71,6 +71,7 @@ const ActivityCalendarDialog = ({
                 </IconButton>
 
                 <SidebarCalendar
+                    transparentBackground
                     markedDates={markedDates}
                     onMarkedDayClick={handleMarkedDayClick}
                 />

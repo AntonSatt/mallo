@@ -35,13 +35,10 @@ const CustomDay = (props) => {
                         ? 'var(--color-primary)'
                         : 'var(--color-text-inverse)',
                     color: selected ? 'white' : 'inherit',
-                    // boxShadow: outsideCurrentMonth ? 'none' : '0 2px 4px rgba(0,0,0,0.15)',
                     boxShadow: disabled || outsideCurrentMonth ? 'none' : '0 2px 4px rgba(0,0,0,0.15)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    // opacity: outsideCurrentMonth ? 0.4 : 1,
-                    // '&:hover': { opacity: disabled ? 1 : 0.85 },
                     opacity: disabled || outsideCurrentMonth ? 0.3 : 1,
                     '&:hover': { opacity: disabled ? 0.3 : 0.85 },
                 }}

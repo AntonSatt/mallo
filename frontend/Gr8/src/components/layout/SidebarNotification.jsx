@@ -12,6 +12,7 @@ const SidebarNotification = ({ onSearch, isForumPage = false }) => {
     const [activityAlignment, setActivityAlignment] = useState("all");
 
     const [notifications, setNotifications] = useState([]);
+    const unreadCount = notifications.filter(n => !n.isSeen).length;
     const [searchValue, setSearchValue] = useState("");
 
     const [showAllPosts, setShowAllPosts] = useState(false);
@@ -115,7 +116,7 @@ const SidebarNotification = ({ onSearch, isForumPage = false }) => {
 
     return (
         <Stack className="notification-wrapper">
-            <Box className="search-bar">
+            <Box className="search-bar" sx={{ display: isForumPage ? "flex" : "none" }}>
                 <img
                     src={SearchHeartButton}
                     alt="Sök"
@@ -133,8 +134,11 @@ const SidebarNotification = ({ onSearch, isForumPage = false }) => {
             <Stack className="notification-box">
                 <Box className="notification-header">
                     <Box sx={{ display: "flex", alignItems: "center", gap: "15px" }}>
-                        <div className="notification-icon-wrapper">
+                        <div className="notification-icon-wrapper" style={{ position: "relative" }}>
                             <img src={NotificationRing} alt="" className="header-icon" />
+                            {unreadCount > 0 && (
+                                <div className="notification-badge">{unreadCount}</div>
+                            )}
                         </div>
                         <Typography className="header-title">Notifikationer</Typography>
                     </Box>

@@ -1,6 +1,6 @@
 import ChatSignalrServices from "../services/ChatSignalrServices";
 import { createContext, useContext, useEffect, useState } from "react";
-import { useAuth } from "./AuthContext.jsx";
+import { useAuth } from '../hooks/useAuth';
 
 // this file is used to keep track of online users in the application. It uses the ChatSignalrServices to 
 // listen for user online and offline events and updates the onlineUsers state accordingly. The context 

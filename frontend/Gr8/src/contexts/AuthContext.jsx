@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { requestNotificationPermission } from "../Firebase.js";
 import { registerAuthListener } from '../services/AuthServices';
 import UserServices from '../services/UserServices';
@@ -65,5 +65,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-// eslint-disable-next-line react-refresh/only-export-components
-export const useAuth = () => useContext(AuthContext);

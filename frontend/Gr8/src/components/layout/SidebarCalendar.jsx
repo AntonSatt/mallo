@@ -154,8 +154,17 @@ const SidebarCalendar = ({ showCreate = false, onCreatePost, markedDates = [], o
                                 className="calendar"
                                 showDaysOutsideCurrentMonth
                                 sx={{
+                                    width: '100%',
+                                    maxWidth: '100%',
                                     "& .MuiDayCalendar-weekContainer": {
-                                        justifyContent: "space-between"
+                                        justifyContent: "center",
+                                        gap: "4px",
+                                    },
+                                    "& .MuiDayCalendar-header": {
+                                        justifyContent: "center"
+                                    },
+                                    "& .MuiPickersSlideTransition-root": {
+                                        minHeight: '220px'
                                     }
                                 }}
                                 slots={{
@@ -181,18 +190,6 @@ const SidebarCalendar = ({ showCreate = false, onCreatePost, markedDates = [], o
                             />
                         </LocalizationProvider>
                     </Box>
-
-                    <Stack className="button-wrapper" direction="row">
-                        <PrimaryButton className="button-choice">
-                            <LocationOnOutlinedIcon sx={{ color: "var(--color-primary) !important" }} />
-                            <Typography className="button-title">Hitta</Typography>
-                        </PrimaryButton>
-
-                        <PrimaryButton className="button-choice">
-                            <BookmarkBorderIcon sx={{ color: "var(--color-primary) !important" }} />
-                            <Typography className="button-title">Favoriter</Typography>
-                        </PrimaryButton>
-                    </Stack>
                 </Box>
             </Stack>
         </Box>

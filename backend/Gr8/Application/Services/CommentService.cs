@@ -2,10 +2,6 @@
 using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Gr8.Application.Services
 {
@@ -25,11 +21,14 @@ namespace Gr8.Application.Services
         public async Task<List<CommentDto>> GetCommentsByPostAsync(int postId)
         {
             var comments = await _communityRepository.GetCommentsByPostAsync(postId);
+            var authorIdentities = await _applicationRepository.GetAuthorIdentitiesByUserIdsAsync(comments.Select(c => c.UserId));
 
             var commentsDtoList = new List<CommentDto>();
 
             foreach (var comment in comments)
             {
+                authorIdentities.TryGetValue(comment.UserId, out var authorIdentity);
+
                 var commentDto = new CommentDto
                 {
                     Id = comment.Id,
@@ -41,14 +40,12 @@ namespace Gr8.Application.Services
                     AuthorInfo = new AuthorDTO
                     {
                         Id = comment.UserId,
-                        AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(comment.UserId)
+                        AvatarId = authorIdentity?.AvatarId ?? 0,
+                        UserName = ResolveAuthorName(comment.AuthorDisplayName, authorIdentity?.UserName)
                     }
                 };
 
-                commentDto.AuthorInfo.UserName = await ResolveAuthorNameAsync(comment.UserId, comment.AuthorDisplayName);
-
                 commentsDtoList.Add(commentDto);
-
             }
 
             return commentsDtoList;
@@ -73,6 +70,9 @@ namespace Gr8.Application.Services
                 return null;
             }
 
+            var authorIdentities = await _applicationRepository.GetAuthorIdentitiesByUserIdsAsync(new[] { comment.UserId });
+            authorIdentities.TryGetValue(comment.UserId, out var authorIdentity);
+
             var resultDto = new CommentDto
             {
                 Id = comment.Id,
@@ -84,11 +84,10 @@ namespace Gr8.Application.Services
                 AuthorInfo = new AuthorDTO
                 {
                     Id = comment.UserId,
-                    AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(comment.UserId)
+                    AvatarId = authorIdentity?.AvatarId ?? 0,
+                    UserName = ResolveAuthorName(comment.AuthorDisplayName, authorIdentity?.UserName)
                 }
             };
-
-            resultDto.AuthorInfo.UserName = await ResolveAuthorNameAsync(comment.UserId, comment.AuthorDisplayName);
 
             await _notificationService.AddNotificationAsync(postId, NotificationTypes.CommentCreated, comment.UserId);
 
@@ -121,9 +120,14 @@ namespace Gr8.Application.Services
             var comment = await _communityRepository.GetCommentByIdAsync(commentId);
 
             if (comment == null)
+            {
                 return null;
+            }
 
-            var commentDto = new CommentDto
+            var authorIdentities = await _applicationRepository.GetAuthorIdentitiesByUserIdsAsync(new[] { comment.UserId });
+            authorIdentities.TryGetValue(comment.UserId, out var authorIdentity);
+
+            return new CommentDto
             {
                 Id = comment.Id,
                 Content = comment.Content,
@@ -134,13 +138,10 @@ namespace Gr8.Application.Services
                 AuthorInfo = new AuthorDTO
                 {
                     Id = comment.UserId,
-                    AvatarId = await _applicationRepository.GetAvatarIdByUserIdAsync(comment.UserId)
+                    AvatarId = authorIdentity?.AvatarId ?? 0,
+                    UserName = ResolveAuthorName(comment.AuthorDisplayName, authorIdentity?.UserName)
                 }
             };
-
-            commentDto.AuthorInfo.UserName = await ResolveAuthorNameAsync(comment.UserId, comment.AuthorDisplayName);
-
-            return commentDto;
         }
 
         public async Task<int> UpdateCommentAsync(CommentDto commentDto)
@@ -159,14 +160,14 @@ namespace Gr8.Application.Services
             return await _communityRepository.SaveChangesAsync();
         }
 
-        private async Task<string?> ResolveAuthorNameAsync(string userId, string? authorDisplayName)
+        private static string? ResolveAuthorName(string? authorDisplayName, string? fallbackUserName)
         {
             if (!string.IsNullOrWhiteSpace(authorDisplayName))
             {
                 return authorDisplayName;
             }
 
-            return await _applicationRepository.GetUserNameByIdAsync(userId);
+            return fallbackUserName;
         }
     }
 }

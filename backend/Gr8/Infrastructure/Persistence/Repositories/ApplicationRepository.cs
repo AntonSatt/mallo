@@ -1,4 +1,5 @@
 using Gr8.Application.Common.Formatting;
+using Gr8.Application.DTOs;
 using Gr8.Application.Interfaces;
 using Gr8.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -68,6 +69,33 @@ namespace Gr8.Infrastructure.Persistence.Repositories
 
             var fullName = AuthorNameFormatter.BuildCapitalizedFullName(authorIdentity.FirstName, authorIdentity.LastName);
             return fullName ?? authorIdentity.UserName;
+        }
+
+        public async Task<Dictionary<string, AuthorIdentityDto>> GetAuthorIdentitiesByUserIdsAsync(IEnumerable<string> userIds)
+        {
+            var distinctUserIds = userIds
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .Distinct()
+                .ToList();
+
+            if (distinctUserIds.Count == 0)
+            {
+                return new Dictionary<string, AuthorIdentityDto>();
+            }
+
+            var users = await _applicationDbContext.Users
+                .Where(u => distinctUserIds.Contains(u.Id))
+                .Select(u => new AuthorIdentityDto
+                {
+                    Id = u.Id,
+                    UserName = u.UserName,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    AvatarId = u.Avatar
+                })
+                .ToListAsync();
+
+            return users.ToDictionary(u => u.Id, u => u);
         }
     }
 }

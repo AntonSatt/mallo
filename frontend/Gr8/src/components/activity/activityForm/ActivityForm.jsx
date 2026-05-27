@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Dialog, Box, Typography, Paper, Stack, CircularProgress, IconButton, DialogContent } from "@mui/material";
+import { Dialog, Box, Typography, Paper, Stack, CircularProgress, IconButton, DialogContent, InputAdornment } from "@mui/material";
 import LinkIcon from '@mui/icons-material/Link';
 import SecondaryButton from "../../../design/buttons/SecondaryButton.jsx";
 import ActivityServices from "../../../services/ActivityService.jsx";
@@ -13,6 +13,7 @@ import 'dayjs/locale/sv';
 import CalendarPicker from "../calender/CalenderPicker.jsx";
 import TimePicker from "../time/TimePicker.jsx";
 import InputField from "../../../design/input/InputField.jsx";
+import CloseIcon from "../../../assets/icons/closeIcon.svg";
 
 dayjs.locale('sv');
 
@@ -272,11 +273,30 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                             )}
 
                             <Box sx={{ mt: 2, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, alignItems: 'center' }}>
-                                <InputField startIcon={<LinkIcon sx={{ color: "var(--color-primary)" }} />}
+                                <InputField
+                                    placeholder="Skriv länkadress"
                                     value={formData.Url || ""}
                                     onChange={(e) => setFormData({ ...formData, Url: e.target.value })}
-                                    placeholder="Skriv länkadress">
-                                </InputField>
+
+                                    sx={{
+                                        "& .MuiOutlinedInput-root": {
+                                            width: "100%", height: "40px"
+                                        },
+                                        "& .MuiInputBase-input::placeholder": {
+                                            fontSize: { xs: "10px", md: "15px" },
+                                        }
+                                    }}
+
+                                    slotProps={{
+                                        input: {
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <LinkIcon sx={{ color: "var(--color-primary)", rotate: "140deg" }} />
+                                                </InputAdornment>
+                                            ),
+                                        },
+                                    }}
+                                />
 
                                 <input
                                     type="file"
@@ -305,7 +325,7 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                                             sx={{ width: 48, height: 48, borderRadius: 1, objectFit: "cover", border: "1px solid var(--color-border)" }}
                                         />
                                         <IconButton size="small" onClick={handleRemoveImage}>
-                                            <CloseIcon fontSize="small" />
+                                            <img src={CloseIcon} alt="close" style={{ width: "25px", height: "25px" }} />
                                         </IconButton>
                                     </Box>
                                 ) : (
@@ -336,7 +356,10 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
                                     {<CalendarMonthOutlinedIcon
                                         sx={{ color: "var(--color-primary)" }}
                                     />
-                                    } onClick={() => setCalendarOpen(true)}
+                                    } onClick={() => {
+                                        setCalendarMode('start');
+                                        setCalendarOpen(true);
+                                    }}
                                 >
                                     Datum & tid
                                 </SecondaryButton>
@@ -364,6 +387,7 @@ const ActivityForm = ({ open, handleClose, onSuccess, activityToEdit }) => {
             <CalendarPicker
                 open={calendarOpen}
                 onClose={() => setCalendarOpen(false)}
+                mode={calendarMode}
                 value={calendarMode === 'start' ? formData.startAt : formData.endAt}
                 onChange={(newDate) => {
                     if (calendarMode === 'start') {

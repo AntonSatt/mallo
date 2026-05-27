@@ -130,19 +130,20 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
             <Box sx={{
                 bgcolor: 'var(--color-primary-soft)',
                 p: 0,
+                pt: 1,
                 pb: 2,
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'flex-start'
+                alignItems: "center"
             }}>
                 <Typography variant="h7" sx={{
                     fontWeight: 600,
                     paddingLeft: 2,
-                    paddingTop: 1
+                    lineHeight: 1.2,
                 }}>
                     {activity.title}
                 </Typography>
-                <Box onClick={(e) => e.stopPropagation()} sx={{ paddingTop: 1, paddingRight: 1 }}>
+                <Box onClick={(e) => e.stopPropagation()} sx={{ paddingRight: 1 }}>
                     <BookmarkButton
                         isBookmarked={activity.isBookmarked}
                         onToggle={async () => {
@@ -304,15 +305,15 @@ const ActivityCard = ({ activity, distance, currentUserId, onCardAction, onBookm
                             mb: 1,
                             px: 0.5,
                             overflow: 'auto',
-                            height: '90px',
+                            height: '100%',
                         }}>
                             <Box
                                 component="img"
                                 src={activity.imageUrl}
                                 alt={activity.title || "Aktivitetsbild"}
                                 sx={{
-                                    width: '100%',
                                     maxHeight: '200px',
+                                    maxWidth: '200px',
                                     objectFit: 'cover',
                                     borderRadius: '15px',
                                     border: '1px solid var(--color-border-light)',

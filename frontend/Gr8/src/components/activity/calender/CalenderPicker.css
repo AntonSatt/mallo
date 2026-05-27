@@ -1,25 +1,23 @@
 .calendar-container {
     background-color: #F8F9FA;
-    border-radius: 15px;
-    padding: 5px;
-    height: 300px;
-    overflow: hidden;
-}
-
-.sidebar-search-input .MuiOutlinedInput-root {
-    background-color: var(--color-text-inverse) !important;
+    border-radius: 20px;
+    padding: 15px 10px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .custom-calendar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 15px;
+    padding: 5px 10px 15px 10px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .nav-arrow {
-    width: 25px;
-    height: 25px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     border: none;
     background-color: var(--color-text-inverse);
@@ -27,24 +25,30 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    transition: transform 0.1s ease;
+}
+
+.nav-arrow:active {
+    transform: scale(0.95);
 }
 
 .date-selection-container {
     display: flex;
-    gap: 5px;
+    gap: 8px;
 }
 
 .select-pill {
     background-color: var(--color-text-inverse);
-    padding: 4px 10px;
+    padding: 6px 14px;
     border-radius: 8px;
     font-weight: 800;
-    font-size: 16px;
+    font-size: 15px;
     position: relative;
     display: flex;
     align-items: center;
     text-transform: capitalize;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .orange-corner {

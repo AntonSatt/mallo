@@ -5,7 +5,52 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import dayjs from 'dayjs';
-import "../calender/CalenderPicker.css";
+import "./CalenderPicker.css";
+
+const CustomDay = (props) => {
+    const { day, outsideCurrentMonth, onDaySelect, selected, disabled } = props;
+
+    const handleSelect = (event) => {
+        if (!disabled && onDaySelect) {
+            onDaySelect(day, 'finish', event);
+        }
+    };
+
+    return (
+        <Box sx={{ position: 'relative', display: 'inline-flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+            <Box
+                component="button"
+                type="button"
+                onClick={handleSelect}
+                disabled={disabled}
+                sx={{
+                    width: { xs: '32px', sm: '36px' },
+                    height: { xs: '32px', sm: '36px' },
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: disabled ? 'default' : 'pointer',
+                    fontWeight: 600,
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    backgroundColor: selected
+                        ? 'var(--color-primary)'
+                        : 'var(--color-text-inverse)',
+                    color: selected ? 'white' : 'inherit',
+                    // boxShadow: outsideCurrentMonth ? 'none' : '0 2px 4px rgba(0,0,0,0.15)',
+                    boxShadow: disabled || outsideCurrentMonth ? 'none' : '0 2px 4px rgba(0,0,0,0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    // opacity: outsideCurrentMonth ? 0.4 : 1,
+                    // '&:hover': { opacity: disabled ? 1 : 0.85 },
+                    opacity: disabled || outsideCurrentMonth ? 0.3 : 1,
+                    '&:hover': { opacity: disabled ? 0.3 : 0.85 },
+                }}
+            >
+                {day.date()}
+            </Box>
+        </Box>
+    );
+};
 
 const CustomCalendarHeader = (props) => {
     const { currentMonth, onMonthChange } = props;
@@ -16,7 +61,7 @@ const CustomCalendarHeader = (props) => {
     return (
         <Box className="custom-calendar-header">
             <button className="nav-arrow" onClick={selectPreviousMonth}>
-                <ArrowBackIosNewIcon sx={{ fontSize: 14 }} />
+                <ArrowBackIosNewIcon sx={{ fontSize: { xs: 12, sm: 14 } }} />
             </button>
 
             <Box className="date-selection-container">
@@ -32,13 +77,14 @@ const CustomCalendarHeader = (props) => {
             </Box>
 
             <button className="nav-arrow" onClick={selectNextMonth}>
-                <ArrowForwardIosIcon sx={{ fontSize: 14 }} />
+                <ArrowForwardIosIcon sx={{ fontSize: { xs: 12, sm: 14 } }} />
             </button>
         </Box>
     );
 };
 
-const CalendarPicker = ({ open, onClose, value, onChange }) => {
+const CalendarPicker = ({ open, onClose, value, onChange, mode }) => {
+    const minAllowedDate = mode === 'end' ? dayjs(value) : dayjs();
     return (
         <Dialog
             open={open}
@@ -46,9 +92,11 @@ const CalendarPicker = ({ open, onClose, value, onChange }) => {
             maxWidth={false}
             sx={{
                 "& .MuiPaper-root": {
-                    borderRadius: "40px",
-                    padding: "40px",
-                    width: "550px",
+                    borderRadius: { xs: "24px", sm: "40px" },
+                    padding: { xs: "24px 16px", sm: "40px" },
+                    width: "100%",
+                    maxWidth: "500px",
+                    margin: "16px",
                     backgroundColor: "white !important",
                     backgroundImage: "none",
                 }
@@ -58,18 +106,22 @@ const CalendarPicker = ({ open, onClose, value, onChange }) => {
                 onClick={onClose}
                 sx={{
                     position: 'absolute',
-                    right: 20,
-                    top: 20,
+                    right: { xs: 12, sm: 20 },
+                    top: { xs: 12, sm: 20 },
                     color: '#FFB37C',
                     zIndex: 1,
                 }}
             >
-                <CancelOutlinedIcon sx={{ fontSize: '30px' }} />
+                <CancelOutlinedIcon sx={{ fontSize: { xs: '24px', sm: '30px' } }} />
             </IconButton>
 
-            <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="h5" sx={{ mb: 4, fontWeight: 500 }}>
-                    Välj <span style={{ color: "var(--color-primary)", fontWeight: 700 }}>startdatum</span>
+            <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column', overflow: 'visible' }}>
+                <Typography variant="h5" sx={{ mb: { xs: 2, sm: 4 }, fontWeight: 500, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+                    Välj {mode === 'end' ? (
+                        <span style={{ color: "var(--color-primary)", fontWeight: 700 }}>slutdatum</span>
+                    ) : (
+                        <span style={{ color: "var(--color-primary)", fontWeight: 700 }}>startdatum</span>
+                    )}
                 </Typography>
 
                 <Box className="calendar-container">
@@ -78,10 +130,16 @@ const CalendarPicker = ({ open, onClose, value, onChange }) => {
                             value={value}
                             onChange={onChange}
                             showDaysOutsideCurrentMonth
+                            // disablePast
+                            minDate={minAllowedDate}
                             slots={{
                                 calendarHeader: CustomCalendarHeader,
+                                day: CustomDay,
                             }}
                             slotProps={{
+                                day: (ownerState) => ({
+                                    disabled: ownerState.disabled,
+                                }),
                                 calendarHeader: {
                                     sx: {
                                         '& .MuiPickersCalendarHeader-labelContainer': { display: 'none' },
@@ -91,20 +149,20 @@ const CalendarPicker = ({ open, onClose, value, onChange }) => {
                             }}
                             sx={{
                                 width: '100%',
+                                height: 'auto',
                                 backgroundColor: 'transparent',
-                                '& .MuiDayCalendar-header': { justifyContent: 'space-between' },
-                                '& .MuiDayCalendar-weekContainer': { justifyContent: 'space-between' },
-                                '& .MuiPickersDay-root': {
-                                    backgroundColor: "var(--color-text-inverse)",
-                                    borderRadius: "8px",
-                                    boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
-                                    fontWeight: 600,
-                                    margin: '3px',
-                                    '&.Mui-selected': {
-                                        backgroundColor: "var(--color-primary) !important",
-                                        color: "var(--color-text-inverse) !important",
-                                    },
-                                }
+                                '& .MuiDayCalendar-header': {
+                                    justifyContent: 'space-between',
+                                    '& .MuiTypography-root': {
+                                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                                        width: { xs: '32px', sm: '36px' }
+                                    }
+                                },
+                                '& .MuiDayCalendar-weekContainer': {
+                                    justifyContent: 'space-between',
+                                    margin: { xs: '4px 0', sm: '8px 0' }
+                                },
+                                '& .MuiPickersDay-root': { display: 'none !important' }
                             }}
                         />
                     </LocalizationProvider>

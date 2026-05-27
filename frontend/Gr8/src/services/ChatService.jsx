@@ -4,9 +4,10 @@ import ApiClient from "../api/ApiClient";
 
 const ChatService = {
     getConversations: async () => {
-        const response = await ApiClient.get(`/chat/conversations`);
-        return response.data;
-    },
+    const response = await ApiClient.get(`/chat/conversations`);
+
+    return response.data;
+},
 
     getChatHistory: async (otherUserId) => {
         const response = await ApiClient.get(`/chat/history/${otherUserId}`);

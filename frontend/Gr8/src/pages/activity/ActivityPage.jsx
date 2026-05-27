@@ -345,7 +345,7 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                 }
                 return 0;
             });
-    }, [activities, userCoords, searchQuery, activeFilters, currentUserId]);
+    }, [activities, userCoords, searchQuery, activeFilters, currentUserId, geolocationPermissionState]);
 
     return (
 
@@ -381,7 +381,7 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
             {/* Search header */}
             <Box className="activity-search-header" sx={{
                 bgcolor: 'var(--color-primary-soft)',
-                pt: 3, pb: 2,
+                pt: 2, pb: 2,
                 px: 2,
                 display: 'flex',
                 borderTopLeftRadius: "20px",
@@ -407,14 +407,14 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                             "& .MuiOutlinedInput-root": {
                                 height: 50,
                                 borderRadius: 25,
-                                width: { xs: "220px", md: '280px' },
+                                width: { xs: "235px", md: '300px' },
                                 bgcolor: 'white !important'
                             },
                         }}
                         slotProps={{
                             input: {
-                                endAdornment: (
-                                    <InputAdornment position="end">
+                                startAdornment: (
+                                    <InputAdornment position="start">
                                         <img
                                             src={SearchHeart}
                                             alt="search"
@@ -607,7 +607,8 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
             </Box>
 
             <ActivityFilter
-                open={filterOpen}
+                key={filterOpen ? "filter-open" : "filter-closed"}
+                open={filterOpen === true}
                 onClose={() => setFilterOpen(false)}
                 currentFilters={activeFilters}
                 onApply={setActiveFilters}

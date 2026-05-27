@@ -1,6 +1,6 @@
 import './ConversationPage.css';
 import { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Box, Typography, IconButton, Paper } from "@mui/material";
 import { useOnlineUsers } from "../../../contexts/OnlineUsersContext.jsx";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
@@ -16,6 +16,8 @@ const ConversationPage = () => {
     const { isUserOnline } = useOnlineUsers();
     const { userId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
+    const fallbackConversation = location.state;
     const { isDesktop } = useViewport();
 
     const [messages, setMessages] = useState([]);
@@ -33,15 +35,18 @@ const ConversationPage = () => {
 
         const loadConversation = async () => {
             try {
-                const conversations = await ChatService.getConversations();
-                const selectedConversation = conversations?.find(
+                const conversationsData = await ChatService.getConversations();
+                const conversations = Array.isArray(conversationsData) ? conversationsData : [];
+
+                const selectedConversation = conversations.find(
                     (conversation) => conversation.otherUserId === userId
                 );
 
-                setConversationInfo(selectedConversation ?? null);
+                setConversationInfo(selectedConversation ?? fallbackConversation ?? null);
 
                 const history = await ChatService.getChatHistory(userId);
-                setMessages(history ?? []);
+
+                setMessages(Array.isArray(history) ? history : []);
 
                 await ChatSignalrServices.markConversationAsRead(userId);
 

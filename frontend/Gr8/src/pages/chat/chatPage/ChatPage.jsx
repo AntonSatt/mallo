@@ -58,8 +58,8 @@ const ChatPage = () => {
                 });
 
                 const conversationsData = await ChatService.getConversations();
-                setConversations(conversationsData ?? []);
-
+                setConversations(Array.isArray(conversationsData) ? conversationsData : []);
+                
             } catch (error) {
                 console.error("Failed to initialize chat:", error);
                 setError(error.message || "Kunde inte ladda chatten. Försök igen senare.");

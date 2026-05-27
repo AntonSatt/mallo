@@ -66,14 +66,14 @@ const TimePicker = ({ open, onClose, formData, onOpenCalendar, setFormData }) =>
                 onClick={onClose}
                 sx={{
                     position: 'absolute',
-                    right: { xs: 6, md: 12 },
-                    top: { xs: 2, md: 20 },
+                    right: { xs: 10, md: 12 },
+                    top: { xs: 10, md: 20 },
                     color: 'var(--color-primary)',
                     p: 0.5,
                     zIndex: 10,
                 }}
             >
-                <CancelOutlinedIcon sx={{ fontSize: { xs: '25px', md: '35px' } }} />
+                <CancelOutlinedIcon sx={{ fontSize: { xs: '30px', md: '35px' } }} />
             </IconButton>
 
             <DialogContent sx={{ p: 0, pt: 0, bgcolor: "transparent", display: "flex", flexDirection: "column", height: "100%" }}>
@@ -83,10 +83,10 @@ const TimePicker = ({ open, onClose, formData, onOpenCalendar, setFormData }) =>
                     sx={{
                         p: 3,
                         display: 'flex',
-                        justifyContent: { xs: 'space-between', md: 'center' },
+                        justifyContent: "flex-start",
                         alignItems: 'center',
-                        gap: { xs: 0, md: 5 },
-                        mt: { xs: 1, md: 6 }
+                        gap: { xs: 0, md: 3 },
+                        mt: { xs: 1, md: 5 }
                     }}
                 >
                     <Box sx={{
@@ -100,20 +100,6 @@ const TimePicker = ({ open, onClose, formData, onOpenCalendar, setFormData }) =>
                     }}>
                         {formData.startAt ? formData.startAt.format('D MMMM') : "Välj datum"}
                     </Box>
-
-                    <Stack direction="row" spacing={1} alignItems="center"
-                        sx={{
-                            bgcolor: 'white',
-                            borderRadius: '30px',
-                            px: 2, py: 0.5,
-                            boxShadow: "2px 3px 2px rgba(0,0,0,0.12)",
-                            paddingLeft: 1
-                        }}>
-                        <Typography variant="body2">
-                            Återkommande
-                        </Typography>
-                        <Switch bgcolor="var(--color-primary)" size="small" />
-                    </Stack>
                 </Box>
 
                 <Divider sx={{ borderColor: "var(--color-bg-muted)", mx: 2, borderBottomWidth: 3 }} />
@@ -132,6 +118,7 @@ const TimePicker = ({ open, onClose, formData, onOpenCalendar, setFormData }) =>
                         }}
                         sx=
                         {{
+                            cursor: 'pointer',
                             bgcolor: 'white',
                             py: 0.8, px: 1,
                             borderRadius: '20px',
@@ -193,6 +180,7 @@ const TimePicker = ({ open, onClose, formData, onOpenCalendar, setFormData }) =>
                             onClose();
                         }}
                         sx={{
+                            cursor: 'pointer',
                             bgcolor: 'white',
                             px: 1, py: 0.8,
                             borderRadius: '20px',
@@ -260,7 +248,7 @@ const TimePicker = ({ open, onClose, formData, onOpenCalendar, setFormData }) =>
                             textTransform: 'none',
                             padding: window.innerWidth >= 1024 ? "8px 24px" : "12px",
                             fontSize: window.innerWidth >= 1024 ? "0.9rem" : "1rem",
-                            maxWidth: window.innerWidth >= 1024 ? "200px" : "100%"
+                            maxWidth: window.innerWidth >= 1024 ? "220px" : "200px"
                         }}
                     >
                         Bekräfta

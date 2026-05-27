@@ -49,6 +49,8 @@ import {
     requestPermission
 } from "../../utils/browserPermissions.js";
 import AboutDialog from "./AboutDialog.jsx";
+import notificationBell from "../../assets/icons/notificationBellOrange.svg";
+import paperPlane from "../../assets/icons/paperPlaneOrange.svg";
 
 // User Settings Page: Provides an interface for users to update their profile information, change their password, and delete their account. 
 // Utilizes accordions for organized sections and handles form validation and API interactions for user data management.
@@ -773,7 +775,11 @@ const UserSettings = () => {
                         <AccordionSummary className="switch-row-summary" component="div">
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', px: 0.5, py: 1 }}>
                                 <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                    <LocationOnOutlinedIcon sx={{ color: 'var(--color-primary)', width: 20, height: 20 }} />
+                                    <img src={paperPlane} alt="edit" style={{
+                                        width: 20,
+                                        height: 20,
+                                        color: 'var(--color-primary)'
+                                    }} />
                                     Platstjänster
                                 </Typography>
                                 <Box className="permissionStateActions">
@@ -804,7 +810,11 @@ const UserSettings = () => {
                         <AccordionSummary className="switch-row-summary" component="div">
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', px: 0.5, py: 1 }}>
                                 <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                    <CircleNotificationsIcon sx={{ color: 'var(--color-primary)', width: 20, height: 20 }} />
+                                    <img src={notificationBell} alt="edit" style={{
+                                        width: 20,
+                                        height: 20,
+                                        color: 'var(--color-primary)'
+                                    }} />
                                     Notifikationer
                                 </Typography>
                                 <Box className="permissionStateActions">

@@ -33,13 +33,13 @@
 #heart-red-right {
     bottom: -20px;
     right: -20px;
-    width: 150px;
+    width: 120px;
 }
 
 #heart-pink-mobile-left-mid {
     bottom: 70px;
-    left: 85px;
-    width: 90px;
+    left: 90px;
+    width: 70px;
     z-index: -1;
 }
 

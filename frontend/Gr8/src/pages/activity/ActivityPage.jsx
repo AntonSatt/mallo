@@ -659,7 +659,7 @@ const ActivityPage = ({ markedDates = [], onMarkedDatesChange, highlightedActivi
                 </Box>
                 <PrimaryButton
                     onClick={handleShowActivity}
-                    sx={{ width: "250px", mb: 4, mt: 2, ml: 4 }}
+                    sx={{ width: "250px", mb: 4, mt: 2, ml: { xs: 2.5, md: 4 } }}
                 >
                     Visa aktivitet
                 </PrimaryButton>

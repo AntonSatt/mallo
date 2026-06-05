@@ -12,7 +12,6 @@ _A Swedish-language community platform where members share posts, find local act
 
 <br />
 
-[![pipeline](https://git.chas-lab.dev/chas-challenge-2026/grupp-8/project/badges/develop/pipeline.svg)](https://git.chas-lab.dev/chas-challenge-2026/grupp-8/project/-/pipelines)
 ![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet&logoColor=white)
 ![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![MSSQL 2022](https://img.shields.io/badge/MSSQL-2022-CC2927?logo=microsoftsqlserver&logoColor=white)
